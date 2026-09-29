@@ -10,11 +10,43 @@ const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
 const supabase = url && key ? createClient(url, key) : null
 const nav = ['Home', 'Schedule', 'Standings', 'Teams', 'Player Stats', 'Team Stats', 'Transactions', 'Sluggers Fantasy', 'Draft', 'Free Agency']
 const fantasyNav = ['Matchups', 'Schedule', 'Standings', 'Player Stats', 'Free Agency', 'Draft']
-const stats = [
-  ['games', 'G'], ['atBats', 'AB'], ['hits', 'H'], ['homeRuns', 'HR'], ['average', 'AVG'],
-  ['rbi', 'RBI'], ['runs', 'R'], ['obp', 'OBP'], ['slugging', 'SLG'], ['ops', 'OPS'],
-  ['strikeouts', 'K'], ['era', 'ERA'], ['fantasyAverage', 'FPTS/G'],
-]
+// Project Rio's export headings, grouped for browsing. Helper columns are export internals.
+const statGroups = {
+  'Offensive Stats': [
+    ['atBats', 'At-Bats'], ['plateAppearances', 'Plate Appearances'], ['runs', 'Runs'],
+    ['hits', 'Hits'], ['rbi', 'RBI'], ['batStrikeouts', 'Strikeouts'], ['batWalks', 'Walks'],
+    ['hitByPitch', 'Hit By Pitch'], ['singles', 'Singles'], ['doubles', 'Doubles'],
+    ['triples', 'Triples'], ['homeRuns', 'Home Runs'], ['oneHr', '1HR'], ['twoHr', '2HR'],
+    ['threeHr', '3HR'], ['grandSlams', 'Grand Slams'], ['itpHomeRuns', 'ITP Home Runs'],
+    ['totalBases', 'Total Bases'], ['sacFlys', 'Sac Flys'],
+    ['doublePlaysHitInto', 'Double Plays Hit Into'], ['triplePlaysHitInto', 'Triple Plays Hit Into'],
+    ['buddyJumpsHitInto', 'Buddy Jumps Hit Into'], ['starSwings', 'Star Swings'],
+    ['starHits', 'Star Hits'], ['batStarsUsed', 'Stars Used'],
+    ['battingAverage', 'Batting Average'], ['onBase', 'On Base %'], ['slug', 'Slug %'],
+    ['onBasePlusSlug', 'On Base + Slug'], ['starSlug', 'Star Slug %'],
+    ['stolenBases', 'Stolen Bases'], ['caughtStealing', 'Caught Stealing'],
+    ['stealAttempts', 'Steal Attempts'],
+  ],
+  'Defensive Stats': [
+    ['putouts', 'Putouts'], ['assists', 'Assists'], ['buddyJumpPutouts', 'Buddy Jump Putouts'],
+    ['buddyJumpAttempts', 'Buddy Jump Attempts'], ['doublePlays', 'Double Plays'],
+    ['triplePlays', 'Triple Plays'], ['bobbles', 'Bobbles'],
+  ],
+  'Pitching Stats': [
+    ['battersFaced', 'Batters Faced'], ['inningsPitched', 'Innings Pitched'],
+    ['pitches', 'Pitches'], ['strikes', 'Strikes'], ['balls', 'Balls'],
+    ['pitchStrikeouts', 'Strikeouts'], ['pitchWalks', 'Walks'], ['beanBalls', 'Bean Balls'],
+    ['hitsAllowed', 'Hits Allowed'], ['runsAllowed', 'Runs Allowed'],
+    ['singlesAllowed', 'Singles Allowed'], ['doublesAllowed', 'Doubles Allowed'],
+    ['triplesAllowed', 'Triples Allowed'], ['hrAllowed', 'HR Allowed'],
+    ['earnedRuns', 'Earned Runs'], ['inheritedRuns', 'Inherited Runs'],
+    ['starPitches', 'Star Pitches'], ['pitchStarsUsed', 'Stars Used'],
+    ['pickoffs', 'Pickoffs'], ['pickoffAttempts', 'Pickoff Attempts'],
+    ['era7', 'ERA-7'], ['era9', 'ERA-9'], ['whip', 'WHIP'],
+    ['baAgainst', 'BA Against'], ['obAgainst', 'OB% Against'],
+    ['slgAgainst', 'SLG Against'], ['opsAgainst', 'OPS Against'],
+  ],
+}
 
 function Empty({ icon: Icon = CalendarDays, title, children }) {
   return <div className="empty"><span className="empty-icon"><Icon size={28} strokeWidth={1.8}/></span><h3>{title}</h3><p>{children}</p></div>
@@ -36,6 +68,7 @@ function App() {
   const [leagueName, setLeagueName] = useState('')
   const [joinCode, setJoinCode] = useState('')
   const [query, setQuery] = useState('')
+  const [statTab, setStatTab] = useState('Offensive Stats')
   const [sort, setSort] = useState({ key: 'id', direction: 'asc' })
   const [selectedPlayer, setSelectedPlayer] = useState(null)
 
@@ -94,7 +127,7 @@ function App() {
           <div className="side-stack"><div className="panel compact"><SectionTitle kicker="ON DECK" right={<CalendarDays size={19}/>}>UPCOMING MATCHES</SectionTitle><Empty title="Schedule coming soon">Matchups will appear when the season schedule is set.</Empty></div><div className="panel compact"><SectionTitle kicker="FINAL SCORES" right={<Trophy size={19}/>}>RECENT RESULTS</SectionTitle><Empty icon={Trophy} title="No games yet">Results will appear after the first game is uploaded.</Empty></div></div></div>
         <div className="home-bottom"><div className="panel news-panel"><SectionTitle kicker="FROM AROUND THE LEAGUE">LATEST NEWS</SectionTitle><div className="news-item"><span className="news-mark">★</span><div><small>LEAGUE UPDATE</small><h3>The player pool is ready</h3><p>Browse all {players.length} players before teams and the season schedule are announced.</p></div><button aria-label="Browse players" onClick={() => go('Player Stats')}>›</button></div></div><div className="panel standings-panel"><SectionTitle kicker="THE RACE" right={<button className="text-link" onClick={() => go('Standings')}>FULL STANDINGS ›</button>}>STANDINGS</SectionTitle><Empty icon={Shield} title="Teams coming soon">Standings begin when teams and results are added.</Empty></div></div>
       </>}
-      {page === 'Player Stats' && <><div className="page-heading"><span className="eyebrow dark">THE PLAYER POOL</span><h1>PLAYER STATS</h1><p>{players.length} players from the supplied master sheet. Game statistics will appear after valid game data is uploaded.</p></div><div className="panel data-panel"><div className="table-tools"><div className="search"><Search size={19}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search players" aria-label="Search players"/></div><span>{filtered.length} PLAYERS</span></div><div className="table-scroll"><table><thead><tr>{[['id','#'],['name','PLAYER'],['class','CLASS'],['source','SOURCE'],...stats].map(([key,label]) => <th key={key}><button onClick={() => sortBy(key)} aria-label={`Sort by ${label}`}>{label}{sort.key === key ? (sort.direction === 'asc' ? <ArrowUp size={13}/> : <ArrowDown size={13}/>) : null}</button></th>)}</tr></thead><tbody>{filtered.map(p => <tr key={p.id} onClick={() => setSelectedPlayer(p)} tabIndex={0} onKeyDown={e => e.key === 'Enter' && setSelectedPlayer(p)}><td>{p.id}</td><td className="player-cell"><span className="player-avatar">{p.name.slice(0,1)}</span><strong>{p.name}</strong></td><td>{p.class}</td><td>{p.source}</td>{stats.map(([key]) => <td key={key}>{p[key] ?? '—'}</td>)}</tr>)}</tbody></table></div><p className="table-footnote">Tap a heading to sort. A dash means no verified game stat is available yet.</p></div></>}
+      {page === 'Player Stats' && <><div className="page-heading"><span className="eyebrow dark">THE PLAYER POOL</span><h1>PLAYER STATS</h1><p>{players.length} players from the supplied master sheet. These are the tracked stat categories; game statistics will appear after verified results are uploaded.</p></div><div className="subnav stat-tabs" role="tablist" aria-label="Player stat categories">{Object.keys(statGroups).map(category => <button key={category} role="tab" aria-selected={statTab === category} className={statTab === category ? 'active' : ''} onClick={() => { setStatTab(category); setSort({ key: 'id', direction: 'asc' }) }}>{category}</button>)}</div><div className="panel data-panel"><div className="table-tools"><div className="search"><Search size={19}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search players" aria-label="Search players"/></div><span>{filtered.length} PLAYERS</span></div><div className="table-scroll" role="tabpanel" aria-label={statTab}><table><thead><tr>{[['id','#'],['name','PLAYER'],['class','CLASS'],['source','SOURCE'],...statGroups[statTab]].map(([key,label]) => <th key={key}><button onClick={() => sortBy(key)} aria-label={`Sort by ${label}`}>{label}{sort.key === key ? (sort.direction === 'asc' ? <ArrowUp size={13}/> : <ArrowDown size={13}/>) : null}</button></th>)}</tr></thead><tbody>{filtered.map(p => <tr key={p.id} onClick={() => setSelectedPlayer(p)} tabIndex={0} onKeyDown={e => e.key === 'Enter' && setSelectedPlayer(p)}><td>{p.id}</td><td className="player-cell"><span className="player-avatar">{p.name.slice(0,1)}</span><strong>{p.name}</strong></td><td>{p.class}</td><td>{p.source}</td>{statGroups[statTab].map(([key]) => <td key={key}>{p[key] ?? '—'}</td>)}</tr>)}</tbody></table></div><p className="table-footnote">Tap a heading to sort. A dash means no verified game stat is available yet. Scroll sideways to see more columns.</p></div></>}
       {page === 'Sluggers Fantasy' && <><div className="page-heading fantasy-heading"><span className="eyebrow dark">PLAY WITH FRIENDS</span><h1>SLUGGERS FANTASY</h1><p>Build a fantasy league, invite friends, and follow your matchups.</p></div>{!session ? <div className="panel gateway"><div className="gateway-icon">★</div><h2>YOUR LEAGUE IS WAITING</h2><p>Sign in with your email to create a fantasy league or join one with an invite code.</p><button className="red-btn" onClick={() => setAuthOpen(true)}>SIGN IN TO FANTASY</button>{!supabase && <p className="setup-note">Account setup is pending for this site.</p>}</div> : <div className="fantasy-layout"><aside className="panel league-sidebar"><SectionTitle kicker="YOUR FANTASY">LEAGUES</SectionTitle>{leagues.map(l => <button key={l.id} className={`league-choice ${selectedLeague?.id === l.id ? 'selected' : ''}`} onClick={() => setSelectedLeague(l)}><span>★</span>{l.name}</button>)}{!leagues.length && <p className="muted">No leagues yet. Create one or enter an invite code.</p>}<form onSubmit={createLeague}><label htmlFor="league-name">CREATE A LEAGUE</label><input id="league-name" required maxLength={60} value={leagueName} onChange={e => setLeagueName(e.target.value)} placeholder="League name"/><button disabled={busy} className="red-btn">CREATE LEAGUE</button></form><form onSubmit={joinLeague}><label htmlFor="invite-code">JOIN WITH A CODE</label><input id="invite-code" required value={joinCode} onChange={e => setJoinCode(e.target.value)} placeholder="Invite code"/><button disabled={busy} className="outline-btn">JOIN LEAGUE</button></form></aside><div className="panel fantasy-main">{selectedLeague ? <><div className="fantasy-title"><div><small>FANTASY LEAGUE</small><h2>{selectedLeague.name}</h2></div><div className="invite">INVITE CODE <strong>{selectedLeague.invite_code}</strong></div></div><div className="subnav">{fantasyNav.map(n => <button className={fantasyTab === n ? 'active' : ''} key={n} onClick={() => setFantasyTab(n)}>{n}</button>)}</div><Empty icon={fantasyTab === 'Standings' ? Trophy : CalendarDays} title={`${fantasyTab} coming soon`}>{fantasyTab === 'Player Stats' ? 'Average fantasy points will appear after games are scored.' : 'This view will populate when the fantasy draft and season data are available.'}</Empty></> : <Empty icon={Trophy} title="Create or join a league">Your fantasy league will appear here.</Empty>}</div></div>}{message && <p className="inline-message" role="status">{message}</p>}</>}
       {page === 'Schedule' && <BasicPage kicker="GAME DAYS" title="SEASON SCHEDULE" icon={CalendarDays} empty="No games scheduled yet" detail="The season schedule will appear here once it is announced."/>}
       {page === 'Standings' && <BasicPage kicker="THE RACE" title="STANDINGS" icon={Trophy} empty="Standings begin on opening day" detail="Teams and game results will determine the standings."/>}
