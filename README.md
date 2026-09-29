@@ -5,12 +5,19 @@ A GitHub Pages-ready front end for the league, using the approved USA Supa Leagu
 ## What works now
 
 - Responsive Home, Schedule, Standings, Teams, Player Stats, Team Stats, Transactions, Sluggers Fantasy, Draft, and Free Agency views.
-- Search and sortable player directory; player details; unassigned player list.
+- Search and sortable player directory with Offensive, Defensive, and Pitching columns, plus Totals and Averages per Game views.
+- Games Played appears before At-Bats and remains a whole-number total in either view.
 - Email magic-link sign-in through Supabase Auth after setup.
 - Signed-in users can create fantasy leagues and join by invite code. Database row-level security restricts league and membership reads to members.
 - GitHub Actions builds and deploys the site to GitHub Pages.
 
-The season schedule, team rosters, games, trade approval, league draft, fantasy draft, scoring, and Project Rio XLSX import need actual league setup/rules and a sample game export. Their views currently show honest empty states. No game statistics or scores are fabricated.
+The season schedule, team rosters, scores, trade approval, league draft, fantasy draft, scoring, and import of other Project Rio stats still need league setup. Their views currently show honest empty states. No game statistics or scores are fabricated.
+
+## Upload official games for Games Played
+
+Upload each official Project Rio `.xlsx` report to the repository's [`games/`](games/) folder on `main` using **Add file → Upload files → Commit changes**. The Pages workflow rebuilds Games Played automatically. Each player listed in the report's `Stats` sheet counts once for that game, including pitchers and players with no at-bats. Team total rows and duplicate copies of the exact same report are ignored. Unknown player names stop deployment so they can be corrected before the count changes.
+
+There is no upload form on the public site yet. Only Games Played is imported from these files; other columns remain blank until the full stats importer is built. The sample report used to design the columns is not in `games/`.
 
 ## Run locally
 
@@ -45,6 +52,6 @@ The generated invite code is visible to league members. Anyone with that code an
 - Team names, owners, roster size and draft order/date.
 - Season schedule and transaction approval rules.
 - Fantasy scoring weights, roster composition, draft order, and season cutoff.
-- A real Project Rio game XLSX export so its sheets/columns can be mapped and validated before importing official stats and calculating fantasy results.
+- Final rules for importing the other Project Rio stats and calculating fantasy results.
 
 Player data is in `src/players.json`; each record has ID, name, class, color and source. The current workbook's calculated game-stat cells are intentionally omitted.
