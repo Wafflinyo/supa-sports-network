@@ -1,0 +1,114 @@
+import React, { useEffect, useMemo, useState } from 'react'
+import { createRoot } from 'react-dom/client'
+import { createClient } from '@supabase/supabase-js'
+import { ArrowDown, ArrowUp, CalendarDays, CircleUserRound, Menu, Search, Shield, Trophy, X } from 'lucide-react'
+import players from './players.json'
+import './styles.css'
+
+const url = import.meta.env.VITE_SUPABASE_URL
+const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+const supabase = url && key ? createClient(url, key) : null
+const nav = ['Home', 'Schedule', 'Standings', 'Teams', 'Player Stats', 'Team Stats', 'Transactions', 'Sluggers Fantasy', 'Draft', 'Free Agency']
+const fantasyNav = ['Matchups', 'Schedule', 'Standings', 'Player Stats', 'Free Agency', 'Draft']
+const stats = [
+  ['games', 'G'], ['atBats', 'AB'], ['hits', 'H'], ['homeRuns', 'HR'], ['average', 'AVG'],
+  ['rbi', 'RBI'], ['runs', 'R'], ['obp', 'OBP'], ['slugging', 'SLG'], ['ops', 'OPS'],
+  ['strikeouts', 'K'], ['era', 'ERA'], ['fantasyAverage', 'FPTS/G'],
+]
+
+function Empty({ icon: Icon = CalendarDays, title, children }) {
+  return <div className="empty"><span className="empty-icon"><Icon size={28} strokeWidth={1.8}/></span><h3>{title}</h3><p>{children}</p></div>
+}
+function SectionTitle({ kicker, children, right }) {
+  return <div className="section-title"><div><small>{kicker}</small><h2>{children}</h2></div>{right}</div>
+}
+function App() {
+  const [page, setPage] = useState('Home')
+  const [fantasyTab, setFantasyTab] = useState('Matchups')
+  const [menu, setMenu] = useState(false)
+  const [session, setSession] = useState(null)
+  const [authOpen, setAuthOpen] = useState(false)
+  const [email, setEmail] = useState('')
+  const [message, setMessage] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [leagues, setLeagues] = useState([])
+  const [selectedLeague, setSelectedLeague] = useState(null)
+  const [leagueName, setLeagueName] = useState('')
+  const [joinCode, setJoinCode] = useState('')
+  const [query, setQuery] = useState('')
+  const [sort, setSort] = useState({ key: 'id', direction: 'asc' })
+  const [selectedPlayer, setSelectedPlayer] = useState(null)
+
+  useEffect(() => {
+    if (!supabase) return
+    supabase.auth.getSession().then(({ data }) => setSession(data.session))
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, next) => setSession(next))
+    return () => subscription.unsubscribe()
+  }, [])
+  useEffect(() => {
+    if (!supabase || !session) { setLeagues([]); setSelectedLeague(null); return }
+    loadLeagues()
+  }, [session?.user?.id])
+  async function loadLeagues() {
+    const { data, error } = await supabase.from('fantasy_memberships').select('league_id, fantasy_leagues(id, name, invite_code, created_at)').order('joined_at', { ascending: false })
+    if (error) { setMessage(error.message); return }
+    const items = (data || []).map(x => x.fantasy_leagues).filter(Boolean)
+    setLeagues(items)
+    setSelectedLeague(current => items.find(x => x.id === current?.id) || items[0] || null)
+  }
+  async function sendLink(e) {
+    e.preventDefault(); if (!supabase) { setMessage('The site owner needs to connect Supabase before sign-in is available.'); return }
+    setBusy(true); setMessage('')
+    const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href.split('#')[0] } })
+    setBusy(false); setMessage(error ? error.message : 'Check your email for a sign-in link.')
+  }
+  async function createLeague(e) {
+    e.preventDefault(); setBusy(true); setMessage('')
+    const { data, error } = await supabase.rpc('create_fantasy_league', { league_name: leagueName.trim() })
+    setBusy(false); if (error) { setMessage(error.message); return }
+    setLeagueName(''); await loadLeagues(); setSelectedLeague(data)
+  }
+  async function joinLeague(e) {
+    e.preventDefault(); setBusy(true); setMessage('')
+    const { error } = await supabase.rpc('join_fantasy_league', { code: joinCode.trim().toUpperCase() })
+    setBusy(false); if (error) { setMessage(error.message); return }
+    setJoinCode(''); setMessage('You joined the league.'); await loadLeagues()
+  }
+  const filtered = useMemo(() => players.filter(p => `${p.name} ${p.class} ${p.source}`.toLowerCase().includes(query.toLowerCase())).sort((a,b) => {
+    const av = a[sort.key], bv = b[sort.key]
+    if (av == null && bv != null) return 1
+    if (bv == null && av != null) return -1
+    const comparison = typeof av === 'number' && typeof bv === 'number' ? av - bv : String(av ?? '').localeCompare(String(bv ?? ''))
+    return sort.direction === 'asc' ? comparison : -comparison
+  }), [query, sort])
+  function sortBy(key) { setSort(s => ({ key, direction: s.key === key && s.direction === 'desc' ? 'asc' : 'desc' })) }
+  function go(next) { setPage(next); setMenu(false); setMessage(''); window.scrollTo({top: 0, behavior: 'smooth'}) }
+  const logo = `${import.meta.env.BASE_URL}usa-supa-league-logo.png`
+  return <>
+    <div className="topline"><div className="container topline-inner"><span><i className="live-dot"/> USA SUPA LEAGUE</span><span>THE LEAGUE STARTS HERE <b>★</b></span><button onClick={() => setAuthOpen(true)}>{session ? session.user.email : 'SIGN IN / JOIN'}</button></div></div>
+    <header className="masthead"><div className="container masthead-inner"><button className="brand" onClick={() => go('Home')}><img src={logo} alt="USA Supa League crest"/><span><strong>USA <em>SUPA</em> LEAGUE</strong><small>THE OFFICIAL LEAGUE HUB</small></span></button><button className="mobile-menu" aria-label="Open menu" onClick={() => setMenu(!menu)}>{menu ? <X/> : <Menu/>}</button><div className="masthead-right"><span className="league-tag">MARIO SUPER SLUGGERS</span><span className="badge-star">★</span></div></div></header>
+    <nav className={`nav ${menu ? 'open' : ''}`} aria-label="Main navigation"><div className="container nav-inner">{nav.map(n => <button key={n} className={page === n ? 'active' : ''} onClick={() => go(n)}>{n}</button>)}</div></nav>
+    <main className="container page-content">
+      {page === 'Home' && <>
+        <div className="home-grid"><div className="hero"><div className="hero-content"><span className="eyebrow">WELCOME TO THE LEAGUE</span><h1>THE GAME<br/><span>STARTS HERE.</span></h1><p>Follow every game, explore the player pool, and manage your fantasy league in one place.</p><button className="yellow-btn" onClick={() => go('Player Stats')}>EXPLORE PLAYERS <span>›</span></button></div><div className="hero-number">01</div></div>
+          <div className="side-stack"><div className="panel compact"><SectionTitle kicker="ON DECK" right={<CalendarDays size={19}/>}>UPCOMING MATCHES</SectionTitle><Empty title="Schedule coming soon">Matchups will appear when the season schedule is set.</Empty></div><div className="panel compact"><SectionTitle kicker="FINAL SCORES" right={<Trophy size={19}/>}>RECENT RESULTS</SectionTitle><Empty icon={Trophy} title="No games yet">Results will appear after the first game is uploaded.</Empty></div></div></div>
+        <div className="home-bottom"><div className="panel news-panel"><SectionTitle kicker="FROM AROUND THE LEAGUE">LATEST NEWS</SectionTitle><div className="news-item"><span className="news-mark">★</span><div><small>LEAGUE UPDATE</small><h3>The player pool is ready</h3><p>Browse all {players.length} players before teams and the season schedule are announced.</p></div><button aria-label="Browse players" onClick={() => go('Player Stats')}>›</button></div></div><div className="panel standings-panel"><SectionTitle kicker="THE RACE" right={<button className="text-link" onClick={() => go('Standings')}>FULL STANDINGS ›</button>}>STANDINGS</SectionTitle><Empty icon={Shield} title="Teams coming soon">Standings begin when teams and results are added.</Empty></div></div>
+      </>}
+      {page === 'Player Stats' && <><div className="page-heading"><span className="eyebrow dark">THE PLAYER POOL</span><h1>PLAYER STATS</h1><p>{players.length} players from the supplied master sheet. Game statistics will appear after valid game data is uploaded.</p></div><div className="panel data-panel"><div className="table-tools"><div className="search"><Search size={19}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search players" aria-label="Search players"/></div><span>{filtered.length} PLAYERS</span></div><div className="table-scroll"><table><thead><tr>{[['id','#'],['name','PLAYER'],['class','CLASS'],['source','SOURCE'],...stats].map(([key,label]) => <th key={key}><button onClick={() => sortBy(key)} aria-label={`Sort by ${label}`}>{label}{sort.key === key ? (sort.direction === 'asc' ? <ArrowUp size={13}/> : <ArrowDown size={13}/>) : null}</button></th>)}</tr></thead><tbody>{filtered.map(p => <tr key={p.id} onClick={() => setSelectedPlayer(p)} tabIndex={0} onKeyDown={e => e.key === 'Enter' && setSelectedPlayer(p)}><td>{p.id}</td><td className="player-cell"><span className="player-avatar">{p.name.slice(0,1)}</span><strong>{p.name}</strong></td><td>{p.class}</td><td>{p.source}</td>{stats.map(([key]) => <td key={key}>{p[key] ?? '—'}</td>)}</tr>)}</tbody></table></div><p className="table-footnote">Tap a heading to sort. A dash means no verified game stat is available yet.</p></div></>}
+      {page === 'Sluggers Fantasy' && <><div className="page-heading fantasy-heading"><span className="eyebrow dark">PLAY WITH FRIENDS</span><h1>SLUGGERS FANTASY</h1><p>Build a fantasy league, invite friends, and follow your matchups.</p></div>{!session ? <div className="panel gateway"><div className="gateway-icon">★</div><h2>YOUR LEAGUE IS WAITING</h2><p>Sign in with your email to create a fantasy league or join one with an invite code.</p><button className="red-btn" onClick={() => setAuthOpen(true)}>SIGN IN TO FANTASY</button>{!supabase && <p className="setup-note">Account setup is pending for this site.</p>}</div> : <div className="fantasy-layout"><aside className="panel league-sidebar"><SectionTitle kicker="YOUR FANTASY">LEAGUES</SectionTitle>{leagues.map(l => <button key={l.id} className={`league-choice ${selectedLeague?.id === l.id ? 'selected' : ''}`} onClick={() => setSelectedLeague(l)}><span>★</span>{l.name}</button>)}{!leagues.length && <p className="muted">No leagues yet. Create one or enter an invite code.</p>}<form onSubmit={createLeague}><label htmlFor="league-name">CREATE A LEAGUE</label><input id="league-name" required maxLength={60} value={leagueName} onChange={e => setLeagueName(e.target.value)} placeholder="League name"/><button disabled={busy} className="red-btn">CREATE LEAGUE</button></form><form onSubmit={joinLeague}><label htmlFor="invite-code">JOIN WITH A CODE</label><input id="invite-code" required value={joinCode} onChange={e => setJoinCode(e.target.value)} placeholder="Invite code"/><button disabled={busy} className="outline-btn">JOIN LEAGUE</button></form></aside><div className="panel fantasy-main">{selectedLeague ? <><div className="fantasy-title"><div><small>FANTASY LEAGUE</small><h2>{selectedLeague.name}</h2></div><div className="invite">INVITE CODE <strong>{selectedLeague.invite_code}</strong></div></div><div className="subnav">{fantasyNav.map(n => <button className={fantasyTab === n ? 'active' : ''} key={n} onClick={() => setFantasyTab(n)}>{n}</button>)}</div><Empty icon={fantasyTab === 'Standings' ? Trophy : CalendarDays} title={`${fantasyTab} coming soon`}>{fantasyTab === 'Player Stats' ? 'Average fantasy points will appear after games are scored.' : 'This view will populate when the fantasy draft and season data are available.'}</Empty></> : <Empty icon={Trophy} title="Create or join a league">Your fantasy league will appear here.</Empty>}</div></div>}{message && <p className="inline-message" role="status">{message}</p>}</>}
+      {page === 'Schedule' && <BasicPage kicker="GAME DAYS" title="SEASON SCHEDULE" icon={CalendarDays} empty="No games scheduled yet" detail="The season schedule will appear here once it is announced."/>}
+      {page === 'Standings' && <BasicPage kicker="THE RACE" title="STANDINGS" icon={Trophy} empty="Standings begin on opening day" detail="Teams and game results will determine the standings."/>}
+      {page === 'Teams' && <BasicPage kicker="THE CLUBS" title="TEAMS" icon={Shield} empty="No teams created yet" detail="Team pages and rosters will appear after the league draft."/>}
+      {page === 'Team Stats' && <BasicPage kicker="BY THE NUMBERS" title="TEAM STATS" icon={Trophy} empty="No team stats yet" detail="Team stats will populate from uploaded game results."/>}
+      {page === 'Transactions' && <BasicPage kicker="LEAGUE MOVES" title="TRANSACTIONS" icon={Shield} empty="No transactions yet" detail="Trade submissions will open when teams and rosters are set."/>}
+      {page === 'Draft' && <BasicPage kicker="BUILD YOUR TEAM" title="SUPA LEAGUE DRAFT" icon={Trophy} empty="Draft room coming soon" detail="The league draft opens after teams and the draft date are confirmed."/>}
+      {page === 'Free Agency' && <><div className="page-heading"><span className="eyebrow dark">AVAILABLE PLAYERS</span><h1>FREE AGENCY</h1><p>No rosters have been set. All {players.length} players are currently unassigned.</p></div><div className="panel"><div className="free-list">{players.map(p => <button key={p.id} onClick={() => setSelectedPlayer(p)}><span>{p.name}</span><small>{p.class}</small></button>)}</div></div></>}
+    </main>
+    <footer><div className="container footer-inner"><span>USA <b>SUPA</b> LEAGUE</span><small>LEAGUE DATA AND FANTASY HUB</small></div></footer>
+    {selectedPlayer && <div className="modal-backdrop" onClick={() => setSelectedPlayer(null)}><div className="modal player-modal" role="dialog" aria-modal="true" aria-label={selectedPlayer.name} onClick={e => e.stopPropagation()}><button className="close" onClick={() => setSelectedPlayer(null)} aria-label="Close"><X/></button><span className="eyebrow dark">PLAYER #{selectedPlayer.id}</span><h2>{selectedPlayer.name}</h2><dl><div><dt>CLASS</dt><dd>{selectedPlayer.class}</dd></div><div><dt>SOURCE</dt><dd>{selectedPlayer.source}</dd></div><div><dt>TEAM</dt><dd>Free agent</dd></div></dl><p>Game stats will be added when results are uploaded.</p></div></div>}
+    {authOpen && <div className="modal-backdrop" onClick={() => { setAuthOpen(false); setMessage('') }}><div className="modal auth-modal" role="dialog" aria-modal="true" aria-label="Sign in" onClick={e => e.stopPropagation()}><button className="close" aria-label="Close" onClick={() => { setAuthOpen(false); setMessage('') }}><X/></button><CircleUserRound size={34} color="#d9232e"/><h2>{session ? 'YOUR ACCOUNT' : 'SIGN IN TO THE LEAGUE'}</h2>{session ? <><p>Signed in as <strong>{session.user.email}</strong></p><button className="red-btn" onClick={async () => { await supabase.auth.signOut(); setAuthOpen(false) }}>SIGN OUT</button></> : <><p>Enter your email and we’ll send a sign-in link.</p><form onSubmit={sendLink}><label htmlFor="sign-in-email">EMAIL ADDRESS</label><input id="sign-in-email" type="email" required autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com"/><button disabled={busy || !supabase} className="red-btn">{busy ? 'SENDING…' : 'SEND SIGN-IN LINK'}</button></form>{!supabase && <p className="setup-note">Account setup is pending for this site.</p>}</>}{message && <p className="inline-message" role="status">{message}</p>}</div></div>}
+  </>
+}
+function BasicPage({ kicker, title, icon, empty, detail }) { return <><div className="page-heading"><span className="eyebrow dark">{kicker}</span><h1>{title}</h1></div><div className="panel basic-panel"><Empty icon={icon} title={empty}>{detail}</Empty></div></> }
+
+createRoot(document.getElementById('root')).render(<App/>)
