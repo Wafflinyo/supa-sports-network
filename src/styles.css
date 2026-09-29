@@ -5,3 +5,4 @@
 .stat-view-switch button{background:#eef1f6;border:1px solid #d9dfe8;color:#24395b;padding:9px 17px;font-family:'Barlow Condensed',Impact,sans-serif;font-size:17px;font-weight:900;text-transform:uppercase;letter-spacing:.025em}
 .stat-view-switch button.active{background:#10244b;border-color:#10244b;color:#fbd13b}
 .stat-view-switch button:focus-visible{outline:3px solid #d9232e;outline-offset:2px}
+.player-avatar{overflow:hidden;flex-shrink:0}.player-avatar.has-portrait{background-color:#10121a;background-repeat:no-repeat}.player-modal-heading{display:flex;align-items:center;gap:17px;margin-bottom:22px;min-width:0}.player-modal-heading h2{margin:5px 0 0;overflow-wrap:anywhere}.player-modal-heading .player-avatar{border-radius:50%}
