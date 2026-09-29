@@ -11,6 +11,10 @@ const sheets = [
   ['IMG_7128.jpeg', 735, 1182, 688, 264, ['Light Blue Yoshi', 'Pink Yoshi', 'Cap', 'Pauline', 'Burger King', 'Harley Quinn', 'Red', 'Roshi', 'Inkling', 'He-Man', 'Nigel Thornberry']],
   ['IMG_7129.jpeg', 734, 1162, 684, 245, ['Sophie', 'Ronald McDonald', 'Sadie Adler', 'Narf', 'Jade Harley', 'Shaggy', 'Brock', 'Buttercup', 'John Cena', 'Isabelle', 'Flowey']],
   ['IMG_7130.jpeg', 737, 1162, 686, 245, ['Sheen Estevez', 'Samus', 'Jack Black', 'Bubbles', 'PANCAKE!?!', 'Comet', 'Rosalina', 'Sans', 'Wendy', 'Saul Goodman', 'Blossom']],
+  ['IMG_7131.jpeg', 739, 1168, 688, 251, ['Timmy Turner', 'Paula', 'Coach', 'Zelda', 'Grimace', 'Scooby Doo', 'Mr. Bean', 'Goombella', 'Steve Harvey', 'Walter White', 'Hatsune Miku']],
+  ['IMG_7132.jpeg', 741, 1171, 687, 262, ['Mike', 'Cynthia', 'Masahiro Sakurai', 'Mona Lisa', 'Ada Wong', 'Garfield', 'Misty', 'Waffle', 'Derrick White', 'Sonya Blade', 'Cammy White']],
+  ['IMG_7133.jpeg', 747, 1182, 695, 266, ['Cortana', 'OAO', 'juhg,koop', 'William Afton', 'Juri Han', 'Cranky Kong', 'Squirrel Girl', 'Horse', 'Josh Block', 'Wrinkly Kong', 'Mario Judah']],
+  ['IMG_7134.jpeg', 746, 491, 689, 263, ['Chica', 'Rose', 'Amelia Earhart']],
 ]
 
 const portraits = new Map(sheets.flatMap(([file, width, height, x, firstY, names]) =>
