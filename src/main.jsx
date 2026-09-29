@@ -2,18 +2,20 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createClient } from '@supabase/supabase-js'
 import { ArrowDown, ArrowUp, CalendarDays, CircleUserRound, Menu, Search, Shield, Trophy, X } from 'lucide-react'
-import players from './players.json'
+import playerPool from './players.json'
+import gamesPlayed from './games-played.json'
 import './styles.css'
 
 const url = import.meta.env.VITE_SUPABASE_URL
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
 const supabase = url && key ? createClient(url, key) : null
+const players = playerPool.map(player => ({ ...player, gamesPlayed: gamesPlayed[player.id] ?? null }))
 const nav = ['Home', 'Schedule', 'Standings', 'Teams', 'Player Stats', 'Team Stats', 'Transactions', 'Sluggers Fantasy', 'Draft', 'Free Agency']
 const fantasyNav = ['Matchups', 'Schedule', 'Standings', 'Player Stats', 'Free Agency', 'Draft']
 // Project Rio's export headings, grouped for browsing. Helper columns are export internals.
 const statGroups = {
   'Offensive Stats': [
-    ['atBats', 'At-Bats'], ['plateAppearances', 'Plate Appearances'], ['runs', 'Runs'],
+    ['gamesPlayed', 'Games Played'], ['atBats', 'At-Bats'], ['plateAppearances', 'Plate Appearances'], ['runs', 'Runs'],
     ['hits', 'Hits'], ['rbi', 'RBI'], ['batStrikeouts', 'Strikeouts'], ['batWalks', 'Walks'],
     ['hitByPitch', 'Hit By Pitch'], ['singles', 'Singles'], ['doubles', 'Doubles'],
     ['triples', 'Triples'], ['homeRuns', 'Home Runs'], ['oneHr', '1HR'], ['twoHr', '2HR'],
@@ -53,6 +55,7 @@ const perGameOnly = new Set(['battingAverage', 'onBase', 'slug', 'onBasePlusSlug
 
 function statValue(player, key, view) {
   const total = player.stats?.[key] ?? player[key]
+  if (key === 'gamesPlayed') return total ?? null
   if (view === 'Totals') return total ?? null
   const perGame = player.perGame?.[key]
   if (perGame != null) return perGame
@@ -64,6 +67,7 @@ function statValue(player, key, view) {
 
 function displayStat(value, view, key) {
   if (value == null) return '—'
+  if (key === 'gamesPlayed') return value
   return view === 'Averages per Game' && typeof value === 'number'
     ? value.toFixed(perGameOnly.has(key) && key !== 'inningsPitched' ? 3 : 2) : value
 }
@@ -156,7 +160,7 @@ function App() {
           <div className="stat-view-switch" role="group" aria-label="Stat display">{['Totals', 'Averages per Game'].map(view => <button key={view} type="button" aria-pressed={statView === view} className={statView === view ? 'active' : ''} onClick={() => setStatView(view)}>{view}</button>)}</div>
           <div className="table-tools"><div className="search"><Search size={19}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search players" aria-label="Search players"/></div><span>{filtered.length} PLAYERS</span></div>
           <div className="table-scroll" role="tabpanel" aria-label={`${statTab} — ${statView}`}><table><thead><tr>{[['id','#'],['name','PLAYER'],['class','CLASS'],['source','SOURCE'],...statGroups[statTab]].map(([key,label]) => <th key={key}><button onClick={() => sortBy(key)} aria-label={`Sort by ${label}`}>{label}{sort.key === key ? (sort.direction === 'asc' ? <ArrowUp size={13}/> : <ArrowDown size={13}/>) : null}</button></th>)}</tr></thead><tbody>{filtered.map(p => <tr key={p.id} onClick={() => setSelectedPlayer(p)} tabIndex={0} onKeyDown={e => e.key === 'Enter' && setSelectedPlayer(p)}><td>{p.id}</td><td className="player-cell"><span className="player-avatar">{p.name.slice(0,1)}</span><strong>{p.name}</strong></td><td>{p.class}</td><td>{p.source}</td>{statGroups[statTab].map(([key]) => <td key={key}>{displayStat(statValue(p, key, statView), statView, key)}</td>)}</tr>)}</tbody></table></div>
-          <p className="table-footnote">{statView === 'Totals' ? 'Season totals and season rates.' : 'Counting stats are divided by games played; rates and innings use their per-game values.'} Tap a heading to sort. A dash means no verified game stat is available yet. Scroll sideways to see more columns.</p>
+          <p className="table-footnote">{statView === 'Totals' ? 'Season totals and season rates.' : 'Games Played remains a total. Other counting stats are divided by games played; rates and innings use their per-game values.'} Tap a heading to sort. A dash means no verified game stat is available yet. Scroll sideways to see more columns.</p>
         </div>
       </>}
       {page === 'Sluggers Fantasy' && <><div className="page-heading fantasy-heading"><span className="eyebrow dark">PLAY WITH FRIENDS</span><h1>SLUGGERS FANTASY</h1><p>Build a fantasy league, invite friends, and follow your matchups.</p></div>{!session ? <div className="panel gateway"><div className="gateway-icon">★</div><h2>YOUR LEAGUE IS WAITING</h2><p>Sign in with your email to create a fantasy league or join one with an invite code.</p><button className="red-btn" onClick={() => setAuthOpen(true)}>SIGN IN TO FANTASY</button>{!supabase && <p className="setup-note">Account setup is pending for this site.</p>}</div> : <div className="fantasy-layout"><aside className="panel league-sidebar"><SectionTitle kicker="YOUR FANTASY">LEAGUES</SectionTitle>{leagues.map(l => <button key={l.id} className={`league-choice ${selectedLeague?.id === l.id ? 'selected' : ''}`} onClick={() => setSelectedLeague(l)}><span>★</span>{l.name}</button>)}{!leagues.length && <p className="muted">No leagues yet. Create one or enter an invite code.</p>}<form onSubmit={createLeague}><label htmlFor="league-name">CREATE A LEAGUE</label><input id="league-name" required maxLength={60} value={leagueName} onChange={e => setLeagueName(e.target.value)} placeholder="League name"/><button disabled={busy} className="red-btn">CREATE LEAGUE</button></form><form onSubmit={joinLeague}><label htmlFor="invite-code">JOIN WITH A CODE</label><input id="invite-code" required value={joinCode} onChange={e => setJoinCode(e.target.value)} placeholder="Invite code"/><button disabled={busy} className="outline-btn">JOIN LEAGUE</button></form></aside><div className="panel fantasy-main">{selectedLeague ? <><div className="fantasy-title"><div><small>FANTASY LEAGUE</small><h2>{selectedLeague.name}</h2></div><div className="invite">INVITE CODE <strong>{selectedLeague.invite_code}</strong></div></div><div className="subnav">{fantasyNav.map(n => <button className={fantasyTab === n ? 'active' : ''} key={n} onClick={() => setFantasyTab(n)}>{n}</button>)}</div><Empty icon={fantasyTab === 'Standings' ? Trophy : CalendarDays} title={`${fantasyTab} coming soon`}>{fantasyTab === 'Player Stats' ? 'Average fantasy points will appear after games are scored.' : 'This view will populate when the fantasy draft and season data are available.'}</Empty></> : <Empty icon={Trophy} title="Create or join a league">Your fantasy league will appear here.</Empty>}</div></div>}{message && <p className="inline-message" role="status">{message}</p>}</>}
