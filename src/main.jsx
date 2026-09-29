@@ -30,12 +30,12 @@ const statGroups = {
     ['stealAttempts', 'Steal Attempts'],
   ],
   'Defensive Stats': [
-    ['putouts', 'Putouts'], ['assists', 'Assists'], ['buddyJumpPutouts', 'Buddy Jump Putouts'],
+    ['gamesPlayed', 'Games Played'], ['putouts', 'Putouts'], ['assists', 'Assists'], ['buddyJumpPutouts', 'Buddy Jump Putouts'],
     ['buddyJumpAttempts', 'Buddy Jump Attempts'], ['doublePlays', 'Double Plays'],
     ['triplePlays', 'Triple Plays'], ['bobbles', 'Bobbles'],
   ],
   'Pitching Stats': [
-    ['battersFaced', 'Batters Faced'], ['inningsPitched', 'Innings Pitched'],
+    ['gamesPlayed', 'Games Played'], ['battersFaced', 'Batters Faced'], ['inningsPitched', 'Innings Pitched'],
     ['pitches', 'Pitches'], ['strikes', 'Strikes'], ['balls', 'Balls'],
     ['pitchStrikeouts', 'Strikeouts'], ['pitchWalks', 'Walks'], ['beanBalls', 'Bean Balls'],
     ['hitsAllowed', 'Hits Allowed'], ['runsAllowed', 'Runs Allowed'],
