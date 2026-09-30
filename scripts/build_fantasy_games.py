@@ -56,10 +56,12 @@ def score_report(entry):
         batting = {}
         pitchers = []
         team = None
+        team_runs = Counter()
         for row_number, row in enumerate(rows_by_heading(wb['Stats']), start=2):
             team = row.get('Team') or team
             if not row.get('Player') or row.get('Position') == 'N/A':
                 continue
+            team_runs[team] += num(row, 'Runs')
             name = row['Player'].strip()
             player_id = entry.get('playerRows', {}).get(str(row_number), by_name.get(name.casefold()))
             if player_id not in entry['players']:
@@ -88,9 +90,14 @@ def score_report(entry):
             score += (outs >= 9) * rules['pitching']['threeInningBonus']
             score += (team_counts[batting[player_id]['team']] == 1) * rules['pitching']['completeGameBonus']
             batting[player_id]['pitching'] = score
-        return {str(player_id): {**{k: round(stats[k], 2) for k in ('batting', 'fielding')},
+        if len(team_runs) != 2:
+            raise ValueError(f'{filename}: expected two teams for shutout scoring')
+        for stats in batting.values():
+            opponent_runs = sum(runs for team, runs in team_runs.items() if team != stats['team'])
+            stats['teamBonus'] = rules['team']['shutoutBonus'] if opponent_runs == 0 else 0
+        return {str(player_id): {**{k: round(stats[k], 2) for k in ('batting', 'fielding', 'teamBonus')},
                                  'pitching': round(stats.get('pitching', 0), 2),
-                                 'total': round(stats['batting'] + stats['fielding'] + stats.get('pitching', 0), 2)}
+                                 'total': round(stats['batting'] + stats['fielding'] + stats.get('pitching', 0) + stats['teamBonus'], 2)}
                 for player_id, stats in batting.items()}
     finally:
         wb.close()

@@ -39,5 +39,8 @@
     "pickoffs": 2,
     "threeInningBonus": 1,
     "completeGameBonus": 2
+  },
+  "team": {
+    "shutoutBonus": 1
   }
 }

@@ -7,7 +7,7 @@ const tabs = ['Matchups', 'Schedule', 'Standings', 'Player Stats', 'Free Agency'
 const labels = {
   rbi: 'RBI', hrAllowed: 'Home runs allowed', hitByPitch: 'Hit by pitch',
   doublePlaysHitInto: 'Hit into double play', buddyJumpPutouts: 'Buddy jump putout bonus',
-  threeInningBonus: 'Pitch at least 3 innings', completeGameBonus: 'Complete game',
+  threeInningBonus: 'Pitch at least 3 innings', completeGameBonus: 'Complete game', shutoutBonus: 'Team shutout bonus',
 }
 const label = key => labels[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, x => x.toUpperCase())
 const points = n => `${n > 0 ? '+' : ''}${n}`
@@ -25,9 +25,10 @@ export function FantasyRules() {
       <p>Head-to-head matchups run Sunday at 12:00 a.m. through Saturday at 11:59:59 p.m. Eastern Time. The higher starter point total wins. A game belongs to the week in which it starts.</p>
       <p>The draft is ten rounds with a snake order. All seven starter spots are open: a starter earns batting, fielding, and pitching points. Every completed game they play during the week counts. Bench players earn no matchup points.</p>
       <p>You may swap one starter with one bench player at any time before either has started a game that week. A player locks in their starter or bench spot when their first game of the week starts. Lineups carry into the next week and unlock Sunday.</p>
-      <div className="rules-tables">{[['Batting', rules.batting], ['Fielding', rules.fielding], ['Pitching', rules.pitching]].map(([area, weights]) =>
+      <div className="rules-tables">{[['Batting', rules.batting], ['Fielding', rules.fielding], ['Pitching', rules.pitching], ['Team bonuses', rules.team]].map(([area, weights]) =>
         <section key={area}><h3>{area}</h3><table><tbody>{Object.entries(weights).map(([key, weight]) =>
           <tr key={key}><td>{label(key)}</td><td>{points(weight)}</td></tr>)}</tbody></table></section>)}</div>
+      <p>A team shutout adds +1 point to every player who played for the team that allowed zero runs in a finished game. It stacks with other points and pitching bonuses. Only fantasy starters contribute to matchup totals.</p>
       <p className="rules-note">Pitching outs are calculated from the report’s innings pitched (three outs per inning). The 3-inning bonus is awarded once at nine outs. A complete game adds two points when one pitcher handles all of their team’s pitching in a finished game. Home runs allowed also count as hits allowed. Buddy jump putouts and grand slams add their bonus to the ordinary points.</p>
     </div>
   </div>
