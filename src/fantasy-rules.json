@@ -21,7 +21,7 @@
     "grandSlams": 2
   },
   "fielding": {
-    "putouts": 0.75,
+    "putouts": 1,
     "assists": 0.75,
     "buddyJumpPutouts": 2,
     "doublePlays": 1,
