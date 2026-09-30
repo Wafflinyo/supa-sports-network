@@ -6,6 +6,7 @@ import playerPool from './players.json'
 import gamesPlayed from './games-played.json'
 import { playerPortraitStyle } from './player-portraits.js'
 import { FantasyLeague, FantasyRules } from './FantasyHub.jsx'
+import TemporaryLeague from './TemporaryLeague.jsx'
 import './styles.css'
 
 const url = import.meta.env.VITE_SUPABASE_URL
@@ -16,7 +17,7 @@ function PlayerAvatar({ player, size = 38 }) {
   const portrait = playerPortraitStyle(player.name, size)
   return <span className={`player-avatar${portrait ? ' has-portrait' : ''}`} style={{ width: size, height: size, flex: `0 0 ${size}px`, ...portrait }} aria-hidden="true">{portrait ? null : player.name.slice(0, 1)}</span>
 }
-const nav = ['Home', 'Schedule', 'Standings', 'Teams', 'Player Stats', 'Team Stats', 'Transactions', 'Sluggers Fantasy', 'Draft', 'Free Agency']
+const nav = ['Home', 'Schedule', 'Standings', 'Teams', 'Player Stats', 'Team Stats', 'Transactions', 'Sluggers Fantasy', 'Draft', 'Free Agency', 'Test Week']
 // Project Rio's export headings, grouped for browsing. Helper columns are export internals.
 const statGroups = {
   'Offensive Stats': [
@@ -84,7 +85,7 @@ function SectionTitle({ kicker, children, right }) {
   return <div className="section-title"><div><small>{kicker}</small><h2>{children}</h2></div>{right}</div>
 }
 function App() {
-  const [page, setPage] = useState('Home')
+  const [page, setPage] = useState(window.location.hash === '#test-week' ? 'Test Week' : 'Home')
   const [rulesOpen, setRulesOpen] = useState(false)
   const [menu, setMenu] = useState(false)
   const [session, setSession] = useState(null)
@@ -146,13 +147,14 @@ function App() {
     return sort.direction === 'asc' ? comparison : -comparison
   }), [query, sort, statTab, statView])
   function sortBy(key) { setSort(s => ({ key, direction: s.key === key && s.direction === 'desc' ? 'asc' : 'desc' })) }
-  function go(next) { setPage(next); setMenu(false); setMessage(''); window.scrollTo({top: 0, behavior: 'smooth'}) }
+  function go(next) { window.history.replaceState(null, '', next === 'Test Week' ? '#test-week' : window.location.pathname); setPage(next); setMenu(false); setMessage(''); window.scrollTo({top: 0, behavior: 'smooth'}) }
   const logo = `${import.meta.env.BASE_URL}sluggers-supa-league-logo.svg`
   return <>
     <div className="topline"><div className="container topline-inner"><span><i className="live-dot"/> SLUGGERS SUPA LEAGUE</span><span>THE LEAGUE STARTS HERE <b>★</b></span><button onClick={() => setAuthOpen(true)}>{session ? session.user.email : 'SIGN IN / JOIN'}</button></div></div>
     <header className="masthead"><div className="container masthead-inner"><button className="brand" onClick={() => go('Home')}><img src={logo} alt="Sluggers Supa League logo"/><span><strong>SLUGGERS <em>SUPA</em> LEAGUE</strong><small>THE OFFICIAL LEAGUE HUB</small></span></button><button className="mobile-menu" aria-label="Open menu" onClick={() => setMenu(!menu)}>{menu ? <X/> : <Menu/>}</button><div className="masthead-right"><span className="league-tag">MARIO SUPER SLUGGERS</span><span className="badge-star">★</span></div></div></header>
     <nav className={`nav ${menu ? 'open' : ''}`} aria-label="Main navigation"><div className="container nav-inner">{nav.map(n => <button key={n} className={page === n ? 'active' : ''} onClick={() => go(n)}>{n}</button>)}</div></nav>
     <main className="container page-content">
+      {page === 'Test Week' && <TemporaryLeague PlayerAvatar={PlayerAvatar}/>}
       {page === 'Home' && <>
         <div className="home-grid"><div className="hero"><div className="hero-content"><span className="eyebrow">WELCOME TO THE LEAGUE</span><h1>THE GAME<br/><span>STARTS HERE.</span></h1><p>Follow every game, explore the player pool, and manage your fantasy league in one place.</p><button className="yellow-btn" onClick={() => go('Player Stats')}>EXPLORE PLAYERS <span>›</span></button></div><div className="hero-number">01</div></div>
           <div className="side-stack"><div className="panel compact"><SectionTitle kicker="ON DECK" right={<CalendarDays size={19}/>}>UPCOMING MATCHES</SectionTitle><Empty title="Schedule coming soon">Matchups will appear when the season schedule is set.</Empty></div><div className="panel compact"><SectionTitle kicker="FINAL SCORES" right={<Trophy size={19}/>}>RECENT RESULTS</SectionTitle><Empty icon={Trophy} title="No games yet">Results will appear after the first game is uploaded.</Empty></div></div></div>
@@ -171,6 +173,7 @@ function App() {
       {page === 'Sluggers Fantasy' && <>
         <div className="page-heading fantasy-heading"><span className="eyebrow dark">PLAY WITH FRIENDS</span><h1>SLUGGERS FANTASY</h1><p>Draft your team, set your weekly lineup, and follow head-to-head matchups.</p><button className="outline-btn rules-toggle" onClick={() => setRulesOpen(!rulesOpen)} aria-expanded={rulesOpen} aria-controls="fantasy-rules">{rulesOpen ? 'HIDE' : 'FANTASY'} RULES & POINT SYSTEM</button></div>
         {rulesOpen && <FantasyRules/>}
+        <div className="panel test-undrafted"><h2>TEMPORARY FANTASY TEST</h2><p>View the eight drafted teams, weekly head-to-head scores, and league game reports.</p><button className="outline-btn" onClick={() => go('Test Week')}>OPEN TEST WEEK</button></div>
         {!session ? <div className="panel gateway"><div className="gateway-icon">★</div><h2>YOUR LEAGUE IS WAITING</h2><p>Sign in with your email to create a fantasy league or join one with an invite code.</p><button className="red-btn" onClick={() => setAuthOpen(true)}>SIGN IN TO FANTASY</button>{!supabase && <p className="setup-note">Account setup is pending for this site.</p>}</div> :
           <div className="fantasy-layout"><aside className="panel league-sidebar"><SectionTitle kicker="YOUR FANTASY">LEAGUES</SectionTitle>{leagues.map(l => <button key={l.id} className={`league-choice ${selectedLeague?.id === l.id ? 'selected' : ''}`} onClick={() => setSelectedLeague(l)}><span>★</span>{l.name}</button>)}{!leagues.length && <p className="muted">No leagues yet. Create one or enter an invite code.</p>}<form onSubmit={createLeague}><label htmlFor="league-name">CREATE A LEAGUE</label><input id="league-name" required maxLength={60} value={leagueName} onChange={e => setLeagueName(e.target.value)} placeholder="League name"/><button disabled={busy} className="red-btn">CREATE LEAGUE</button></form><form onSubmit={joinLeague}><label htmlFor="invite-code">JOIN WITH A CODE</label><input id="invite-code" required value={joinCode} onChange={e => setJoinCode(e.target.value)} placeholder="Invite code"/><button disabled={busy} className="outline-btn">JOIN LEAGUE</button></form></aside><div className="panel fantasy-main">{selectedLeague ? <FantasyLeague key={selectedLeague.id} initialLeague={selectedLeague} user={session.user} supabase={supabase} players={players} onLeagueRefresh={loadLeagues}/> : <Empty icon={Trophy} title="Create or join a league">Your fantasy league will appear here.</Empty>}</div></div>}{message && <p className="inline-message" role="status">{message}</p>}
       </>}

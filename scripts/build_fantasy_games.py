@@ -44,11 +44,11 @@ def weighted(row, mapping, weights):
     return sum(num(row, heading) * weights[key] for key, heading in mapping.items())
 
 
-def score_report(entry):
+def score_report(entry, report_directory=None):
     filename = entry['report']
     if Path(filename).name != filename or not filename.endswith('.xlsx'):
         raise ValueError('A report must be an XLSX filename inside games/')
-    path = ROOT / 'games' / filename
+    path = (Path(report_directory) if report_directory else ROOT / 'games') / filename
     if not path.is_file():
         raise ValueError(f'Missing report: {filename}')
     wb = load_workbook(path, read_only=True, data_only=True)

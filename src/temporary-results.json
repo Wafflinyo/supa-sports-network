@@ -1,0 +1,87 @@
+{
+  "fixtureId": "temporary-week-2026-10-04",
+  "games": [],
+  "playerStats": {},
+  "standings": {
+    "delfino": {
+      "played": 0,
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "runsFor": 0,
+      "runsAgainst": 0
+    },
+    "sarasaland": {
+      "played": 0,
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "runsFor": 0,
+      "runsAgainst": 0
+    },
+    "yoshi": {
+      "played": 0,
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "runsFor": 0,
+      "runsAgainst": 0
+    },
+    "dk-island": {
+      "played": 0,
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "runsFor": 0,
+      "runsAgainst": 0
+    },
+    "kongo": {
+      "played": 0,
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "runsFor": 0,
+      "runsAgainst": 0
+    },
+    "toad-town": {
+      "played": 0,
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "runsFor": 0,
+      "runsAgainst": 0
+    },
+    "evershade": {
+      "played": 0,
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "runsFor": 0,
+      "runsAgainst": 0
+    },
+    "dark-land": {
+      "played": 0,
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "runsFor": 0,
+      "runsAgainst": 0
+    },
+    "diamond": {
+      "played": 0,
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "runsFor": 0,
+      "runsAgainst": 0
+    },
+    "ricco": {
+      "played": 0,
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "runsFor": 0,
+      "runsAgainst": 0
+    }
+  }
+}
