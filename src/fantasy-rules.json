@@ -1,0 +1,43 @@
+{
+  "timezone": "America/New_York",
+  "minTeams": 6,
+  "maxTeams": 8,
+  "rosterSize": 10,
+  "starters": 7,
+  "bench": 3,
+  "batting": {
+    "singles": 1,
+    "doubles": 2,
+    "triples": 3,
+    "homeRuns": 4,
+    "runs": 1,
+    "rbi": 1,
+    "walks": 0.5,
+    "hitByPitch": 0.5,
+    "stolenBases": 2,
+    "caughtStealing": -1,
+    "strikeouts": -2,
+    "doublePlaysHitInto": -1,
+    "grandSlams": 2
+  },
+  "fielding": {
+    "putouts": 0.75,
+    "assists": 0.75,
+    "buddyJumpPutouts": 2,
+    "doublePlays": 1,
+    "triplePlays": 2,
+    "bobbles": -2
+  },
+  "pitching": {
+    "outs": 0.75,
+    "strikeouts": 3,
+    "hitsAllowed": -0.25,
+    "earnedRuns": -1,
+    "hrAllowed": -0.5,
+    "walks": -0.5,
+    "beanBalls": -0.5,
+    "pickoffs": 2,
+    "threeInningBonus": 1,
+    "completeGameBonus": 2
+  }
+}

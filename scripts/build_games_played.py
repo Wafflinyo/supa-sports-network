@@ -23,6 +23,8 @@ def build_counts():
         raise ValueError("The player roster has duplicate names; game appearances cannot be matched safely.")
 
     files = sorted(SOURCE.glob("*.xlsx"))
+    schedule = json.loads((ROOT / "games" / "schedule.json").read_text(encoding="utf-8"))
+    overrides = {entry["report"]: entry.get("playerRows", {}) for entry in schedule if entry.get("report")}
     counts = Counter()
     fingerprints = set()
     if files:
@@ -44,12 +46,12 @@ def build_counts():
                 raise ValueError(f"{path.name}: expected Player and Position columns on Stats sheet")
             player_col, position_col = headings.index("Player"), headings.index("Position")
             seen = set()
-            for row in rows:
+            for row_number, row in enumerate(rows, start=2):
                 name = row[player_col] if len(row) > player_col else None
                 position = row[position_col] if len(row) > position_col else None
                 if not isinstance(name, str) or not name.strip() or not isinstance(position, str) or position.strip().upper() == "N/A":
                     continue
-                player_id = ids_by_name.get(name.strip().casefold())
+                player_id = overrides.get(path.name, {}).get(str(row_number), ids_by_name.get(name.strip().casefold()))
                 if player_id is None:
                     raise ValueError(f"{path.name}: unknown player {name!r}; correct the roster match before publishing")
                 seen.add(player_id)
