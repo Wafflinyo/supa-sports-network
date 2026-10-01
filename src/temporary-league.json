@@ -3173,6 +3173,146 @@
         34
       ],
       "playerScores": {}
+    },
+    {
+      "id": "test-week-2-game-1",
+      "awayId": "ricco",
+      "homeId": "sarasaland",
+      "startsAt": "2026-10-11T16:00:00-04:00",
+      "stadium": "Peach Ice Garden",
+      "players": [
+        20,
+        18,
+        135,
+        101,
+        71,
+        16,
+        64,
+        33,
+        36,
+        6,
+        53,
+        57,
+        77,
+        78,
+        40,
+        65,
+        47,
+        35
+      ],
+      "playerScores": {}
+    },
+    {
+      "id": "test-week-2-game-2",
+      "awayId": "delfino",
+      "homeId": "evershade",
+      "startsAt": "2026-10-12T19:00:00-04:00",
+      "stadium": "Luigi Mansion",
+      "players": [
+        1,
+        50,
+        76,
+        67,
+        23,
+        26,
+        24,
+        27,
+        25,
+        2,
+        54,
+        62,
+        108,
+        19,
+        42,
+        41,
+        46,
+        45
+      ],
+      "playerScores": {}
+    },
+    {
+      "id": "test-week-2-game-3",
+      "awayId": "toad-town",
+      "homeId": "kongo",
+      "startsAt": "2026-10-14T19:00:00-04:00",
+      "stadium": "DK Jungle",
+      "players": [
+        5,
+        61,
+        22,
+        75,
+        14,
+        30,
+        29,
+        17,
+        105,
+        4,
+        49,
+        55,
+        82,
+        112,
+        38,
+        56,
+        15,
+        37
+      ],
+      "playerScores": {}
+    },
+    {
+      "id": "test-week-2-game-4",
+      "awayId": "yoshi",
+      "homeId": "diamond",
+      "startsAt": "2026-10-16T19:00:00-04:00",
+      "stadium": "Wario City",
+      "players": [
+        7,
+        63,
+        28,
+        89,
+        87,
+        59,
+        9,
+        70,
+        12,
+        11,
+        39,
+        80,
+        86,
+        31,
+        69,
+        60,
+        32,
+        34
+      ],
+      "playerScores": {}
+    },
+    {
+      "id": "test-week-2-game-5",
+      "awayId": "dk-island",
+      "homeId": "dark-land",
+      "startsAt": "2026-10-17T19:00:00-04:00",
+      "stadium": "Bowser Castle",
+      "players": [
+        3,
+        52,
+        94,
+        130,
+        58,
+        66,
+        68,
+        8,
+        99,
+        10,
+        51,
+        73,
+        43,
+        21,
+        13,
+        44,
+        114,
+        48
+      ],
+      "playerScores": {}
     }
   ],
   "fantasyTeams": [
@@ -3930,5 +4070,539 @@
     68
   ],
   "freeAgentPickups": false,
-  "fantasyLineupsSetBy": "Commissioner before first report; retain these selections on rebuild"
+  "fantasyLineupsSetBy": "Commissioner before first report; retain these selections on rebuild",
+  "weeks": [
+    {
+      "number": 1,
+      "start": "2026-10-04",
+      "end": "2026-10-10",
+      "label": "October 4\u201310, 2026",
+      "fantasyMatchups": [
+        [
+          "test-fantasy-1",
+          "test-fantasy-8"
+        ],
+        [
+          "test-fantasy-2",
+          "test-fantasy-7"
+        ],
+        [
+          "test-fantasy-3",
+          "test-fantasy-6"
+        ],
+        [
+          "test-fantasy-4",
+          "test-fantasy-5"
+        ]
+      ],
+      "fantasyTeams": [
+        {
+          "id": "test-fantasy-1",
+          "name": "Pitch Please",
+          "players": [
+            1,
+            52,
+            18,
+            23,
+            130,
+            47,
+            17,
+            45,
+            19,
+            36
+          ],
+          "starters": [
+            1,
+            52,
+            18,
+            23,
+            36,
+            47,
+            17
+          ],
+          "bench": [
+            45,
+            19,
+            130
+          ]
+        },
+        {
+          "id": "test-fantasy-2",
+          "name": "The Swingin\u2019 Dinguses",
+          "players": [
+            6,
+            49,
+            39,
+            108,
+            86,
+            5,
+            66,
+            67,
+            13,
+            15
+          ],
+          "starters": [
+            67,
+            49,
+            39,
+            86,
+            13,
+            66,
+            5
+          ],
+          "bench": [
+            108,
+            6,
+            15
+          ]
+        },
+        {
+          "id": "test-fantasy-3",
+          "name": "Sons of Pitches",
+          "players": [
+            2,
+            62,
+            51,
+            53,
+            87,
+            22,
+            32,
+            4,
+            7,
+            34
+          ],
+          "starters": [
+            2,
+            62,
+            51,
+            53,
+            7,
+            22,
+            34
+          ],
+          "bench": [
+            4,
+            87,
+            32
+          ]
+        },
+        {
+          "id": "test-fantasy-4",
+          "name": "Big Bat Energy",
+          "players": [
+            11,
+            82,
+            10,
+            33,
+            77,
+            24,
+            99,
+            69,
+            38,
+            42
+          ],
+          "starters": [
+            11,
+            69,
+            10,
+            33,
+            77,
+            24,
+            42
+          ],
+          "bench": [
+            82,
+            38,
+            99
+          ]
+        },
+        {
+          "id": "test-fantasy-5",
+          "name": "Bowser\u2019s Tax Evaders",
+          "players": [
+            75,
+            59,
+            3,
+            114,
+            105,
+            80,
+            56,
+            65,
+            21,
+            35
+          ],
+          "starters": [
+            59,
+            65,
+            3,
+            21,
+            35,
+            80,
+            56
+          ],
+          "bench": [
+            75,
+            105,
+            114
+          ]
+        },
+        {
+          "id": "test-fantasy-6",
+          "name": "The Foul Ball Goblins",
+          "players": [
+            89,
+            50,
+            55,
+            31,
+            78,
+            101,
+            46,
+            14,
+            70,
+            43
+          ],
+          "starters": [
+            50,
+            89,
+            55,
+            31,
+            14,
+            70,
+            43
+          ],
+          "bench": [
+            78,
+            101,
+            46
+          ]
+        },
+        {
+          "id": "test-fantasy-7",
+          "name": "Oops! All Dingers",
+          "players": [
+            94,
+            73,
+            63,
+            60,
+            30,
+            76,
+            44,
+            58,
+            27,
+            71
+          ],
+          "starters": [
+            73,
+            44,
+            63,
+            60,
+            30,
+            27,
+            58
+          ],
+          "bench": [
+            94,
+            71,
+            76
+          ]
+        },
+        {
+          "id": "test-fantasy-8",
+          "name": "Bunt Cake",
+          "players": [
+            135,
+            61,
+            28,
+            57,
+            20,
+            112,
+            48,
+            54,
+            40,
+            37
+          ],
+          "starters": [
+            61,
+            37,
+            57,
+            28,
+            48,
+            20,
+            54
+          ],
+          "bench": [
+            112,
+            135,
+            40
+          ]
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "start": "2026-10-11",
+      "end": "2026-10-17",
+      "label": "October 11\u201317, 2026",
+      "fantasyMatchups": [
+        [
+          "test-fantasy-1",
+          "test-fantasy-7"
+        ],
+        [
+          "test-fantasy-8",
+          "test-fantasy-6"
+        ],
+        [
+          "test-fantasy-2",
+          "test-fantasy-5"
+        ],
+        [
+          "test-fantasy-3",
+          "test-fantasy-4"
+        ]
+      ],
+      "fantasyTeams": [
+        {
+          "id": "test-fantasy-1",
+          "name": "Pitch Please",
+          "players": [
+            1,
+            52,
+            18,
+            23,
+            130,
+            47,
+            17,
+            45,
+            19,
+            36
+          ],
+          "starters": [
+            1,
+            52,
+            18,
+            23,
+            36,
+            47,
+            17
+          ],
+          "bench": [
+            45,
+            19,
+            130
+          ]
+        },
+        {
+          "id": "test-fantasy-2",
+          "name": "The Swingin\u2019 Dinguses",
+          "players": [
+            6,
+            49,
+            39,
+            108,
+            86,
+            5,
+            66,
+            67,
+            13,
+            15
+          ],
+          "starters": [
+            67,
+            49,
+            39,
+            86,
+            13,
+            66,
+            5
+          ],
+          "bench": [
+            108,
+            6,
+            15
+          ]
+        },
+        {
+          "id": "test-fantasy-3",
+          "name": "Sons of Pitches",
+          "players": [
+            2,
+            62,
+            51,
+            53,
+            87,
+            22,
+            32,
+            4,
+            7,
+            34
+          ],
+          "starters": [
+            2,
+            62,
+            51,
+            53,
+            7,
+            22,
+            34
+          ],
+          "bench": [
+            4,
+            87,
+            32
+          ]
+        },
+        {
+          "id": "test-fantasy-4",
+          "name": "Big Bat Energy",
+          "players": [
+            11,
+            82,
+            10,
+            33,
+            77,
+            24,
+            99,
+            69,
+            38,
+            42
+          ],
+          "starters": [
+            11,
+            69,
+            10,
+            33,
+            77,
+            24,
+            42
+          ],
+          "bench": [
+            82,
+            38,
+            99
+          ]
+        },
+        {
+          "id": "test-fantasy-5",
+          "name": "Bowser\u2019s Tax Evaders",
+          "players": [
+            75,
+            59,
+            3,
+            114,
+            105,
+            80,
+            56,
+            65,
+            21,
+            35
+          ],
+          "starters": [
+            59,
+            65,
+            3,
+            21,
+            35,
+            80,
+            56
+          ],
+          "bench": [
+            75,
+            105,
+            114
+          ]
+        },
+        {
+          "id": "test-fantasy-6",
+          "name": "The Foul Ball Goblins",
+          "players": [
+            89,
+            50,
+            55,
+            31,
+            78,
+            101,
+            46,
+            14,
+            70,
+            43
+          ],
+          "starters": [
+            50,
+            89,
+            55,
+            31,
+            14,
+            70,
+            43
+          ],
+          "bench": [
+            78,
+            101,
+            46
+          ]
+        },
+        {
+          "id": "test-fantasy-7",
+          "name": "Oops! All Dingers",
+          "players": [
+            94,
+            73,
+            63,
+            60,
+            30,
+            76,
+            44,
+            58,
+            27,
+            71
+          ],
+          "starters": [
+            73,
+            44,
+            63,
+            60,
+            30,
+            27,
+            58
+          ],
+          "bench": [
+            94,
+            71,
+            76
+          ]
+        },
+        {
+          "id": "test-fantasy-8",
+          "name": "Bunt Cake",
+          "players": [
+            135,
+            61,
+            28,
+            57,
+            20,
+            112,
+            48,
+            54,
+            40,
+            37
+          ],
+          "starters": [
+            61,
+            37,
+            57,
+            28,
+            48,
+            20,
+            54
+          ],
+          "bench": [
+            112,
+            135,
+            40
+          ]
+        }
+      ]
+    }
+  ]
 }

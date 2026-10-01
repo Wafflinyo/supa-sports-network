@@ -79,6 +79,7 @@ def build(fixture_path=ROOT/'src/temporary-league.json', manifest_path=REPORTS/'
         if fingerprint in fingerprints:
             raise ValueError('The same report cannot count for two fixtures')
         fingerprints.add(fingerprint)
+        before = {pid:dict(stats) for pid,stats in totals.items()}
         runs = Counter()
         wb = read_rio_workbook(path)
         try:
@@ -143,8 +144,13 @@ def build(fixture_path=ROOT/'src/temporary-league.json', manifest_path=REPORTS/'
             if runs[opponent] == 0:
                 for pid in reported_lineups[team]['battingOrder']:
                     totals[str(pid)]['teamShutouts'] += 1
+        game_stats = {}
+        for pid in game['players']:
+            key = str(pid)
+            game_stats[key] = {k:v-before.get(key,{}).get(k,0) for k,v in totals[key].items() if isinstance(v,(int,float))}
+            game_stats[key]['positionsPlayed'] = reported_lineups[owners[pid]]['positionsByPlayer'][key].split(',')
         games.append({'id':game_id,'startsAt':game['startsAt'],'awayRuns':runs[away],
-                      'homeRuns':runs[home],'playerScores':scores,'teamLineups':reported_lineups})
+                      'homeRuns':runs[home],'playerScores':scores,'teamLineups':reported_lineups,'playerStats':game_stats})
     per_game = {}
     for pid, s in totals.items():
         s['battingAverage'] = ratio(s['hits'],s['atBats'])

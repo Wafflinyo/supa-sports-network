@@ -3,7 +3,8 @@ import test from './temporary-league.json'
 import results from './temporary-results.json'
 import statGroups from './temporary-stat-columns.json'
 import TestMatchupBreakdown from './TestMatchupBreakdown.jsx'
-import { sumScores, matchupScore } from './fantasy-scoring.js'
+import { weekResults, fantasyStandings } from './temporary-weeks.js'
+import { sumScores, matchupScore, weekKey } from './fantasy-scoring.js'
 
 const profiles = test.profiles
 const leagueTeam = id => test.teams.find(t => t.id === id)
@@ -11,8 +12,6 @@ const fantasyTeam = id => test.fantasyTeams.find(t => t.id === id)
 const owner = pid => test.teams.find(t => t.players.includes(pid))
 const date = value => new Intl.DateTimeFormat('en-US', {timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(new Date(value))
 const names = ids => ids.map(id => profiles[id].name).join(' + ')
-const points = id => sumScores(results.games, id, test.weekStart)
-const teamPoints = team => matchupScore(team.starters.map(player_id=>({player_id,slot:'starter'})), results.games, test.weekStart)
 const completed = id => results.games.find(game=>game.id===id)
 const reportedTeam = team => {
   const lineup = results.lineups?.[team.id]
@@ -38,6 +37,15 @@ const statValue = (id,key,view) => key==='gamesPlayed' || view==='Totals' ? resu
 const display = (value,key,view) => value == null ? '—' : rateKeys.has(key) ? value.toFixed(3) : key==='inningsPitched' || view!=='Totals' && key!=='gamesPlayed' ? value.toFixed(2) : value
 
 export default function TemporaryLeague({ PlayerAvatar }) {
+  const [weekNumber,setWeekNumber] = useState(2)
+  const week = test.weeks.find(w=>w.number===weekNumber)
+  const schedule = test.schedule.filter(game=>weekKey(new Date(game.startsAt))===week.start)
+  const weeklyResults = weekResults(results,week.start)
+  const weekFinal = schedule.every(game=>completed(game.id))
+  const points = id => sumScores(results.games,id,week.start)
+  const teamPoints = team => matchupScore(team.starters.map(player_id=>({player_id,slot:'starter'})),results.games,week.start)
+  const fantasyTeam = id => week.fantasyTeams.find(t=>t.id===id)
+  const standings = fantasyStandings(test,results)
   const [tab,setTab] = useState('League teams')
   const [draft,setDraft] = useState('League')
   const [round,setRound] = useState(1)
@@ -55,7 +63,7 @@ export default function TemporaryLeague({ PlayerAvatar }) {
   const [statView,setStatView] = useState('Totals')
   const [query,setQuery] = useState('')
   const [sort,setSort] = useState({key:'fantasyPoints',direction:'desc'})
-  const tabs = ['League teams','Week schedule','Standings','Player Stats','Fantasy Stats','Fantasy teams','Draft boards']
+  const tabs = ['League teams','Week schedule','Standings','Player Stats','Fantasy Stats','Fantasy teams','Fantasy standings','Draft boards']
   const isFantasyStats = tab==='Fantasy Stats'
   const columns = isFantasyStats ? fantasyColumns : [...statGroups[statGroup],['fantasyPoints','Fantasy points']]
   const shownStat = (id,key) => statValue(id,key,statView) ?? (isFantasyStats && results.playerStats[id] ? 0 : null)
@@ -71,8 +79,9 @@ export default function TemporaryLeague({ PlayerAvatar }) {
   const roster = fantasyTeam(selected)
   const player = (id,detail) => <div className="test-player" key={id}><PlayerAvatar player={profiles[id]} size={30}/><div><strong>{profiles[id].name}</strong><small>{detail || profiles[id].ability}</small></div></div>
   return <>
-    <div className="page-heading"><span className="eyebrow dark">TEMPORARY EXHIBITION SETUP</span><h1>THE TEST WEEK</h1><p>October 4–10, 2026 · Eastern Time. {results.games.length} of 5 game reports received. Putouts earn 1 point; assists earn 0.75. Results and fantasy points come from uploaded Project Rio reports.</p></div>
+    <div className="page-heading"><span className="eyebrow dark">TEMPORARY EXHIBITION SETUP</span><h1>THE TEST WEEK</h1><p>{week.label} · Eastern Time. {weeklyResults.games.length} of 5 game reports received. Putouts earn 1 point; assists earn 0.75. Results and fantasy points come from uploaded Project Rio reports.</p></div>
     <div className="test-summary panel"><div><strong>10</strong><span>league teams</span></div><div><strong>90</strong><span>rostered players</span></div><div><strong>5</strong><span>scheduled games</span></div><div><strong>8</strong><span>fantasy teams</span></div></div>
+    <div className="stat-view-switch" aria-label="Test week selector">{test.weeks.map(w=><button key={w.number} className={weekNumber===w.number?'active':''} onClick={()=>{setActiveMatchup(null);setWeekNumber(w.number)}}>Week {w.number} · {w.label}</button>)}</div>
     <div className="subnav test-tabs">{tabs.map(t => <button key={t} className={tab===t?'active':''} onClick={()=>setTab(t)}>{t}</button>)}</div>
     {tab==='League teams' && <>
       <p className="test-note">Nine rounds in snake order after captain anchors. Lineups emphasize contact at the top, power in the middle, pitching options, and chemistry in the outfield. Named Miis use Mii stats and color chemistry.</p>
@@ -87,8 +96,8 @@ export default function TemporaryLeague({ PlayerAvatar }) {
         </div></section>)}</div>
       <p className="test-note">Teams awaiting reports show suggested lineups. After a report arrives, batting order and starting positions come from that report. Buddy jumps depend on in-game positioning.</p>
     </>}
-    {tab==='Week schedule' && <section className="panel test-team"><div className="section-title"><div><small>ONE GAME PER TEAM · SEVEN INNINGS</small><h2>WEEK 1 SCHEDULE</h2></div></div><div className="test-team-body">
-      {test.schedule.map(game=><article className="test-game" key={game.id}><div><small>{date(game.startsAt)} ET</small><strong>{leagueTeam(game.awayId).name}<span> at </span>{leagueTeam(game.homeId).name}</strong><p>{game.stadium} · {completed(game.id)?'Final':'Awaiting game report'}</p></div><b>{completed(game.id)?`${completed(game.id).awayRuns}–${completed(game.id).homeRuns}`:'VS'}</b></article>)}
+    {tab==='Week schedule' && <section className="panel test-team"><div className="section-title"><div><small>ONE GAME PER TEAM · SEVEN INNINGS</small><h2>WEEK {week.number} SCHEDULE</h2></div></div><div className="test-team-body">
+      {schedule.map(game=><article className="test-game" key={game.id}><div><small>{date(game.startsAt)} ET</small><strong>{leagueTeam(game.awayId).name}<span> at </span>{leagueTeam(game.homeId).name}</strong><p>{game.stadium} · {completed(game.id)?'Final':'Awaiting game report'}</p></div><b>{completed(game.id)?`${completed(game.id).awayRuns}–${completed(game.id).homeRuns}`:'VS'}</b></article>)}
       <p className="test-note">All ten teams appear exactly once. Fantasy matchups run Sunday at 12:00 a.m. through Saturday at 11:59:59 p.m. These scheduled times are exhibition fixtures, not live database lineup locks.</p>
     </div></section>}
     {tab==='Standings' && <>
@@ -101,15 +110,17 @@ export default function TemporaryLeague({ PlayerAvatar }) {
       <div className="table-scroll"><table className="fantasy-simple-table"><thead><tr><th><button onClick={()=>sortBy('name')}>Player</button></th><th>Team</th><th>Position(s) Played</th>{columns.map(([key,label])=><th key={key}><button onClick={()=>sortBy(key)}>{label}{sort.key===key?(sort.direction==='asc'?' ↑':' ↓'):''}</button></th>)}</tr></thead><tbody>{statPlayers.map(p=><tr key={p.id}><td>{p.name}</td><td>{owner(p.id).name}</td><td>{results.playerStats[p.id]?.positionsPlayed?.join(', ')||'—'}</td>{columns.map(([key])=><td key={key}>{display(shownStat(p.id,key),key,statView)}</td>)}</tr>)}</tbody></table></div>
       <p className="test-note">{isFantasyStats?'Only stats that affect fantasy scoring are included. Bonus columns count qualifying games; Fantasy Points includes their awarded points. All players show their earned points, while only fantasy starters contribute to head-to-head scores.':'All columns match the regular Player Stats categories. Totals use cumulative counts and recalculated rates; averages use counts per appearance and mean reported game rates. Pitching innings are decimal innings, as in Rio (1.33 means four outs).'} Positions include every reported position across uploaded games. A dash means no reported value yet. Averages divide fantasy points and scoring counts by games played. Scroll sideways for every column. Click headings to sort.</p>
     </section>}
+    {tab==='Fantasy standings' && <section className="panel test-team"><div className="section-title"><h2>FANTASY LEAGUE STANDINGS</h2></div><div className="table-scroll"><table className="fantasy-simple-table"><thead><tr><th>Rank</th><th>Team</th><th>Played</th><th>W</th><th>L</th><th>T</th><th>Win %</th><th>Points for</th><th>Points against</th></tr></thead><tbody>{standings.map((row,i)=><tr key={row.id}><td>{i+1}</td><td>{row.name}</td>{['played','wins','losses','ties'].map(key=><td key={key}>{row[key]}</td>)}<td>{row.played?((row.wins+row.ties/2)/row.played).toFixed(3):'—'}</td><td>{row.pointsFor}</td><td>{row.pointsAgainst}</td></tr>)}</tbody></table></div><p className="test-note">Completed weeks only. Ranked by win percentage, then points for. Bench points are excluded. Week 1 results are preserved; Week 2 counts after all five reports arrive.</p></section>}
     {tab==='Fantasy teams' && <>
+      <div className="subnav"><button className="active">Week {week.number} matchups</button><button onClick={()=>setTab('Fantasy standings')}>Fantasy standings</button></div>
       <p className="test-note">The temporary fantasy league uses a ten-round snake draft from the 90 league-rostered characters. Eight rosters have seven open starters and three bench players. Free-agent pickups are disabled.</p>
-      <div className="test-matchups">{test.fantasyMatchups.map(([a,b],index)=><button type="button" className="panel test-matchup test-matchup-button" key={a} onClick={()=>setActiveMatchup(index)}><strong>{fantasyTeam(a).name} · {teamPoints(fantasyTeam(a))}</strong><span>VS</span><strong>{fantasyTeam(b).name} · {teamPoints(fantasyTeam(b))}</strong><small>{results.games.length===5?'Final':`${results.games.length}/5 reports received · provisional scores`} · <b>Open matchup →</b></small></button>)}</div>
-      {activeMatchup!==null && <dialog ref={matchupDialog} className="matchup-dialog" aria-labelledby="matchup-dialog-title" onCancel={()=>setActiveMatchup(null)} onClick={e=>{if(e.target===e.currentTarget)setActiveMatchup(null)}}><div className="matchup-dialog-content"><header className="matchup-dialog-header"><button type="button" onClick={()=>setActiveMatchup(null)}>← Back to matchups</button><h2 id="matchup-dialog-title">{test.fantasyMatchups[activeMatchup].map(id=>fantasyTeam(id).name).join(' vs ')}</h2><button type="button" aria-label="Close matchup" onClick={()=>setActiveMatchup(null)}>✕</button></header><div className="test-matchup matchup-scoreboard">{test.fantasyMatchups[activeMatchup].map((id,index)=><React.Fragment key={id}>{index===1 && <span>VS</span>}<strong>{fantasyTeam(id).name} · {teamPoints(fantasyTeam(id))}</strong></React.Fragment>)}<small>{results.games.length}/5 reports received · {results.games.length===5?'Final scores':'Provisional scores'}</small></div><TestMatchupBreakdown teams={test.fantasyMatchups[activeMatchup].map(fantasyTeam)} test={test} results={results} columns={fantasyColumns} PlayerAvatar={PlayerAvatar}/></div></dialog>}
+      <div className="test-matchups">{week.fantasyMatchups.map(([a,b],index)=><button type="button" className="panel test-matchup test-matchup-button" key={a} onClick={()=>setActiveMatchup(index)}><strong>{fantasyTeam(a).name} · {teamPoints(fantasyTeam(a))}</strong><span>VS</span><strong>{fantasyTeam(b).name} · {teamPoints(fantasyTeam(b))}</strong><small>{weekFinal?'Final':`${weeklyResults.games.length}/5 reports received · provisional scores`} · <b>Open matchup →</b></small></button>)}</div>
+      {activeMatchup!==null && <dialog ref={matchupDialog} className="matchup-dialog" aria-labelledby="matchup-dialog-title" onCancel={()=>setActiveMatchup(null)} onClick={e=>{if(e.target===e.currentTarget)setActiveMatchup(null)}}><div className="matchup-dialog-content"><header className="matchup-dialog-header"><button type="button" onClick={()=>setActiveMatchup(null)}>← Back to matchups</button><h2 id="matchup-dialog-title">{week.fantasyMatchups[activeMatchup].map(id=>fantasyTeam(id).name).join(' vs ')}</h2><button type="button" aria-label="Close matchup" onClick={()=>setActiveMatchup(null)}>✕</button></header><div className="test-matchup matchup-scoreboard">{week.fantasyMatchups[activeMatchup].map((id,index)=><React.Fragment key={id}>{index===1 && <span>VS</span>}<strong>{fantasyTeam(id).name} · {teamPoints(fantasyTeam(id))}</strong></React.Fragment>)}<small>{weeklyResults.games.length}/5 reports received · {weekFinal?'Final scores':'Provisional scores'}</small></div><TestMatchupBreakdown teams={week.fantasyMatchups[activeMatchup].map(fantasyTeam)} test={test} results={weeklyResults} columns={fantasyColumns} PlayerAvatar={PlayerAvatar}/></div></dialog>}
 
       <div className="test-fantasy-layout"><aside className="panel test-fantasy-list">{test.fantasyTeams.map(team=><button className={team.id===selected?'selected':''} key={team.id} onClick={()=>setSelected(team.id)}>{team.name}<small>7 starters · 3 bench</small></button>)}</aside>
         <section className="panel test-team"><div className="section-title"><div><small>TEMPORARY FANTASY ROSTER</small><h2>{roster.name}</h2></div></div><div className="test-team-body">
           <div className="test-fantasy-roster">{[['Starters',roster.starters],['Bench',roster.bench]].map(([title,ids])=><section key={title}><h3>{title} ({ids.length})</h3>{ids.map(id=>player(id,`${owner(id).name} · ${points(id)} pts${title==='Bench'?' · excluded from matchup':''}`))}</section>)}</div>
-          <p className="test-note">Starting lineups and benches were set by the commissioner before the first game report. Only starters contribute to the weekly matchup.</p>
+          <p className="test-note">Current starters and benches carry forward to Week 2. Completed Week 1 uses its saved lineup. Only starters contribute to the weekly matchup.</p>
         </div></section></div>
       <details className="panel test-undrafted"><summary>10 league-rostered players not drafted in fantasy</summary><p>{names(test.eligibleUndrafted)}</p><p>They remain unavailable for pickups during this test.</p></details>
       <p className="test-note">These saved exhibition lineups score automatically when reports are added and the site rebuilds. Only seven starters contribute; all batting, fielding, pitching, and team bonuses count for each starter. Registered accounts, live drafts, and editable lineups with game-time locks still require Supabase setup.</p>
