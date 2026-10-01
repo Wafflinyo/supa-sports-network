@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import test from './temporary-league.json'
 import results from './temporary-results.json'
+import statGroups from './temporary-stat-columns.json'
 import { sumScores, matchupScore } from './fantasy-scoring.js'
 
 const profiles = test.profiles
@@ -12,14 +13,35 @@ const names = ids => ids.map(id => profiles[id].name).join(' + ')
 const points = id => sumScores(results.games, id, test.weekStart)
 const teamPoints = team => matchupScore(team.starters.map(player_id=>({player_id,slot:'starter'})), results.games, test.weekStart)
 const completed = id => results.games.find(game=>game.id===id)
+const reportedTeam = team => {
+  const lineup = results.lineups?.[team.id]
+  if (!lineup) return team
+  const outfield = ['LF','CF','RF'].map(pos=>lineup.defense[pos])
+  return {...team,...lineup,reported:true,buddyPairs:team.goodChemistryPairs.filter(pair=>pair.every(id=>outfield.includes(id)))}
+}
+const rateKeys = new Set(['battingAverage','onBase','slug','onBasePlusSlug','starSlug','era7','era9','whip','baAgainst','obAgainst','slgAgainst','opsAgainst'])
+const statValue = (id,key,view) => key==='gamesPlayed' || view==='Totals' ? results.playerStats[id]?.[key] : results.perGame?.[id]?.[key]
+const display = (value,key,view) => value == null ? '—' : rateKeys.has(key) ? value.toFixed(3) : key==='inningsPitched' || view!=='Totals' && key!=='gamesPlayed' ? value.toFixed(2) : value
 
 export default function TemporaryLeague({ PlayerAvatar }) {
   const [tab,setTab] = useState('League teams')
   const [draft,setDraft] = useState('League')
   const [round,setRound] = useState(1)
   const [selected,setSelected] = useState(test.fantasyTeams[0].id)
-  const [statGroup,setStatGroup] = useState('Batting')
-  const tabs = ['League teams','Week schedule','Stats & standings','Fantasy teams','Draft boards']
+  const [statGroup,setStatGroup] = useState('Offensive Stats')
+  const [statView,setStatView] = useState('Totals')
+  const [query,setQuery] = useState('')
+  const [sort,setSort] = useState({key:'fantasyPoints',direction:'desc'})
+  const tabs = ['League teams','Week schedule','Standings','Player Stats','Fantasy teams','Draft boards']
+  const statPlayers = Object.values(profiles).filter(p=>p.name.toLowerCase().includes(query.toLowerCase())).sort((a,b)=>{
+    const av=sort.key==='name'?a.name:statValue(a.id,sort.key,statView)
+    const bv=sort.key==='name'?b.name:statValue(b.id,sort.key,statView)
+    if(av==null && bv!=null)return 1
+    if(bv==null && av!=null)return -1
+    const comparison=typeof av==='number' && typeof bv==='number'?av-bv:String(av??'').localeCompare(String(bv??''))
+    return sort.direction==='asc'?comparison:-comparison
+  })
+  const sortBy = key => setSort(previous=>({key,direction:previous.key===key && previous.direction==='desc'?'asc':'desc'}))
   const roster = fantasyTeam(selected)
   const player = (id,detail) => <div className="test-player" key={id}><PlayerAvatar player={profiles[id]} size={30}/><div><strong>{profiles[id].name}</strong><small>{detail || profiles[id].ability}</small></div></div>
   return <>
@@ -28,32 +50,38 @@ export default function TemporaryLeague({ PlayerAvatar }) {
     <div className="subnav test-tabs">{tabs.map(t => <button key={t} className={tab===t?'active':''} onClick={()=>setTab(t)}>{t}</button>)}</div>
     {tab==='League teams' && <>
       <p className="test-note">Nine rounds in snake order after captain anchors. Lineups emphasize contact at the top, power in the middle, pitching options, and chemistry in the outfield. Named Miis use Mii stats and color chemistry.</p>
-      <div className="test-grid">{test.teams.map(team => <section className="panel test-team" key={team.id}>
+      <div className="test-grid">{test.teams.map(reportedTeam).map(team => <section className="panel test-team" key={team.id}>
         <div className="section-title"><div><small>{team.players.length} PLAYERS · ANCHOR {profiles[team.anchor].name}</small><h2>{team.name}</h2></div></div>
-        <div className="test-team-body"><p>{team.identity}</p>
+        <div className="test-team-body"><p>{team.reported?'Actual report lineup · leftmost position is the starting position':team.identity}</p>
           <div className="test-lineup-head"><span>BAT</span><span>PLAYER / ABILITY</span><span>POS</span></div>
           {team.battingOrder.map((id,i) => <div className="test-lineup-row" key={id}><b>{i+1}</b>{player(id)}<b>{Object.entries(team.defense).find(([,pid])=>pid===id)?.[0]}</b></div>)}
           <dl className="test-details"><div><dt>Opening pitcher</dt><dd>{profiles[team.defense.P].name}</dd></div><div><dt>Pitching options</dt><dd>{team.pitchingDepth.map(id=>profiles[id].name).join(', ')}</dd></div><div><dt>Outfield buddy pairs</dt><dd>{team.buddyPairs.map(pair=>names(pair)).join('; ') || 'No positive pair'}</dd></div><div><dt>Positive chemistry</dt><dd>{team.goodChemistryPairs.length} pairs</dd></div>
             {!!team.badChemistryPairs.length && <div><dt>Watch chemistry</dt><dd>{team.badChemistryPairs.map(pair=>names(pair)).join('; ')}. Keep these pairs apart in fielding and batting order.</dd></div>}
           </dl>
         </div></section>)}</div>
-      <p className="test-note">Buddy jumps depend on in-game positioning. Suggested positions and pitching options can be adjusted in Dolphin before play.</p>
+      <p className="test-note">Teams awaiting reports show suggested lineups. After a report arrives, batting order and starting positions come from that report. Buddy jumps depend on in-game positioning.</p>
     </>}
     {tab==='Week schedule' && <section className="panel test-team"><div className="section-title"><div><small>ONE GAME PER TEAM · SEVEN INNINGS</small><h2>WEEK 1 SCHEDULE</h2></div></div><div className="test-team-body">
       {test.schedule.map(game=><article className="test-game" key={game.id}><div><small>{date(game.startsAt)} ET</small><strong>{leagueTeam(game.awayId).name}<span> at </span>{leagueTeam(game.homeId).name}</strong><p>{game.stadium} · {completed(game.id)?'Final':'Awaiting game report'}</p></div><b>{completed(game.id)?`${completed(game.id).awayRuns}–${completed(game.id).homeRuns}`:'VS'}</b></article>)}
       <p className="test-note">All ten teams appear exactly once. Fantasy matchups run Sunday at 12:00 a.m. through Saturday at 11:59:59 p.m. These scheduled times are exhibition fixtures, not live database lineup locks.</p>
     </div></section>}
-    {tab==='Stats & standings' && <>
+    {tab==='Standings' && <>
       <section className="panel test-team"><div className="section-title"><h2>LEAGUE STANDINGS</h2></div><div className="table-scroll"><table className="fantasy-simple-table"><thead><tr><th>Team</th><th>GP</th><th>W</th><th>L</th><th>T</th><th>Runs for</th><th>Runs against</th></tr></thead><tbody>{[...test.teams].sort((a,b)=>results.standings[b.id].wins-results.standings[a.id].wins || (results.standings[b.id].runsFor-results.standings[b.id].runsAgainst)-(results.standings[a.id].runsFor-results.standings[a.id].runsAgainst)).map(team=><tr key={team.id}><td>{team.name}</td>{['played','wins','losses','ties','runsFor','runsAgainst'].map(key=><td key={key}>{results.standings[team.id][key]}</td>)}</tr>)}</tbody></table></div></section>
-      <section className="panel test-team"><div className="section-title"><h2>PLAYER STATS</h2></div><div className="subnav">{['Batting','Fielding','Pitching'].map(group=><button key={group} className={group===statGroup?'active':''} onClick={()=>setStatGroup(group)}>{group}</button>)}</div><div className="table-scroll"><table className="fantasy-simple-table"><thead><tr><th>Player</th><th>Team</th>{(statGroup==='Batting'?['GP','AB','H','R','RBI','HR','AVG','SLG']:statGroup==='Fielding'?['GP','PO','A','Buddy PO','DP','TP','Bobbles']:['Pitch games','IP','K','H allowed','ER','BB','ERA-7','WHIP']).map(label=><th key={label}>{label}</th>)}<th>Fantasy pts</th></tr></thead><tbody>{Object.entries(results.playerStats).sort(([a],[b])=>points(b)-points(a)).filter(([,stats])=>statGroup!=='Pitching'||stats.pitchingGames>0).map(([id,stats])=><tr key={id}><td>{profiles[id].name}</td><td>{owner(Number(id)).name}</td>{(statGroup==='Batting'?['gamesPlayed','atBats','hits','runs','rbi','homeRuns','battingAverage','slugging']:statGroup==='Fielding'?['gamesPlayed','putouts','assists','buddyJumpPutouts','doublePlays','triplePlays','bobbles']:['pitchingGames','inningsPitched','pitchStrikeouts','hitsAllowed','earnedRuns','pitchWalks','era7','whip']).map(key=><td key={key}>{stats[key]??'—'}</td>)}<td>{points(id)}</td></tr>)}</tbody></table></div>{!results.games.length && <p className="test-note">No game reports yet. Stats will appear after the first report is processed.</p>}</section>
     </>}
+    {tab==='Player Stats' && <section className="panel test-team"><div className="section-title"><h2>TEST PLAYER STATS</h2></div>
+      <div className="subnav">{Object.keys(statGroups).map(group=><button key={group} className={group===statGroup?'active':''} onClick={()=>setStatGroup(group)}>{group}</button>)}</div>
+      <div className="stat-view-switch">{['Totals','Averages per Game'].map(view=><button key={view} className={statView===view?'active':''} onClick={()=>setStatView(view)}>{view}</button>)}</div>
+      <div className="table-tools"><div className="search"><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search test players" aria-label="Search test players"/></div><span>{statPlayers.length} PLAYERS</span></div>
+      <div className="table-scroll"><table className="fantasy-simple-table"><thead><tr><th><button onClick={()=>sortBy('name')}>Player</button></th><th>Team</th><th>Starting position</th>{[...statGroups[statGroup],['fantasyPoints','Fantasy points']].map(([key,label])=><th key={key}><button onClick={()=>sortBy(key)}>{label}{sort.key===key?(sort.direction==='asc'?' ↑':' ↓'):''}</button></th>)}</tr></thead><tbody>{statPlayers.map(p=><tr key={p.id}><td>{p.name}</td><td>{owner(p.id).name}</td><td>{results.lineups?.[owner(p.id).id]?.positionsByPlayer[p.id]?.split(',')[0].trim()??'—'}</td>{[...statGroups[statGroup],['fantasyPoints','Fantasy points']].map(([key])=><td key={key}>{display(statValue(p.id,key,statView),key,statView)}</td>)}</tr>)}</tbody></table></div>
+      <p className="test-note">All columns match the regular Player Stats categories. A dash means no reported value yet. Totals use cumulative counts and recalculated rates; per-game views use counts per appearance and mean reported game rates. Pitching innings are decimal innings, as in Rio (1.33 means four outs). Scroll sideways for every column. Click headings to sort.</p>
+    </section>}
     {tab==='Fantasy teams' && <>
       <p className="test-note">The temporary fantasy league uses a ten-round snake draft from the 90 league-rostered characters. Eight rosters have seven open starters and three bench players. Free-agent pickups are disabled.</p>
       <div className="test-matchups">{test.fantasyMatchups.map(([a,b])=><div className="panel test-matchup" key={a}><strong>{fantasyTeam(a).name} · {teamPoints(fantasyTeam(a))}</strong><span>VS</span><strong>{fantasyTeam(b).name} · {teamPoints(fantasyTeam(b))}</strong><small>{results.games.length===5?'Final':`${results.games.length}/5 reports received · provisional scores`}</small></div>)}</div>
       <div className="test-fantasy-layout"><aside className="panel test-fantasy-list">{test.fantasyTeams.map(team=><button className={team.id===selected?'selected':''} key={team.id} onClick={()=>setSelected(team.id)}>{team.name}<small>7 starters · 3 bench</small></button>)}</aside>
         <section className="panel test-team"><div className="section-title"><div><small>TEMPORARY FANTASY ROSTER</small><h2>{roster.name}</h2></div></div><div className="test-team-body">
           <div className="test-fantasy-roster">{[['Starters',roster.starters],['Bench',roster.bench]].map(([title,ids])=><section key={title}><h3>{title} ({ids.length})</h3>{ids.map(id=>player(id,`${owner(id).name} · ${points(id)} pts${title==='Bench'?' · excluded from matchup':''}`))}</section>)}</div>
-          <p className="test-note">Draft priorities combine hitting/contact, power and trajectory, fielding and catch/dive abilities, and expected pitching roles. These are roster selections, not point projections.</p>
+          <p className="test-note">Starting lineups and benches were set by the commissioner before the first game report. Only starters contribute to the weekly matchup.</p>
         </div></section></div>
       <details className="panel test-undrafted"><summary>10 league-rostered players not drafted in fantasy</summary><p>{names(test.eligibleUndrafted)}</p><p>They remain unavailable for pickups during this test.</p></details>
       <p className="test-note">These saved exhibition lineups score automatically when reports are added and the site rebuilds. Only seven starters contribute; all batting, fielding, pitching, and team bonuses count for each starter. Registered accounts, live drafts, and editable lineups with game-time locks still require Supabase setup.</p>

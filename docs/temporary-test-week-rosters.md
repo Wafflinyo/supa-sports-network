@@ -2,7 +2,7 @@
 
 October 4–10, 2026 · Eastern. Putouts: **1 point**. Assists: **0.75 points**.
 
-Draft ownership is unchanged. Batting orders were rechecked for contact, power, and chemistry. Positions were checked for range, catch abilities, arms, outfield buddy pairs, and pitching depth. Fantasy starters were re-ranked for the new putout value.
+Draft ownership is unchanged. Batting orders were rechecked for contact, power, and chemistry. Positions were checked for range, catch abilities, arms, outfield buddy pairs, and pitching depth. Fantasy starters and benches were set by the commissioner before the first report; these selections are retained on rebuild.
 
 ## League lineups
 
@@ -196,51 +196,51 @@ Seven open starters; three bench. Only starters contribute to the weekly matchup
 
 ### Pitch Please
 
-Starters: Mario, Blue Dry Bones, Birdo, Red Pianta, Cranky Kong, Green Shy Guy, Shy Guy.
+Starters: Mario, Blue Dry Bones, Birdo, Red Pianta, Green Magikoopa, Green Shy Guy, Shy Guy.
 
-Bench: Blue Shy Guy, Monty Mole, Green Magikoopa.
+Bench: Blue Shy Guy, Monty Mole, Cranky Kong.
 
 ### The Swingin’ Dinguses
 
-Starters: Daisy, Dry Bones, Petey Piranha, Shaggy, Scooby Doo, Baby DK, Peach.
+Starters: Red Yoshi, Dry Bones, Petey Piranha, Shaggy, Green Koopa, Baby DK, Peach.
 
-Bench: Green Koopa, Red Yoshi, Boo.
+Bench: Scooby Doo, Daisy, Boo.
 
 ### Sons of Pitches
 
-Starters: Luigi, Brown Kritter, Dark Bones, Fire Bro, Brock, Blue Pianta, Green Toad.
+Starters: Luigi, Brown Kritter, Dark Bones, Fire Bro, Yoshi, Blue Pianta, Blue Magikoopa.
 
-Bench: Diddy Kong, Yoshi, Blue Magikoopa.
+Bench: Diddy Kong, Brock, Green Toad.
 
 ### Big Bat Energy
 
-Starters: Wario, Ronald McDonald, Bowser, Purple Toad, Roshi, Yellow Pianta, Sans.
+Starters: Wario, Yellow Yoshi, Bowser, Purple Toad, Roshi, Yellow Pianta, Paragoomba.
 
-Bench: Yellow Yoshi, King Boo, Paragoomba.
+Bench: Ronald McDonald, King Boo, Sans.
 
 ### Bowser’s Tax Evaders
 
-Starters: Kritter, Harley Quinn, Donkey Kong, Coach, Mike, Nigel Thornberry, Blooper.
+Starters: Kritter, Baby Daisy, Donkey Kong, Red Paratroopa, Red Magikoopa, Nigel Thornberry, Blooper.
 
-Bench: Baby Daisy, Red Paratroopa, Red Magikoopa.
+Bench: Harley Quinn, Coach, Mike.
 
 ### The Foul Ball Goblins
 
-Starters: Green Dry Bones, John Cena, Wiggler, Yellow Toad, Inkling, Saul Goodman, Yellow Shy Guy.
+Starters: Green Dry Bones, John Cena, Wiggler, Yellow Toad, Red Toad, Light Blue Yoshi, Red Koopa.
 
-Bench: Red Toad, Light Blue Yoshi, Red Koopa.
+Bench: Inkling, Saul Goodman, Yellow Shy Guy.
 
 ### Oops! All Dingers
 
-Starters: Pauline, Jack Black, King K Rool, Blue Kritter, Blue Toad, Red, Tiny Kong.
+Starters: Pauline, Green Paratroopa, King K Rool, Blue Kritter, Blue Toad, Green Noki, Tiny Kong.
 
-Bench: Green Paratroopa, Pink Yoshi, Green Noki.
+Bench: Jack Black, Pink Yoshi, Red.
 
 ### Bunt Cake
 
-Starters: Red Kritter, Mario Judah, Funky Kong, Hammer Bro, Walter White, Bowser Jr., Boomerang Bro.
+Starters: Red Kritter, Yellow Magikoopa, Funky Kong, Hammer Bro, Gray Shy Guy, Bowser Jr., Boomerang Bro.
 
-Bench: Gray Shy Guy, Yellow Magikoopa, Dixie Kong.
+Bench: Walter White, Mario Judah, Dixie Kong.
 
 ## Schedule
 
@@ -268,3 +268,5 @@ After each report is registered and published, Test Week updates its game scores
 This test uses fixed saved lineups. Website uploads, user accounts, and live game-time lineup locks are not activated. Temporary data is kept separate from official season records and can be cleared after the test.
 
 Ratings and chemistry use the supplied workbooks. Named Miis retain stock Mii abilities. Two roster chemistry conflicts remain as listed; suggested positions avoid pairing them for buddy jumps. No game results are fabricated.
+
+Uploaded reports replace each team’s displayed batting order and starting positions. For positions such as `LF, P`, use `LF` as the starting position and retain pitching stats from the Pitching sheet. Test Player Stats mirrors all regular-site stat columns, with totals, per-game averages, search, and sorting.

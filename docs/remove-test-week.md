@@ -9,7 +9,7 @@ The trial is separate from official `games/`, official player appearances, regis
 When testing is finished, make a new cleanup commit rather than force-resetting main:
 
 1. Restore `src/main.jsx`, `src/styles.css`, `.github/workflows/deploy.yml`, and `scripts/build_fantasy_games.py` from the checkpoint, reviewing any later non-test changes before applying them.
-2. Delete `src/TemporaryLeague.jsx`, `src/temporary-league.json`, `src/temporary-results.json`, `scripts/build_temporary_results.py`, and `scripts/review_temporary_lineups.py`.
+2. Delete `src/TemporaryLeague.jsx`, `src/temporary-league.json`, `src/temporary-results.json`, `src/temporary-stat-columns.json`, `scripts/build_temporary_results.py`, and `scripts/review_temporary_lineups.py`.
 3. Delete every test report and manifest in `test-games/`. Delete test-week documentation if a complete repository cleanup is desired.
 4. Keep `src/fantasy-rules.json` at the current agreed weights; it was changed in a separate commit before the temporary setup.
 5. Build and deploy. Confirm that Test Week navigation, its Fantasy shortcut, trial teams, scores, and trial assets are absent, and the regular site and Rules & Point System remain available.

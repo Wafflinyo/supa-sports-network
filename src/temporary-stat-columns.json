@@ -1,0 +1,288 @@
+{
+  "Offensive Stats": [
+    [
+      "gamesPlayed",
+      "Games Played"
+    ],
+    [
+      "atBats",
+      "At-Bats"
+    ],
+    [
+      "plateAppearances",
+      "Plate Appearances"
+    ],
+    [
+      "runs",
+      "Runs"
+    ],
+    [
+      "hits",
+      "Hits"
+    ],
+    [
+      "rbi",
+      "RBI"
+    ],
+    [
+      "batStrikeouts",
+      "Strikeouts"
+    ],
+    [
+      "batWalks",
+      "Walks"
+    ],
+    [
+      "hitByPitch",
+      "Hit By Pitch"
+    ],
+    [
+      "singles",
+      "Singles"
+    ],
+    [
+      "doubles",
+      "Doubles"
+    ],
+    [
+      "triples",
+      "Triples"
+    ],
+    [
+      "homeRuns",
+      "Home Runs"
+    ],
+    [
+      "oneHr",
+      "1HR"
+    ],
+    [
+      "twoHr",
+      "2HR"
+    ],
+    [
+      "threeHr",
+      "3HR"
+    ],
+    [
+      "grandSlams",
+      "Grand Slams"
+    ],
+    [
+      "itpHomeRuns",
+      "ITP Home Runs"
+    ],
+    [
+      "totalBases",
+      "Total Bases"
+    ],
+    [
+      "sacFlys",
+      "Sac Flys"
+    ],
+    [
+      "doublePlaysHitInto",
+      "Double Plays Hit Into"
+    ],
+    [
+      "triplePlaysHitInto",
+      "Triple Plays Hit Into"
+    ],
+    [
+      "buddyJumpsHitInto",
+      "Buddy Jumps Hit Into"
+    ],
+    [
+      "starSwings",
+      "Star Swings"
+    ],
+    [
+      "starHits",
+      "Star Hits"
+    ],
+    [
+      "batStarsUsed",
+      "Stars Used"
+    ],
+    [
+      "battingAverage",
+      "Batting Average"
+    ],
+    [
+      "onBase",
+      "On Base %"
+    ],
+    [
+      "slug",
+      "Slug %"
+    ],
+    [
+      "onBasePlusSlug",
+      "On Base + Slug"
+    ],
+    [
+      "starSlug",
+      "Star Slug %"
+    ],
+    [
+      "stolenBases",
+      "Stolen Bases"
+    ],
+    [
+      "caughtStealing",
+      "Caught Stealing"
+    ],
+    [
+      "stealAttempts",
+      "Steal Attempts"
+    ]
+  ],
+  "Defensive Stats": [
+    [
+      "gamesPlayed",
+      "Games Played"
+    ],
+    [
+      "putouts",
+      "Putouts"
+    ],
+    [
+      "assists",
+      "Assists"
+    ],
+    [
+      "buddyJumpPutouts",
+      "Buddy Jump Putouts"
+    ],
+    [
+      "buddyJumpAttempts",
+      "Buddy Jump Attempts"
+    ],
+    [
+      "doublePlays",
+      "Double Plays"
+    ],
+    [
+      "triplePlays",
+      "Triple Plays"
+    ],
+    [
+      "bobbles",
+      "Bobbles"
+    ]
+  ],
+  "Pitching Stats": [
+    [
+      "gamesPlayed",
+      "Games Played"
+    ],
+    [
+      "battersFaced",
+      "Batters Faced"
+    ],
+    [
+      "inningsPitched",
+      "Innings Pitched"
+    ],
+    [
+      "pitches",
+      "Pitches"
+    ],
+    [
+      "strikes",
+      "Strikes"
+    ],
+    [
+      "balls",
+      "Balls"
+    ],
+    [
+      "pitchStrikeouts",
+      "Strikeouts"
+    ],
+    [
+      "pitchWalks",
+      "Walks"
+    ],
+    [
+      "beanBalls",
+      "Bean Balls"
+    ],
+    [
+      "hitsAllowed",
+      "Hits Allowed"
+    ],
+    [
+      "runsAllowed",
+      "Runs Allowed"
+    ],
+    [
+      "singlesAllowed",
+      "Singles Allowed"
+    ],
+    [
+      "doublesAllowed",
+      "Doubles Allowed"
+    ],
+    [
+      "triplesAllowed",
+      "Triples Allowed"
+    ],
+    [
+      "hrAllowed",
+      "HR Allowed"
+    ],
+    [
+      "earnedRuns",
+      "Earned Runs"
+    ],
+    [
+      "inheritedRuns",
+      "Inherited Runs"
+    ],
+    [
+      "starPitches",
+      "Star Pitches"
+    ],
+    [
+      "pitchStarsUsed",
+      "Stars Used"
+    ],
+    [
+      "pickoffs",
+      "Pickoffs"
+    ],
+    [
+      "pickoffAttempts",
+      "Pickoff Attempts"
+    ],
+    [
+      "era7",
+      "ERA-7"
+    ],
+    [
+      "era9",
+      "ERA-9"
+    ],
+    [
+      "whip",
+      "WHIP"
+    ],
+    [
+      "baAgainst",
+      "BA Against"
+    ],
+    [
+      "obAgainst",
+      "OB% Against"
+    ],
+    [
+      "slgAgainst",
+      "SLG Against"
+    ],
+    [
+      "opsAgainst",
+      "OPS Against"
+    ]
+  ]
+}

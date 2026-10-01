@@ -42,6 +42,7 @@ def priority(pid):
     return score
 
 for team in data['fantasyTeams']:
+    if data.get('fantasyLineupsSetBy'): continue
     ranked = sorted(team['players'], key=lambda pid: (-priority(pid), pid))
     team['starters'], team['bench'] = ranked[:7], ranked[7:]
 
@@ -62,7 +63,8 @@ for team in data['fantasyTeams']:
     assert len(team['starters']) == 7 and len(team['bench']) == 3
     assert set(team['starters']).isdisjoint(team['bench'])
     assert set(team['starters']+team['bench']) == set(team['players'])
-    assert min(priority(p) for p in team['starters']) >= max(priority(p) for p in team['bench'])
+    if not data.get('fantasyLineupsSetBy'):
+        assert min(priority(p) for p in team['starters']) >= max(priority(p) for p in team['bench'])
 fantasy_ids = [p for t in data['fantasyTeams'] for p in t['players']]
 assert len(set(fantasy_ids)) == len(fantasy_ids) == 80 and set(fantasy_ids) <= set(league_ids)
 path.write_text(json.dumps(data, indent=2)+'\n')
