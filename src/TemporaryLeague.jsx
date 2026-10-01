@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import test from './temporary-league.json'
 import results from './temporary-results.json'
 import statGroups from './temporary-stat-columns.json'
+import TestMatchupBreakdown from './TestMatchupBreakdown.jsx'
 import { sumScores, matchupScore } from './fantasy-scoring.js'
 
 const profiles = test.profiles
@@ -93,7 +94,7 @@ export default function TemporaryLeague({ PlayerAvatar }) {
     </section>}
     {tab==='Fantasy teams' && <>
       <p className="test-note">The temporary fantasy league uses a ten-round snake draft from the 90 league-rostered characters. Eight rosters have seven open starters and three bench players. Free-agent pickups are disabled.</p>
-      <div className="test-matchups">{test.fantasyMatchups.map(([a,b])=><div className="panel test-matchup" key={a}><strong>{fantasyTeam(a).name} · {teamPoints(fantasyTeam(a))}</strong><span>VS</span><strong>{fantasyTeam(b).name} · {teamPoints(fantasyTeam(b))}</strong><small>{results.games.length===5?'Final':`${results.games.length}/5 reports received · provisional scores`}</small></div>)}</div>
+      <div className="test-matchups test-matchups-detailed">{test.fantasyMatchups.map(([a,b],index)=><details className="panel test-matchup-card" key={a} open={index===0}><summary className="test-matchup"><strong>{fantasyTeam(a).name} · {teamPoints(fantasyTeam(a))}</strong><span>VS</span><strong>{fantasyTeam(b).name} · {teamPoints(fantasyTeam(b))}</strong><small>{results.games.length===5?'Final':`${results.games.length}/5 reports received · provisional scores`} · <b>View matchup breakdown</b></small></summary><TestMatchupBreakdown teams={[fantasyTeam(a),fantasyTeam(b)]} test={test} results={results} columns={fantasyColumns} PlayerAvatar={PlayerAvatar}/></details>)}</div>
       <div className="test-fantasy-layout"><aside className="panel test-fantasy-list">{test.fantasyTeams.map(team=><button className={team.id===selected?'selected':''} key={team.id} onClick={()=>setSelected(team.id)}>{team.name}<small>7 starters · 3 bench</small></button>)}</aside>
         <section className="panel test-team"><div className="section-title"><div><small>TEMPORARY FANTASY ROSTER</small><h2>{roster.name}</h2></div></div><div className="test-team-body">
           <div className="test-fantasy-roster">{[['Starters',roster.starters],['Bench',roster.bench]].map(([title,ids])=><section key={title}><h3>{title} ({ids.length})</h3>{ids.map(id=>player(id,`${owner(id).name} · ${points(id)} pts${title==='Bench'?' · excluded from matchup':''}`))}</section>)}</div>
