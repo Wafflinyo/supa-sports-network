@@ -6,5 +6,9 @@
   {
     "gameId": "test-week-1-game-5",
     "report": "test-week-1-game-5.rio.json"
+  },
+  {
+    "gameId": "test-week-1-game-4",
+    "report": "test-week-1-game-4.rio.json"
   }
 ]
