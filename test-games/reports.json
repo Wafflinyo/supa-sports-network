@@ -2,5 +2,9 @@
   {
     "gameId": "test-week-1-game-1",
     "report": "test-week-1-game-1.rio.json"
+  },
+  {
+    "gameId": "test-week-1-game-5",
+    "report": "test-week-1-game-5.rio.json"
   }
 ]
