@@ -20,6 +20,19 @@ const reportedTeam = team => {
   return {...team,...lineup,reported:true,buddyPairs:team.goodChemistryPairs.filter(pair=>pair.every(id=>outfield.includes(id)))}
 }
 const rateKeys = new Set(['battingAverage','onBase','slug','onBasePlusSlug','starSlug','era7','era9','whip','baAgainst','obAgainst','slgAgainst','opsAgainst'])
+const fantasyColumns = [
+  ['gamesPlayed','Games Played'],['fantasyPoints','Fantasy Points'],
+  ['singles','Singles'],['doubles','Doubles'],['triples','Triples'],['homeRuns','Home Runs'],
+  ['runs','Runs'],['rbi','RBI'],['batWalks','Batting Walks'],['hitByPitch','Hit By Pitch'],
+  ['stolenBases','Stolen Bases'],['caughtStealing','Caught Stealing'],['batStrikeouts','Batting Strikeouts'],
+  ['doublePlaysHitInto','Double Plays Hit Into'],['grandSlams','Grand Slams'],
+  ['putouts','Putouts'],['assists','Assists'],['buddyJumpPutouts','Buddy Jump Putouts'],
+  ['doublePlays','Double Plays'],['triplePlays','Triple Plays'],['bobbles','Bobbles'],
+  ['outs','Pitching Outs'],['pitchStrikeouts','Pitching Strikeouts'],['hitsAllowed','Hits Allowed'],
+  ['earnedRuns','Earned Runs'],['hrAllowed','Home Runs Allowed'],['pitchWalks','Pitching Walks'],
+  ['beanBalls','Bean Balls'],['pickoffs','Pickoffs'],['threeInningGames','3-Inning Bonuses'],
+  ['completeGames','Complete-Game Bonuses'],['teamShutouts','Team Shutout Bonuses'],
+]
 const statValue = (id,key,view) => key==='gamesPlayed' || view==='Totals' ? results.playerStats[id]?.[key] : results.perGame?.[id]?.[key]
 const display = (value,key,view) => value == null ? '—' : rateKeys.has(key) ? value.toFixed(3) : key==='inningsPitched' || view!=='Totals' && key!=='gamesPlayed' ? value.toFixed(2) : value
 
@@ -32,10 +45,13 @@ export default function TemporaryLeague({ PlayerAvatar }) {
   const [statView,setStatView] = useState('Totals')
   const [query,setQuery] = useState('')
   const [sort,setSort] = useState({key:'fantasyPoints',direction:'desc'})
-  const tabs = ['League teams','Week schedule','Standings','Player Stats','Fantasy teams','Draft boards']
+  const tabs = ['League teams','Week schedule','Standings','Player Stats','Fantasy Stats','Fantasy teams','Draft boards']
+  const isFantasyStats = tab==='Fantasy Stats'
+  const columns = isFantasyStats ? fantasyColumns : [...statGroups[statGroup],['fantasyPoints','Fantasy points']]
+  const shownStat = (id,key) => statValue(id,key,statView) ?? (isFantasyStats && results.playerStats[id] ? 0 : null)
   const statPlayers = Object.values(profiles).filter(p=>p.name.toLowerCase().includes(query.toLowerCase())).sort((a,b)=>{
-    const av=sort.key==='name'?a.name:statValue(a.id,sort.key,statView)
-    const bv=sort.key==='name'?b.name:statValue(b.id,sort.key,statView)
+    const av=sort.key==='name'?a.name:shownStat(a.id,sort.key)
+    const bv=sort.key==='name'?b.name:shownStat(b.id,sort.key)
     if(av==null && bv!=null)return 1
     if(bv==null && av!=null)return -1
     const comparison=typeof av==='number' && typeof bv==='number'?av-bv:String(av??'').localeCompare(String(bv??''))
@@ -68,12 +84,12 @@ export default function TemporaryLeague({ PlayerAvatar }) {
     {tab==='Standings' && <>
       <section className="panel test-team"><div className="section-title"><h2>LEAGUE STANDINGS</h2></div><div className="table-scroll"><table className="fantasy-simple-table"><thead><tr><th>Team</th><th>GP</th><th>W</th><th>L</th><th>T</th><th>Runs for</th><th>Runs against</th></tr></thead><tbody>{[...test.teams].sort((a,b)=>results.standings[b.id].wins-results.standings[a.id].wins || (results.standings[b.id].runsFor-results.standings[b.id].runsAgainst)-(results.standings[a.id].runsFor-results.standings[a.id].runsAgainst)).map(team=><tr key={team.id}><td>{team.name}</td>{['played','wins','losses','ties','runsFor','runsAgainst'].map(key=><td key={key}>{results.standings[team.id][key]}</td>)}</tr>)}</tbody></table></div></section>
     </>}
-    {tab==='Player Stats' && <section className="panel test-team"><div className="section-title"><h2>TEST PLAYER STATS</h2></div>
-      <div className="subnav">{Object.keys(statGroups).map(group=><button key={group} className={group===statGroup?'active':''} onClick={()=>setStatGroup(group)}>{group}</button>)}</div>
-      <div className="stat-view-switch">{['Totals','Averages per Game'].map(view=><button key={view} className={statView===view?'active':''} onClick={()=>setStatView(view)}>{view}</button>)}</div>
+    {(tab==='Player Stats' || isFantasyStats) && <section className="panel test-team test-stats"><div className="section-title"><h2>{isFantasyStats?'FANTASY STATS':'TEST PLAYER STATS'}</h2></div>
+      {!isFantasyStats && <div className="subnav">{Object.keys(statGroups).map(group=><button key={group} className={group===statGroup?'active':''} onClick={()=>setStatGroup(group)}>{group}</button>)}</div>}
+      <div className="stat-view-switch">{['Totals','Averages per Game'].map(view=><button key={view} className={statView===view?'active':''} onClick={()=>setStatView(view)}>{view==='Totals'?'Totals':'Averages'}</button>)}</div>
       <div className="table-tools"><div className="search"><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search test players" aria-label="Search test players"/></div><span>{statPlayers.length} PLAYERS</span></div>
-      <div className="table-scroll"><table className="fantasy-simple-table"><thead><tr><th><button onClick={()=>sortBy('name')}>Player</button></th><th>Team</th><th>Starting position</th>{[...statGroups[statGroup],['fantasyPoints','Fantasy points']].map(([key,label])=><th key={key}><button onClick={()=>sortBy(key)}>{label}{sort.key===key?(sort.direction==='asc'?' ↑':' ↓'):''}</button></th>)}</tr></thead><tbody>{statPlayers.map(p=><tr key={p.id}><td>{p.name}</td><td>{owner(p.id).name}</td><td>{results.lineups?.[owner(p.id).id]?.positionsByPlayer[p.id]?.split(',')[0].trim()??'—'}</td>{[...statGroups[statGroup],['fantasyPoints','Fantasy points']].map(([key])=><td key={key}>{display(statValue(p.id,key,statView),key,statView)}</td>)}</tr>)}</tbody></table></div>
-      <p className="test-note">All columns match the regular Player Stats categories. A dash means no reported value yet. Totals use cumulative counts and recalculated rates; per-game views use counts per appearance and mean reported game rates. Pitching innings are decimal innings, as in Rio (1.33 means four outs). Scroll sideways for every column. Click headings to sort.</p>
+      <div className="table-scroll"><table className="fantasy-simple-table"><thead><tr><th><button onClick={()=>sortBy('name')}>Player</button></th><th>Team</th><th>Position(s) Played</th>{columns.map(([key,label])=><th key={key}><button onClick={()=>sortBy(key)}>{label}{sort.key===key?(sort.direction==='asc'?' ↑':' ↓'):''}</button></th>)}</tr></thead><tbody>{statPlayers.map(p=><tr key={p.id}><td>{p.name}</td><td>{owner(p.id).name}</td><td>{results.playerStats[p.id]?.positionsPlayed?.join(', ')||'—'}</td>{columns.map(([key])=><td key={key}>{display(shownStat(p.id,key),key,statView)}</td>)}</tr>)}</tbody></table></div>
+      <p className="test-note">{isFantasyStats?'Only stats that affect fantasy scoring are included. Bonus columns count qualifying games; Fantasy Points includes their awarded points. All players show their earned points, while only fantasy starters contribute to head-to-head scores.':'All columns match the regular Player Stats categories. Totals use cumulative counts and recalculated rates; averages use counts per appearance and mean reported game rates. Pitching innings are decimal innings, as in Rio (1.33 means four outs).'} Positions include every reported position across uploaded games. A dash means no reported value yet. Averages divide fantasy points and scoring counts by games played. Scroll sideways for every column. Click headings to sort.</p>
     </section>}
     {tab==='Fantasy teams' && <>
       <p className="test-note">The temporary fantasy league uses a ten-round snake draft from the 90 league-rostered characters. Eight rosters have seven open starters and three bench players. Free-agent pickups are disabled.</p>

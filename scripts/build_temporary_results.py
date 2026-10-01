@@ -97,6 +97,12 @@ def build(fixture_path=ROOT/'src/temporary-league.json', manifest_path=REPORTS/'
                 lineup['defense'][position] = pid
                 lineup['positionsByPlayer'][str(pid)] = row['Position']
                 stats = totals.setdefault(str(pid), Counter())
+                played_positions = stats.setdefault('positionsPlayed', [])
+                for played in row['Position'].split(','):
+                    played = played.strip().upper()
+                    if played not in {'P','C','1B','2B','3B','SS','LF','CF','RF'}:
+                        raise ValueError(f'Unknown played position {played!r}')
+                    if played not in played_positions: played_positions.append(played)
                 stats['gamesPlayed'] += 1
                 for key, heading in STAT_COLUMNS.items(): stats[key] += num(row, heading)
                 collect_rates(row, BAT_RATES, pid, rate_samples)
@@ -110,6 +116,7 @@ def build(fixture_path=ROOT/'src/temporary-league.json', manifest_path=REPORTS/'
                 reported_lineups[owners[pid]]['pitchingDepth'].append(pid)
                 stats = totals[str(pid)]
                 stats['outs'] += round(num(row,'Innings Pitched')*3)
+                stats['threeInningGames'] += int(round(num(row,'Innings Pitched')*3)>=9)
                 stats['pitchingGames'] += 1
                 for key, heading in PITCH_COLUMNS.items(): stats[key] += num(row,heading)
                 collect_rates(row, PITCH_RATES, pid, rate_samples)
@@ -118,6 +125,8 @@ def build(fixture_path=ROOT/'src/temporary-league.json', manifest_path=REPORTS/'
         away, home = game['awayId'], game['homeId']
         for team, lineup in reported_lineups.items():
             if len(lineup['defense']) != 9: raise ValueError('A report needs all nine starting positions per team')
+            if len(lineup['pitchingDepth']) == 1:
+                totals[str(lineup['pitchingDepth'][0])]['completeGames'] += 1
             starter = lineup['defense']['P']
             lineup['pitchingDepth'] = [starter]+[pid for pid in lineup['pitchingDepth'] if pid!=starter]
             lineups[team] = lineup
@@ -126,6 +135,9 @@ def build(fixture_path=ROOT/'src/temporary-league.json', manifest_path=REPORTS/'
             s['played'] += 1
             s['runsFor'] += runs[team]; s['runsAgainst'] += runs[opponent]
             s['wins' if runs[team]>runs[opponent] else 'losses' if runs[team]<runs[opponent] else 'ties'] += 1
+            if runs[opponent] == 0:
+                for pid in reported_lineups[team]['battingOrder']:
+                    totals[str(pid)]['teamShutouts'] += 1
         games.append({'id':game_id,'startsAt':game['startsAt'],'awayRuns':runs[away],
                       'homeRuns':runs[home],'playerScores':scores,'teamLineups':reported_lineups})
     per_game = {}
