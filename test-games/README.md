@@ -2,6 +2,10 @@
 
 Keep exhibition reports here, outside official `games/` data.
 
+Reports can be original Project Rio `.xlsx` files or LibreOffice `.ods` files. ODS imports read cached cell values, including merged team-name cells, without converting or editing the source report. Undefined pitching rates such as `INF` are displayed as unavailable; the underlying counts still score normally.
+
+Alternatively, publish a reviewed `.rio.json` extract containing only `Stats` and `Pitching` row objects needed for the site. This keeps the source workbook, unused sheets, and document metadata out of the public repository. Registered JSON reports go through the same roster, lineup, duplicate-report, and scoring validation.
+
 Add each report to `reports.json` with its fixture ID, for example:
 
 ```json
@@ -21,4 +25,4 @@ Each report must match all 18 scheduled players and their two team rosters. Fixt
 
 Run `python scripts/build_temporary_results.py`, then `npm run build`. GitHub deployment also runs this builder. The output updates the Test Week results, player stats, standings, and fixed-lineup fantasy totals. Bench points are displayed but excluded from matchup totals. This does not activate web uploads or account-based lineup editing.
 
-To reset results, clear `reports.json` and remove the exhibition XLSX files, then rebuild. To remove the whole trial later, remove the Test Week entry/component and builder workflow step. Official season data is separate.
+To reset results, clear `reports.json` and remove the exhibition report files, then rebuild. To remove the whole trial later, follow `docs/remove-test-week.md`. Official season data is separate.

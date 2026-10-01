@@ -4,9 +4,10 @@ Temporary reports are isolated from games/ and official season scoring.
 """
 import hashlib
 import json
+import math
 from collections import Counter
 from pathlib import Path
-from openpyxl import load_workbook
+from rio_workbook import read_rio_workbook
 from build_fantasy_games import score_report, rows_by_heading, num, by_name
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -46,8 +47,12 @@ def collect_rates(row, columns, pid, samples):
     for key, heading in columns.items():
         if heading not in row: raise ValueError(f'Missing {heading} for {row.get("Player")}')
         value = row[heading]
+        # Rio exports INF when a pitcher allows runs/hits without an out.
+        # Preserve raw counts; leave undefined rate averages unavailable.
+        if isinstance(value,str) and value.strip().upper() in {'INF','INFINITY','NAN'}: continue
         if value is not None:
             if not isinstance(value,(int,float)): raise ValueError(f'Invalid {heading}')
+            if not math.isfinite(value): continue
             samples.setdefault(str(pid),{}).setdefault(key,[]).append(value)
 
 def build(fixture_path=ROOT/'src/temporary-league.json', manifest_path=REPORTS/'reports.json',
@@ -75,7 +80,7 @@ def build(fixture_path=ROOT/'src/temporary-league.json', manifest_path=REPORTS/'
             raise ValueError('The same report cannot count for two fixtures')
         fingerprints.add(fingerprint)
         runs = Counter()
-        wb = load_workbook(path, read_only=True, data_only=True)
+        wb = read_rio_workbook(path)
         try:
             export_teams = {}
             export_team = None

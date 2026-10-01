@@ -7,7 +7,7 @@ import json
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
-from openpyxl import load_workbook
+from rio_workbook import read_rio_workbook
 
 ROOT = Path(__file__).resolve().parents[1]
 rules = json.loads((ROOT / 'src/fantasy-rules.json').read_text())
@@ -46,12 +46,12 @@ def weighted(row, mapping, weights):
 
 def score_report(entry, report_directory=None):
     filename = entry['report']
-    if Path(filename).name != filename or not filename.endswith('.xlsx'):
-        raise ValueError('A report must be an XLSX filename inside games/')
+    if Path(filename).name != filename or not (Path(filename).suffix.lower() in {'.xlsx','.ods'} or filename.endswith('.rio.json')):
+        raise ValueError('A report must be XLSX, ODS, or reviewed Rio JSON inside its report directory')
     path = (Path(report_directory) if report_directory else ROOT / 'games') / filename
     if not path.is_file():
         raise ValueError(f'Missing report: {filename}')
-    wb = load_workbook(path, read_only=True, data_only=True)
+    wb = read_rio_workbook(path)
     try:
         batting = {}
         pitchers = []
