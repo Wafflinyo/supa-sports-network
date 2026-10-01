@@ -14,5 +14,9 @@
   {
     "gameId": "test-week-1-game-3",
     "report": "test-week-1-game-3.rio.json"
+  },
+  {
+    "gameId": "test-week-1-game-2",
+    "report": "test-week-1-game-2.rio.json"
   }
 ]
