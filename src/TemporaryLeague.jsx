@@ -97,7 +97,7 @@ export default function TemporaryLeague({ PlayerAvatar }) {
     {tab==='Fantasy schedule' && <section className="panel test-team"><div className="section-title"><h2>WEEK {week.number} FANTASY SCHEDULE</h2></div><div className="test-team-body"><p className="test-note">{week.label} · Sunday 12:00 a.m.–Saturday 11:59:59 p.m. ET</p>{week.fantasyMatchups.map(([a,b])=><article key={a} className="test-game"><strong>{fantasyTeam(a).name} <span>vs</span> {fantasyTeam(b).name}</strong><b>{weekFinal?'Final':'Upcoming'}</b></article>)}</div></section>}
     {tab==='League teams' && <>
       <p className="test-note">Nine rounds in snake order after captain anchors. Lineups emphasize contact at the top, power in the middle, pitching options, and chemistry in the outfield. Named Miis use Mii stats and color chemistry.</p>
-      <div className="test-grid">{test.teams.map(reportedTeam).map(team => <details className="panel test-team test-team-disclosure" key={team.id} name="test-team-lineups">
+      <div className="test-grid test-roster-columns">{[0,1].map(column=><div className="test-roster-column" key={column}>{test.teams.filter((_,index)=>index%2===column).map(reportedTeam).map(team => <details className="panel test-team test-team-disclosure" key={team.id} style={{order:test.teams.findIndex(t=>t.id===team.id)}}>
         <summary className="section-title"><div><small>{team.players.length} PLAYERS · ANCHOR {profiles[team.anchor].name}</small><h2>{team.name}</h2></div><span className="disclosure-label">Lineup <span aria-hidden="true">⌄</span></span></summary>
         <div className="test-team-body"><p>{team.reported?'Actual report lineup · leftmost position is the starting position':team.identity}</p>
           <div className="test-lineup-head"><span>BAT</span><span>PLAYER / ABILITY</span><span>POS</span></div>
@@ -106,7 +106,7 @@ export default function TemporaryLeague({ PlayerAvatar }) {
             {!!team.badChemistryPairs.length && <div><dt>Watch chemistry</dt><dd>{team.badChemistryPairs.map(pair=>names(pair)).join('; ')}. Keep these pairs apart in fielding and batting order.</dd></div>}
           </dl>
           {team.players.filter(id=>!team.battingOrder.includes(id)).length>0 && <section className="test-league-bench"><h3>Bench</h3>{team.players.filter(id=>!team.battingOrder.includes(id)).map(id=>player(id))}</section>}
-        </div></details>)}</div>
+        </div></details>)}</div>)}</div>
       <p className="test-note">Teams awaiting reports show suggested lineups. After a report arrives, batting order and starting positions come from that report. Buddy jumps depend on in-game positioning.</p>
     </>}
     {tab==='Week schedule' && <section className="panel test-team"><div className="section-title"><div><small>ONE GAME PER TEAM · SEVEN INNINGS</small><h2>WEEK {week.number} SCHEDULE</h2></div></div><div className="test-team-body">
