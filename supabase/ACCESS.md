@@ -27,7 +27,7 @@ Regenerate GM Code replaces the code, increments its version, and removes all el
 
 ## Deployment and verification
 
-Apply 001 and 002, then the timestamped access-code migration. The migration generates the commissioner bootstrap code in Postgres. Deploy `supabase/functions/league-auth/index.ts`. The dashboard deployment has platform JWT/API-key verification enabled. The endpoint handles username validation and rate limiting before invoking Auth. Existing email-confirmation settings remain unchanged.
+Apply 001 and 002, then the timestamped access-code and private-fantasy-helper migrations in order. The migration generates the commissioner bootstrap code in Postgres. Deploy `supabase/functions/league-auth/index.ts`. The dashboard deployment has platform JWT/API-key verification enabled. The endpoint handles username validation and rate limiting before invoking Auth. Existing email-confirmation settings remain unchanged.
 
 `src/supabase-config.json` contains the public project connection only; environment settings can override it.
 
