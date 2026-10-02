@@ -1,0 +1,40 @@
+-- Dashboard SQL regression check: all changes roll back; no credentials are displayed.
+begin;
+do $$
+declare a uuid:=gen_random_uuid(); b uuid:=gen_random_uuid(); c uuid:=gen_random_uuid();
+ sa uuid:=gen_random_uuid(); sb uuid:=gen_random_uuid(); sc uuid:=gen_random_uuid(); secret text; gm jsonb; reply jsonb; league uuid; i integer;
+begin
+ insert into auth.users(id,email) values(a,'access_test_comm@accounts.supasports.invalid'),(b,'access_test_gm@accounts.supasports.invalid'),(c,'access_test_other@accounts.supasports.invalid');
+ insert into auth.sessions(id,user_id,created_at,updated_at) values(sa,a,now(),now()),(sb,b,now(),now()),(sc,c,now(),now());
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',a,'role','authenticated','session_id',sa)::text,true);
+ if public.league_session_access()->>'role' <> 'participant' then raise exception 'Blank login is elevated'; end if;
+ begin perform public.league_code_list(); raise exception 'Participant read code list'; exception when others then if sqlerrm<>'Commissioner access required' then raise; end if; end;
+ select code into secret from league_private.setup_receipt where purpose='Initial commissioner code';
+ reply:=public.activate_league_access(secret);
+ if reply->>'role'<>'commissioner' then raise exception 'Commissioner activation failed'; end if;
+ select id into league from public.create_fantasy_league('Access regression test');
+ gm:=public.regenerate_gm_code(1,'Regression team');
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',b,'role','authenticated','session_id',sb)::text,true);
+ reply:=public.activate_league_access(gm->>'code');
+ if reply->>'role'<>'gm' or (reply->>'slot')::integer<>1 then raise exception 'GM scope failed'; end if;
+ begin perform public.regenerate_gm_code(2,'Other team'); raise exception 'GM rotated code'; exception when others then if sqlerrm<>'Commissioner access required' then raise; end if; end;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',c,'role','authenticated','session_id',sc)::text,true);
+ reply:=public.activate_league_access(secret);
+ if reply->>'error'<>'This commissioner code belongs to another account.' then raise exception 'Commissioner not bound'; end if;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',a,'role','authenticated','session_id',sa)::text,true);
+ perform public.regenerate_gm_code(1,'Regression team');
+ if not exists(select 1 from public.fantasy_memberships where league_id=league and user_id=a) then raise exception 'Rotation removed fantasy membership'; end if;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',b,'role','authenticated','session_id',sb)::text,true);
+ if public.league_session_access()->>'role'<>'participant' then raise exception 'Old session still elevated'; end if;
+ reply:=public.activate_league_access(gm->>'code');
+ if reply->>'error'<>'Invalid or inactive permission code.' then raise exception 'Old code still works'; end if;
+ for i in 1..5 loop reply:=public.activate_league_access('bad'); end loop;
+ if reply->>'error'<>'Too many code attempts. Try again in 15 minutes.' then raise exception 'Rate limit failed'; end if;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',a,'role','authenticated','session_id',sa)::text,true);
+ perform public.leave_league_access();
+ if public.league_session_access()->>'role'<>'participant' then raise exception 'Ordinary mode failed'; end if;
+ if has_function_privilege('anon','public.activate_league_access(text)','EXECUTE') then raise exception 'Anonymous code activation allowed'; end if;
+ if has_table_privilege('authenticated','league_private.access_codes','SELECT') or has_table_privilege('anon','league_private.setup_receipt','SELECT') then raise exception 'Codes exposed'; end if;
+end $$;
+rollback;
+select 'PASS: session scope, commissioner binding, GM regeneration/revocation, ordinary mode, attempt limits, private codes; test data rolled back' as result;

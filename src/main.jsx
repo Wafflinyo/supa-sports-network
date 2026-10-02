@@ -1,17 +1,19 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createClient } from '@supabase/supabase-js'
-import { ArrowDown, ArrowUp, CalendarDays, CircleUserRound, Menu, Search, Shield, Trophy, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, CalendarDays, Menu, Search, Shield, Trophy, X } from 'lucide-react'
 import playerPool from './players.json'
 import gamesPlayed from './games-played.json'
 import { playerPortraitStyle } from './player-portraits.js'
 import { FantasyLeague, FantasyRules } from './FantasyHub.jsx'
 import TemporaryLeague from './TemporaryLeague.jsx'
 import { leagueTabs } from './navigation.js'
+import { AccountDialog, CommissionerCodes } from './LeagueAccount.jsx'
+import connection from './supabase-config.json'
 import './styles.css'
 
-const url = import.meta.env.VITE_SUPABASE_URL
-const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+const url = import.meta.env.VITE_SUPABASE_URL || connection.url
+const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || connection.publishableKey
 const supabase = url && key ? createClient(url, key) : null
 const players = playerPool.map(player => ({ ...player, gamesPlayed: gamesPlayed[player.id] ?? null }))
 function PlayerAvatar({ player, size = 38 }) {
@@ -91,7 +93,7 @@ function App() {
   const [menu, setMenu] = useState(false)
   const [session, setSession] = useState(null)
   const [authOpen, setAuthOpen] = useState(false)
-  const [email, setEmail] = useState('')
+  const [access, setAccess] = useState({role:'viewer'})
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
   const [leagues, setLeagues] = useState([])
@@ -114,18 +116,19 @@ function App() {
     if (!supabase || !session) { setLeagues([]); setSelectedLeague(null); return }
     loadLeagues()
   }, [session?.user?.id])
+  useEffect(() => {
+    if (!session || !supabase) { setAccess({role:'viewer'}); return }
+    let live=true
+    const refresh=async()=>{const r=await supabase.rpc('league_session_access');if(live) setAccess(r.error?{role:'participant'}:r.data)}
+    refresh(); const timer=setInterval(refresh,15000)
+    return()=>{live=false;clearInterval(timer)}
+  }, [session?.user?.id])
   async function loadLeagues() {
-    const { data, error } = await supabase.from('fantasy_memberships').select('league_id, fantasy_leagues(id, name, invite_code, created_at)').order('joined_at', { ascending: false })
+    const { data, error } = await supabase.from('fantasy_memberships').select('league_id, fantasy_leagues(id, name, invite_code, created_at)').eq('user_id', session.user.id).order('joined_at', { ascending: false })
     if (error) { setMessage(error.message); return }
     const items = (data || []).map(x => x.fantasy_leagues).filter(Boolean)
     setLeagues(items)
     setSelectedLeague(current => items.find(x => x.id === current?.id) || items[0] || null)
-  }
-  async function sendLink(e) {
-    e.preventDefault(); if (!supabase) { setMessage('The site owner needs to connect Supabase before sign-in is available.'); return }
-    setBusy(true); setMessage('')
-    const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href.split('#')[0] } })
-    setBusy(false); setMessage(error ? error.message : 'Check your email for a sign-in link.')
   }
   async function createLeague(e) {
     e.preventDefault(); setBusy(true); setMessage('')
@@ -151,10 +154,12 @@ function App() {
   function go(next) { window.history.replaceState(null, '', next === 'Test Week' ? '#test-week' : window.location.pathname); setPage(next); setMenu(false); setMessage(''); window.scrollTo({top: 0, behavior: 'smooth'}) }
   const logo = `${import.meta.env.BASE_URL}sluggers-supa-league-logo.svg`
   return <>
-    <div className="topline"><div className="container topline-inner"><span><i className="live-dot"/> SLUGGERS SUPA LEAGUE</span><span>THE LEAGUE STARTS HERE <b>★</b></span><button onClick={() => setAuthOpen(true)}>{session ? session.user.email : 'SIGN IN / JOIN'}</button></div></div>
+    <div className="topline"><div className="container topline-inner"><span><i className="live-dot"/> SLUGGERS SUPA LEAGUE</span><span>THE LEAGUE STARTS HERE <b>★</b></span><button onClick={() => setAuthOpen(true)}>{session ? session.user.email?.split('@')[0] : 'SIGN IN / JOIN'}</button></div></div>
     <header className="masthead"><div className="container masthead-inner"><button className="brand" onClick={() => go('Home')}><img src={logo} alt="Sluggers Supa League logo"/><span><strong>SLUGGERS <em>SUPA</em> LEAGUE</strong><small>THE OFFICIAL LEAGUE HUB</small></span></button><button className="mobile-menu" aria-label="Open menu" onClick={() => setMenu(!menu)}>{menu ? <X/> : <Menu/>}</button><div className="masthead-right"><span className="league-tag">MARIO SUPER SLUGGERS</span><span className="badge-star">★</span></div></div></header>
     <nav className={`nav ${menu ? 'open' : ''}`} aria-label="Main navigation"><div className="container nav-inner">{nav.map(n => <button key={n} className={page === n ? 'active' : ''} onClick={() => go(n)}>{n}</button>)}</div></nav>
     <main className="container page-content">
+      {access.role === 'commissioner' && <CommissionerCodes supabase={supabase} onAccess={setAccess}/>}
+      {access.role === 'gm' && <p className="inline-message">GM access enabled for {access.team}.</p>}
       {page === 'Test Week' && <TemporaryLeague PlayerAvatar={PlayerAvatar}/>}
       {page === 'Home' && <>
         <div className="home-grid"><div className="hero"><div className="hero-content"><span className="eyebrow">WELCOME TO THE LEAGUE</span><h1>THE GAME<br/><span>STARTS HERE.</span></h1><p>Follow every game, explore the player pool, and manage your fantasy league in one place.</p><button className="yellow-btn" onClick={() => go('Player Stats')}>EXPLORE PLAYERS <span>›</span></button></div><div className="hero-number">01</div></div>
@@ -175,7 +180,7 @@ function App() {
         <div className="page-heading fantasy-heading"><span className="eyebrow dark">PLAY WITH FRIENDS</span><h1>SLUGGERS FANTASY</h1><p>Draft your team, set your weekly lineup, and follow head-to-head matchups.</p><button className="outline-btn rules-toggle" onClick={() => setRulesOpen(!rulesOpen)} aria-expanded={rulesOpen} aria-controls="fantasy-rules">{rulesOpen ? 'HIDE' : 'FANTASY'} RULES & POINT SYSTEM</button></div>
         {rulesOpen && <FantasyRules/>}
         <div className="panel test-undrafted"><h2>TEMPORARY FANTASY TEST</h2><p>View the eight drafted teams, weekly head-to-head scores, and league game reports.</p><button className="outline-btn" onClick={() => go('Test Week')}>OPEN TEST WEEK</button></div>
-        {!session ? <div className="panel gateway"><div className="gateway-icon">★</div><h2>YOUR LEAGUE IS WAITING</h2><p>Sign in with your email to create a fantasy league or join one with an invite code.</p><button className="red-btn" onClick={() => setAuthOpen(true)}>SIGN IN TO FANTASY</button>{!supabase && <p className="setup-note">Account setup is pending for this site.</p>}</div> :
+        {!session ? <div className="panel gateway"><div className="gateway-icon">★</div><h2>YOUR LEAGUE IS WAITING</h2><p>Sign in with your username to create a fantasy league or join one with an invite code.</p><button className="red-btn" onClick={() => setAuthOpen(true)}>SIGN IN TO FANTASY</button>{!supabase && <p className="setup-note">Account setup is pending for this site.</p>}</div> :
           <div className="fantasy-layout"><aside className="panel league-sidebar"><SectionTitle kicker="YOUR FANTASY">LEAGUES</SectionTitle>{leagues.map(l => <button key={l.id} className={`league-choice ${selectedLeague?.id === l.id ? 'selected' : ''}`} onClick={() => setSelectedLeague(l)}><span>★</span>{l.name}</button>)}{!leagues.length && <p className="muted">No leagues yet. Create one or enter an invite code.</p>}<form onSubmit={createLeague}><label htmlFor="league-name">CREATE A LEAGUE</label><input id="league-name" required maxLength={60} value={leagueName} onChange={e => setLeagueName(e.target.value)} placeholder="League name"/><button disabled={busy} className="red-btn">CREATE LEAGUE</button></form><form onSubmit={joinLeague}><label htmlFor="invite-code">JOIN WITH A CODE</label><input id="invite-code" required value={joinCode} onChange={e => setJoinCode(e.target.value)} placeholder="Invite code"/><button disabled={busy} className="outline-btn">JOIN LEAGUE</button></form></aside><div className="panel fantasy-main">{selectedLeague ? <FantasyLeague key={selectedLeague.id} initialLeague={selectedLeague} user={session.user} supabase={supabase} players={players} onLeagueRefresh={loadLeagues}/> : <Empty icon={Trophy} title="Create or join a league">Your fantasy league will appear here.</Empty>}</div></div>}{message && <p className="inline-message" role="status">{message}</p>}
       </>}
       {page === 'Schedule' && <BasicPage kicker="GAME DAYS" title="SEASON SCHEDULE" icon={CalendarDays} empty="No games scheduled yet" detail="The season schedule will appear here once it is announced."/>}
@@ -188,7 +193,7 @@ function App() {
     </main>
     <footer><div className="container footer-inner"><span>SLUGGERS <b>SUPA</b> LEAGUE</span><small>LEAGUE DATA AND FANTASY HUB</small></div></footer>
     {selectedPlayer && <div className="modal-backdrop" onClick={() => setSelectedPlayer(null)}><div className="modal player-modal" role="dialog" aria-modal="true" aria-label={selectedPlayer.name} onClick={e => e.stopPropagation()}><button className="close" onClick={() => setSelectedPlayer(null)} aria-label="Close"><X/></button><div className="player-modal-heading"><PlayerAvatar player={selectedPlayer} size={76}/><div><span className="eyebrow dark">PLAYER #{selectedPlayer.id}</span><h2>{selectedPlayer.name}</h2></div></div><dl><div><dt>CLASS</dt><dd>{selectedPlayer.class}</dd></div><div><dt>SOURCE</dt><dd>{selectedPlayer.source}</dd></div><div><dt>TEAM</dt><dd>Free agent</dd></div></dl><p>Game stats will be added when results are uploaded.</p></div></div>}
-    {authOpen && <div className="modal-backdrop" onClick={() => { setAuthOpen(false); setMessage('') }}><div className="modal auth-modal" role="dialog" aria-modal="true" aria-label="Sign in" onClick={e => e.stopPropagation()}><button className="close" aria-label="Close" onClick={() => { setAuthOpen(false); setMessage('') }}><X/></button><CircleUserRound size={34} color="#d9232e"/><h2>{session ? 'YOUR ACCOUNT' : 'SIGN IN TO THE LEAGUE'}</h2>{session ? <><p>Signed in as <strong>{session.user.email}</strong></p><button className="red-btn" onClick={async () => { await supabase.auth.signOut(); setAuthOpen(false) }}>SIGN OUT</button></> : <><p>Enter your email and we’ll send a sign-in link.</p><form onSubmit={sendLink}><label htmlFor="sign-in-email">EMAIL ADDRESS</label><input id="sign-in-email" type="email" required autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com"/><button disabled={busy || !supabase} className="red-btn">{busy ? 'SENDING…' : 'SEND SIGN-IN LINK'}</button></form>{!supabase && <p className="setup-note">Account setup is pending for this site.</p>}</>}{message && <p className="inline-message" role="status">{message}</p>}</div></div>}
+    {authOpen && <AccountDialog supabase={supabase} session={session} onClose={() => setAuthOpen(false)} onAccess={setAccess}/>}
   </>
 }
 function BasicPage({ kicker, title, icon, empty, detail }) { return <><div className="page-heading"><span className="eyebrow dark">{kicker}</span><h1>{title}</h1></div><div className="panel basic-panel"><Empty icon={icon} title={empty}>{detail}</Empty></div></> }

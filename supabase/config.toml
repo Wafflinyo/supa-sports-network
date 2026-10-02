@@ -1,0 +1,3 @@
+project_id = "supa-sports-network"
+[functions.league-auth]
+verify_jwt = true
