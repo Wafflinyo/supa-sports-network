@@ -7,6 +7,7 @@ import gamesPlayed from './games-played.json'
 import { playerPortraitStyle } from './player-portraits.js'
 import { FantasyLeague, FantasyRules } from './FantasyHub.jsx'
 import TemporaryLeague from './TemporaryLeague.jsx'
+import { leagueTabs } from './navigation.js'
 import './styles.css'
 
 const url = import.meta.env.VITE_SUPABASE_URL
@@ -17,7 +18,7 @@ function PlayerAvatar({ player, size = 38 }) {
   const portrait = playerPortraitStyle(player.name, size)
   return <span className={`player-avatar${portrait ? ' has-portrait' : ''}`} style={{ width: size, height: size, flex: `0 0 ${size}px`, ...portrait }} aria-hidden="true">{portrait ? null : player.name.slice(0, 1)}</span>
 }
-const nav = ['Home', 'Schedule', 'Standings', 'Teams', 'Player Stats', 'Team Stats', 'Transactions', 'Sluggers Fantasy', 'Draft', 'Free Agency', 'Test Week']
+const nav = [...leagueTabs, 'Test Week']
 // Project Rio's export headings, grouped for browsing. Helper columns are export internals.
 const statGroups = {
   'Offensive Stats': [
@@ -166,7 +167,7 @@ function App() {
         <div className="panel data-panel">
           <div className="stat-view-switch" role="group" aria-label="Stat display">{['Totals', 'Averages per Game'].map(view => <button key={view} type="button" aria-pressed={statView === view} className={statView === view ? 'active' : ''} onClick={() => setStatView(view)}>{view}</button>)}</div>
           <div className="table-tools"><div className="search"><Search size={19}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search players" aria-label="Search players"/></div><span>{filtered.length} PLAYERS</span></div>
-          <div className="table-scroll" role="tabpanel" aria-label={`${statTab} — ${statView}`}><table><thead><tr>{[['id','#'],['name','PLAYER'],['class','CLASS'],['source','SOURCE'],...statGroups[statTab]].map(([key,label]) => <th key={key}><button onClick={() => sortBy(key)} aria-label={`Sort by ${label}`}>{label}{sort.key === key ? (sort.direction === 'asc' ? <ArrowUp size={13}/> : <ArrowDown size={13}/>) : null}</button></th>)}</tr></thead><tbody>{filtered.map(p => <tr key={p.id} onClick={() => setSelectedPlayer(p)} tabIndex={0} onKeyDown={e => e.key === 'Enter' && setSelectedPlayer(p)}><td>{p.id}</td><td className="player-cell"><PlayerAvatar player={p}/><strong>{p.name}</strong></td><td>{p.class}</td><td>{p.source}</td>{statGroups[statTab].map(([key]) => <td key={key}>{displayStat(statValue(p, key, statView), statView, key)}</td>)}</tr>)}</tbody></table></div>
+          <div className="table-scroll" role="tabpanel" aria-label={`${statTab} — ${statView}`}><table><thead><tr>{[['id','#'],['name','PLAYER'],['class','CLASS'],['source','SOURCE'],...statGroups[statTab]].map(([key,label]) => <th key={key} className={key==='name'?'sticky-player':undefined}><button onClick={() => sortBy(key)} aria-label={`Sort by ${label}`}>{label}{sort.key === key ? (sort.direction === 'asc' ? <ArrowUp size={13}/> : <ArrowDown size={13}/>) : null}</button></th>)}</tr></thead><tbody>{filtered.map(p => <tr key={p.id} onClick={() => setSelectedPlayer(p)} tabIndex={0} onKeyDown={e => e.key === 'Enter' && setSelectedPlayer(p)}><td>{p.id}</td><td className="player-cell"><PlayerAvatar player={p}/><strong>{p.name}</strong></td><td>{p.class}</td><td>{p.source}</td>{statGroups[statTab].map(([key]) => <td key={key}>{displayStat(statValue(p, key, statView), statView, key)}</td>)}</tr>)}</tbody></table></div>
           <p className="table-footnote">{statView === 'Totals' ? 'Season totals and season rates.' : 'Games Played remains a total. Other counting stats are divided by games played; rates and innings use their per-game values.'} Tap a heading to sort. A dash means no verified game stat is available yet. Scroll sideways to see more columns.</p>
         </div>
       </>}
