@@ -3333,17 +3333,17 @@
       ],
       "starters": [
         1,
-        52,
         18,
         23,
-        36,
         47,
-        17
+        17,
+        130,
+        19
       ],
       "bench": [
-        45,
-        19,
-        130
+        52,
+        36,
+        45
       ]
     },
     {
@@ -3366,13 +3366,13 @@
         49,
         39,
         86,
-        13,
         66,
-        5
+        5,
+        6
       ],
       "bench": [
+        13,
         108,
-        6,
         15
       ]
     },
@@ -3392,16 +3392,16 @@
         34
       ],
       "starters": [
-        2,
         62,
         51,
         53,
         7,
         22,
-        34
+        34,
+        4
       ],
       "bench": [
-        4,
+        2,
         87,
         32
       ]
@@ -3425,15 +3425,15 @@
         11,
         69,
         10,
-        33,
-        77,
         24,
-        42
-      ],
-      "bench": [
-        82,
+        42,
         38,
         99
+      ],
+      "bench": [
+        33,
+        77,
+        82
       ]
     },
     {
@@ -3453,16 +3453,16 @@
       ],
       "starters": [
         59,
-        65,
         3,
-        21,
         35,
         80,
-        56
+        56,
+        75,
+        105
       ],
       "bench": [
-        75,
-        105,
+        65,
+        21,
         114
       ]
     },
@@ -3485,14 +3485,14 @@
         50,
         89,
         55,
-        31,
         14,
         70,
-        43
+        78,
+        101
       ],
       "bench": [
-        78,
-        101,
+        31,
+        43,
         46
       ]
     },
@@ -3513,16 +3513,16 @@
       ],
       "starters": [
         73,
-        44,
         63,
         60,
         30,
         27,
-        58
+        58,
+        71
       ],
       "bench": [
+        44,
         94,
-        71,
         76
       ]
     },
@@ -3544,16 +3544,16 @@
       "starters": [
         61,
         37,
-        57,
         28,
         48,
         20,
-        54
+        54,
+        40
       ],
       "bench": [
+        57,
         112,
-        135,
-        40
+        135
       ]
     }
   ],
@@ -4379,17 +4379,17 @@
           ],
           "starters": [
             1,
-            52,
             18,
             23,
-            36,
             47,
-            17
+            17,
+            130,
+            19
           ],
           "bench": [
-            45,
-            19,
-            130
+            52,
+            36,
+            45
           ]
         },
         {
@@ -4412,13 +4412,13 @@
             49,
             39,
             86,
-            13,
             66,
-            5
+            5,
+            6
           ],
           "bench": [
+            13,
             108,
-            6,
             15
           ]
         },
@@ -4438,16 +4438,16 @@
             34
           ],
           "starters": [
-            2,
             62,
             51,
             53,
             7,
             22,
-            34
+            34,
+            4
           ],
           "bench": [
-            4,
+            2,
             87,
             32
           ]
@@ -4471,15 +4471,15 @@
             11,
             69,
             10,
-            33,
-            77,
             24,
-            42
-          ],
-          "bench": [
-            82,
+            42,
             38,
             99
+          ],
+          "bench": [
+            33,
+            77,
+            82
           ]
         },
         {
@@ -4499,16 +4499,16 @@
           ],
           "starters": [
             59,
-            65,
             3,
-            21,
             35,
             80,
-            56
+            56,
+            75,
+            105
           ],
           "bench": [
-            75,
-            105,
+            65,
+            21,
             114
           ]
         },
@@ -4531,14 +4531,14 @@
             50,
             89,
             55,
-            31,
             14,
             70,
-            43
+            78,
+            101
           ],
           "bench": [
-            78,
-            101,
+            31,
+            43,
             46
           ]
         },
@@ -4559,16 +4559,16 @@
           ],
           "starters": [
             73,
-            44,
             63,
             60,
             30,
             27,
-            58
+            58,
+            71
           ],
           "bench": [
+            44,
             94,
-            71,
             76
           ]
         },
@@ -4590,19 +4590,128 @@
           "starters": [
             61,
             37,
-            57,
             28,
             48,
             20,
-            54
+            54,
+            40
           ],
           "bench": [
+            57,
             112,
-            135,
-            40
+            135
           ]
         }
-      ]
+      ],
+      "lineupReview": {
+        "basis": "Week 1 fantasy points across batting, fielding and pitching; keep incumbent starters when tied. One sample game per player, not a Week 2 projection.",
+        "changes": [
+          {
+            "teamId": "test-fantasy-1",
+            "promoted": [
+              130,
+              19
+            ],
+            "benched": [
+              52,
+              36
+            ],
+            "basedOnWeek": 1,
+            "priorStarterPoints": 62.75,
+            "selectedPriorWeekPoints": 84.0
+          },
+          {
+            "teamId": "test-fantasy-2",
+            "promoted": [
+              6
+            ],
+            "benched": [
+              13
+            ],
+            "basedOnWeek": 1,
+            "priorStarterPoints": 68.75,
+            "selectedPriorWeekPoints": 73.0
+          },
+          {
+            "teamId": "test-fantasy-3",
+            "promoted": [
+              4
+            ],
+            "benched": [
+              2
+            ],
+            "basedOnWeek": 1,
+            "priorStarterPoints": 61.75,
+            "selectedPriorWeekPoints": 71.0
+          },
+          {
+            "teamId": "test-fantasy-4",
+            "promoted": [
+              38,
+              99
+            ],
+            "benched": [
+              33,
+              77
+            ],
+            "basedOnWeek": 1,
+            "priorStarterPoints": 63.0,
+            "selectedPriorWeekPoints": 71.75
+          },
+          {
+            "teamId": "test-fantasy-5",
+            "promoted": [
+              75,
+              105
+            ],
+            "benched": [
+              65,
+              21
+            ],
+            "basedOnWeek": 1,
+            "priorStarterPoints": 60.0,
+            "selectedPriorWeekPoints": 73.5
+          },
+          {
+            "teamId": "test-fantasy-6",
+            "promoted": [
+              78,
+              101
+            ],
+            "benched": [
+              31,
+              43
+            ],
+            "basedOnWeek": 1,
+            "priorStarterPoints": 81.0,
+            "selectedPriorWeekPoints": 88.5
+          },
+          {
+            "teamId": "test-fantasy-7",
+            "promoted": [
+              71
+            ],
+            "benched": [
+              44
+            ],
+            "basedOnWeek": 1,
+            "priorStarterPoints": 63.75,
+            "selectedPriorWeekPoints": 67.5
+          },
+          {
+            "teamId": "test-fantasy-8",
+            "promoted": [
+              40
+            ],
+            "benched": [
+              57
+            ],
+            "basedOnWeek": 1,
+            "priorStarterPoints": 95.0,
+            "selectedPriorWeekPoints": 104.0
+          }
+        ]
+      }
     }
   ]
 }
