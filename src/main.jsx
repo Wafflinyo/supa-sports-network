@@ -11,6 +11,7 @@ import { leagueTabs } from './navigation.js'
 import { AccountDialog, CommissionerCodes } from './LeagueAccount.jsx'
 import { ClosedSeasonRoom, SSLDraftRoom } from './SeasonRooms.jsx'
 import LeagueHistory from './LeagueHistory.jsx'
+import PlayerProfile from './PlayerProfile.jsx'
 import connection from './supabase-config.json'
 import './styles.css'
 
@@ -26,10 +27,10 @@ const nav = [...leagueTabs, 'Test Week']
 // Project Rio's export headings, grouped for browsing. Helper columns are export internals.
 const statGroups = {
   'Offensive Stats': [
-    ['gamesPlayed', 'Games Played'], ['atBats', 'At-Bats'], ['plateAppearances', 'Plate Appearances'], ['runs', 'Runs'],
-    ['hits', 'Hits'], ['rbi', 'RBI'], ['batStrikeouts', 'Strikeouts'], ['batWalks', 'Walks'],
+    ['gamesPlayed', 'Games Played'], ['mvps', 'MVPs'], ['atBats', 'At-Bats'], ['plateAppearances', 'Plate Appearances'], ['runs', 'Runs'],
+    ['hits', 'Hits'], ['rbi', 'RBI'], ['homeRuns', 'Home Runs'], ['batStrikeouts', 'Strikeouts'], ['batWalks', 'Walks'],
     ['hitByPitch', 'Hit By Pitch'], ['singles', 'Singles'], ['doubles', 'Doubles'],
-    ['triples', 'Triples'], ['homeRuns', 'Home Runs'], ['oneHr', '1HR'], ['twoHr', '2HR'],
+    ['triples', 'Triples'], ['oneHr', '1HR'], ['twoHr', '2HR'],
     ['threeHr', '3HR'], ['grandSlams', 'Grand Slams'], ['itpHomeRuns', 'ITP Home Runs'],
     ['totalBases', 'Total Bases'], ['sacFlys', 'Sac Flys'],
     ['doublePlaysHitInto', 'Double Plays Hit Into'], ['triplePlaysHitInto', 'Triple Plays Hit Into'],
@@ -41,12 +42,12 @@ const statGroups = {
     ['stealAttempts', 'Steal Attempts'],
   ],
   'Defensive Stats': [
-    ['gamesPlayed', 'Games Played'], ['putouts', 'Putouts'], ['assists', 'Assists'], ['buddyJumpPutouts', 'Buddy Jump Putouts'],
+    ['gamesPlayed', 'Games Played'], ['mvps', 'MVPs'], ['putouts', 'Putouts'], ['assists', 'Assists'], ['buddyJumpPutouts', 'Buddy Jump Putouts'],
     ['buddyJumpAttempts', 'Buddy Jump Attempts'], ['doublePlays', 'Double Plays'],
     ['triplePlays', 'Triple Plays'], ['bobbles', 'Bobbles'],
   ],
   'Pitching Stats': [
-    ['gamesPlayed', 'Games Played'], ['battersFaced', 'Batters Faced'], ['inningsPitched', 'Innings Pitched'],
+    ['gamesPlayed', 'Games Played'], ['mvps', 'MVPs'], ['battersFaced', 'Batters Faced'], ['inningsPitched', 'Innings Pitched'],
     ['pitches', 'Pitches'], ['strikes', 'Strikes'], ['balls', 'Balls'],
     ['pitchStrikeouts', 'Strikeouts'], ['pitchWalks', 'Walks'], ['beanBalls', 'Bean Balls'],
     ['hitsAllowed', 'Hits Allowed'], ['runsAllowed', 'Runs Allowed'],
@@ -205,7 +206,7 @@ function App() {
       {page === 'Free Agency' && <><div className="page-heading"><span className="eyebrow dark">AVAILABLE PLAYERS</span><h1>FREE AGENCY</h1><p>No rosters have been set. All {players.length} players are currently unassigned.</p></div><div className="panel"><div className="free-list">{players.map(p => <button key={p.id} onClick={() => setSelectedPlayer(p)}><span>{p.name}</span><small>{p.class}</small></button>)}</div></div></>}
     </main>
     <footer><div className="container footer-inner"><span>SLUGGERS <b>SUPA</b> LEAGUE</span><small>LEAGUE DATA AND FANTASY HUB</small></div></footer>
-    {selectedPlayer && <div className="modal-backdrop" onClick={() => setSelectedPlayer(null)}><div className="modal player-modal" role="dialog" aria-modal="true" aria-label={selectedPlayer.name} onClick={e => e.stopPropagation()}><button className="close" onClick={() => setSelectedPlayer(null)} aria-label="Close"><X/></button><div className="player-modal-heading"><PlayerAvatar player={selectedPlayer} size={76}/><div><span className="eyebrow dark">PLAYER #{selectedPlayer.id}</span><h2>{selectedPlayer.name}</h2></div></div><dl><div><dt>CLASS</dt><dd>{selectedPlayer.class}</dd></div><div><dt>SOURCE</dt><dd>{selectedPlayer.source}</dd></div><div><dt>TEAM</dt><dd>Free agent</dd></div></dl><p>Game stats will be added when results are uploaded.</p></div></div>}
+    {selectedPlayer && <PlayerProfile player={selectedPlayer} PlayerAvatar={PlayerAvatar} onClose={() => setSelectedPlayer(null)}/>}
     {authOpen && <AccountDialog supabase={supabase} session={session} onClose={() => setAuthOpen(false)} onAccess={setAccess}/>}
   </>
 }

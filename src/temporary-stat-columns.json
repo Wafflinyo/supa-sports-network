@@ -5,6 +5,10 @@
       "Games Played"
     ],
     [
+      "mvps",
+      "MVPs"
+    ],
+    [
       "atBats",
       "At-Bats"
     ],
@@ -23,6 +27,10 @@
     [
       "rbi",
       "RBI"
+    ],
+    [
+      "homeRuns",
+      "Home Runs"
     ],
     [
       "batStrikeouts",
@@ -47,10 +55,6 @@
     [
       "triples",
       "Triples"
-    ],
-    [
-      "homeRuns",
-      "Home Runs"
     ],
     [
       "oneHr",
@@ -143,6 +147,10 @@
       "Games Played"
     ],
     [
+      "mvps",
+      "MVPs"
+    ],
+    [
       "putouts",
       "Putouts"
     ],
@@ -175,6 +183,10 @@
     [
       "gamesPlayed",
       "Games Played"
+    ],
+    [
+      "mvps",
+      "MVPs"
     ],
     [
       "battersFaced",

@@ -39,7 +39,7 @@ export default function TestExtraPanels({tab,test,results,week,weeklyResults,sch
     return <section className="panel test-team"><div className="section-title"><h2>{fantasy?'FANTASY':'LEAGUE'} FREE AGENCY</h2><span>{pool.length} undrafted players</span></div><div className="test-team-body"><p className="test-note">{fantasy?'Only league-rostered characters are eligible. Pickups remain disabled for this test.':'These players are outside the ten temporary league rosters. Signing controls have not been enabled.'}</p><div className="table-tools"><div className="search"><input aria-label="Search undrafted players" placeholder="Search players" value={query} onChange={e=>setQuery(e.target.value)}/></div></div><div className="testing-player-pool">{pool.filter(p=>p.name.toLowerCase().includes(query.toLowerCase())).map(p=><div className="test-player" key={p.id}><PlayerAvatar player={p} size={28}/><div><strong>{p.name}</strong><small>{p.ability || p.class}</small></div></div>)}</div></div></section>
   }
   if(tab!=='Team Stats')return null
-  const columns=statGroups[group]
+  const columns=statGroups[group].filter(([key])=>key!=='mvps')
   const value=(stats,key)=>average && !rateKeys.has(key) && key!=='gamesPlayed' ? ratio(stats[key],stats.gamesPlayed):stats[key]
   const rows=test.teams.map(team=>({...team,stats:teamStats(team,results)})).sort((a,b)=>sort.direction*(sort.key==='name'?a.name.localeCompare(b.name):(value(a.stats,sort.key)||0)-(value(b.stats,sort.key)||0)))
   const sortBy=key=>setSort(old=>({key,direction:old.key===key?-old.direction:-1}))
