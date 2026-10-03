@@ -1,0 +1,14 @@
+import React, {useState} from 'react'
+import {BookOpen, Trophy} from 'lucide-react'
+import archive from './ssl-history.json'
+
+export default function LeagueHistory(){
+ const [tab,setTab]=useState('Past Seasons'),[category,setCategory]=useState('All Records')
+ const categories=['All Records','Batting','Fielding','Pitching','Team Records']
+ const records=archive.records.filter(r=>category==='All Records'||r.category===category)
+ return <><div className="page-heading"><span className="eyebrow dark">THE LEAGUE LEGACY</span><h1>SSL HISTORY</h1><p>Past seasons, champions, and the records that define Sluggers Supa League.</p></div>
+ <div className="subnav history-tabs" role="tablist" aria-label="SSL history sections">{['Past Seasons','League Records'].map(name=><button key={name} role="tab" id={`history-tab-${name.replaceAll(' ','-')}`} aria-selected={tab===name} aria-controls="history-panel" className={tab===name?'active':''} onClick={()=>setTab(name)}>{name}</button>)}</div>
+ <section className="panel history-panel" id="history-panel" role="tabpanel" aria-labelledby={`history-tab-${tab.replaceAll(' ','-')}`}>
+ {tab==='Past Seasons'?<>{archive.seasons.length?<div className="history-season-list">{archive.seasons.map(s=><details key={s.id}><summary><strong>{s.name}</strong><span>{s.champion} · Champion</span></summary><p>{s.summary}</p>{s.standings?.length>0&&<div className="table-scroll"><table className="fantasy-simple-table"><thead><tr><th>Team</th><th>W</th><th>L</th></tr></thead><tbody>{s.standings.map(t=><tr key={t.team}><td>{t.team}</td><td>{t.wins}</td><td>{t.losses}</td></tr>)}</tbody></table></div>}</details>)}</div>:<div className="empty"><span className="empty-icon"><BookOpen size={28}/></span><h3>NO COMPLETED SEASONS YET</h3><p>Official season summaries, champions, and final standings will be archived here after each season. Temporary test games are kept separate.</p></div>}</>:<><div className="subnav records-tabs" role="tablist" aria-label="Record categories">{categories.map(name=><button key={name} role="tab" aria-selected={category===name} className={category===name?'active':''} onClick={()=>setCategory(name)}>{name}</button>)}</div>{records.length?<div className="table-scroll"><table className="fantasy-simple-table history-records"><thead><tr><th>Record</th><th>Holder</th><th>Value</th><th>Season / Game</th></tr></thead><tbody>{records.map(r=><tr key={r.id}><td>{r.title}</td><td>{r.holder}</td><td>{r.value}</td><td>{r.season}</td></tr>)}</tbody></table></div>:<div className="empty"><span className="empty-icon"><Trophy size={28}/></span><h3>NO OFFICIAL RECORDS YET</h3><p>{category==='All Records'?'Batting, fielding, pitching, and team records':category+' records'} will appear once official game results are verified. Exhibition stats won’t count toward league records.</p></div>}</>}
+ </section></>
+}
