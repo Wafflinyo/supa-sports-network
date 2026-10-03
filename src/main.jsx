@@ -8,10 +8,11 @@ import { playerPortraitStyle } from './player-portraits.js'
 import { FantasyLeague, FantasyRules } from './FantasyHub.jsx'
 import TemporaryLeague from './TemporaryLeague.jsx'
 import { leagueTabs } from './navigation.js'
-import { AccountDialog, CommissionerCodes } from './LeagueAccount.jsx'
+import { AccountDialog } from './LeagueAccount.jsx'
 import { ClosedSeasonRoom, SSLDraftRoom } from './SeasonRooms.jsx'
 import LeagueHistory from './LeagueHistory.jsx'
 import PlayerProfile from './PlayerProfile.jsx'
+import {OfficialTeams,TeamSetup,CommissionerWorkspace,teamLogo} from './TeamIdentity.jsx'
 import connection from './supabase-config.json'
 import './styles.css'
 
@@ -108,15 +109,26 @@ function App() {
   const [statView, setStatView] = useState('Totals')
   const [sort, setSort] = useState({ key: 'id', direction: 'asc' })
   const [selectedPlayer, setSelectedPlayer] = useState(null)
+  const [officialTeams,setOfficialTeams]=useState([])
+  const [teamsLoading,setTeamsLoading]=useState(true)
+  const [teamsMessage,setTeamsMessage]=useState('')
+  async function loadOfficialTeams(){
+    if(!supabase){setTeamsLoading(false);return}
+    const r=await supabase.from('ssl_teams').select('*,ssl_locations(name)').order('slot')
+    if(r.error)setTeamsMessage(r.error.message);else{setOfficialTeams(r.data||[]);setTeamsMessage('')}
+    setTeamsLoading(false)
+  }
+  useEffect(()=>{loadOfficialTeams();const timer=setInterval(loadOfficialTeams,15000);return()=>clearInterval(timer)},[])
   const isCommissioner = Boolean(session && access.role === 'commissioner')
-  const visibleNav = isCommissioner ? [...nav, 'Commissioner Tools'] : nav
+  const isGM=Boolean(session && access.role==='gm')
+  const visibleNav = isCommissioner ? [...nav, 'Commissioner Tools'] : isGM ? [...nav,'Team Tools'] : nav
 
   useEffect(() => {
-    if (page === 'Commissioner Tools' && !isCommissioner) {
+    if ((page === 'Commissioner Tools' && !isCommissioner)||(page==='Team Tools' && !isGM)) {
       setPage('Home')
       setMenu(false)
     }
-  }, [page, isCommissioner])
+  }, [page, isCommissioner,isGM])
 
   useEffect(() => {
     if (!supabase) return
@@ -163,15 +175,15 @@ function App() {
     return sort.direction === 'asc' ? comparison : -comparison
   }), [query, sort, statTab, statView])
   function sortBy(key) { setSort(s => ({ key, direction: s.key === key && s.direction === 'desc' ? 'asc' : 'desc' })) }
-  function go(next) { if (next === 'Commissioner Tools' && !isCommissioner) return; window.history.replaceState(null, '', next === 'Test Week' ? '#test-week' : window.location.pathname); setPage(next); setMenu(false); setMessage(''); window.scrollTo({top: 0, behavior: 'smooth'}) }
+  function go(next) { if ((next === 'Commissioner Tools' && !isCommissioner)||(next==='Team Tools'&&!isGM)) return; window.history.replaceState(null, '', next === 'Test Week' ? '#test-week' : window.location.pathname); setPage(next); setMenu(false); setMessage(''); window.scrollTo({top: 0, behavior: 'smooth'}) }
   const logo = `${import.meta.env.BASE_URL}sluggers-supa-league-logo.svg`
   return <>
     <div className="topline"><div className="container topline-inner"><span><i className="live-dot"/> SLUGGERS SUPA LEAGUE</span><span>THE LEAGUE STARTS HERE <b>★</b></span><button onClick={() => setAuthOpen(true)}>{session ? session.user.email?.split('@')[0] : 'SIGN IN / JOIN'}</button></div></div>
     <header className="masthead"><div className="container masthead-inner"><button className="brand" onClick={() => go('Home')}><img src={logo} alt="Sluggers Supa League logo"/><span><strong>SLUGGERS <em>SUPA</em> LEAGUE</strong><small>THE OFFICIAL LEAGUE HUB</small></span></button><button className="mobile-menu" aria-label="Open menu" onClick={() => setMenu(!menu)}>{menu ? <X/> : <Menu/>}</button><div className="masthead-right"><span className="league-tag">MARIO SUPER SLUGGERS</span><span className="badge-star">★</span></div></div></header>
     <nav className={`nav ${menu ? 'open' : ''}`} aria-label="Main navigation"><div className="container nav-inner">{visibleNav.map(n => <button key={n} className={page === n ? 'active' : ''} onClick={() => go(n)}>{n}</button>)}</div></nav>
     <main className="container page-content">
-      {page === 'Commissioner Tools' && isCommissioner && <><div className="page-heading"><span className="eyebrow dark">LEAGUE ADMINISTRATION</span><h1>COMMISSIONER TOOLS</h1></div><CommissionerCodes supabase={supabase} onAccess={setAccess}/></>}
-      {access.role === 'gm' && <p className="inline-message">GM access enabled for {access.team}.</p>}
+      {page === 'Commissioner Tools' && isCommissioner && <><div className="page-heading"><span className="eyebrow dark">LEAGUE ADMINISTRATION</span><h1>COMMISSIONER TOOLS</h1></div><CommissionerWorkspace supabase={supabase} access={access} teams={officialTeams} onChange={loadOfficialTeams} onAccess={setAccess}/></>}
+      {page==='Team Tools' && isGM && <><div className="page-heading"><span className="eyebrow dark">YOUR CLUB</span><h1>TEAM TOOLS</h1></div><TeamSetup key={access.slot} supabase={supabase} access={access} teams={officialTeams} onChange={loadOfficialTeams} onAccess={setAccess}/></>}
       {page === 'Test Week' && <TemporaryLeague PlayerAvatar={PlayerAvatar}/>}
       {page === 'Home' && <>
         <div className="home-grid"><div className="hero"><div className="hero-content"><span className="eyebrow">WELCOME TO THE LEAGUE</span><h1>THE GAME<br/><span>STARTS HERE.</span></h1><p>Follow every game, explore the player pool, and manage your fantasy league in one place.</p><button className="yellow-btn" onClick={() => go('Player Stats')}>EXPLORE PLAYERS <span>›</span></button></div><div className="hero-number">01</div></div>
@@ -197,12 +209,12 @@ function App() {
       </>}
       {page === 'Schedule' && <BasicPage kicker="GAME DAYS" title="SEASON SCHEDULE" icon={CalendarDays} empty="No games scheduled yet" detail="The season schedule will appear here once it is announced."/>}
       {page === 'Standings' && <BasicPage kicker="THE RACE" title="STANDINGS" icon={Trophy} empty="Standings begin on opening day" detail="Teams and game results will determine the standings."/>}
-      {page === 'Teams' && <BasicPage kicker="THE CLUBS" title="TEAMS" icon={Shield} empty="No teams created yet" detail="Team pages and rosters will appear after the league draft."/>}
+      {page === 'Teams' && <OfficialTeams teams={officialTeams} loading={teamsLoading} message={teamsMessage} supabase={supabase}/>}
       {page === 'Team Stats' && <BasicPage kicker="BY THE NUMBERS" title="TEAM STATS" icon={Trophy} empty="No team stats yet" detail="Team stats will populate from uploaded game results."/>}
       {page === 'Transactions' && <BasicPage kicker="LEAGUE MOVES" title="TRANSACTIONS" icon={Shield} empty="No transactions yet" detail="Trade submissions will open when teams and rosters are set."/>}
       {['SSL Playoffs', 'Voting'].includes(page) && <ClosedSeasonRoom kind={page}/>}
       {page === 'SSL History' && <LeagueHistory/>}
-      {page === 'SSL Draft Room' && <SSLDraftRoom supabase={supabase} isCommissioner={isCommissioner} players={players}/>}
+      {page === 'SSL Draft Room' && <SSLDraftRoom supabase={supabase} isCommissioner={isCommissioner} players={players} registeredTeams={officialTeams.map(t=>({id:`team-${t.slot}`,name:t.name,logo:teamLogo(supabase,t.logo_path)}))}/>}
       {page === 'Free Agency' && <><div className="page-heading"><span className="eyebrow dark">AVAILABLE PLAYERS</span><h1>FREE AGENCY</h1><p>No rosters have been set. All {players.length} players are currently unassigned.</p></div><div className="panel"><div className="free-list">{players.map(p => <button key={p.id} onClick={() => setSelectedPlayer(p)}><span>{p.name}</span><small>{p.class}</small></button>)}</div></div></>}
     </main>
     <footer><div className="container footer-inner"><span>SLUGGERS <b>SUPA</b> LEAGUE</span><small>LEAGUE DATA AND FANTASY HUB</small></div></footer>
