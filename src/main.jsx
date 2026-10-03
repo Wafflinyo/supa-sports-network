@@ -105,6 +105,15 @@ function App() {
   const [statView, setStatView] = useState('Totals')
   const [sort, setSort] = useState({ key: 'id', direction: 'asc' })
   const [selectedPlayer, setSelectedPlayer] = useState(null)
+  const isCommissioner = Boolean(session && access.role === 'commissioner')
+  const visibleNav = isCommissioner ? [...nav, 'Commissioner Tools'] : nav
+
+  useEffect(() => {
+    if (page === 'Commissioner Tools' && !isCommissioner) {
+      setPage('Home')
+      setMenu(false)
+    }
+  }, [page, isCommissioner])
 
   useEffect(() => {
     if (!supabase) return
@@ -151,14 +160,14 @@ function App() {
     return sort.direction === 'asc' ? comparison : -comparison
   }), [query, sort, statTab, statView])
   function sortBy(key) { setSort(s => ({ key, direction: s.key === key && s.direction === 'desc' ? 'asc' : 'desc' })) }
-  function go(next) { window.history.replaceState(null, '', next === 'Test Week' ? '#test-week' : window.location.pathname); setPage(next); setMenu(false); setMessage(''); window.scrollTo({top: 0, behavior: 'smooth'}) }
+  function go(next) { if (next === 'Commissioner Tools' && !isCommissioner) return; window.history.replaceState(null, '', next === 'Test Week' ? '#test-week' : window.location.pathname); setPage(next); setMenu(false); setMessage(''); window.scrollTo({top: 0, behavior: 'smooth'}) }
   const logo = `${import.meta.env.BASE_URL}sluggers-supa-league-logo.svg`
   return <>
     <div className="topline"><div className="container topline-inner"><span><i className="live-dot"/> SLUGGERS SUPA LEAGUE</span><span>THE LEAGUE STARTS HERE <b>★</b></span><button onClick={() => setAuthOpen(true)}>{session ? session.user.email?.split('@')[0] : 'SIGN IN / JOIN'}</button></div></div>
     <header className="masthead"><div className="container masthead-inner"><button className="brand" onClick={() => go('Home')}><img src={logo} alt="Sluggers Supa League logo"/><span><strong>SLUGGERS <em>SUPA</em> LEAGUE</strong><small>THE OFFICIAL LEAGUE HUB</small></span></button><button className="mobile-menu" aria-label="Open menu" onClick={() => setMenu(!menu)}>{menu ? <X/> : <Menu/>}</button><div className="masthead-right"><span className="league-tag">MARIO SUPER SLUGGERS</span><span className="badge-star">★</span></div></div></header>
-    <nav className={`nav ${menu ? 'open' : ''}`} aria-label="Main navigation"><div className="container nav-inner">{nav.map(n => <button key={n} className={page === n ? 'active' : ''} onClick={() => go(n)}>{n}</button>)}</div></nav>
+    <nav className={`nav ${menu ? 'open' : ''}`} aria-label="Main navigation"><div className="container nav-inner">{visibleNav.map(n => <button key={n} className={page === n ? 'active' : ''} onClick={() => go(n)}>{n}</button>)}</div></nav>
     <main className="container page-content">
-      {access.role === 'commissioner' && <CommissionerCodes supabase={supabase} onAccess={setAccess}/>}
+      {page === 'Commissioner Tools' && isCommissioner && <><div className="page-heading"><span className="eyebrow dark">LEAGUE ADMINISTRATION</span><h1>COMMISSIONER TOOLS</h1></div><CommissionerCodes supabase={supabase} onAccess={setAccess}/></>}
       {access.role === 'gm' && <p className="inline-message">GM access enabled for {access.team}.</p>}
       {page === 'Test Week' && <TemporaryLeague PlayerAvatar={PlayerAvatar}/>}
       {page === 'Home' && <>
