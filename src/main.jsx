@@ -9,6 +9,7 @@ import { FantasyLeague, FantasyRules } from './FantasyHub.jsx'
 import TemporaryLeague from './TemporaryLeague.jsx'
 import { leagueTabs } from './navigation.js'
 import { AccountDialog, CommissionerCodes } from './LeagueAccount.jsx'
+import { ClosedSeasonRoom, SSLDraftRoom } from './SeasonRooms.jsx'
 import connection from './supabase-config.json'
 import './styles.css'
 
@@ -197,7 +198,8 @@ function App() {
       {page === 'Teams' && <BasicPage kicker="THE CLUBS" title="TEAMS" icon={Shield} empty="No teams created yet" detail="Team pages and rosters will appear after the league draft."/>}
       {page === 'Team Stats' && <BasicPage kicker="BY THE NUMBERS" title="TEAM STATS" icon={Trophy} empty="No team stats yet" detail="Team stats will populate from uploaded game results."/>}
       {page === 'Transactions' && <BasicPage kicker="LEAGUE MOVES" title="TRANSACTIONS" icon={Shield} empty="No transactions yet" detail="Trade submissions will open when teams and rosters are set."/>}
-      {page === 'Draft' && <BasicPage kicker="BUILD YOUR TEAM" title="SUPA LEAGUE DRAFT" icon={Trophy} empty="Draft room coming soon" detail="The league draft opens after teams and the draft date are confirmed."/>}
+      {['SSL Playoffs', 'Voting'].includes(page) && <ClosedSeasonRoom kind={page}/>}
+      {page === 'SSL Draft Room' && <SSLDraftRoom supabase={supabase} isCommissioner={isCommissioner} players={players}/>}
       {page === 'Free Agency' && <><div className="page-heading"><span className="eyebrow dark">AVAILABLE PLAYERS</span><h1>FREE AGENCY</h1><p>No rosters have been set. All {players.length} players are currently unassigned.</p></div><div className="panel"><div className="free-list">{players.map(p => <button key={p.id} onClick={() => setSelectedPlayer(p)}><span>{p.name}</span><small>{p.class}</small></button>)}</div></div></>}
     </main>
     <footer><div className="container footer-inner"><span>SLUGGERS <b>SUPA</b> LEAGUE</span><small>LEAGUE DATA AND FANTASY HUB</small></div></footer>

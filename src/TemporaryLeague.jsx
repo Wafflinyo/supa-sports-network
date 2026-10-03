@@ -6,6 +6,7 @@ import { leagueTabs } from './navigation.js'
 import { FantasyRules } from './FantasyHub.jsx'
 import TestExtraPanels from './TestExtraPanels.jsx'
 import TestMatchupBreakdown from './TestMatchupBreakdown.jsx'
+import { ClosedSeasonRoom } from './SeasonRooms.jsx'
 import { weekResults, fantasyStandings } from './temporary-weeks.js'
 import { sumScores, matchupScore, weekKey } from './fantasy-scoring.js'
 
@@ -53,7 +54,7 @@ export default function TemporaryLeague({ PlayerAvatar }) {
   const [fantasyTab,setFantasyTab] = useState('Matchups')
   const fantasyTabs = ['Matchups','Schedule','Standings','Teams','Fantasy Stats','Transactions','Free Agency','Draft','Rules & Point System']
   const fantasyMap = {Matchups:'Fantasy teams',Schedule:'Fantasy schedule',Standings:'Fantasy standings',Teams:'Fantasy teams','Fantasy Stats':'Fantasy Stats',Transactions:'Fantasy transactions','Free Agency':'Fantasy free agency',Draft:'Draft boards','Rules & Point System':'Fantasy rules'}
-  const tab = section==='Sluggers Fantasy' ? fantasyMap[fantasyTab] : ({Teams:'League teams',Schedule:'Week schedule',Draft:'Draft boards'}[section] || section)
+  const tab = section==='Sluggers Fantasy' ? fantasyMap[fantasyTab] : ({Teams:'League teams',Schedule:'Week schedule',Draft:'Draft boards','SSL Draft Room':'Draft boards'}[section] || section)
   const setTab = name => { if(name==='Fantasy standings'){setSection('Sluggers Fantasy');setFantasyTab('Standings')}else setSection(name) }
   const [draft,setDraft] = useState('League')
   const [round,setRound] = useState(1)
@@ -93,6 +94,7 @@ export default function TemporaryLeague({ PlayerAvatar }) {
     <div className="subnav test-tabs">{tabs.map(t => <button key={t} className={section===t?'active':''} onClick={()=>{setActiveMatchup(null);setSection(t);setDraft(t==='Sluggers Fantasy'?'Fantasy':'League');setRound(1)}}>{t}</button>)}</div>
     {section==='Sluggers Fantasy' && <div className="subnav test-fantasy-tabs" aria-label="Testing fantasy navigation">{fantasyTabs.map(name=><button key={name} className={fantasyTab===name?'active':''} onClick={()=>{setActiveMatchup(null);setFantasyTab(name);setDraft('Fantasy');setRound(1)}}>{name}</button>)}</div>}
     <TestExtraPanels tab={tab} test={test} results={results} week={week} weeklyResults={weeklyResults} schedule={schedule} PlayerAvatar={PlayerAvatar} onNavigate={setSection} fantasyTeams={week.fantasyTeams}/>
+    {['SSL Playoffs','Voting'].includes(tab) && <ClosedSeasonRoom kind={tab}/>}
     {tab==='Fantasy rules' && <FantasyRules/>}
     {tab==='Fantasy schedule' && <section className="panel test-team"><div className="section-title"><h2>WEEK {week.number} FANTASY SCHEDULE</h2></div><div className="test-team-body"><p className="test-note">{week.label} · Sunday 12:00 a.m.–Saturday 11:59:59 p.m. ET</p>{week.fantasyMatchups.map(([a,b])=><article key={a} className="test-game"><strong>{fantasyTeam(a).name} <span>vs</span> {fantasyTeam(b).name}</strong><b>{weekFinal?'Final':'Upcoming'}</b></article>)}</div></section>}
     {tab==='League teams' && <>

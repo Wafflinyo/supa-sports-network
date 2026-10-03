@@ -1,0 +1,31 @@
+begin;
+do $$
+declare u uuid:=gen_random_uuid(); sid uuid:=gen_random_uuid(); r public.ssl_draft_seasons; winner text;
+begin
+ insert into auth.users(id,email) values(u,'draft_test_'||substr(replace(u::text,'-',''),1,8)||'@accounts.supasports.invalid');
+ insert into auth.sessions(id,user_id,created_at,updated_at) values(sid,u,now(),now());
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',u,'role','authenticated','session_id',sid)::text,true);
+ begin perform public.create_ssl_season('Forbidden test','[]',1,true);raise exception 'Participant created season';exception when others then if sqlerrm<>'Commissioner access required' then raise;end if;end;
+ insert into league_private.session_access(session_id,user_id,slot,code_version) select sid,u,0,version from league_private.access_codes where slot=0;
+ set local role authenticated;
+ select * into r from public.create_ssl_season('Draft regression '||u::text,'[{"id":"a","name":"Alpha","logo":""},{"id":"b","name":"Beta","logo":""}]',2,true);
+ if jsonb_array_length(r.draft_order)<>0 then raise exception 'Unrevealed order leaked';end if;
+ select * into r from public.ssl_draft_action(r.id,'draw');winner:=r.draft_order->0->>'id';
+ select * into r from public.ssl_draft_action(r.id,'draw');
+ if jsonb_array_length(r.draft_order)<>2 or r.draft_order->0->>'id'=r.draft_order->1->>'id' then raise exception 'Lottery repeat';end if;
+ begin perform public.ssl_draft_action(r.id,'draw');raise exception 'Reroll allowed';exception when others then if sqlerrm<>'Lottery is already finished' then raise;end if;end;
+ select * into r from public.ssl_draft_action(r.id,'start');
+ select * into r from public.ssl_draft_action(r.id,'pick',1);
+ begin perform public.ssl_draft_action(r.id,'pick',1);raise exception 'Duplicate pick';exception when others then if sqlerrm<>'Player already drafted' then raise;end if;end;
+ select * into r from public.ssl_draft_action(r.id,'pick',2);
+ select * into r from public.ssl_draft_action(r.id,'pick',3);
+ select * into r from public.ssl_draft_action(r.id,'pick',4);
+ if r.stage<>'complete' or r.picks->0->>'team'<>winner or r.picks->3->>'team'<>winner or r.picks->1->>'team'<>r.picks->2->>'team' then raise exception 'Snake order or completion failed';end if;
+ perform public.leave_league_access();
+ begin perform public.ssl_draft_action(r.id,'start');raise exception 'Revoked permission accepted';exception when others then if sqlerrm<>'Commissioner access required' then raise;end if;end;
+ if has_table_privilege('authenticated','league_private.ssl_lottery_order','SELECT') or has_table_privilege('anon','league_private.ssl_lottery_order','SELECT') then raise exception 'Lottery visible';end if;
+ if has_table_privilege('authenticated','public.ssl_draft_seasons','UPDATE') or has_function_privilege('anon','public.ssl_draft_action(uuid,text,integer)','EXECUTE') then raise exception 'Public draft mutation';end if;
+ reset role;
+end $$;
+rollback;
+select 'PASS: commissioner-only mutations, private unrevealed order, unique draws, no rerolls, snake order, duplicate rejection, completion, revocation; fixtures rolled back' as result;
