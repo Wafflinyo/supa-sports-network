@@ -71,3 +71,5 @@
 
 /* Keep roster numbers intact, including three-digit player numbers. */
 .ssl-stat-table td.roster-number{white-space:nowrap;overflow-wrap:normal;word-break:normal;font-variant-numeric:tabular-nums}
+
+.league-sidebar form select{width:100%;padding:10px 12px;border:1px solid #cfd6e1;background:white;color:#10244b;margin-bottom:12px}

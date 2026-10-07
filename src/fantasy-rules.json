@@ -1,7 +1,7 @@
 {
   "timezone": "America/New_York",
   "minTeams": 6,
-  "maxTeams": 8,
+  "maxTeams": 10,
   "rosterSize": 10,
   "starters": 7,
   "bench": 3,
@@ -42,5 +42,10 @@
   },
   "team": {
     "shutoutBonus": 1
-  }
+  },
+  "allowedTeamSizes": [
+    6,
+    8,
+    10
+  ]
 }

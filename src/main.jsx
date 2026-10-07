@@ -103,6 +103,7 @@ function App() {
   const [leagues, setLeagues] = useState([])
   const [selectedLeague, setSelectedLeague] = useState(null)
   const [leagueName, setLeagueName] = useState('')
+  const [leagueSize, setLeagueSize] = useState(8)
   const [joinCode, setJoinCode] = useState('')
   const [query, setQuery] = useState('')
   const [statTab, setStatTab] = useState('Offensive Stats')
@@ -156,7 +157,7 @@ function App() {
   }
   async function createLeague(e) {
     e.preventDefault(); setBusy(true); setMessage('')
-    const { data, error } = await supabase.rpc('create_fantasy_league', { league_name: leagueName.trim() })
+    const { data, error } = await supabase.rpc('create_fantasy_league', { league_name: leagueName.trim(), league_size: leagueSize })
     setBusy(false); if (error) { setMessage(error.message); return }
     setLeagueName(''); await loadLeagues(); setSelectedLeague(data)
   }
@@ -208,7 +209,7 @@ function App() {
         {rulesOpen && <FantasyRules/>}
         <div className="panel test-undrafted"><h2>TEMPORARY FANTASY TEST</h2><p>View the eight drafted teams, weekly head-to-head scores, and league game reports.</p><button className="outline-btn" onClick={() => go('Test Week')}>OPEN TEST WEEK</button></div>
         {!session ? <div className="panel gateway"><div className="gateway-icon">★</div><h2>YOUR LEAGUE IS WAITING</h2><p>Sign in with your username to create a fantasy league or join one with an invite code.</p><button className="red-btn" onClick={() => setAuthOpen(true)}>SIGN IN TO FANTASY</button>{!supabase && <p className="setup-note">Account setup is pending for this site.</p>}</div> :
-          <div className="fantasy-layout"><aside className="panel league-sidebar"><SectionTitle kicker="YOUR FANTASY">LEAGUES</SectionTitle>{leagues.map(l => <button key={l.id} className={`league-choice ${selectedLeague?.id === l.id ? 'selected' : ''}`} onClick={() => setSelectedLeague(l)}><span>★</span>{l.name}</button>)}{!leagues.length && <p className="muted">No leagues yet. Create one or enter an invite code.</p>}<form onSubmit={createLeague}><label htmlFor="league-name">CREATE A LEAGUE</label><input id="league-name" required maxLength={60} value={leagueName} onChange={e => setLeagueName(e.target.value)} placeholder="League name"/><button disabled={busy} className="red-btn">CREATE LEAGUE</button></form><form onSubmit={joinLeague}><label htmlFor="invite-code">JOIN WITH A CODE</label><input id="invite-code" required value={joinCode} onChange={e => setJoinCode(e.target.value)} placeholder="Invite code"/><button disabled={busy} className="outline-btn">JOIN LEAGUE</button></form></aside><div className="panel fantasy-main">{selectedLeague ? <FantasyLeague key={selectedLeague.id} initialLeague={selectedLeague} user={session.user} supabase={supabase} players={players} onLeagueRefresh={loadLeagues}/> : <Empty icon={Trophy} title="Create or join a league">Your fantasy league will appear here.</Empty>}</div></div>}{message && <p className="inline-message" role="status">{message}</p>}
+          <div className="fantasy-layout"><aside className="panel league-sidebar"><SectionTitle kicker="YOUR FANTASY">LEAGUES</SectionTitle>{leagues.map(l => <button key={l.id} className={`league-choice ${selectedLeague?.id === l.id ? 'selected' : ''}`} onClick={() => setSelectedLeague(l)}><span>★</span>{l.name}</button>)}{!leagues.length && <p className="muted">No leagues yet. Create one or enter an invite code.</p>}<form onSubmit={createLeague}><label htmlFor="league-name">CREATE A LEAGUE</label><input id="league-name" required maxLength={60} value={leagueName} onChange={e => setLeagueName(e.target.value)} placeholder="League name"/><label htmlFor="league-size">NUMBER OF TEAMS</label><select id="league-size" value={leagueSize} onChange={e=>setLeagueSize(Number(e.target.value))}>{[6,8,10].map(n=><option key={n} value={n}>{n} teams</option>)}</select><button disabled={busy} className="red-btn">CREATE LEAGUE</button></form><form onSubmit={joinLeague}><label htmlFor="invite-code">JOIN WITH A CODE</label><input id="invite-code" required value={joinCode} onChange={e => setJoinCode(e.target.value)} placeholder="Invite code"/><button disabled={busy} className="outline-btn">JOIN LEAGUE</button></form></aside><div className="panel fantasy-main">{selectedLeague ? <FantasyLeague key={selectedLeague.id} initialLeague={selectedLeague} user={session.user} supabase={supabase} players={players} onLeagueRefresh={loadLeagues}/> : <Empty icon={Trophy} title="Create or join a league">Your fantasy league will appear here.</Empty>}</div></div>}{message && <p className="inline-message" role="status">{message}</p>}
       </>}
       {page === 'Schedule' && <BasicPage kicker="GAME DAYS" title="SEASON SCHEDULE" icon={CalendarDays} empty="No games scheduled yet" detail="The season schedule will appear here once it is announced."/>}
       {page === 'Standings' && <BasicPage kicker="THE RACE" title="STANDINGS" icon={Trophy} empty="Standings begin on opening day" detail="Teams and game results will determine the standings."/>}

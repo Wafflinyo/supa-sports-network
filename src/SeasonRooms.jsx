@@ -9,7 +9,7 @@ export function ClosedSeasonRoom({kind}){
 function TeamMark({team}){return team?.logo?<img className="draft-team-logo" src={team.logo} alt={`${team.name} logo`} referrerPolicy="no-referrer"/>:<Shield size={34} aria-hidden="true"/>}
 export function SSLDraftRoom({supabase,isCommissioner,players,registeredTeams=[]}){
  const [seasons,setSeasons]=useState([]),[selected,setSelected]=useState(null),[message,setMessage]=useState(''),[busy,setBusy]=useState(false),[rolling,setRolling]=useState(false),[revealed,setRevealed]=useState(null),[setup,setSetup]=useState(false)
- const [name,setName]=useState(''),[rounds,setRounds]=useState(11),[snake,setSnake]=useState(true),[entries,setEntries]=useState(Array.from({length:10},(_,i)=>({id:`team-${i+1}`,name:'',logo:''}))),[chosen,setChosen]=useState('')
+ const [name,setName]=useState(''),[rounds,setRounds]=useState(11),[snake,setSnake]=useState(true),[entries,setEntries]=useState(Array.from({length:12},(_,i)=>({id:`team-${i+1}`,name:'',logo:''}))),[chosen,setChosen]=useState('')
  const timer=useRef(null),mounted=useRef(true),lastDraw=useRef(null)
  const season=seasons.find(s=>s.id===selected)||seasons[0]
  async function load(){if(!supabase)return;const r=await supabase.from('ssl_draft_seasons').select('*').order('created_at',{ascending:false});if(mounted.current){if(r.error)setMessage(r.error.message);else setSeasons(r.data||[])}}

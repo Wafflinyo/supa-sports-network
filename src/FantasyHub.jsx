@@ -19,7 +19,7 @@ export function FantasyRules() {
     <div className="section-title"><div><small>LEAGUE HANDBOOK</small><h2>FANTASY RULES & POINT SYSTEM</h2></div></div>
     <div className="rules-content">
       <div className="rules-overview">
-        <div><strong>6–8</strong><span>teams per league</span></div>
+        <div><strong>6 / 8 / 10</strong><span>teams per league</span></div>
         <div><strong>10</strong><span>players drafted</span></div>
         <div><strong>7 + 3</strong><span>starters + bench</span></div>
       </div>
@@ -147,11 +147,11 @@ export function FantasyLeague({ initialLeague, user, supabase, players, onLeague
     <div className="subnav">{tabs.map(t => <button key={t} className={tab === t ? 'active' : ''} onClick={() => setTab(t)}>{t}</button>)}</div>
     {error && <p className="inline-message" role="alert">{error}</p>}
     {tab === 'Draft' && <div className="fantasy-content">
-      <div className="fantasy-section-head"><h3>Fantasy draft room</h3><span>{members.length} / 8 managers · 10 rounds · snake draft</span></div>
-      {league.state === 'waiting' && <div className="draft-callout"><p>Invite 6 to 8 managers. The commissioner starts the draft when everyone is in. Order follows join order and reverses each round.</p>
-        {league.owner_id === user.id && <button className="red-btn" disabled={busy || members.length < 6 || members.length > 8}
+      <div className="fantasy-section-head"><h3>Fantasy draft room</h3><span>{members.length} / {league.team_limit ?? 8} managers · 10 rounds · snake draft</span></div>
+      {league.state === 'waiting' && <div className="draft-callout"><p>Invite exactly {league.team_limit ?? 8} managers. The commissioner starts the draft when everyone is in. Order follows join order and reverses each round.</p>
+        {league.owner_id === user.id && <button className="red-btn" disabled={busy || members.length !== (league.team_limit ?? 8)}
           onClick={() => run(() => supabase.rpc('start_fantasy_draft', { target_league: league.id }))}>START DRAFT</button>}
-        {members.length < 6 && <small>{6 - members.length} more manager{6 - members.length === 1 ? '' : 's'} needed.</small>}</div>}
+        {members.length < (league.team_limit ?? 8) && <small>{(league.team_limit ?? 8) - members.length} more manager{(league.team_limit ?? 8) - members.length === 1 ? '' : 's'} needed.</small>}</div>}
       {league.state !== 'waiting' && <><div className="draft-callout"><strong>{league.state === 'active' ? 'Draft complete' : `Round ${roundIndex + 1}, pick ${nextPick} of ${managerCount * 10}`}</strong>
         {league.state === 'drafting' && <span>{turnUser === user.id ? 'Your pick is on the clock' : `${teamName(turnUser)} is picking`}</span>}</div>
         <div className="draft-layout"><div><div className="draft-search"><Search size={18}/><input placeholder="Search available players" aria-label="Search available players" value={draftQuery} onChange={e => setDraftQuery(e.target.value)}/></div>
