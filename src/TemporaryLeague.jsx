@@ -42,7 +42,7 @@ const fantasyColumns = [
 const statValue = (id,key,view) => key==='gamesPlayed' || view==='Totals' ? results.playerStats[id]?.[key] : results.perGame?.[id]?.[key]
 const display = (value,key,view) => value == null ? '—' : rateKeys.has(key) ? value.toFixed(3) : key==='inningsPitched' || view!=='Totals' && key!=='gamesPlayed' ? value.toFixed(2) : value
 
-export default function TemporaryLeague({ PlayerAvatar }) {
+function PopulatedTestingLeague({ PlayerAvatar }) {
   const [weekNumber,setWeekNumber] = useState(2)
   const week = test.weeks.find(w=>w.number===weekNumber)
   const schedule = test.schedule.filter(game=>weekKey(new Date(game.startsAt))===week.start)
@@ -148,4 +148,24 @@ export default function TemporaryLeague({ PlayerAvatar }) {
       <div className="table-scroll"><table className="fantasy-simple-table test-draft-table"><thead><tr><th>Pick</th><th>Team</th><th>Player</th><th>Ability</th></tr></thead><tbody>{(draft==='League'?test.leagueDraft:test.fantasyDraft).filter(p=>p.round===round).map(p=><tr key={p.pick}><td>{p.pick}</td><td>{(draft==='League'?leagueTeam(p.teamId):fantasyTeam(p.teamId)).name}</td><td>{profiles[p.playerId].name}</td><td>{profiles[p.playerId].ability}</td></tr>)}</tbody></table></div>
     </div></section>}
   </>
+}
+
+
+function EmptyTestingLeague() {
+  const [section,setSection] = useState('Home')
+  const [fantasyTab,setFantasyTab] = useState('Matchups')
+  const fantasyTabs = ['Matchups','Schedule','Standings','Teams','Fantasy Stats','Transactions','Free Agency','Draft','Rules & Point System']
+  const fantasy = section === 'Sluggers Fantasy'
+  const current = fantasy ? fantasyTab : section
+  return <>
+    <div className="page-heading"><span className="eyebrow dark">TEMPORARY EXHIBITION SETUP</span><h1>LEAGUE TESTING</h1><p>Testing has been reset. Start a new test setup to add league teams, fantasy teams, schedules, and game reports.</p></div>
+    <div className="test-summary panel testing-summary">{['league teams','rostered players','scheduled games','fantasy teams'].map(label=><div key={label}><strong>0</strong><span>{label}</span></div>)}</div>
+    <div className="subnav test-tabs">{leagueTabs.map(name=><button key={name} className={section===name?'active':''} onClick={()=>setSection(name)}>{name}</button>)}</div>
+    {fantasy && <div className="subnav test-fantasy-tabs" aria-label="Testing fantasy navigation">{fantasyTabs.map(name=><button key={name} className={fantasyTab===name?'active':''} onClick={()=>setFantasyTab(name)}>{name}</button>)}</div>}
+    {fantasy && current==='Rules & Point System' ? <FantasyRules/> : ['SSL Playoffs','Voting'].includes(current) ? <ClosedSeasonRoom kind={current}/> : <section className="panel basic-panel"><div className="empty"><h3>{fantasy?'Fantasy ':''}{current} — no test data</h3><p>There are no test teams, drafts, games, results, or fantasy scores. This tab is ready for a new testing setup.</p></div></section>}
+  </>
+}
+
+export default function TemporaryLeague(props) {
+  return test.weeks.length && test.teams.length ? <PopulatedTestingLeague {...props}/> : <EmptyTestingLeague/>
 }
