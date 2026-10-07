@@ -1342,13 +1342,22 @@
     "rosterOrder": 111
   },
   {
+    "id": 118,
+    "name": "Ada Wong",
+    "class": "Balanced",
+    "color": "Red",
+    "source": "Resident Evil",
+    "kind": "mii",
+    "rosterOrder": 112
+  },
+  {
     "id": 77,
     "name": "Roshi",
     "class": "Balanced",
     "color": "Orange",
     "source": "Dragon Ball",
     "kind": "mii",
-    "rosterOrder": 112
+    "rosterOrder": 113
   },
   {
     "id": 78,
@@ -1357,7 +1366,7 @@
     "color": "Orange",
     "source": "Splatoon",
     "kind": "mii",
-    "rosterOrder": 113
+    "rosterOrder": 114
   },
   {
     "id": 79,
@@ -1366,7 +1375,25 @@
     "color": "Orange",
     "source": "Cartoon",
     "kind": "mii",
-    "rosterOrder": 114
+    "rosterOrder": 115
+  },
+  {
+    "id": 119,
+    "name": "Garfield",
+    "class": "Balanced",
+    "color": "Orange",
+    "source": "Garfield",
+    "kind": "mii",
+    "rosterOrder": 116
+  },
+  {
+    "id": 120,
+    "name": "Misty",
+    "class": "Balanced",
+    "color": "Orange",
+    "source": "Pokemon",
+    "kind": "mii",
+    "rosterOrder": 117
   },
   {
     "id": 80,
@@ -1375,7 +1402,7 @@
     "color": "Yellow",
     "source": "Cartoon",
     "kind": "mii",
-    "rosterOrder": 115
+    "rosterOrder": 118
   },
   {
     "id": 81,
@@ -1384,7 +1411,7 @@
     "color": "Yellow",
     "source": "Bejeweled",
     "kind": "mii",
-    "rosterOrder": 116
+    "rosterOrder": 119
   },
   {
     "id": 82,
@@ -1393,7 +1420,7 @@
     "color": "Yellow",
     "source": "Food",
     "kind": "mii",
-    "rosterOrder": 117
+    "rosterOrder": 120
   },
   {
     "id": 83,
@@ -1402,7 +1429,25 @@
     "color": "Yellow",
     "source": "Red Dead Redemption",
     "kind": "mii",
-    "rosterOrder": 118
+    "rosterOrder": 121
+  },
+  {
+    "id": 121,
+    "name": "Waffle",
+    "class": "Balanced",
+    "color": "Yellow",
+    "source": "GM",
+    "kind": "mii",
+    "rosterOrder": 122
+  },
+  {
+    "id": 136,
+    "name": "Chica",
+    "class": "Balanced",
+    "color": "Yellow",
+    "source": "FNAF",
+    "kind": "mii",
+    "rosterOrder": 123
   },
   {
     "id": 84,
@@ -1411,7 +1456,7 @@
     "color": "Light Green",
     "source": "GM",
     "kind": "mii",
-    "rosterOrder": 119
+    "rosterOrder": 124
   },
   {
     "id": 85,
@@ -1420,7 +1465,7 @@
     "color": "Light Green",
     "source": "Homestuck",
     "kind": "mii",
-    "rosterOrder": 120
+    "rosterOrder": 125
   },
   {
     "id": 86,
@@ -1429,7 +1474,25 @@
     "color": "Light Green",
     "source": "Scooby Doo",
     "kind": "mii",
-    "rosterOrder": 121
+    "rosterOrder": 126
+  },
+  {
+    "id": 122,
+    "name": "Derrick White",
+    "class": "Balanced",
+    "color": "Light Green",
+    "source": "Basketball",
+    "kind": "mii",
+    "rosterOrder": 127
+  },
+  {
+    "id": 123,
+    "name": "Sonya Blade",
+    "class": "Balanced",
+    "color": "Light Green",
+    "source": "Mortal Kombat",
+    "kind": "mii",
+    "rosterOrder": 128
   },
   {
     "id": 87,
@@ -1438,7 +1501,7 @@
     "color": "Green",
     "source": "Pokemon",
     "kind": "mii",
-    "rosterOrder": 122
+    "rosterOrder": 129
   },
   {
     "id": 88,
@@ -1447,7 +1510,7 @@
     "color": "Green",
     "source": "Cartoon",
     "kind": "mii",
-    "rosterOrder": 123
+    "rosterOrder": 130
   },
   {
     "id": 89,
@@ -1456,7 +1519,7 @@
     "color": "Green",
     "source": "I don't know, I can't see him",
     "kind": "mii",
-    "rosterOrder": 124
+    "rosterOrder": 131
   },
   {
     "id": 90,
@@ -1465,7 +1528,7 @@
     "color": "Green",
     "source": "Animal Crossing",
     "kind": "mii",
-    "rosterOrder": 125
+    "rosterOrder": 132
   },
   {
     "id": 91,
@@ -1474,52 +1537,16 @@
     "color": "Green",
     "source": "Undertale",
     "kind": "mii",
-    "rosterOrder": 126
+    "rosterOrder": 133
   },
   {
-    "id": 92,
-    "name": "Sheen Estevez",
+    "id": 124,
+    "name": "Cammy White",
     "class": "Balanced",
-    "color": "Blue",
-    "source": "Jimmy Neutron",
+    "color": "Green",
+    "source": "Street Fighter",
     "kind": "mii",
-    "rosterOrder": 127
-  },
-  {
-    "id": 93,
-    "name": "Samus",
-    "class": "Balanced",
-    "color": "Blue",
-    "source": "Metroid",
-    "kind": "mii",
-    "rosterOrder": 128
-  },
-  {
-    "id": 94,
-    "name": "Jack Black",
-    "class": "Balanced",
-    "color": "Blue",
-    "source": "Minecraft",
-    "kind": "mii",
-    "rosterOrder": 129
-  },
-  {
-    "id": 95,
-    "name": "Bubbles",
-    "class": "Balanced",
-    "color": "Blue",
-    "source": "Cartoon",
-    "kind": "mii",
-    "rosterOrder": 130
-  },
-  {
-    "id": 96,
-    "name": "PANCAKE!?!",
-    "class": "Balanced",
-    "color": "Blue",
-    "source": "Unknown",
-    "kind": "mii",
-    "rosterOrder": 131
+    "rosterOrder": 134
   },
   {
     "id": 97,
@@ -1528,7 +1555,7 @@
     "color": "Light Blue",
     "source": "GM",
     "kind": "mii",
-    "rosterOrder": 132
+    "rosterOrder": 135
   },
   {
     "id": 98,
@@ -1538,7 +1565,7 @@
     "source": "Mario",
     "kind": "mii",
     "portraitName": "Rosalina",
-    "rosterOrder": 133
+    "rosterOrder": 136
   },
   {
     "id": 99,
@@ -1547,7 +1574,7 @@
     "color": "Light Blue",
     "source": "Deltarune",
     "kind": "mii",
-    "rosterOrder": 134
+    "rosterOrder": 137
   },
   {
     "id": 100,
@@ -1557,232 +1584,7 @@
     "source": "Food",
     "kind": "mii",
     "portraitName": "Wendy",
-    "rosterOrder": 135
-  },
-  {
-    "id": 101,
-    "name": "Saul Goodman",
-    "class": "Balanced",
-    "color": "Pink",
-    "source": "Better Call Saul",
-    "kind": "mii",
-    "rosterOrder": 136
-  },
-  {
-    "id": 102,
-    "name": "Blossom",
-    "class": "Balanced",
-    "color": "Pink",
-    "source": "Cartoon",
-    "kind": "mii",
-    "rosterOrder": 137
-  },
-  {
-    "id": 103,
-    "name": "Timmy Turner",
-    "class": "Balanced",
-    "color": "Pink",
-    "source": "Cartoon",
-    "kind": "mii",
     "rosterOrder": 138
-  },
-  {
-    "id": 104,
-    "name": "Paula",
-    "class": "Balanced",
-    "color": "Pink",
-    "source": "Earthbound",
-    "kind": "mii",
-    "rosterOrder": 139
-  },
-  {
-    "id": 105,
-    "name": "Coach",
-    "class": "Balanced",
-    "color": "Purple",
-    "source": "Left for Dead",
-    "kind": "mii",
-    "rosterOrder": 140
-  },
-  {
-    "id": 106,
-    "name": "Zelda",
-    "class": "Balanced",
-    "color": "Purple",
-    "source": "Legend of Zelda",
-    "kind": "mii",
-    "rosterOrder": 141
-  },
-  {
-    "id": 107,
-    "name": "Grimace",
-    "class": "Balanced",
-    "color": "Purple",
-    "source": "Fast Food",
-    "kind": "mii",
-    "rosterOrder": 142
-  },
-  {
-    "id": 108,
-    "name": "Scooby Doo",
-    "class": "Balanced",
-    "color": "Brown",
-    "source": "Scooby Doo ",
-    "kind": "mii",
-    "rosterOrder": 143
-  },
-  {
-    "id": 109,
-    "name": "Mr. Bean",
-    "class": "Balanced",
-    "color": "Brown",
-    "source": "Mr. Bean",
-    "kind": "mii",
-    "rosterOrder": 144
-  },
-  {
-    "id": 110,
-    "name": "Goombella",
-    "class": "Balanced",
-    "color": "Brown",
-    "source": "Paper Mario ",
-    "kind": "mii",
-    "rosterOrder": 145
-  },
-  {
-    "id": 111,
-    "name": "Steve Harvey",
-    "class": "Balanced",
-    "color": "White",
-    "source": "Himself",
-    "kind": "mii",
-    "rosterOrder": 146
-  },
-  {
-    "id": 112,
-    "name": "Walter White",
-    "class": "Balanced",
-    "color": "White",
-    "source": "Breaking Bad",
-    "kind": "mii",
-    "rosterOrder": 147
-  },
-  {
-    "id": 113,
-    "name": "Hatsune Miku",
-    "class": "Balanced",
-    "color": "White",
-    "source": "Vocaloid ",
-    "kind": "mii",
-    "rosterOrder": 148
-  },
-  {
-    "id": 114,
-    "name": "Mike",
-    "class": "Balanced",
-    "color": "Black",
-    "source": "Breaking Bad",
-    "kind": "mii",
-    "rosterOrder": 149
-  },
-  {
-    "id": 115,
-    "name": "Cynthia",
-    "class": "Balanced",
-    "color": "Black",
-    "source": "Pokemon ",
-    "kind": "mii",
-    "rosterOrder": 150
-  },
-  {
-    "id": 116,
-    "name": "Masahiro Sakurai",
-    "class": "Balanced",
-    "color": "Black",
-    "source": "Smashy Bros",
-    "kind": "mii",
-    "rosterOrder": 151
-  },
-  {
-    "id": 117,
-    "name": "Mona Lisa",
-    "class": "Balanced",
-    "color": "Black",
-    "source": "Da Vinci ",
-    "kind": "mii",
-    "rosterOrder": 152
-  },
-  {
-    "id": 118,
-    "name": "Ada Wong",
-    "class": "Balanced",
-    "color": "Red",
-    "source": "Resident Evil",
-    "kind": "mii",
-    "rosterOrder": 153
-  },
-  {
-    "id": 119,
-    "name": "Garfield",
-    "class": "Balanced",
-    "color": "Orange",
-    "source": "Garfield",
-    "kind": "mii",
-    "rosterOrder": 154
-  },
-  {
-    "id": 120,
-    "name": "Misty",
-    "class": "Balanced",
-    "color": "Orange",
-    "source": "Pokemon",
-    "kind": "mii",
-    "rosterOrder": 155
-  },
-  {
-    "id": 121,
-    "name": "Waffle",
-    "class": "Balanced",
-    "color": "Yellow",
-    "source": "GM",
-    "kind": "mii",
-    "rosterOrder": 156
-  },
-  {
-    "id": 122,
-    "name": "Derrick White",
-    "class": "Balanced",
-    "color": "Light Green",
-    "source": "Basketball",
-    "kind": "mii",
-    "rosterOrder": 157
-  },
-  {
-    "id": 123,
-    "name": "Sonya Blade",
-    "class": "Balanced",
-    "color": "Light Green",
-    "source": "Mortal Kombat",
-    "kind": "mii",
-    "rosterOrder": 158
-  },
-  {
-    "id": 124,
-    "name": "Cammy White",
-    "class": "Balanced",
-    "color": "Green",
-    "source": "Street Fighter",
-    "kind": "mii",
-    "rosterOrder": 159
-  },
-  {
-    "id": 125,
-    "name": "Cortana",
-    "class": "Balanced",
-    "color": "Blue",
-    "source": "Halo",
-    "kind": "mii",
-    "rosterOrder": 160
   },
   {
     "id": 126,
@@ -1791,7 +1593,97 @@
     "color": "Light Blue",
     "source": "GM",
     "kind": "mii",
-    "rosterOrder": 161
+    "rosterOrder": 139
+  },
+  {
+    "id": 92,
+    "name": "Sheen Estevez",
+    "class": "Balanced",
+    "color": "Blue",
+    "source": "Jimmy Neutron",
+    "kind": "mii",
+    "rosterOrder": 140
+  },
+  {
+    "id": 93,
+    "name": "Samus",
+    "class": "Balanced",
+    "color": "Blue",
+    "source": "Metroid",
+    "kind": "mii",
+    "rosterOrder": 141
+  },
+  {
+    "id": 94,
+    "name": "Jack Black",
+    "class": "Balanced",
+    "color": "Blue",
+    "source": "Minecraft",
+    "kind": "mii",
+    "rosterOrder": 142
+  },
+  {
+    "id": 95,
+    "name": "Bubbles",
+    "class": "Balanced",
+    "color": "Blue",
+    "source": "Cartoon",
+    "kind": "mii",
+    "rosterOrder": 143
+  },
+  {
+    "id": 96,
+    "name": "PANCAKE!?!",
+    "class": "Balanced",
+    "color": "Blue",
+    "source": "Unknown",
+    "kind": "mii",
+    "rosterOrder": 144
+  },
+  {
+    "id": 125,
+    "name": "Cortana",
+    "class": "Balanced",
+    "color": "Blue",
+    "source": "Halo",
+    "kind": "mii",
+    "rosterOrder": 145
+  },
+  {
+    "id": 101,
+    "name": "Saul Goodman",
+    "class": "Balanced",
+    "color": "Pink",
+    "source": "Better Call Saul",
+    "kind": "mii",
+    "rosterOrder": 146
+  },
+  {
+    "id": 102,
+    "name": "Blossom",
+    "class": "Balanced",
+    "color": "Pink",
+    "source": "Cartoon",
+    "kind": "mii",
+    "rosterOrder": 147
+  },
+  {
+    "id": 103,
+    "name": "Timmy Turner",
+    "class": "Balanced",
+    "color": "Pink",
+    "source": "Cartoon",
+    "kind": "mii",
+    "rosterOrder": 148
+  },
+  {
+    "id": 104,
+    "name": "Paula",
+    "class": "Balanced",
+    "color": "Pink",
+    "source": "Earthbound",
+    "kind": "mii",
+    "rosterOrder": 149
   },
   {
     "id": 127,
@@ -1800,88 +1692,7 @@
     "color": "Pink",
     "source": "Totally not Jung Kook from BTS",
     "kind": "mii",
-    "rosterOrder": 162
-  },
-  {
-    "id": 128,
-    "name": "William Afton",
-    "class": "Balanced",
-    "color": "Purple",
-    "source": "FNAF",
-    "kind": "mii",
-    "rosterOrder": 163
-  },
-  {
-    "id": 129,
-    "name": "Juri Han",
-    "class": "Balanced",
-    "color": "Purple",
-    "source": "Street Fighter",
-    "kind": "mii",
-    "rosterOrder": 164
-  },
-  {
-    "id": 130,
-    "name": "Cranky Kong",
-    "class": "Balanced",
-    "color": "Brown",
-    "source": "Donkey Kong",
-    "kind": "mii",
-    "rosterOrder": 165
-  },
-  {
-    "id": 131,
-    "name": "Squirrel Girl",
-    "class": "Balanced",
-    "color": "Brown",
-    "source": "Marvel",
-    "kind": "mii",
-    "rosterOrder": 166
-  },
-  {
-    "id": 132,
-    "name": "Horse",
-    "class": "Balanced",
-    "color": "Brown",
-    "source": "Wherever Horses Come From",
-    "kind": "mii",
-    "rosterOrder": 167
-  },
-  {
-    "id": 133,
-    "name": "Josh Block",
-    "class": "Balanced",
-    "color": "White",
-    "source": "WorldofTShirts",
-    "kind": "mii",
-    "rosterOrder": 168
-  },
-  {
-    "id": 134,
-    "name": "Wrinkly Kong",
-    "class": "Balanced",
-    "color": "White",
-    "source": "Donkey Kong",
-    "kind": "mii",
-    "rosterOrder": 169
-  },
-  {
-    "id": 135,
-    "name": "Mario Judah",
-    "class": "Balanced",
-    "color": "Black",
-    "source": "Rap",
-    "kind": "mii",
-    "rosterOrder": 170
-  },
-  {
-    "id": 136,
-    "name": "Chica",
-    "class": "Balanced",
-    "color": "Yellow",
-    "source": "FNAF",
-    "kind": "mii",
-    "rosterOrder": 171
+    "rosterOrder": 150
   },
   {
     "id": 137,
@@ -1890,7 +1701,151 @@
     "color": "Pink",
     "source": "Rose",
     "kind": "mii",
-    "rosterOrder": 172
+    "rosterOrder": 151
+  },
+  {
+    "id": 105,
+    "name": "Coach",
+    "class": "Balanced",
+    "color": "Purple",
+    "source": "Left for Dead",
+    "kind": "mii",
+    "rosterOrder": 152
+  },
+  {
+    "id": 106,
+    "name": "Zelda",
+    "class": "Balanced",
+    "color": "Purple",
+    "source": "Legend of Zelda",
+    "kind": "mii",
+    "rosterOrder": 153
+  },
+  {
+    "id": 107,
+    "name": "Grimace",
+    "class": "Balanced",
+    "color": "Purple",
+    "source": "Fast Food",
+    "kind": "mii",
+    "rosterOrder": 154
+  },
+  {
+    "id": 128,
+    "name": "William Afton",
+    "class": "Balanced",
+    "color": "Purple",
+    "source": "FNAF",
+    "kind": "mii",
+    "rosterOrder": 155
+  },
+  {
+    "id": 129,
+    "name": "Juri Han",
+    "class": "Balanced",
+    "color": "Purple",
+    "source": "Street Fighter",
+    "kind": "mii",
+    "rosterOrder": 156
+  },
+  {
+    "id": 108,
+    "name": "Scooby Doo",
+    "class": "Balanced",
+    "color": "Brown",
+    "source": "Scooby Doo ",
+    "kind": "mii",
+    "rosterOrder": 157
+  },
+  {
+    "id": 109,
+    "name": "Mr. Bean",
+    "class": "Balanced",
+    "color": "Brown",
+    "source": "Mr. Bean",
+    "kind": "mii",
+    "rosterOrder": 158
+  },
+  {
+    "id": 110,
+    "name": "Goombella",
+    "class": "Balanced",
+    "color": "Brown",
+    "source": "Paper Mario ",
+    "kind": "mii",
+    "rosterOrder": 159
+  },
+  {
+    "id": 130,
+    "name": "Cranky Kong",
+    "class": "Balanced",
+    "color": "Brown",
+    "source": "Donkey Kong",
+    "kind": "mii",
+    "rosterOrder": 160
+  },
+  {
+    "id": 131,
+    "name": "Squirrel Girl",
+    "class": "Balanced",
+    "color": "Brown",
+    "source": "Marvel",
+    "kind": "mii",
+    "rosterOrder": 161
+  },
+  {
+    "id": 132,
+    "name": "Horse",
+    "class": "Balanced",
+    "color": "Brown",
+    "source": "Wherever Horses Come From",
+    "kind": "mii",
+    "rosterOrder": 162
+  },
+  {
+    "id": 111,
+    "name": "Steve Harvey",
+    "class": "Balanced",
+    "color": "White",
+    "source": "Himself",
+    "kind": "mii",
+    "rosterOrder": 163
+  },
+  {
+    "id": 112,
+    "name": "Walter White",
+    "class": "Balanced",
+    "color": "White",
+    "source": "Breaking Bad",
+    "kind": "mii",
+    "rosterOrder": 164
+  },
+  {
+    "id": 113,
+    "name": "Hatsune Miku",
+    "class": "Balanced",
+    "color": "White",
+    "source": "Vocaloid ",
+    "kind": "mii",
+    "rosterOrder": 165
+  },
+  {
+    "id": 133,
+    "name": "Josh Block",
+    "class": "Balanced",
+    "color": "White",
+    "source": "WorldofTShirts",
+    "kind": "mii",
+    "rosterOrder": 166
+  },
+  {
+    "id": 134,
+    "name": "Wrinkly Kong",
+    "class": "Balanced",
+    "color": "White",
+    "source": "Donkey Kong",
+    "kind": "mii",
+    "rosterOrder": 167
   },
   {
     "id": 138,
@@ -1898,6 +1853,51 @@
     "class": "Balanced",
     "color": "White",
     "source": "Plane",
+    "kind": "mii",
+    "rosterOrder": 168
+  },
+  {
+    "id": 114,
+    "name": "Mike",
+    "class": "Balanced",
+    "color": "Black",
+    "source": "Breaking Bad",
+    "kind": "mii",
+    "rosterOrder": 169
+  },
+  {
+    "id": 115,
+    "name": "Cynthia",
+    "class": "Balanced",
+    "color": "Black",
+    "source": "Pokemon ",
+    "kind": "mii",
+    "rosterOrder": 170
+  },
+  {
+    "id": 116,
+    "name": "Masahiro Sakurai",
+    "class": "Balanced",
+    "color": "Black",
+    "source": "Smashy Bros",
+    "kind": "mii",
+    "rosterOrder": 171
+  },
+  {
+    "id": 117,
+    "name": "Mona Lisa",
+    "class": "Balanced",
+    "color": "Black",
+    "source": "Da Vinci ",
+    "kind": "mii",
+    "rosterOrder": 172
+  },
+  {
+    "id": 135,
+    "name": "Mario Judah",
+    "class": "Balanced",
+    "color": "Black",
+    "source": "Rap",
     "kind": "mii",
     "rosterOrder": 173
   }
