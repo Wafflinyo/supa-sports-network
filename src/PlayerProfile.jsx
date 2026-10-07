@@ -20,7 +20,7 @@ export default function PlayerProfile({player, PlayerAvatar, onClose}) {
   },[])
   return <dialog ref={dialog} className="modal player-modal career-profile" aria-labelledby="career-player-name" onCancel={onClose} onClick={e=>{if(e.target===e.currentTarget){const r=e.currentTarget.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)onClose()}}}>
     <button className="close" onClick={onClose} aria-label="Close player profile"><X/></button>
-    <div className="player-modal-heading"><PlayerAvatar player={player} size={76}/><div><span className="eyebrow dark">SSL PLAYER PROFILE · #{player.id}</span><h2 id="career-player-name">{player.name}</h2></div></div>
+    <div className="player-modal-heading"><PlayerAvatar player={player} size={76}/><div><span className="eyebrow dark">SSL PLAYER PROFILE · #{player.rosterOrder || player.id}</span><h2 id="career-player-name">{player.name}</h2></div></div>
     <div className="career-bio"><span>{player.class}</span><span>{player.source}</span><span>{player.team || 'Free agent'}</span></div>
     <dl className="career-summary">{[['SEASONS AS A SLUGGER',career.seasons],['CAREER GAMES PLAYED',career.games],['CAREER MVPs',career.mvps]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value ?? '—'}</dd></div>)}</dl>
     <h3 className="career-title">CAREER AVERAGES</h3>

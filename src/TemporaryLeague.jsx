@@ -1,3 +1,4 @@
+import playerPool from './players.json'
 import React, { useState, useRef, useEffect } from 'react'
 import test from './temporary-league.json'
 import results from './temporary-results.json'
@@ -83,7 +84,7 @@ export default function TemporaryLeague({ PlayerAvatar }) {
     if(av==null && bv!=null)return 1
     if(bv==null && av!=null)return -1
     const comparison=typeof av==='number' && typeof bv==='number'?av-bv:String(av??'').localeCompare(String(bv??''))
-    return sort.direction==='asc'?comparison:-comparison
+    return comparison ? (sort.direction==='asc'?comparison:-comparison) : (playerPool.find(p=>p.id===a.id)?.rosterOrder ?? a.id)-(playerPool.find(p=>p.id===b.id)?.rosterOrder ?? b.id)
   })
   const sortBy = key => setSort(previous=>({key,direction:previous.key===key && previous.direction==='desc'?'asc':'desc'}))
   const roster = fantasyTeam(selected)

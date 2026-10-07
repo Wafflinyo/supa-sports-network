@@ -107,7 +107,7 @@ function App() {
   const [query, setQuery] = useState('')
   const [statTab, setStatTab] = useState('Offensive Stats')
   const [statView, setStatView] = useState('Totals')
-  const [sort, setSort] = useState({ key: 'id', direction: 'asc' })
+  const [sort, setSort] = useState({ key: 'default', direction: 'desc' })
   const [selectedPlayer, setSelectedPlayer] = useState(null)
   const [officialTeams,setOfficialTeams]=useState([])
   const [teamsLoading,setTeamsLoading]=useState(true)
@@ -166,13 +166,16 @@ function App() {
     setBusy(false); if (error) { setMessage(error.message); return }
     setJoinCode(''); setMessage('You joined the league.'); await loadLeagues()
   }
+  const hasOfficialStats = players.some(player => (player.gamesPlayed ?? 0) > 0)
+  const categorySort = statTab === 'Pitching Stats' ? {key:'era7',direction:'asc'} : statTab === 'Defensive Stats' ? {key:'putouts',direction:'desc'} : {key:'battingAverage',direction:'desc'}
+  const activeSort = sort.key === 'default' ? (hasOfficialStats ? categorySort : {key:'id',direction:'asc'}) : sort
   const filtered = useMemo(() => players.filter(p => `${p.name} ${p.class} ${p.source}`.toLowerCase().includes(query.toLowerCase())).sort((a,b) => {
-    const av = statGroups[statTab].some(([key]) => key === sort.key) ? statValue(a, sort.key, statView) : a[sort.key]
-    const bv = statGroups[statTab].some(([key]) => key === sort.key) ? statValue(b, sort.key, statView) : b[sort.key]
+    const av = statGroups[statTab].some(([key]) => key === activeSort.key) ? statValue(a, activeSort.key, statView) : a[activeSort.key === 'id' ? 'rosterOrder' : activeSort.key]
+    const bv = statGroups[statTab].some(([key]) => key === activeSort.key) ? statValue(b, activeSort.key, statView) : b[activeSort.key === 'id' ? 'rosterOrder' : activeSort.key]
     if (av == null && bv != null) return 1
     if (bv == null && av != null) return -1
     const comparison = typeof av === 'number' && typeof bv === 'number' ? av - bv : String(av ?? '').localeCompare(String(bv ?? ''))
-    return sort.direction === 'asc' ? comparison : -comparison
+    return comparison ? (activeSort.direction === 'asc' ? comparison : -comparison) : a.rosterOrder - b.rosterOrder
   }), [query, sort, statTab, statView])
   function sortBy(key) { setSort(s => ({ key, direction: s.key === key && s.direction === 'desc' ? 'asc' : 'desc' })) }
   function go(next) { if ((next === 'Commissioner Tools' && !isCommissioner)||(next==='Team Tools'&&!isGM)) return; window.history.replaceState(null, '', next === 'Test Week' ? '#test-week' : window.location.pathname); setPage(next); setMenu(false); setMessage(''); window.scrollTo({top: 0, behavior: 'smooth'}) }
@@ -196,7 +199,7 @@ function App() {
         <div className="panel data-panel">
           <div className="stat-view-switch" role="group" aria-label="Stat display">{['Totals', 'Averages per Game'].map(view => <button key={view} type="button" aria-pressed={statView === view} className={statView === view ? 'active' : ''} onClick={() => setStatView(view)}>{view}</button>)}</div>
           <div className="table-tools"><div className="search"><Search size={19}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search players" aria-label="Search players"/></div><span>{filtered.length} PLAYERS</span></div>
-          <div className="table-scroll" role="tabpanel" aria-label={`${statTab} — ${statView}`}><table className="ssl-stat-table regular-player-stats" style={{width: `${514+statGroups[statTab].length*112}px`}}><caption>{statTab} · {statView}</caption><colgroup><col style={{width:44}}/><col style={{width:230}}/><col style={{width:120}}/><col style={{width:120}}/>{statGroups[statTab].map(([key])=><col key={key} style={{width:112}}/>)}</colgroup><thead><tr>{[['id','#'],['name','PLAYER'],['class','CLASS'],['source','SOURCE'],...statGroups[statTab]].map(([key,label]) => <th key={key} className={key==='name'?'sticky-player':!['id','class','source'].includes(key)?'numeric-column':undefined}><button onClick={() => sortBy(key)} aria-label={`Sort by ${label}`}>{label}{sort.key === key ? (sort.direction === 'asc' ? <ArrowUp size={13}/> : <ArrowDown size={13}/>) : null}</button></th>)}</tr></thead><tbody>{filtered.map(p => <tr key={p.id} onClick={() => setSelectedPlayer(p)} tabIndex={0} onKeyDown={e => e.key === 'Enter' && setSelectedPlayer(p)}><td>{p.id}</td><td className="player-cell"><PlayerAvatar player={p}/><strong>{p.name}</strong></td><td>{p.class}</td><td>{p.source}</td>{statGroups[statTab].map(([key]) => <td key={key} className="numeric-column">{displayStat(statValue(p, key, statView), statView, key)}</td>)}</tr>)}</tbody></table></div>
+          <div className="table-scroll" role="tabpanel" aria-label={`${statTab} — ${statView}`}><table className="ssl-stat-table regular-player-stats" style={{width: `${514+statGroups[statTab].length*112}px`}}><caption>{statTab} · {statView}</caption><colgroup><col style={{width:44}}/><col style={{width:230}}/><col style={{width:120}}/><col style={{width:120}}/>{statGroups[statTab].map(([key])=><col key={key} style={{width:112}}/>)}</colgroup><thead><tr>{[['id','#'],['name','PLAYER'],['class','CLASS'],['source','SOURCE'],...statGroups[statTab]].map(([key,label]) => <th key={key} className={key==='name'?'sticky-player':!['id','class','source'].includes(key)?'numeric-column':undefined}><button onClick={() => sortBy(key)} aria-label={`Sort by ${label}`}>{label}{activeSort.key === key ? (activeSort.direction === 'asc' ? <ArrowUp size={13}/> : <ArrowDown size={13}/>) : null}</button></th>)}</tr></thead><tbody>{filtered.map(p => <tr key={p.id} onClick={() => setSelectedPlayer(p)} tabIndex={0} onKeyDown={e => e.key === 'Enter' && setSelectedPlayer(p)}><td>{p.rosterOrder}</td><td className="player-cell"><PlayerAvatar player={p}/><strong>{p.name}</strong></td><td>{p.class}</td><td>{p.source}</td>{statGroups[statTab].map(([key]) => <td key={key} className="numeric-column">{displayStat(statValue(p, key, statView), statView, key)}</td>)}</tr>)}</tbody></table></div>
           <p className="table-footnote">{statView === 'Totals' ? 'Season totals and season rates.' : 'Games Played remains a total. Other counting stats are divided by games played; rates and innings use their per-game values.'} Tap a heading to sort. A dash means no verified game stat is available yet. Scroll sideways to see more columns.</p>
         </div>
       </>}

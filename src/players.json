@@ -8,7 +8,8 @@
     "gameCharacterId": 0,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 0
+    "portraitIndex": 0,
+    "rosterOrder": 1
   },
   {
     "id": 2,
@@ -19,62 +20,8 @@
     "gameCharacterId": 1,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 1
-  },
-  {
-    "id": 3,
-    "name": "Donkey Kong",
-    "class": "Power",
-    "color": "Brown",
-    "source": "Mario",
-    "gameCharacterId": 2,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 2
-  },
-  {
-    "id": 4,
-    "name": "Diddy Kong",
-    "class": "Technique",
-    "color": "Brown",
-    "source": "Mario",
-    "gameCharacterId": 3,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 3
-  },
-  {
-    "id": 5,
-    "name": "Peach",
-    "class": "Technique",
-    "color": "Pink",
-    "source": "Mario",
-    "gameCharacterId": 4,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 4
-  },
-  {
-    "id": 6,
-    "name": "Daisy",
-    "class": "Balanced",
-    "color": "Orange",
-    "source": "Mario",
-    "gameCharacterId": 5,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 5
-  },
-  {
-    "id": 7,
-    "name": "Yoshi",
-    "class": "Technique",
-    "color": "Light Green",
-    "source": "Mario",
-    "gameCharacterId": 6,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 6
+    "portraitIndex": 1,
+    "rosterOrder": 2
   },
   {
     "id": 8,
@@ -85,7 +32,8 @@
     "gameCharacterId": 7,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 7
+    "portraitIndex": 7,
+    "rosterOrder": 3
   },
   {
     "id": 9,
@@ -96,18 +44,8 @@
     "gameCharacterId": 8,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 8
-  },
-  {
-    "id": 10,
-    "name": "Bowser",
-    "class": "Power",
-    "color": "Black",
-    "source": "Mario",
-    "gameCharacterId": 9,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 9
+    "portraitIndex": 8,
+    "rosterOrder": 4
   },
   {
     "id": 11,
@@ -118,7 +56,8 @@
     "gameCharacterId": 10,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 10
+    "portraitIndex": 10,
+    "rosterOrder": 5
   },
   {
     "id": 12,
@@ -129,87 +68,92 @@
     "gameCharacterId": 11,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 11
+    "portraitIndex": 11,
+    "rosterOrder": 6
   },
   {
-    "id": 13,
-    "name": "Green Koopa",
-    "class": "Speed",
-    "color": "Green",
+    "id": 5,
+    "name": "Peach",
+    "class": "Technique",
+    "color": "Pink",
     "source": "Mario",
-    "gameCharacterId": 12,
+    "gameCharacterId": 4,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "rioAliases": [
-      "Koopa Troopa"
-    ],
-    "portraitIndex": 12
+    "portraitIndex": 4,
+    "rosterOrder": 7
   },
   {
-    "id": 14,
-    "name": "Red Toad",
-    "class": "Speed",
+    "id": 6,
+    "name": "Daisy",
+    "class": "Balanced",
+    "color": "Orange",
+    "source": "Mario",
+    "gameCharacterId": 5,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 5,
+    "rosterOrder": 8
+  },
+  {
+    "id": 155,
+    "name": "Rosalina",
+    "class": "Technique",
+    "color": "Light Blue",
+    "source": "Mario",
+    "gameCharacterId": 117,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 87,
+    "rosterOrder": 9
+  },
+  {
+    "id": 161,
+    "name": "Pauline",
+    "class": "Balanced",
     "color": "Red",
     "source": "Mario",
-    "gameCharacterId": 13,
+    "gameCharacterId": 123,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 13
+    "portraitIndex": 93,
+    "rosterOrder": 10
   },
   {
-    "id": 15,
-    "name": "Boo",
-    "class": "Speed",
-    "color": "White",
-    "source": "Mario",
-    "gameCharacterId": 14,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 14
-  },
-  {
-    "id": 16,
-    "name": "Toadette",
+    "id": 64,
+    "name": "Baby Peach",
     "class": "Balanced",
     "color": "Pink",
     "source": "Mario",
-    "gameCharacterId": 15,
+    "gameCharacterId": 63,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 15
+    "portraitIndex": 63,
+    "rosterOrder": 11
   },
   {
-    "id": 17,
-    "name": "Shy Guy",
-    "class": "Balanced",
-    "color": "Red",
-    "source": "Mario",
-    "gameCharacterId": 16,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 16
-  },
-  {
-    "id": 18,
-    "name": "Birdo",
+    "id": 65,
+    "name": "Baby Daisy",
     "class": "Power",
-    "color": "Pink",
+    "color": "Orange",
     "source": "Mario",
-    "gameCharacterId": 17,
+    "gameCharacterId": 64,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 17
+    "portraitIndex": 64,
+    "rosterOrder": 12
   },
   {
-    "id": 19,
-    "name": "Monty Mole",
-    "class": "Speed",
-    "color": "Brown",
+    "id": 10,
+    "name": "Bowser",
+    "class": "Power",
+    "color": "Black",
     "source": "Mario",
-    "gameCharacterId": 18,
+    "gameCharacterId": 9,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 18
+    "portraitIndex": 9,
+    "rosterOrder": 13
   },
   {
     "id": 20,
@@ -220,225 +164,152 @@
     "gameCharacterId": 19,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 19
+    "portraitIndex": 19,
+    "rosterOrder": 14
   },
   {
-    "id": 21,
-    "name": "Red Paratroopa",
+    "id": 167,
+    "name": "Larry",
     "class": "Balanced",
-    "color": "Red",
+    "color": "Light Blue",
     "source": "Mario",
-    "gameCharacterId": 20,
+    "gameCharacterId": 129,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "rioAliases": [
-      "Paratroopa"
-    ],
-    "portraitIndex": 20
+    "portraitIndex": 99,
+    "rosterOrder": 15
   },
   {
-    "id": 22,
-    "name": "Blue Pianta",
-    "class": "Speed",
-    "color": "Blue",
+    "id": 168,
+    "name": "Iggy",
+    "class": "Technique",
+    "color": "Green",
     "source": "Mario",
-    "gameCharacterId": 21,
+    "gameCharacterId": 130,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 21
+    "portraitIndex": 100,
+    "rosterOrder": 16
   },
   {
-    "id": 23,
-    "name": "Red Pianta",
-    "class": "Speed",
-    "color": "Red",
-    "source": "Mario",
-    "gameCharacterId": 22,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 22
-  },
-  {
-    "id": 24,
-    "name": "Yellow Pianta",
+    "id": 169,
+    "name": "Lemmy",
     "class": "Speed",
     "color": "Yellow",
     "source": "Mario",
-    "gameCharacterId": 23,
+    "gameCharacterId": 131,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 23
+    "portraitIndex": 101,
+    "rosterOrder": 17
   },
   {
-    "id": 25,
-    "name": "Blue Noki",
-    "class": "Balanced",
+    "id": 170,
+    "name": "Ludwig",
+    "class": "Technique",
     "color": "Blue",
     "source": "Mario",
-    "gameCharacterId": 24,
+    "gameCharacterId": 132,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 24
+    "portraitIndex": 102,
+    "rosterOrder": 18
   },
   {
-    "id": 26,
-    "name": "Red Noki",
-    "class": "Balanced",
-    "color": "Red",
-    "source": "Mario",
-    "gameCharacterId": 25,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 25
-  },
-  {
-    "id": 27,
-    "name": "Green Noki",
-    "class": "Balanced",
-    "color": "Green",
-    "source": "Mario",
-    "gameCharacterId": 26,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 26
-  },
-  {
-    "id": 28,
-    "name": "Hammer Bro",
+    "id": 171,
+    "name": "Morton",
     "class": "Power",
-    "color": "Green",
+    "color": "Gray",
     "source": "Mario",
-    "gameCharacterId": 27,
+    "gameCharacterId": 133,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "rioAliases": [
-      "Hammer Bro."
-    ],
-    "portraitIndex": 27
+    "portraitIndex": 103,
+    "rosterOrder": 19
   },
   {
-    "id": 29,
-    "name": "Toadsworth",
+    "id": 172,
+    "name": "Roy",
+    "class": "Power",
+    "color": "Pink",
+    "source": "Mario",
+    "gameCharacterId": 134,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 104,
+    "rosterOrder": 20
+  },
+  {
+    "id": 173,
+    "name": "Wendy",
+    "class": "Technique",
+    "color": "Pink",
+    "source": "Mario",
+    "gameCharacterId": 135,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 105,
+    "rosterOrder": 21
+  },
+  {
+    "id": 164,
+    "name": "Boom Boom",
+    "class": "Power",
+    "color": "Maroon",
+    "source": "Mario",
+    "gameCharacterId": 126,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 96,
+    "rosterOrder": 22
+  },
+  {
+    "id": 165,
+    "name": "Pom Pom",
+    "class": "Technique",
+    "color": "Pink",
+    "source": "Mario",
+    "gameCharacterId": 127,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 97,
+    "rosterOrder": 23
+  },
+  {
+    "id": 162,
+    "name": "King Bob-omb",
+    "class": "Power",
+    "color": "Black",
+    "source": "Mario",
+    "gameCharacterId": 124,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 94,
+    "rosterOrder": 24
+  },
+  {
+    "id": 3,
+    "name": "Donkey Kong",
+    "class": "Power",
+    "color": "Brown",
+    "source": "Mario",
+    "gameCharacterId": 2,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 2,
+    "rosterOrder": 25
+  },
+  {
+    "id": 4,
+    "name": "Diddy Kong",
     "class": "Technique",
     "color": "Brown",
     "source": "Mario",
-    "gameCharacterId": 28,
+    "gameCharacterId": 3,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 28
-  },
-  {
-    "id": 30,
-    "name": "Blue Toad",
-    "class": "Speed",
-    "color": "Blue",
-    "source": "Mario",
-    "gameCharacterId": 29,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 29
-  },
-  {
-    "id": 31,
-    "name": "Yellow Toad",
-    "class": "Speed",
-    "color": "Yellow",
-    "source": "Mario",
-    "gameCharacterId": 30,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 30
-  },
-  {
-    "id": 32,
-    "name": "Green Toad",
-    "class": "Speed",
-    "color": "Green",
-    "source": "Mario",
-    "gameCharacterId": 31,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 31
-  },
-  {
-    "id": 33,
-    "name": "Purple Toad",
-    "class": "Speed",
-    "color": "Purple",
-    "source": "Mario",
-    "gameCharacterId": 32,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 32
-  },
-  {
-    "id": 34,
-    "name": "Blue Magikoopa",
-    "class": "Balanced",
-    "color": "Blue",
-    "source": "Mario",
-    "gameCharacterId": 33,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "rioAliases": [
-      "Magikoopa"
-    ],
-    "portraitIndex": 33
-  },
-  {
-    "id": 35,
-    "name": "Red Magikoopa",
-    "class": "Balanced",
-    "color": "Red",
-    "source": "Mario",
-    "gameCharacterId": 34,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 34
-  },
-  {
-    "id": 36,
-    "name": "Green Magikoopa",
-    "class": "Balanced",
-    "color": "Green",
-    "source": "Mario",
-    "gameCharacterId": 35,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 35
-  },
-  {
-    "id": 37,
-    "name": "Yellow Magikoopa",
-    "class": "Balanced",
-    "color": "Yellow",
-    "source": "Mario",
-    "gameCharacterId": 36,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 36
-  },
-  {
-    "id": 38,
-    "name": "King Boo",
-    "class": "Power",
-    "color": "White",
-    "source": "Mario",
-    "gameCharacterId": 37,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 37
-  },
-  {
-    "id": 39,
-    "name": "Petey Piranha",
-    "class": "Power",
-    "color": "Light Green",
-    "source": "Mario",
-    "gameCharacterId": 38,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 38
+    "portraitIndex": 3,
+    "rosterOrder": 26
   },
   {
     "id": 40,
@@ -449,192 +320,8 @@
     "gameCharacterId": 39,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 39
-  },
-  {
-    "id": 41,
-    "name": "Goomba",
-    "class": "Speed",
-    "color": "Brown",
-    "source": "Mario",
-    "gameCharacterId": 40,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 40
-  },
-  {
-    "id": 42,
-    "name": "Paragoomba",
-    "class": "Balanced",
-    "color": "Brown",
-    "source": "Mario",
-    "gameCharacterId": 41,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 41
-  },
-  {
-    "id": 43,
-    "name": "Red Koopa",
-    "class": "Speed",
-    "color": "Red",
-    "source": "Mario",
-    "gameCharacterId": 42,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "rioAliases": [
-      "Red Koopa Troopa"
-    ],
-    "portraitIndex": 42
-  },
-  {
-    "id": 44,
-    "name": "Green Paratroopa",
-    "class": "Balanced",
-    "color": "Green",
-    "source": "Mario",
-    "gameCharacterId": 43,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 43
-  },
-  {
-    "id": 45,
-    "name": "Blue Shy Guy",
-    "class": "Technique",
-    "color": "Blue",
-    "source": "Mario",
-    "gameCharacterId": 44,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 44
-  },
-  {
-    "id": 46,
-    "name": "Yellow Shy Guy",
-    "class": "Speed",
-    "color": "Yellow",
-    "source": "Mario",
-    "gameCharacterId": 45,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 45
-  },
-  {
-    "id": 47,
-    "name": "Green Shy Guy",
-    "class": "Power",
-    "color": "Green",
-    "source": "Mario",
-    "gameCharacterId": 46,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 46
-  },
-  {
-    "id": 48,
-    "name": "Gray Shy Guy",
-    "class": "Technique",
-    "color": "Black",
-    "source": "Mario",
-    "gameCharacterId": 47,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 47
-  },
-  {
-    "id": 49,
-    "name": "Dry Bones",
-    "class": "Balanced",
-    "color": "White",
-    "source": "Mario",
-    "gameCharacterId": 48,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 48
-  },
-  {
-    "id": 50,
-    "name": "Green Dry Bones",
-    "class": "Balanced",
-    "color": "Green",
-    "source": "Mario",
-    "gameCharacterId": 49,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 49
-  },
-  {
-    "id": 51,
-    "name": "Dark Bones",
-    "class": "Balanced",
-    "color": "Red",
-    "source": "Mario",
-    "gameCharacterId": 50,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 50
-  },
-  {
-    "id": 52,
-    "name": "Blue Dry Bones",
-    "class": "Balanced",
-    "color": "Blue",
-    "source": "Mario",
-    "gameCharacterId": 51,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 51
-  },
-  {
-    "id": 53,
-    "name": "Fire Bro",
-    "class": "Power",
-    "color": "Red",
-    "source": "Mario",
-    "gameCharacterId": 52,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "rioAliases": [
-      "Fire Bro."
-    ],
-    "portraitIndex": 52
-  },
-  {
-    "id": 54,
-    "name": "Boomerang Bro",
-    "class": "Power",
-    "color": "Blue",
-    "source": "Mario",
-    "gameCharacterId": 53,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "rioAliases": [
-      "Boomerang Bro."
-    ],
-    "portraitIndex": 53
-  },
-  {
-    "id": 55,
-    "name": "Wiggler",
-    "class": "Speed",
-    "color": "Yellow",
-    "source": "Mario",
-    "gameCharacterId": 54,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 54
-  },
-  {
-    "id": 56,
-    "name": "Blooper",
-    "class": "Technique",
-    "color": "White",
-    "source": "Mario",
-    "gameCharacterId": 55,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 55
+    "portraitIndex": 39,
+    "rosterOrder": 27
   },
   {
     "id": 57,
@@ -645,7 +332,8 @@
     "gameCharacterId": 56,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 56
+    "portraitIndex": 56,
+    "rosterOrder": 28
   },
   {
     "id": 58,
@@ -656,7 +344,32 @@
     "gameCharacterId": 57,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 57
+    "portraitIndex": 57,
+    "rosterOrder": 29
+  },
+  {
+    "id": 66,
+    "name": "Baby DK",
+    "class": "Power",
+    "color": "Brown",
+    "source": "Mario",
+    "gameCharacterId": 65,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 65,
+    "rosterOrder": 30
+  },
+  {
+    "id": 166,
+    "name": "Chimp",
+    "class": "Speed",
+    "color": "Light Green",
+    "source": "Mario",
+    "gameCharacterId": 128,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 98,
+    "rosterOrder": 31
   },
   {
     "id": 59,
@@ -667,7 +380,8 @@
     "gameCharacterId": 58,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 58
+    "portraitIndex": 58,
+    "rosterOrder": 32
   },
   {
     "id": 60,
@@ -678,7 +392,8 @@
     "gameCharacterId": 59,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 59
+    "portraitIndex": 59,
+    "rosterOrder": 33
   },
   {
     "id": 61,
@@ -689,7 +404,8 @@
     "gameCharacterId": 60,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 60
+    "portraitIndex": 60,
+    "rosterOrder": 34
   },
   {
     "id": 62,
@@ -700,7 +416,20 @@
     "gameCharacterId": 61,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 61
+    "portraitIndex": 61,
+    "rosterOrder": 35
+  },
+  {
+    "id": 143,
+    "name": "Purple Kritter",
+    "class": "Power",
+    "color": "Purple",
+    "source": "Mario",
+    "gameCharacterId": 75,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 75,
+    "rosterOrder": 36
   },
   {
     "id": 63,
@@ -714,40 +443,20 @@
     "rioAliases": [
       "King K. Rool"
     ],
-    "portraitIndex": 62
+    "portraitIndex": 62,
+    "rosterOrder": 37
   },
   {
-    "id": 64,
-    "name": "Baby Peach",
-    "class": "Balanced",
-    "color": "Pink",
+    "id": 7,
+    "name": "Yoshi",
+    "class": "Technique",
+    "color": "Light Green",
     "source": "Mario",
-    "gameCharacterId": 63,
+    "gameCharacterId": 6,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 63
-  },
-  {
-    "id": 65,
-    "name": "Baby Daisy",
-    "class": "Power",
-    "color": "Orange",
-    "source": "Mario",
-    "gameCharacterId": 64,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 64
-  },
-  {
-    "id": 66,
-    "name": "Baby DK",
-    "class": "Power",
-    "color": "Brown",
-    "source": "Mario",
-    "gameCharacterId": 65,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 65
+    "portraitIndex": 6,
+    "rosterOrder": 38
   },
   {
     "id": 67,
@@ -758,7 +467,8 @@
     "gameCharacterId": 66,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 66
+    "portraitIndex": 66,
+    "rosterOrder": 39
   },
   {
     "id": 68,
@@ -769,7 +479,8 @@
     "gameCharacterId": 67,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 67
+    "portraitIndex": 67,
+    "rosterOrder": 40
   },
   {
     "id": 69,
@@ -780,7 +491,8 @@
     "gameCharacterId": 68,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 68
+    "portraitIndex": 68,
+    "rosterOrder": 41
   },
   {
     "id": 70,
@@ -791,7 +503,8 @@
     "gameCharacterId": 69,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 69
+    "portraitIndex": 69,
+    "rosterOrder": 42
   },
   {
     "id": 71,
@@ -802,546 +515,8 @@
     "gameCharacterId": 70,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 70
-  },
-  {
-    "id": 72,
-    "name": "Cap",
-    "class": "Balanced",
-    "color": "Red",
-    "source": "GM",
-    "kind": "mii"
-  },
-  {
-    "id": 73,
-    "name": "Pauline (Mii)",
-    "class": "Balanced",
-    "color": "Red",
-    "source": "Mario",
-    "kind": "mii",
-    "portraitName": "Pauline"
-  },
-  {
-    "id": 74,
-    "name": "Burger King",
-    "class": "Balanced",
-    "color": "Red",
-    "source": "Food",
-    "kind": "mii"
-  },
-  {
-    "id": 75,
-    "name": "Harley Quinn",
-    "class": "Balanced",
-    "color": "Red",
-    "source": "DC",
-    "kind": "mii"
-  },
-  {
-    "id": 76,
-    "name": "Red",
-    "class": "Balanced",
-    "color": "Red",
-    "source": "Pokemon",
-    "kind": "mii"
-  },
-  {
-    "id": 77,
-    "name": "Roshi",
-    "class": "Balanced",
-    "color": "Orange",
-    "source": "Dragon Ball",
-    "kind": "mii"
-  },
-  {
-    "id": 78,
-    "name": "Inkling",
-    "class": "Balanced",
-    "color": "Orange",
-    "source": "Splatoon",
-    "kind": "mii"
-  },
-  {
-    "id": 79,
-    "name": "He-Man",
-    "class": "Balanced",
-    "color": "Orange",
-    "source": "Cartoon",
-    "kind": "mii"
-  },
-  {
-    "id": 80,
-    "name": "Nigel Thornberry",
-    "class": "Balanced",
-    "color": "Yellow",
-    "source": "Cartoon",
-    "kind": "mii"
-  },
-  {
-    "id": 81,
-    "name": "Sophie",
-    "class": "Balanced",
-    "color": "Yellow",
-    "source": "Bejeweled",
-    "kind": "mii"
-  },
-  {
-    "id": 82,
-    "name": "Ronald McDonald",
-    "class": "Balanced",
-    "color": "Yellow",
-    "source": "Food",
-    "kind": "mii"
-  },
-  {
-    "id": 83,
-    "name": "Sadie Adler",
-    "class": "Balanced",
-    "color": "Yellow",
-    "source": "Red Dead Redemption",
-    "kind": "mii"
-  },
-  {
-    "id": 84,
-    "name": "Narf",
-    "class": "Balanced",
-    "color": "Light Green",
-    "source": "GM",
-    "kind": "mii"
-  },
-  {
-    "id": 85,
-    "name": "Jade Harley",
-    "class": "Balanced",
-    "color": "Light Green",
-    "source": "Homestuck",
-    "kind": "mii"
-  },
-  {
-    "id": 86,
-    "name": "Shaggy",
-    "class": "Balanced",
-    "color": "Light Green",
-    "source": "Scooby Doo",
-    "kind": "mii"
-  },
-  {
-    "id": 87,
-    "name": "Brock",
-    "class": "Balanced",
-    "color": "Green",
-    "source": "Pokemon",
-    "kind": "mii"
-  },
-  {
-    "id": 88,
-    "name": "Buttercup",
-    "class": "Balanced",
-    "color": "Green",
-    "source": "Cartoon",
-    "kind": "mii"
-  },
-  {
-    "id": 89,
-    "name": "John Cena",
-    "class": "Balanced",
-    "color": "Green",
-    "source": "I don't know, I can't see him",
-    "kind": "mii"
-  },
-  {
-    "id": 90,
-    "name": "Isabelle",
-    "class": "Balanced",
-    "color": "Green",
-    "source": "Animal Crossing",
-    "kind": "mii"
-  },
-  {
-    "id": 91,
-    "name": "Flowey",
-    "class": "Balanced",
-    "color": "Green",
-    "source": "Undertale",
-    "kind": "mii"
-  },
-  {
-    "id": 92,
-    "name": "Sheen Estevez",
-    "class": "Balanced",
-    "color": "Blue",
-    "source": "Jimmy Neutron",
-    "kind": "mii"
-  },
-  {
-    "id": 93,
-    "name": "Samus",
-    "class": "Balanced",
-    "color": "Blue",
-    "source": "Metroid",
-    "kind": "mii"
-  },
-  {
-    "id": 94,
-    "name": "Jack Black",
-    "class": "Balanced",
-    "color": "Blue",
-    "source": "Minecraft",
-    "kind": "mii"
-  },
-  {
-    "id": 95,
-    "name": "Bubbles",
-    "class": "Balanced",
-    "color": "Blue",
-    "source": "Cartoon",
-    "kind": "mii"
-  },
-  {
-    "id": 96,
-    "name": "PANCAKE!?!",
-    "class": "Balanced",
-    "color": "Blue",
-    "source": "Unknown",
-    "kind": "mii"
-  },
-  {
-    "id": 97,
-    "name": "Comet",
-    "class": "Balanced",
-    "color": "Light Blue",
-    "source": "GM",
-    "kind": "mii"
-  },
-  {
-    "id": 98,
-    "name": "Rosalina (Mii)",
-    "class": "Balanced",
-    "color": "Light Blue",
-    "source": "Mario",
-    "kind": "mii",
-    "portraitName": "Rosalina"
-  },
-  {
-    "id": 99,
-    "name": "Sans",
-    "class": "Balanced",
-    "color": "Light Blue",
-    "source": "Deltarune",
-    "kind": "mii"
-  },
-  {
-    "id": 100,
-    "name": "Wendy (Mii)",
-    "class": "Balanced",
-    "color": "Light Blue",
-    "source": "Food",
-    "kind": "mii",
-    "portraitName": "Wendy"
-  },
-  {
-    "id": 101,
-    "name": "Saul Goodman",
-    "class": "Balanced",
-    "color": "Pink",
-    "source": "Better Call Saul",
-    "kind": "mii"
-  },
-  {
-    "id": 102,
-    "name": "Blossom",
-    "class": "Balanced",
-    "color": "Pink",
-    "source": "Cartoon",
-    "kind": "mii"
-  },
-  {
-    "id": 103,
-    "name": "Timmy Turner",
-    "class": "Balanced",
-    "color": "Pink",
-    "source": "Cartoon",
-    "kind": "mii"
-  },
-  {
-    "id": 104,
-    "name": "Paula",
-    "class": "Balanced",
-    "color": "Pink",
-    "source": "Earthbound",
-    "kind": "mii"
-  },
-  {
-    "id": 105,
-    "name": "Coach",
-    "class": "Balanced",
-    "color": "Purple",
-    "source": "Left for Dead",
-    "kind": "mii"
-  },
-  {
-    "id": 106,
-    "name": "Zelda",
-    "class": "Balanced",
-    "color": "Purple",
-    "source": "Legend of Zelda",
-    "kind": "mii"
-  },
-  {
-    "id": 107,
-    "name": "Grimace",
-    "class": "Balanced",
-    "color": "Purple",
-    "source": "Fast Food",
-    "kind": "mii"
-  },
-  {
-    "id": 108,
-    "name": "Scooby Doo",
-    "class": "Balanced",
-    "color": "Brown",
-    "source": "Scooby Doo ",
-    "kind": "mii"
-  },
-  {
-    "id": 109,
-    "name": "Mr. Bean",
-    "class": "Balanced",
-    "color": "Brown",
-    "source": "Mr. Bean",
-    "kind": "mii"
-  },
-  {
-    "id": 110,
-    "name": "Goombella",
-    "class": "Balanced",
-    "color": "Brown",
-    "source": "Paper Mario ",
-    "kind": "mii"
-  },
-  {
-    "id": 111,
-    "name": "Steve Harvey",
-    "class": "Balanced",
-    "color": "White",
-    "source": "Himself",
-    "kind": "mii"
-  },
-  {
-    "id": 112,
-    "name": "Walter White",
-    "class": "Balanced",
-    "color": "White",
-    "source": "Breaking Bad",
-    "kind": "mii"
-  },
-  {
-    "id": 113,
-    "name": "Hatsune Miku",
-    "class": "Balanced",
-    "color": "White",
-    "source": "Vocaloid ",
-    "kind": "mii"
-  },
-  {
-    "id": 114,
-    "name": "Mike",
-    "class": "Balanced",
-    "color": "Black",
-    "source": "Breaking Bad",
-    "kind": "mii"
-  },
-  {
-    "id": 115,
-    "name": "Cynthia",
-    "class": "Balanced",
-    "color": "Black",
-    "source": "Pokemon ",
-    "kind": "mii"
-  },
-  {
-    "id": 116,
-    "name": "Masahiro Sakurai",
-    "class": "Balanced",
-    "color": "Black",
-    "source": "Smashy Bros",
-    "kind": "mii"
-  },
-  {
-    "id": 117,
-    "name": "Mona Lisa",
-    "class": "Balanced",
-    "color": "Black",
-    "source": "Da Vinci ",
-    "kind": "mii"
-  },
-  {
-    "id": 118,
-    "name": "Ada Wong",
-    "class": "Balanced",
-    "color": "Red",
-    "source": "Resident Evil",
-    "kind": "mii"
-  },
-  {
-    "id": 119,
-    "name": "Garfield",
-    "class": "Balanced",
-    "color": "Orange",
-    "source": "Garfield",
-    "kind": "mii"
-  },
-  {
-    "id": 120,
-    "name": "Misty",
-    "class": "Balanced",
-    "color": "Orange",
-    "source": "Pokemon",
-    "kind": "mii"
-  },
-  {
-    "id": 121,
-    "name": "Waffle",
-    "class": "Balanced",
-    "color": "Yellow",
-    "source": "GM",
-    "kind": "mii"
-  },
-  {
-    "id": 122,
-    "name": "Derrick White",
-    "class": "Balanced",
-    "color": "Light Green",
-    "source": "Basketball",
-    "kind": "mii"
-  },
-  {
-    "id": 123,
-    "name": "Sonya Blade",
-    "class": "Balanced",
-    "color": "Light Green",
-    "source": "Mortal Kombat",
-    "kind": "mii"
-  },
-  {
-    "id": 124,
-    "name": "Cammy White",
-    "class": "Balanced",
-    "color": "Green",
-    "source": "Street Fighter",
-    "kind": "mii"
-  },
-  {
-    "id": 125,
-    "name": "Cortana",
-    "class": "Balanced",
-    "color": "Blue",
-    "source": "Halo",
-    "kind": "mii"
-  },
-  {
-    "id": 126,
-    "name": "OAO",
-    "class": "Balanced",
-    "color": "Light Blue",
-    "source": "GM",
-    "kind": "mii"
-  },
-  {
-    "id": 127,
-    "name": "juhg,koop",
-    "class": "Balanced",
-    "color": "Pink",
-    "source": "Totally not Jung Kook from BTS",
-    "kind": "mii"
-  },
-  {
-    "id": 128,
-    "name": "William Afton",
-    "class": "Balanced",
-    "color": "Purple",
-    "source": "FNAF",
-    "kind": "mii"
-  },
-  {
-    "id": 129,
-    "name": "Juri Han",
-    "class": "Balanced",
-    "color": "Purple",
-    "source": "Street Fighter",
-    "kind": "mii"
-  },
-  {
-    "id": 130,
-    "name": "Cranky Kong",
-    "class": "Balanced",
-    "color": "Brown",
-    "source": "Donkey Kong",
-    "kind": "mii"
-  },
-  {
-    "id": 131,
-    "name": "Squirrel Girl",
-    "class": "Balanced",
-    "color": "Brown",
-    "source": "Marvel",
-    "kind": "mii"
-  },
-  {
-    "id": 132,
-    "name": "Horse",
-    "class": "Balanced",
-    "color": "Brown",
-    "source": "Wherever Horses Come From",
-    "kind": "mii"
-  },
-  {
-    "id": 133,
-    "name": "Josh Block",
-    "class": "Balanced",
-    "color": "White",
-    "source": "WorldofTShirts",
-    "kind": "mii"
-  },
-  {
-    "id": 134,
-    "name": "Wrinkly Kong",
-    "class": "Balanced",
-    "color": "White",
-    "source": "Donkey Kong",
-    "kind": "mii"
-  },
-  {
-    "id": 135,
-    "name": "Mario Judah",
-    "class": "Balanced",
-    "color": "Black",
-    "source": "Rap",
-    "kind": "mii"
-  },
-  {
-    "id": 136,
-    "name": "Chica",
-    "class": "Balanced",
-    "color": "Yellow",
-    "source": "FNAF",
-    "kind": "mii"
-  },
-  {
-    "id": 137,
-    "name": "Rose",
-    "class": "Balanced",
-    "color": "Pink",
-    "source": "Rose",
-    "kind": "mii"
-  },
-  {
-    "id": 138,
-    "name": "Amelia Earhart",
-    "class": "Balanced",
-    "color": "White",
-    "source": "Plane",
-    "kind": "mii"
+    "portraitIndex": 70,
+    "rosterOrder": 43
   },
   {
     "id": 139,
@@ -1352,7 +527,8 @@
     "gameCharacterId": 71,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 71
+    "portraitIndex": 71,
+    "rosterOrder": 44
   },
   {
     "id": 140,
@@ -1363,7 +539,80 @@
     "gameCharacterId": 72,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 72
+    "portraitIndex": 72,
+    "rosterOrder": 45
+  },
+  {
+    "id": 18,
+    "name": "Birdo",
+    "class": "Power",
+    "color": "Pink",
+    "source": "Mario",
+    "gameCharacterId": 17,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 17,
+    "rosterOrder": 46
+  },
+  {
+    "id": 14,
+    "name": "Red Toad",
+    "class": "Speed",
+    "color": "Red",
+    "source": "Mario",
+    "gameCharacterId": 13,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 13,
+    "rosterOrder": 47
+  },
+  {
+    "id": 30,
+    "name": "Blue Toad",
+    "class": "Speed",
+    "color": "Blue",
+    "source": "Mario",
+    "gameCharacterId": 29,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 29,
+    "rosterOrder": 48
+  },
+  {
+    "id": 31,
+    "name": "Yellow Toad",
+    "class": "Speed",
+    "color": "Yellow",
+    "source": "Mario",
+    "gameCharacterId": 30,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 30,
+    "rosterOrder": 49
+  },
+  {
+    "id": 32,
+    "name": "Green Toad",
+    "class": "Speed",
+    "color": "Green",
+    "source": "Mario",
+    "gameCharacterId": 31,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 31,
+    "rosterOrder": 50
+  },
+  {
+    "id": 33,
+    "name": "Purple Toad",
+    "class": "Speed",
+    "color": "Purple",
+    "source": "Mario",
+    "gameCharacterId": 32,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 32,
+    "rosterOrder": 51
   },
   {
     "id": 141,
@@ -1374,29 +623,62 @@
     "gameCharacterId": 73,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 73
+    "portraitIndex": 73,
+    "rosterOrder": 52
   },
   {
-    "id": 142,
-    "name": "Orange Pianta",
+    "id": 16,
+    "name": "Toadette",
+    "class": "Balanced",
+    "color": "Pink",
+    "source": "Mario",
+    "gameCharacterId": 15,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 15,
+    "rosterOrder": 53
+  },
+  {
+    "id": 29,
+    "name": "Toadsworth",
+    "class": "Technique",
+    "color": "Brown",
+    "source": "Mario",
+    "gameCharacterId": 28,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 28,
+    "rosterOrder": 54
+  },
+  {
+    "id": 13,
+    "name": "Green Koopa",
     "class": "Speed",
-    "color": "Orange",
+    "color": "Green",
     "source": "Mario",
-    "gameCharacterId": 74,
+    "gameCharacterId": 12,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 74
+    "rioAliases": [
+      "Koopa Troopa"
+    ],
+    "portraitIndex": 12,
+    "rosterOrder": 55
   },
   {
-    "id": 143,
-    "name": "Purple Kritter",
-    "class": "Power",
-    "color": "Purple",
+    "id": 43,
+    "name": "Red Koopa",
+    "class": "Speed",
+    "color": "Red",
     "source": "Mario",
-    "gameCharacterId": 75,
+    "gameCharacterId": 42,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 75
+    "rioAliases": [
+      "Red Koopa Troopa"
+    ],
+    "portraitIndex": 42,
+    "rosterOrder": 56
   },
   {
     "id": 144,
@@ -1407,62 +689,35 @@
     "gameCharacterId": 76,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 76
+    "portraitIndex": 76,
+    "rosterOrder": 57
   },
   {
-    "id": 145,
-    "name": "Ice Bro",
-    "class": "Power",
-    "color": "Light Blue",
-    "source": "Mario",
-    "gameCharacterId": 102,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 77
-  },
-  {
-    "id": 146,
-    "name": "Purple Bones",
+    "id": 21,
+    "name": "Red Paratroopa",
     "class": "Balanced",
-    "color": "Purple",
+    "color": "Red",
     "source": "Mario",
-    "gameCharacterId": 108,
+    "gameCharacterId": 20,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 78
+    "rioAliases": [
+      "Paratroopa"
+    ],
+    "portraitIndex": 20,
+    "rosterOrder": 58
   },
   {
-    "id": 147,
-    "name": "Yellow Bones",
+    "id": 44,
+    "name": "Green Paratroopa",
     "class": "Balanced",
-    "color": "Yellow",
+    "color": "Green",
     "source": "Mario",
-    "gameCharacterId": 109,
+    "gameCharacterId": 43,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 79
-  },
-  {
-    "id": 148,
-    "name": "Yellow Noki",
-    "class": "Balanced",
-    "color": "Yellow",
-    "source": "Mario",
-    "gameCharacterId": 110,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 80
-  },
-  {
-    "id": 149,
-    "name": "Pink Noki",
-    "class": "Balanced",
-    "color": "Pink",
-    "source": "Mario",
-    "gameCharacterId": 111,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 81
+    "portraitIndex": 43,
+    "rosterOrder": 59
   },
   {
     "id": 150,
@@ -1473,7 +728,140 @@
     "gameCharacterId": 112,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 82
+    "portraitIndex": 82,
+    "rosterOrder": 60
+  },
+  {
+    "id": 49,
+    "name": "Dry Bones",
+    "class": "Balanced",
+    "color": "White",
+    "source": "Mario",
+    "gameCharacterId": 48,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 48,
+    "rosterOrder": 61
+  },
+  {
+    "id": 50,
+    "name": "Green Dry Bones",
+    "class": "Balanced",
+    "color": "Green",
+    "source": "Mario",
+    "gameCharacterId": 49,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 49,
+    "rosterOrder": 62
+  },
+  {
+    "id": 51,
+    "name": "Dark Bones",
+    "class": "Balanced",
+    "color": "Red",
+    "source": "Mario",
+    "gameCharacterId": 50,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 50,
+    "rosterOrder": 63
+  },
+  {
+    "id": 52,
+    "name": "Blue Dry Bones",
+    "class": "Balanced",
+    "color": "Blue",
+    "source": "Mario",
+    "gameCharacterId": 51,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 51,
+    "rosterOrder": 64
+  },
+  {
+    "id": 146,
+    "name": "Purple Bones",
+    "class": "Balanced",
+    "color": "Purple",
+    "source": "Mario",
+    "gameCharacterId": 108,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 78,
+    "rosterOrder": 65
+  },
+  {
+    "id": 147,
+    "name": "Yellow Bones",
+    "class": "Balanced",
+    "color": "Yellow",
+    "source": "Mario",
+    "gameCharacterId": 109,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 79,
+    "rosterOrder": 66
+  },
+  {
+    "id": 17,
+    "name": "Shy Guy",
+    "class": "Balanced",
+    "color": "Red",
+    "source": "Mario",
+    "gameCharacterId": 16,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 16,
+    "rosterOrder": 67
+  },
+  {
+    "id": 45,
+    "name": "Blue Shy Guy",
+    "class": "Technique",
+    "color": "Blue",
+    "source": "Mario",
+    "gameCharacterId": 44,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 44,
+    "rosterOrder": 68
+  },
+  {
+    "id": 46,
+    "name": "Yellow Shy Guy",
+    "class": "Speed",
+    "color": "Yellow",
+    "source": "Mario",
+    "gameCharacterId": 45,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 45,
+    "rosterOrder": 69
+  },
+  {
+    "id": 47,
+    "name": "Green Shy Guy",
+    "class": "Power",
+    "color": "Green",
+    "source": "Mario",
+    "gameCharacterId": 46,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 46,
+    "rosterOrder": 70
+  },
+  {
+    "id": 48,
+    "name": "Gray Shy Guy",
+    "class": "Technique",
+    "color": "Black",
+    "source": "Mario",
+    "gameCharacterId": 47,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 47,
+    "rosterOrder": 71
   },
   {
     "id": 151,
@@ -1484,7 +872,8 @@
     "gameCharacterId": 113,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 83
+    "portraitIndex": 83,
+    "rosterOrder": 72
   },
   {
     "id": 152,
@@ -1495,7 +884,59 @@
     "gameCharacterId": 114,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 84
+    "portraitIndex": 84,
+    "rosterOrder": 73
+  },
+  {
+    "id": 34,
+    "name": "Blue Magikoopa",
+    "class": "Balanced",
+    "color": "Blue",
+    "source": "Mario",
+    "gameCharacterId": 33,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "rioAliases": [
+      "Magikoopa"
+    ],
+    "portraitIndex": 33,
+    "rosterOrder": 74
+  },
+  {
+    "id": 35,
+    "name": "Red Magikoopa",
+    "class": "Balanced",
+    "color": "Red",
+    "source": "Mario",
+    "gameCharacterId": 34,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 34,
+    "rosterOrder": 75
+  },
+  {
+    "id": 36,
+    "name": "Green Magikoopa",
+    "class": "Balanced",
+    "color": "Green",
+    "source": "Mario",
+    "gameCharacterId": 35,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 35,
+    "rosterOrder": 76
+  },
+  {
+    "id": 37,
+    "name": "Yellow Magikoopa",
+    "class": "Balanced",
+    "color": "Yellow",
+    "source": "Mario",
+    "gameCharacterId": 36,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 36,
+    "rosterOrder": 77
   },
   {
     "id": 153,
@@ -1506,7 +947,8 @@
     "gameCharacterId": 115,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 85
+    "portraitIndex": 85,
+    "rosterOrder": 78
   },
   {
     "id": 154,
@@ -1517,18 +959,89 @@
     "gameCharacterId": 116,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 86
+    "portraitIndex": 86,
+    "rosterOrder": 79
   },
   {
-    "id": 155,
-    "name": "Rosalina",
-    "class": "Technique",
-    "color": "Light Blue",
+    "id": 28,
+    "name": "Hammer Bro",
+    "class": "Power",
+    "color": "Green",
     "source": "Mario",
-    "gameCharacterId": 117,
+    "gameCharacterId": 27,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 87
+    "rioAliases": [
+      "Hammer Bro."
+    ],
+    "portraitIndex": 27,
+    "rosterOrder": 80
+  },
+  {
+    "id": 53,
+    "name": "Fire Bro",
+    "class": "Power",
+    "color": "Red",
+    "source": "Mario",
+    "gameCharacterId": 52,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "rioAliases": [
+      "Fire Bro."
+    ],
+    "portraitIndex": 52,
+    "rosterOrder": 81
+  },
+  {
+    "id": 54,
+    "name": "Boomerang Bro",
+    "class": "Power",
+    "color": "Blue",
+    "source": "Mario",
+    "gameCharacterId": 53,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "rioAliases": [
+      "Boomerang Bro."
+    ],
+    "portraitIndex": 53,
+    "rosterOrder": 82
+  },
+  {
+    "id": 145,
+    "name": "Ice Bro",
+    "class": "Power",
+    "color": "Light Blue",
+    "source": "Mario",
+    "gameCharacterId": 102,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 77,
+    "rosterOrder": 83
+  },
+  {
+    "id": 15,
+    "name": "Boo",
+    "class": "Speed",
+    "color": "White",
+    "source": "Mario",
+    "gameCharacterId": 14,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 14,
+    "rosterOrder": 84
+  },
+  {
+    "id": 38,
+    "name": "King Boo",
+    "class": "Power",
+    "color": "White",
+    "source": "Mario",
+    "gameCharacterId": 37,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 37,
+    "rosterOrder": 85
   },
   {
     "id": 156,
@@ -1539,7 +1052,8 @@
     "gameCharacterId": 118,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 88
+    "portraitIndex": 88,
+    "rosterOrder": 86
   },
   {
     "id": 157,
@@ -1550,7 +1064,8 @@
     "gameCharacterId": 119,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 89
+    "portraitIndex": 89,
+    "rosterOrder": 87
   },
   {
     "id": 158,
@@ -1561,7 +1076,8 @@
     "gameCharacterId": 120,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 90
+    "portraitIndex": 90,
+    "rosterOrder": 88
   },
   {
     "id": 159,
@@ -1572,7 +1088,8 @@
     "gameCharacterId": 121,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 91
+    "portraitIndex": 91,
+    "rosterOrder": 89
   },
   {
     "id": 160,
@@ -1583,29 +1100,116 @@
     "gameCharacterId": 122,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 92
+    "portraitIndex": 92,
+    "rosterOrder": 90
   },
   {
-    "id": 161,
-    "name": "Pauline",
+    "id": 22,
+    "name": "Blue Pianta",
+    "class": "Speed",
+    "color": "Blue",
+    "source": "Mario",
+    "gameCharacterId": 21,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 21,
+    "rosterOrder": 91
+  },
+  {
+    "id": 23,
+    "name": "Red Pianta",
+    "class": "Speed",
+    "color": "Red",
+    "source": "Mario",
+    "gameCharacterId": 22,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 22,
+    "rosterOrder": 92
+  },
+  {
+    "id": 24,
+    "name": "Yellow Pianta",
+    "class": "Speed",
+    "color": "Yellow",
+    "source": "Mario",
+    "gameCharacterId": 23,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 23,
+    "rosterOrder": 93
+  },
+  {
+    "id": 142,
+    "name": "Orange Pianta",
+    "class": "Speed",
+    "color": "Orange",
+    "source": "Mario",
+    "gameCharacterId": 74,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 74,
+    "rosterOrder": 94
+  },
+  {
+    "id": 25,
+    "name": "Blue Noki",
+    "class": "Balanced",
+    "color": "Blue",
+    "source": "Mario",
+    "gameCharacterId": 24,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 24,
+    "rosterOrder": 95
+  },
+  {
+    "id": 26,
+    "name": "Red Noki",
     "class": "Balanced",
     "color": "Red",
     "source": "Mario",
-    "gameCharacterId": 123,
+    "gameCharacterId": 25,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 93
+    "portraitIndex": 25,
+    "rosterOrder": 96
   },
   {
-    "id": 162,
-    "name": "King Bob-omb",
-    "class": "Power",
-    "color": "Black",
+    "id": 27,
+    "name": "Green Noki",
+    "class": "Balanced",
+    "color": "Green",
     "source": "Mario",
-    "gameCharacterId": 124,
+    "gameCharacterId": 26,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 94
+    "portraitIndex": 26,
+    "rosterOrder": 97
+  },
+  {
+    "id": 148,
+    "name": "Yellow Noki",
+    "class": "Balanced",
+    "color": "Yellow",
+    "source": "Mario",
+    "gameCharacterId": 110,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 80,
+    "rosterOrder": 98
+  },
+  {
+    "id": 149,
+    "name": "Pink Noki",
+    "class": "Balanced",
+    "color": "Pink",
+    "source": "Mario",
+    "gameCharacterId": 111,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 81,
+    "rosterOrder": 99
   },
   {
     "id": 163,
@@ -1616,116 +1220,685 @@
     "gameCharacterId": 125,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 95
+    "portraitIndex": 95,
+    "rosterOrder": 100
   },
   {
-    "id": 164,
-    "name": "Boom Boom",
-    "class": "Power",
-    "color": "Maroon",
-    "source": "Mario",
-    "gameCharacterId": 126,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 96
-  },
-  {
-    "id": 165,
-    "name": "Pom Pom",
-    "class": "Technique",
-    "color": "Pink",
-    "source": "Mario",
-    "gameCharacterId": 127,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 97
-  },
-  {
-    "id": 166,
-    "name": "Chimp",
+    "id": 41,
+    "name": "Goomba",
     "class": "Speed",
+    "color": "Brown",
+    "source": "Mario",
+    "gameCharacterId": 40,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 40,
+    "rosterOrder": 101
+  },
+  {
+    "id": 42,
+    "name": "Paragoomba",
+    "class": "Balanced",
+    "color": "Brown",
+    "source": "Mario",
+    "gameCharacterId": 41,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 41,
+    "rosterOrder": 102
+  },
+  {
+    "id": 19,
+    "name": "Monty Mole",
+    "class": "Speed",
+    "color": "Brown",
+    "source": "Mario",
+    "gameCharacterId": 18,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 18,
+    "rosterOrder": 103
+  },
+  {
+    "id": 39,
+    "name": "Petey Piranha",
+    "class": "Power",
     "color": "Light Green",
     "source": "Mario",
-    "gameCharacterId": 128,
+    "gameCharacterId": 38,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 98
+    "portraitIndex": 38,
+    "rosterOrder": 104
   },
   {
-    "id": 167,
-    "name": "Larry",
-    "class": "Balanced",
-    "color": "Light Blue",
-    "source": "Mario",
-    "gameCharacterId": 129,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 99
-  },
-  {
-    "id": 168,
-    "name": "Iggy",
-    "class": "Technique",
-    "color": "Green",
-    "source": "Mario",
-    "gameCharacterId": 130,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 100
-  },
-  {
-    "id": 169,
-    "name": "Lemmy",
+    "id": 55,
+    "name": "Wiggler",
     "class": "Speed",
     "color": "Yellow",
     "source": "Mario",
-    "gameCharacterId": 131,
+    "gameCharacterId": 54,
     "portrait": "portraits/character-select.png",
     "kind": "character",
-    "portraitIndex": 101
+    "portraitIndex": 54,
+    "rosterOrder": 105
   },
   {
-    "id": 170,
-    "name": "Ludwig",
+    "id": 56,
+    "name": "Blooper",
     "class": "Technique",
+    "color": "White",
+    "source": "Mario",
+    "gameCharacterId": 55,
+    "portrait": "portraits/character-select.png",
+    "kind": "character",
+    "portraitIndex": 55,
+    "rosterOrder": 106
+  },
+  {
+    "id": 72,
+    "name": "Cap",
+    "class": "Balanced",
+    "color": "Red",
+    "source": "GM",
+    "kind": "mii",
+    "rosterOrder": 107
+  },
+  {
+    "id": 73,
+    "name": "Pauline (Mii)",
+    "class": "Balanced",
+    "color": "Red",
+    "source": "Mario",
+    "kind": "mii",
+    "portraitName": "Pauline",
+    "rosterOrder": 108
+  },
+  {
+    "id": 74,
+    "name": "Burger King",
+    "class": "Balanced",
+    "color": "Red",
+    "source": "Food",
+    "kind": "mii",
+    "rosterOrder": 109
+  },
+  {
+    "id": 75,
+    "name": "Harley Quinn",
+    "class": "Balanced",
+    "color": "Red",
+    "source": "DC",
+    "kind": "mii",
+    "rosterOrder": 110
+  },
+  {
+    "id": 76,
+    "name": "Red",
+    "class": "Balanced",
+    "color": "Red",
+    "source": "Pokemon",
+    "kind": "mii",
+    "rosterOrder": 111
+  },
+  {
+    "id": 77,
+    "name": "Roshi",
+    "class": "Balanced",
+    "color": "Orange",
+    "source": "Dragon Ball",
+    "kind": "mii",
+    "rosterOrder": 112
+  },
+  {
+    "id": 78,
+    "name": "Inkling",
+    "class": "Balanced",
+    "color": "Orange",
+    "source": "Splatoon",
+    "kind": "mii",
+    "rosterOrder": 113
+  },
+  {
+    "id": 79,
+    "name": "He-Man",
+    "class": "Balanced",
+    "color": "Orange",
+    "source": "Cartoon",
+    "kind": "mii",
+    "rosterOrder": 114
+  },
+  {
+    "id": 80,
+    "name": "Nigel Thornberry",
+    "class": "Balanced",
+    "color": "Yellow",
+    "source": "Cartoon",
+    "kind": "mii",
+    "rosterOrder": 115
+  },
+  {
+    "id": 81,
+    "name": "Sophie",
+    "class": "Balanced",
+    "color": "Yellow",
+    "source": "Bejeweled",
+    "kind": "mii",
+    "rosterOrder": 116
+  },
+  {
+    "id": 82,
+    "name": "Ronald McDonald",
+    "class": "Balanced",
+    "color": "Yellow",
+    "source": "Food",
+    "kind": "mii",
+    "rosterOrder": 117
+  },
+  {
+    "id": 83,
+    "name": "Sadie Adler",
+    "class": "Balanced",
+    "color": "Yellow",
+    "source": "Red Dead Redemption",
+    "kind": "mii",
+    "rosterOrder": 118
+  },
+  {
+    "id": 84,
+    "name": "Narf",
+    "class": "Balanced",
+    "color": "Light Green",
+    "source": "GM",
+    "kind": "mii",
+    "rosterOrder": 119
+  },
+  {
+    "id": 85,
+    "name": "Jade Harley",
+    "class": "Balanced",
+    "color": "Light Green",
+    "source": "Homestuck",
+    "kind": "mii",
+    "rosterOrder": 120
+  },
+  {
+    "id": 86,
+    "name": "Shaggy",
+    "class": "Balanced",
+    "color": "Light Green",
+    "source": "Scooby Doo",
+    "kind": "mii",
+    "rosterOrder": 121
+  },
+  {
+    "id": 87,
+    "name": "Brock",
+    "class": "Balanced",
+    "color": "Green",
+    "source": "Pokemon",
+    "kind": "mii",
+    "rosterOrder": 122
+  },
+  {
+    "id": 88,
+    "name": "Buttercup",
+    "class": "Balanced",
+    "color": "Green",
+    "source": "Cartoon",
+    "kind": "mii",
+    "rosterOrder": 123
+  },
+  {
+    "id": 89,
+    "name": "John Cena",
+    "class": "Balanced",
+    "color": "Green",
+    "source": "I don't know, I can't see him",
+    "kind": "mii",
+    "rosterOrder": 124
+  },
+  {
+    "id": 90,
+    "name": "Isabelle",
+    "class": "Balanced",
+    "color": "Green",
+    "source": "Animal Crossing",
+    "kind": "mii",
+    "rosterOrder": 125
+  },
+  {
+    "id": 91,
+    "name": "Flowey",
+    "class": "Balanced",
+    "color": "Green",
+    "source": "Undertale",
+    "kind": "mii",
+    "rosterOrder": 126
+  },
+  {
+    "id": 92,
+    "name": "Sheen Estevez",
+    "class": "Balanced",
     "color": "Blue",
-    "source": "Mario",
-    "gameCharacterId": 132,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 102
+    "source": "Jimmy Neutron",
+    "kind": "mii",
+    "rosterOrder": 127
   },
   {
-    "id": 171,
-    "name": "Morton",
-    "class": "Power",
-    "color": "Gray",
-    "source": "Mario",
-    "gameCharacterId": 133,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 103
+    "id": 93,
+    "name": "Samus",
+    "class": "Balanced",
+    "color": "Blue",
+    "source": "Metroid",
+    "kind": "mii",
+    "rosterOrder": 128
   },
   {
-    "id": 172,
-    "name": "Roy",
-    "class": "Power",
+    "id": 94,
+    "name": "Jack Black",
+    "class": "Balanced",
+    "color": "Blue",
+    "source": "Minecraft",
+    "kind": "mii",
+    "rosterOrder": 129
+  },
+  {
+    "id": 95,
+    "name": "Bubbles",
+    "class": "Balanced",
+    "color": "Blue",
+    "source": "Cartoon",
+    "kind": "mii",
+    "rosterOrder": 130
+  },
+  {
+    "id": 96,
+    "name": "PANCAKE!?!",
+    "class": "Balanced",
+    "color": "Blue",
+    "source": "Unknown",
+    "kind": "mii",
+    "rosterOrder": 131
+  },
+  {
+    "id": 97,
+    "name": "Comet",
+    "class": "Balanced",
+    "color": "Light Blue",
+    "source": "GM",
+    "kind": "mii",
+    "rosterOrder": 132
+  },
+  {
+    "id": 98,
+    "name": "Rosalina (Mii)",
+    "class": "Balanced",
+    "color": "Light Blue",
+    "source": "Mario",
+    "kind": "mii",
+    "portraitName": "Rosalina",
+    "rosterOrder": 133
+  },
+  {
+    "id": 99,
+    "name": "Sans",
+    "class": "Balanced",
+    "color": "Light Blue",
+    "source": "Deltarune",
+    "kind": "mii",
+    "rosterOrder": 134
+  },
+  {
+    "id": 100,
+    "name": "Wendy (Mii)",
+    "class": "Balanced",
+    "color": "Light Blue",
+    "source": "Food",
+    "kind": "mii",
+    "portraitName": "Wendy",
+    "rosterOrder": 135
+  },
+  {
+    "id": 101,
+    "name": "Saul Goodman",
+    "class": "Balanced",
     "color": "Pink",
-    "source": "Mario",
-    "gameCharacterId": 134,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 104
+    "source": "Better Call Saul",
+    "kind": "mii",
+    "rosterOrder": 136
   },
   {
-    "id": 173,
-    "name": "Wendy",
-    "class": "Technique",
+    "id": 102,
+    "name": "Blossom",
+    "class": "Balanced",
     "color": "Pink",
-    "source": "Mario",
-    "gameCharacterId": 135,
-    "portrait": "portraits/character-select.png",
-    "kind": "character",
-    "portraitIndex": 105
+    "source": "Cartoon",
+    "kind": "mii",
+    "rosterOrder": 137
+  },
+  {
+    "id": 103,
+    "name": "Timmy Turner",
+    "class": "Balanced",
+    "color": "Pink",
+    "source": "Cartoon",
+    "kind": "mii",
+    "rosterOrder": 138
+  },
+  {
+    "id": 104,
+    "name": "Paula",
+    "class": "Balanced",
+    "color": "Pink",
+    "source": "Earthbound",
+    "kind": "mii",
+    "rosterOrder": 139
+  },
+  {
+    "id": 105,
+    "name": "Coach",
+    "class": "Balanced",
+    "color": "Purple",
+    "source": "Left for Dead",
+    "kind": "mii",
+    "rosterOrder": 140
+  },
+  {
+    "id": 106,
+    "name": "Zelda",
+    "class": "Balanced",
+    "color": "Purple",
+    "source": "Legend of Zelda",
+    "kind": "mii",
+    "rosterOrder": 141
+  },
+  {
+    "id": 107,
+    "name": "Grimace",
+    "class": "Balanced",
+    "color": "Purple",
+    "source": "Fast Food",
+    "kind": "mii",
+    "rosterOrder": 142
+  },
+  {
+    "id": 108,
+    "name": "Scooby Doo",
+    "class": "Balanced",
+    "color": "Brown",
+    "source": "Scooby Doo ",
+    "kind": "mii",
+    "rosterOrder": 143
+  },
+  {
+    "id": 109,
+    "name": "Mr. Bean",
+    "class": "Balanced",
+    "color": "Brown",
+    "source": "Mr. Bean",
+    "kind": "mii",
+    "rosterOrder": 144
+  },
+  {
+    "id": 110,
+    "name": "Goombella",
+    "class": "Balanced",
+    "color": "Brown",
+    "source": "Paper Mario ",
+    "kind": "mii",
+    "rosterOrder": 145
+  },
+  {
+    "id": 111,
+    "name": "Steve Harvey",
+    "class": "Balanced",
+    "color": "White",
+    "source": "Himself",
+    "kind": "mii",
+    "rosterOrder": 146
+  },
+  {
+    "id": 112,
+    "name": "Walter White",
+    "class": "Balanced",
+    "color": "White",
+    "source": "Breaking Bad",
+    "kind": "mii",
+    "rosterOrder": 147
+  },
+  {
+    "id": 113,
+    "name": "Hatsune Miku",
+    "class": "Balanced",
+    "color": "White",
+    "source": "Vocaloid ",
+    "kind": "mii",
+    "rosterOrder": 148
+  },
+  {
+    "id": 114,
+    "name": "Mike",
+    "class": "Balanced",
+    "color": "Black",
+    "source": "Breaking Bad",
+    "kind": "mii",
+    "rosterOrder": 149
+  },
+  {
+    "id": 115,
+    "name": "Cynthia",
+    "class": "Balanced",
+    "color": "Black",
+    "source": "Pokemon ",
+    "kind": "mii",
+    "rosterOrder": 150
+  },
+  {
+    "id": 116,
+    "name": "Masahiro Sakurai",
+    "class": "Balanced",
+    "color": "Black",
+    "source": "Smashy Bros",
+    "kind": "mii",
+    "rosterOrder": 151
+  },
+  {
+    "id": 117,
+    "name": "Mona Lisa",
+    "class": "Balanced",
+    "color": "Black",
+    "source": "Da Vinci ",
+    "kind": "mii",
+    "rosterOrder": 152
+  },
+  {
+    "id": 118,
+    "name": "Ada Wong",
+    "class": "Balanced",
+    "color": "Red",
+    "source": "Resident Evil",
+    "kind": "mii",
+    "rosterOrder": 153
+  },
+  {
+    "id": 119,
+    "name": "Garfield",
+    "class": "Balanced",
+    "color": "Orange",
+    "source": "Garfield",
+    "kind": "mii",
+    "rosterOrder": 154
+  },
+  {
+    "id": 120,
+    "name": "Misty",
+    "class": "Balanced",
+    "color": "Orange",
+    "source": "Pokemon",
+    "kind": "mii",
+    "rosterOrder": 155
+  },
+  {
+    "id": 121,
+    "name": "Waffle",
+    "class": "Balanced",
+    "color": "Yellow",
+    "source": "GM",
+    "kind": "mii",
+    "rosterOrder": 156
+  },
+  {
+    "id": 122,
+    "name": "Derrick White",
+    "class": "Balanced",
+    "color": "Light Green",
+    "source": "Basketball",
+    "kind": "mii",
+    "rosterOrder": 157
+  },
+  {
+    "id": 123,
+    "name": "Sonya Blade",
+    "class": "Balanced",
+    "color": "Light Green",
+    "source": "Mortal Kombat",
+    "kind": "mii",
+    "rosterOrder": 158
+  },
+  {
+    "id": 124,
+    "name": "Cammy White",
+    "class": "Balanced",
+    "color": "Green",
+    "source": "Street Fighter",
+    "kind": "mii",
+    "rosterOrder": 159
+  },
+  {
+    "id": 125,
+    "name": "Cortana",
+    "class": "Balanced",
+    "color": "Blue",
+    "source": "Halo",
+    "kind": "mii",
+    "rosterOrder": 160
+  },
+  {
+    "id": 126,
+    "name": "OAO",
+    "class": "Balanced",
+    "color": "Light Blue",
+    "source": "GM",
+    "kind": "mii",
+    "rosterOrder": 161
+  },
+  {
+    "id": 127,
+    "name": "juhg,koop",
+    "class": "Balanced",
+    "color": "Pink",
+    "source": "Totally not Jung Kook from BTS",
+    "kind": "mii",
+    "rosterOrder": 162
+  },
+  {
+    "id": 128,
+    "name": "William Afton",
+    "class": "Balanced",
+    "color": "Purple",
+    "source": "FNAF",
+    "kind": "mii",
+    "rosterOrder": 163
+  },
+  {
+    "id": 129,
+    "name": "Juri Han",
+    "class": "Balanced",
+    "color": "Purple",
+    "source": "Street Fighter",
+    "kind": "mii",
+    "rosterOrder": 164
+  },
+  {
+    "id": 130,
+    "name": "Cranky Kong",
+    "class": "Balanced",
+    "color": "Brown",
+    "source": "Donkey Kong",
+    "kind": "mii",
+    "rosterOrder": 165
+  },
+  {
+    "id": 131,
+    "name": "Squirrel Girl",
+    "class": "Balanced",
+    "color": "Brown",
+    "source": "Marvel",
+    "kind": "mii",
+    "rosterOrder": 166
+  },
+  {
+    "id": 132,
+    "name": "Horse",
+    "class": "Balanced",
+    "color": "Brown",
+    "source": "Wherever Horses Come From",
+    "kind": "mii",
+    "rosterOrder": 167
+  },
+  {
+    "id": 133,
+    "name": "Josh Block",
+    "class": "Balanced",
+    "color": "White",
+    "source": "WorldofTShirts",
+    "kind": "mii",
+    "rosterOrder": 168
+  },
+  {
+    "id": 134,
+    "name": "Wrinkly Kong",
+    "class": "Balanced",
+    "color": "White",
+    "source": "Donkey Kong",
+    "kind": "mii",
+    "rosterOrder": 169
+  },
+  {
+    "id": 135,
+    "name": "Mario Judah",
+    "class": "Balanced",
+    "color": "Black",
+    "source": "Rap",
+    "kind": "mii",
+    "rosterOrder": 170
+  },
+  {
+    "id": 136,
+    "name": "Chica",
+    "class": "Balanced",
+    "color": "Yellow",
+    "source": "FNAF",
+    "kind": "mii",
+    "rosterOrder": 171
+  },
+  {
+    "id": 137,
+    "name": "Rose",
+    "class": "Balanced",
+    "color": "Pink",
+    "source": "Rose",
+    "kind": "mii",
+    "rosterOrder": 172
+  },
+  {
+    "id": 138,
+    "name": "Amelia Earhart",
+    "class": "Balanced",
+    "color": "White",
+    "source": "Plane",
+    "kind": "mii",
+    "rosterOrder": 173
   }
 ]
