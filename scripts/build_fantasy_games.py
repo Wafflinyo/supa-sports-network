@@ -12,6 +12,8 @@ from rio_workbook import read_rio_workbook
 ROOT = Path(__file__).resolve().parents[1]
 rules = json.loads((ROOT / 'src/fantasy-rules.json').read_text())
 roster = json.loads((ROOT / 'src/players.json').read_text())
+from player_identity import resolve_player
+
 by_name = {p['name'].strip().casefold(): p['id'] for p in roster}
 assert len(by_name) == len(roster), 'Player names must be unique or explicitly mapped'
 
@@ -63,7 +65,7 @@ def score_report(entry, report_directory=None):
                 continue
             team_runs[team] += num(row, 'Runs')
             name = row['Player'].strip()
-            player_id = entry.get('playerRows', {}).get(str(row_number), by_name.get(name.casefold()))
+            player_id = (entry.get('playerRows', {}).get(str(row_number)) or resolve_player(name, entry['players']))
             if player_id not in entry['players']:
                 raise ValueError(f'{filename} row {row_number}: {name} has no scheduled player ID; fix schedule.json')
             if player_id in batting:
@@ -75,7 +77,7 @@ def score_report(entry, report_directory=None):
             name = row.get('Player')
             if not name or 'Totals' in name:
                 continue
-            player_id = entry.get('pitcherRows', {}).get(str(row_number), by_name.get(name.strip().casefold()))
+            player_id = (entry.get('pitcherRows', {}).get(str(row_number)) or resolve_player(name, entry['players']))
             if player_id not in batting:
                 raise ValueError(f'{filename} Pitching row {row_number}: unmapped pitcher {name}')
             pitchers.append((player_id, row))

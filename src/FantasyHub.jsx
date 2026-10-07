@@ -1,3 +1,4 @@
+import {PlayerPortrait} from './PlayerPortrait.jsx'
 import React, { useEffect, useMemo, useState } from 'react'
 import { CalendarDays, LockKeyhole, Search, Trophy } from 'lucide-react'
 import { matchupPairs, matchupScore, previousWeek, rules, sumScores, weekKey } from './fantasy-scoring.js'
@@ -154,7 +155,7 @@ export function FantasyLeague({ initialLeague, user, supabase, players, onLeague
       {league.state !== 'waiting' && <><div className="draft-callout"><strong>{league.state === 'active' ? 'Draft complete' : `Round ${roundIndex + 1}, pick ${nextPick} of ${managerCount * 10}`}</strong>
         {league.state === 'drafting' && <span>{turnUser === user.id ? 'Your pick is on the clock' : `${teamName(turnUser)} is picking`}</span>}</div>
         <div className="draft-layout"><div><div className="draft-search"><Search size={18}/><input placeholder="Search available players" aria-label="Search available players" value={draftQuery} onChange={e => setDraftQuery(e.target.value)}/></div>
-          <div className="draft-pool">{available.map(player => <div key={player.id} className="draft-player"><div><strong>{player.name}</strong><small>{player.class} · #{player.id}</small></div><button disabled={busy || league.state !== 'drafting' || turnUser !== user.id}
+          <div className="draft-pool">{available.map(player => <div key={player.id} className="draft-player"><div className="portrait-label"><PlayerPortrait player={player}/><div><strong>{player.name}</strong><small>{player.class} · #{player.id}</small></div></div><button disabled={busy || league.state !== 'drafting' || turnUser !== user.id}
             onClick={() => run(() => supabase.rpc('make_fantasy_pick', { target_league: league.id, chosen_player: player.id }))}>DRAFT</button></div>)}</div></div>
           <div className="draft-board"><h4>Your roster ({myRoster.length}/10)</h4>{myRoster.map((pick,i) => <p key={pick.pick_number}>{i + 1}. {byId.get(pick.player_id)?.name}</p>)}
             <h4>All picks</h4><div className="pick-history">{[...picks].reverse().map(p => <p key={p.pick_number}>#{p.pick_number} {teamName(p.user_id)} · {byId.get(p.player_id)?.name}</p>)}</div></div></div></>}
@@ -167,7 +168,7 @@ export function FantasyLeague({ initialLeague, user, supabase, players, onLeague
         <div className="lineup-grid">{[['starter','Starters (7)'],['bench','Bench (3)']].map(([slot,title]) => <section key={slot}><h4>{title}</h4>{mine.filter(x => x.slot === slot).map(row => <button key={row.player_id}
           className={`lineup-player ${selectedStarter === row.player_id ? 'chosen' : ''}`} disabled={busy || locked(row.player_id) || (slot === 'bench' && !selectedStarter)}
           onClick={() => slot === 'starter' ? setSelectedStarter(row.player_id) : run(() => supabase.rpc('swap_fantasy_lineup', { target_league: league.id, starter_player: selectedStarter, bench_player: row.player_id }))}>
-          <span>{byId.get(row.player_id)?.name}<small>{locked(row.player_id) ? <><LockKeyhole size={12}/> Locked this week</> : 'Available to swap'}</small></span>
+          <span><PlayerPortrait player={byId.get(row.player_id)}/>{byId.get(row.player_id)?.name}<small>{locked(row.player_id) ? <><LockKeyhole size={12}/> Locked this week</> : 'Available to swap'}</small></span>
           <strong>{slot === 'starter' ? formatScore(sumScores(scoringGames, row.player_id, currentWeek)) : 'BENCH'}</strong></button>)}</section>)}</div>
       </>}
     </div>}
@@ -177,8 +178,8 @@ export function FantasyLeague({ initialLeague, user, supabase, players, onLeague
       {league.state === 'active' ? <><p className="fantasy-hint">Completed matchup weeks with official scored games. Current week scores are in Matchups.</p><table className="fantasy-simple-table"><thead><tr><th>Team</th><th>W</th><th>L</th><th>T</th><th>Points</th></tr></thead><tbody>{[...order].sort((a,b) => records.get(b.user_id).wins - records.get(a.user_id).wins || records.get(b.user_id).points - records.get(a.user_id).points).map(o => <tr key={o.user_id}><td>{teamName(o.user_id)}</td><td>{records.get(o.user_id).wins}</td><td>{records.get(o.user_id).losses}</td><td>{records.get(o.user_id).ties}</td><td>{formatScore(records.get(o.user_id).points)}</td></tr>)}</tbody></table></> : <p className="fantasy-hint">Standings open after the draft.</p>}</div>}
     {tab === 'Player Stats' && <div className="fantasy-content"><div className="fantasy-section-head"><h3>Fantasy points</h3><span>Current matchup</span></div>
       <div className="draft-search"><Search size={18}/><input placeholder="Search players" value={draftQuery} onChange={e => setDraftQuery(e.target.value)}/></div>
-      <div className="fantasy-player-list">{players.filter(p => p.name.toLowerCase().includes(draftQuery.toLowerCase())).map(p => <div key={p.id}><span>{p.name}</span><strong>{formatScore(sumScores(scoringGames, p.id, currentWeek))}</strong></div>)}</div></div>}
+      <div className="fantasy-player-list">{players.filter(p => p.name.toLowerCase().includes(draftQuery.toLowerCase())).map(p => <div key={p.id}><span className="portrait-label"><PlayerPortrait player={p}/>{p.name}</span><strong>{formatScore(sumScores(scoringGames, p.id, currentWeek))}</strong></div>)}</div></div>}
     {tab === 'Free Agency' && <div className="fantasy-content"><div className="fantasy-section-head"><h3>Available players</h3></div><p className="fantasy-hint">Drafted players belong to their fantasy teams. Free agent claims and trades will open with transaction rules.</p>
-      <div className="fantasy-player-list">{players.filter(p => !drafted.has(p.id)).map(p => <div key={p.id}><span>{p.name}</span><small>{p.class}</small></div>)}</div></div>}
+      <div className="fantasy-player-list">{players.filter(p => !drafted.has(p.id)).map(p => <div key={p.id}><span className="portrait-label"><PlayerPortrait player={p}/>{p.name}</span><small>{p.class}</small></div>)}</div></div>}
   </>
 }

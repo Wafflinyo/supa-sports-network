@@ -5,6 +5,7 @@ sheet count; team totals and the Pitching sheet are intentionally ignored.
 """
 
 import hashlib
+from player_identity import resolve_player
 import json
 import sys
 from collections import Counter
@@ -51,7 +52,8 @@ def build_counts():
                 position = row[position_col] if len(row) > position_col else None
                 if not isinstance(name, str) or not name.strip() or not isinstance(position, str) or position.strip().upper() == "N/A":
                     continue
-                player_id = overrides.get(path.name, {}).get(str(row_number), ids_by_name.get(name.strip().casefold()))
+                scheduled_ids = next((entry["players"] for entry in schedule if entry.get("report") == path.name), None)
+                player_id = overrides.get(path.name, {}).get(str(row_number)) or resolve_player(name, scheduled_ids)
                 if player_id is None:
                     raise ValueError(f"{path.name}: unknown player {name!r}; correct the roster match before publishing")
                 seen.add(player_id)

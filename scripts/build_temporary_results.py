@@ -9,6 +9,7 @@ from collections import Counter
 from pathlib import Path
 from rio_workbook import read_rio_workbook
 from build_fantasy_games import score_report, rows_by_heading, num, by_name
+from player_identity import resolve_player
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORTS = ROOT / 'test-games'
@@ -89,7 +90,7 @@ def build(fixture_path=ROOT/'src/temporary-league.json', manifest_path=REPORTS/'
             for row_number, row in enumerate(rows_by_heading(wb['Stats']), start=2):
                 export_team = row.get('Team') or export_team
                 if not row.get('Player') or row.get('Position') == 'N/A': continue
-                pid = entry.get('playerRows',{}).get(str(row_number), by_name.get(row['Player'].strip().casefold()))
+                pid = (entry.get('playerRows', {}).get(str(row_number)) or resolve_player(row['Player'], entry['players']))
                 if pid not in game['players']: raise ValueError('Player is not in the scheduled roster')
                 team = owners[pid]
                 export_teams.setdefault(team,set()).add(export_team)
@@ -118,7 +119,7 @@ def build(fixture_path=ROOT/'src/temporary-league.json', manifest_path=REPORTS/'
                 raise ValueError('Report team assignments do not match the two scheduled rosters')
             for row_number, row in enumerate(rows_by_heading(wb['Pitching']), start=2):
                 if not row.get('Player') or 'Totals' in row['Player']: continue
-                pid = entry.get('pitcherRows',{}).get(str(row_number), by_name.get(row['Player'].strip().casefold()))
+                pid = (entry.get('pitcherRows', {}).get(str(row_number)) or resolve_player(row['Player'], entry['players']))
                 reported_lineups[owners[pid]]['pitchingDepth'].append(pid)
                 stats = totals[str(pid)]
                 stats['outs'] += round(num(row,'Innings Pitched')*3)

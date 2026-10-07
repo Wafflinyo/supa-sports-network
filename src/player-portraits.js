@@ -1,3 +1,5 @@
+import playerPool from './players.json'
+
 // Portraits are positioned from the supplied Project Rio player/icon screenshots.
 // Keep the names alongside each sheet so future roster changes cannot shift portraits.
 const sheets = [
@@ -20,8 +22,16 @@ const sheets = [
 const portraits = new Map(sheets.flatMap(([file, width, height, x, firstY, names]) =>
   names.map((name, index) => [name, { file, width, height, x, y: firstY + index * 87 }])))
 
-export function playerPortraitStyle(name, size) {
-  const portrait = portraits.get(name)
+const playersById = new Map(playerPool.map(player => [player.id, player]))
+export function playerPortraitStyle(player, size) {
+  const identity = playersById.get(player.id) || player
+  if (identity.portrait) return {
+    backgroundImage: `url(${import.meta.env.BASE_URL}${identity.portrait})`,
+    backgroundSize: `${480 * size / 51}px ${561 * size / 51}px`,
+    backgroundPosition: `${(size - 48 * size / 51) / 2 - identity.portraitIndex % 10 * 48 * size / 51}px ${-Math.floor(identity.portraitIndex / 10) * size}px`,
+    backgroundRepeat: 'no-repeat',
+  }
+  const portrait = portraits.get(identity.portraitName || identity.name)
   if (!portrait) return null
   const scale = size / 76
   return {

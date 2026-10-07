@@ -21,7 +21,7 @@ const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || connection.publisha
 const supabase = url && key ? createClient(url, key) : null
 const players = playerPool.map(player => ({ ...player, gamesPlayed: gamesPlayed[player.id] ?? null }))
 function PlayerAvatar({ player, size = 38 }) {
-  const portrait = playerPortraitStyle(player.name, size)
+  const portrait = playerPortraitStyle(player, size)
   return <span className={`player-avatar${portrait ? ' has-portrait' : ''}`} style={{ width: size, height: size, flex: `0 0 ${size}px`, ...portrait }} aria-hidden="true">{portrait ? null : player.name.slice(0, 1)}</span>
 }
 const nav = [...leagueTabs, 'Test Week']
