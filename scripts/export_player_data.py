@@ -1,17 +1,22 @@
 """Export the SSL editor's actual DOL values and chemistry to the website.
 Usage: python scripts/export_player_data.py /path/main.dol /path/SSL-Editor.html
 Use --bone-bat-adjustment only for the SSL-Gear/Tune baseline.
-Otherwise all values are exported directly from the supplied DOL.
+Original roster values come from the required edited Game Data workbook.
+Custom additions and chemistry come from the supplied DOL.
+Approved trajectory and Bone Goomba changes are applied last.
 No game binaries are stored in this repository.
 """
 import argparse, hashlib, json, re, struct, sys
+import openpyxl
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 COLORS = ['Red','Orange','Yellow','Light Green','Green','Blue','Light Blue','Pink','Purple','Brown','White','Black']
 CLASSES = ['Balanced','Power','Speed','Technique']
-def export(dol_path, editor_path, bone_bat_adjustment=False):
+def export(dol_path, editor_path, bone_bat_adjustment=False, league_stats_path=None):
+    if not league_stats_path:
+        raise ValueError("Supply --league-stats: original roster values are overridden by the edited league workbook, not the base DOL.")
     binary = Path(dol_path).read_bytes()
-    cfg = json.loads(re.search(r'const CFG=(.*?);\n', Path(editor_path).read_text()).group(1))
+    cfg = json.loads(re.search(r'const CFG=(.*?);\n', Path(editor_path).read_text(),re.S).group(1))
     sections = [(struct.unpack_from('>I',binary,i*4)[0],struct.unpack_from('>I',binary,0x48+i*4)[0],struct.unpack_from('>I',binary,0x90+i*4)[0]) for i in range(18)]
     def read(address,size=1):
         for offset,start,length in sections:
@@ -34,6 +39,15 @@ def export(dol_path, editor_path, bone_bat_adjustment=False):
         return value
     players=json.loads((ROOT/'src/players.json').read_text())
     def cid(p): return p['gameCharacterId'] if p['kind']=='character' else 77+COLORS.index(p['color'])
+    workbook=openpyxl.load_workbook(league_stats_path,data_only=True,read_only=True)
+    sheet=workbook['Game Data']
+    header=next(sheet.iter_rows(values_only=True))
+    def clean(value): return ' '.join(str(value).split()).lower()
+    columns={clean(name):i for i,name in enumerate(header) if name is not None}
+    names={row[0].strip().casefold():row for row in sheet.iter_rows(min_row=2,values_only=True) if isinstance(row[0],str) and row[2] in CLASSES}
+    mapping={'player class':'Class','weight':'Weight','hit trajectory':'Hitting Trajectory (sweet spot)','slap contact size':'Slap hit contact size','charge contact size':'Charge Hit Contact Size','slap hit power':'Slap Hit Power?','charge hit power':'Charge Hit Power','bunting':'Bunting','speed':'Speed','outfield throwing speed':'Throwing Speed','fielding':'Fielding','curveball speed':'Curveball Speed','charge pitch speed':'Fastball Speed','curve':'Curve','pitching stamina':'Stamina','displayed pitching':'Pitching CSS','displayed batting':'Batting CSS','displayed fielding':'Fielding CSS','displayed speed':'Speed CSS'}
+    adjustments=json.loads((ROOT/'src/player-data-adjustments.json').read_text())
+    covered=[]
     records={}
     for p in players:
         a=cid(p); values=stats(a)
@@ -43,6 +57,21 @@ def export(dol_path, editor_path, bone_bat_adjustment=False):
                 if other['kind']=='character': assert chemistry(a,cid(other))==chemistry(a+12,cid(other))
         if a==103 and bone_bat_adjustment:
             values.update({'slap contact size':60,'charge contact size':40,'slap hit power':45,'charge hit power':58})
+        if p['id']<=138:
+            name=(p.get('portraitName',p['name']) if p['kind']=='mii' else p['name']).strip().casefold()
+            if name not in names: raise ValueError(f"League workbook has no row for {p['name']}")
+            row=names[name]
+            for key, heading in mapping.items():
+                value=row[columns[clean(heading)]]
+                if key not in ['player class','hit trajectory']:
+                    value=float(str(value).strip().rstrip(','))
+                    if not value.is_integer(): raise ValueError(f"Non-integer {key} for {p['name']}")
+                    value=int(value)
+                values[key]=value
+            covered.append(p['id'])
+        if values['hit trajectory']=='Low':values['hit trajectory']='Medium'
+        if p.get('gameCharacterId') in [12,42,76]: values['hit trajectory']='Medium'
+        values.update(adjustments['players'].get(str(p['id']),{}))
         good=[];bad=[];conditional=[]
         for other in players:
             if other['id']==p['id']: continue
@@ -51,13 +80,15 @@ def export(dol_path, editor_path, bone_bat_adjustment=False):
                 conditional.append(other['id']);continue
             value=chemistry(a,cid(other))
             (good if value==2 else bad if value==0 else []).append(other['id'])
-        records[str(p['id'])]={'stats':values,'goodChemistryIds':good,'badChemistryIds':bad,'conditionalGoodChemistryIds':conditional,'miiColorProfile':p['kind']=='mii'}
+        records[str(p['id'])]={'stats':values,'goodChemistryIds':good,'badChemistryIds':bad,'conditionalGoodChemistryIds':conditional,'miiColorProfile':False,'statsSource':'league workbook' if p['id']<=138 else 'custom game DOL'}
         p['class']=values['player class']
     (ROOT/'src/players.json').write_text(json.dumps(players,indent=2)+'\n')
-    data={'source':{'label':'SSL-BoneBat game setup' if bone_bat_adjustment else 'Current SSL game setup','baselineSha256':hashlib.sha256(binary).hexdigest(),'adjustments':{'Bone Goomba':{'slap contact size':60,'charge contact size':40,'slap hit power':45,'charge hit power':58}} if bone_bat_adjustment else {},'miiNote':'Mii stats use the matching color profile. Male and female values match. Same-color Mii chemistry requires opposite genders.'},'players':records}
+    assert len(covered)==138
+    data={'source':{'label':adjustments['label'],'baselineSha256':hashlib.sha256(binary).hexdigest(),'leagueWorkbook':{'name':Path(league_stats_path).name,'sha256':hashlib.sha256(Path(league_stats_path).read_bytes()).hexdigest(),'coveredPlayerIds':covered},'adjustments':adjustments,'miiNote':'Named Mii stats follow the edited league roster. Same-color Mii chemistry requires opposite genders.'},'players':records}
     (ROOT/'src/player-data.json').write_text(json.dumps(data,indent=2)+'\n')
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('dol_path');parser.add_argument('editor_path')
     parser.add_argument('--bone-bat-adjustment',action='store_true',help='Apply the four approved BoneBat reductions to an older Gear/Tune baseline.')
-    args=parser.parse_args();export(args.dol_path,args.editor_path,args.bone_bat_adjustment)
+    parser.add_argument('--league-stats',required=True,help='Edited Game Data workbook for the original 138-player roster.')
+    args=parser.parse_args();export(args.dol_path,args.editor_path,args.bone_bat_adjustment,args.league_stats)

@@ -2,7 +2,7 @@
   {
     "id": 1,
     "name": "Mario",
-    "class": "Balanced",
+    "class": "Power",
     "color": "Red",
     "source": "Mario",
     "gameCharacterId": 0,
@@ -50,7 +50,7 @@
   {
     "id": 11,
     "name": "Wario",
-    "class": "Technique",
+    "class": "Power",
     "color": "Yellow",
     "source": "Mario",
     "gameCharacterId": 10,
@@ -62,7 +62,7 @@
   {
     "id": 12,
     "name": "Waluigi",
-    "class": "Technique",
+    "class": "Speed",
     "color": "Purple",
     "source": "Mario",
     "gameCharacterId": 11,
@@ -74,7 +74,7 @@
   {
     "id": 5,
     "name": "Peach",
-    "class": "Balanced",
+    "class": "Technique",
     "color": "Pink",
     "source": "Mario",
     "gameCharacterId": 4,
@@ -86,7 +86,7 @@
   {
     "id": 6,
     "name": "Daisy",
-    "class": "Power",
+    "class": "Balanced",
     "color": "Orange",
     "source": "Mario",
     "gameCharacterId": 5,
@@ -314,7 +314,7 @@
   {
     "id": 40,
     "name": "Dixie Kong",
-    "class": "Balanced",
+    "class": "Technique",
     "color": "Pink",
     "source": "Mario",
     "gameCharacterId": 39,
@@ -350,7 +350,7 @@
   {
     "id": 66,
     "name": "Baby DK",
-    "class": "Speed",
+    "class": "Power",
     "color": "Brown",
     "source": "Mario",
     "gameCharacterId": 65,
@@ -449,7 +449,7 @@
   {
     "id": 7,
     "name": "Yoshi",
-    "class": "Speed",
+    "class": "Technique",
     "color": "Light Green",
     "source": "Mario",
     "gameCharacterId": 6,
@@ -461,7 +461,7 @@
   {
     "id": 67,
     "name": "Red Yoshi",
-    "class": "Speed",
+    "class": "Power",
     "color": "Red",
     "source": "Mario",
     "gameCharacterId": 66,
@@ -485,7 +485,7 @@
   {
     "id": 69,
     "name": "Yellow Yoshi",
-    "class": "Speed",
+    "class": "Technique",
     "color": "Yellow",
     "source": "Mario",
     "gameCharacterId": 68,
@@ -497,7 +497,7 @@
   {
     "id": 70,
     "name": "Light Blue Yoshi",
-    "class": "Speed",
+    "class": "Balanced",
     "color": "Light Blue",
     "source": "Mario",
     "gameCharacterId": 69,
@@ -641,7 +641,7 @@
   {
     "id": 29,
     "name": "Toadsworth",
-    "class": "Balanced",
+    "class": "Technique",
     "color": "Brown",
     "source": "Mario",
     "gameCharacterId": 28,
@@ -808,7 +808,7 @@
   {
     "id": 17,
     "name": "Shy Guy",
-    "class": "Technique",
+    "class": "Balanced",
     "color": "Red",
     "source": "Mario",
     "gameCharacterId": 16,
@@ -832,7 +832,7 @@
   {
     "id": 46,
     "name": "Yellow Shy Guy",
-    "class": "Technique",
+    "class": "Speed",
     "color": "Yellow",
     "source": "Mario",
     "gameCharacterId": 45,
@@ -844,7 +844,7 @@
   {
     "id": 47,
     "name": "Green Shy Guy",
-    "class": "Technique",
+    "class": "Power",
     "color": "Green",
     "source": "Mario",
     "gameCharacterId": 46,
@@ -1335,7 +1335,7 @@
   {
     "id": 56,
     "name": "Blooper",
-    "class": "Balanced",
+    "class": "Technique",
     "color": "White",
     "source": "Mario",
     "gameCharacterId": 55,

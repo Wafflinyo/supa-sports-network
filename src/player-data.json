@@ -1,23 +1,177 @@
 {
   "source": {
-    "label": "SSL-BoneBat game setup",
-    "baselineSha256": "9f7093b79f09970b0c38db6ac0923ff42ec7f00f7b4cad80df786bd04abf8cd1",
+    "label": "Current SSL league setup",
+    "baselineSha256": "e5a4617758ae8fc6ea2a1fe04bfe70eae2a1746cd826afdf3ea039af3b07f94a",
+    "leagueWorkbook": {
+      "name": "Untitled spreadsheet-3.xlsx",
+      "sha256": "85c05eeacdfd591d5f8c377440d96c6a6f44b1c8f7338ef5795a020ff41442be",
+      "coveredPlayerIds": [
+        1,
+        2,
+        8,
+        9,
+        11,
+        12,
+        5,
+        6,
+        64,
+        65,
+        10,
+        20,
+        3,
+        4,
+        40,
+        57,
+        58,
+        66,
+        59,
+        60,
+        61,
+        62,
+        63,
+        7,
+        67,
+        68,
+        69,
+        70,
+        71,
+        18,
+        14,
+        30,
+        31,
+        32,
+        33,
+        16,
+        29,
+        13,
+        43,
+        21,
+        44,
+        49,
+        50,
+        51,
+        52,
+        17,
+        45,
+        46,
+        47,
+        48,
+        34,
+        35,
+        36,
+        37,
+        28,
+        53,
+        54,
+        15,
+        38,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        41,
+        42,
+        19,
+        39,
+        55,
+        56,
+        72,
+        73,
+        74,
+        75,
+        76,
+        118,
+        77,
+        78,
+        79,
+        119,
+        120,
+        80,
+        81,
+        82,
+        83,
+        121,
+        136,
+        84,
+        85,
+        86,
+        122,
+        123,
+        87,
+        88,
+        89,
+        90,
+        91,
+        124,
+        97,
+        98,
+        99,
+        100,
+        126,
+        92,
+        93,
+        94,
+        95,
+        96,
+        125,
+        101,
+        102,
+        103,
+        104,
+        127,
+        137,
+        105,
+        106,
+        107,
+        128,
+        129,
+        108,
+        109,
+        110,
+        130,
+        131,
+        132,
+        111,
+        112,
+        113,
+        133,
+        134,
+        138,
+        114,
+        115,
+        116,
+        117,
+        135
+      ]
+    },
     "adjustments": {
-      "Bone Goomba": {
-        "slap contact size": 60,
-        "charge contact size": 40,
-        "slap hit power": 45,
-        "charge hit power": 58
+      "label": "Current SSL league setup",
+      "rules": {
+        "minimumTrajectory": "Medium",
+        "koopaTroopaTrajectory": "Medium"
+      },
+      "players": {
+        "174": {
+          "slap contact size": 60,
+          "charge contact size": 40,
+          "slap hit power": 45,
+          "charge hit power": 58
+        },
+        "141": {
+          "hit trajectory": "High"
+        }
       }
     },
-    "miiNote": "Mii stats use the matching color profile. Male and female values match. Same-color Mii chemistry requires opposite genders."
+    "miiNote": "Named Mii stats follow the edited league roster. Same-color Mii chemistry requires opposite genders."
   },
   "players": {
     "1": {
       "stats": {
-        "player class": "Balanced",
+        "player class": "Power",
         "pitching stamina": 87,
-        "weight": 2,
+        "weight": 3,
         "fielding ability": 0,
         "baserunning ability": 7,
         "slap contact size": 75,
@@ -88,7 +242,8 @@
         38
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "2": {
       "stats": {
@@ -158,7 +313,8 @@
         38
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "8": {
       "stats": {
@@ -167,18 +323,18 @@
         "weight": 0,
         "fielding ability": 0,
         "baserunning ability": 7,
-        "slap contact size": 60,
-        "charge contact size": 40,
-        "slap hit power": 20,
-        "charge hit power": 30,
+        "slap contact size": 65,
+        "charge contact size": 45,
+        "slap hit power": 30,
+        "charge hit power": 35,
         "hit trajectory": "Medium",
         "bunting": 40,
         "speed": 80,
-        "outfield throwing speed": 30,
-        "fielding": 40,
+        "outfield throwing speed": 60,
+        "fielding": 60,
         "displayed pitching": 5,
-        "displayed batting": 3,
-        "displayed fielding": 4,
+        "displayed batting": 4,
+        "displayed fielding": 5,
         "displayed speed": 8,
         "curveball speed": 110,
         "charge pitch speed": 118,
@@ -229,7 +385,8 @@
         39
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "9": {
       "stats": {
@@ -238,18 +395,18 @@
         "weight": 0,
         "fielding ability": 2,
         "baserunning ability": 0,
-        "slap contact size": 55,
-        "charge contact size": 35,
-        "slap hit power": 10,
-        "charge hit power": 20,
+        "slap contact size": 60,
+        "charge contact size": 40,
+        "slap hit power": 20,
+        "charge hit power": 25,
         "hit trajectory": "Medium",
         "bunting": 40,
         "speed": 80,
-        "outfield throwing speed": 20,
-        "fielding": 50,
+        "outfield throwing speed": 50,
+        "fielding": 70,
         "displayed pitching": 5,
         "displayed batting": 2,
-        "displayed fielding": 5,
+        "displayed fielding": 7,
         "displayed speed": 8,
         "curveball speed": 109,
         "charge pitch speed": 119,
@@ -298,11 +455,12 @@
         39
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "11": {
       "stats": {
-        "player class": "Technique",
+        "player class": "Power",
         "pitching stamina": 98,
         "weight": 3,
         "fielding ability": 11,
@@ -311,7 +469,7 @@
         "charge contact size": 40,
         "slap hit power": 50,
         "charge hit power": 80,
-        "hit trajectory": "Medium",
+        "hit trajectory": "High",
         "bunting": 10,
         "speed": 40,
         "outfield throwing speed": 80,
@@ -357,11 +515,12 @@
         18
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "12": {
       "stats": {
-        "player class": "Technique",
+        "player class": "Speed",
         "pitching stamina": 59,
         "weight": 3,
         "fielding ability": 12,
@@ -413,19 +572,20 @@
         18
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "5": {
       "stats": {
-        "player class": "Balanced",
-        "pitching stamina": 63,
+        "player class": "Technique",
+        "pitching stamina": 80,
         "weight": 2,
         "fielding ability": 12,
         "baserunning ability": 0,
         "slap contact size": 80,
         "charge contact size": 60,
-        "slap hit power": 20,
-        "charge hit power": 40,
+        "slap hit power": 35,
+        "charge hit power": 45,
         "hit trajectory": "Medium",
         "bunting": 50,
         "speed": 50,
@@ -476,22 +636,23 @@
         18
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "6": {
       "stats": {
-        "player class": "Power",
+        "player class": "Balanced",
         "pitching stamina": 66,
         "weight": 2,
         "fielding ability": 1,
         "baserunning ability": 0,
-        "slap contact size": 70,
-        "charge contact size": 50,
+        "slap contact size": 75,
+        "charge contact size": 55,
         "slap hit power": 40,
-        "charge hit power": 60,
+        "charge hit power": 80,
         "hit trajectory": "Medium",
         "bunting": 40,
-        "speed": 50,
+        "speed": 60,
         "outfield throwing speed": 60,
         "fielding": 80,
         "displayed pitching": 7,
@@ -533,7 +694,8 @@
         145
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "155": {
       "stats": {
@@ -582,7 +744,8 @@
         38
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "161": {
       "stats": {
@@ -628,26 +791,27 @@
         39
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "64": {
       "stats": {
         "player class": "Balanced",
-        "pitching stamina": 30,
+        "pitching stamina": 60,
         "weight": 0,
         "fielding ability": 12,
         "baserunning ability": 0,
         "slap contact size": 70,
         "charge contact size": 55,
-        "slap hit power": 15,
-        "charge hit power": 25,
+        "slap hit power": 25,
+        "charge hit power": 30,
         "hit trajectory": "Medium",
         "bunting": 50,
         "speed": 60,
         "outfield throwing speed": 30,
         "fielding": 50,
         "displayed pitching": 8,
-        "displayed batting": 2,
+        "displayed batting": 3,
         "displayed fielding": 5,
         "displayed speed": 6,
         "curveball speed": 105,
@@ -703,26 +867,27 @@
         39
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "65": {
       "stats": {
         "player class": "Power",
-        "pitching stamina": 35,
+        "pitching stamina": 55,
         "weight": 0,
         "fielding ability": 1,
         "baserunning ability": 0,
         "slap contact size": 70,
-        "charge contact size": 50,
-        "slap hit power": 20,
-        "charge hit power": 40,
+        "charge contact size": 65,
+        "slap hit power": 35,
+        "charge hit power": 50,
         "hit trajectory": "Medium",
         "bunting": 50,
         "speed": 60,
         "outfield throwing speed": 40,
-        "fielding": 50,
-        "displayed pitching": 6,
-        "displayed batting": 4,
+        "fielding": 55,
+        "displayed pitching": 7,
+        "displayed batting": 6,
         "displayed fielding": 5,
         "displayed speed": 6,
         "curveball speed": 115,
@@ -764,7 +929,8 @@
         39
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "10": {
       "stats": {
@@ -857,7 +1023,8 @@
         163
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "20": {
       "stats": {
@@ -872,8 +1039,8 @@
         "charge hit power": 70,
         "hit trajectory": "Medium",
         "bunting": 20,
-        "speed": 70,
-        "outfield throwing speed": 68,
+        "speed": 80,
+        "outfield throwing speed": 78,
         "fielding": 42,
         "displayed pitching": 5,
         "displayed batting": 7,
@@ -937,7 +1104,8 @@
         163
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "167": {
       "stats": {
@@ -997,7 +1165,8 @@
         141
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "168": {
       "stats": {
@@ -1058,7 +1227,8 @@
         141
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "169": {
       "stats": {
@@ -1116,7 +1286,8 @@
         141
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "170": {
       "stats": {
@@ -1166,7 +1337,8 @@
         155
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "171": {
       "stats": {
@@ -1221,7 +1393,8 @@
         16
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "172": {
       "stats": {
@@ -1272,7 +1445,8 @@
         4
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "173": {
       "stats": {
@@ -1317,7 +1491,8 @@
         16
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "164": {
       "stats": {
@@ -1373,7 +1548,8 @@
         141
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "165": {
       "stats": {
@@ -1425,7 +1601,8 @@
         16
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "162": {
       "stats": {
@@ -1482,7 +1659,8 @@
         160
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "3": {
       "stats": {
@@ -1531,12 +1709,13 @@
         63
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "4": {
       "stats": {
         "player class": "Technique",
-        "pitching stamina": 65,
+        "pitching stamina": 70,
         "weight": 1,
         "fielding ability": 9,
         "baserunning ability": 0,
@@ -1546,13 +1725,13 @@
         "charge hit power": 40,
         "hit trajectory": "Medium",
         "bunting": 40,
-        "speed": 65,
+        "speed": 76,
         "outfield throwing speed": 40,
         "fielding": 84,
         "displayed pitching": 5,
         "displayed batting": 4,
         "displayed fielding": 8,
-        "displayed speed": 6,
+        "displayed speed": 7,
         "curveball speed": 125,
         "charge pitch speed": 134,
         "curve": 55
@@ -1576,11 +1755,12 @@
         63
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "40": {
       "stats": {
-        "player class": "Balanced",
+        "player class": "Technique",
         "pitching stamina": 48,
         "weight": 1,
         "fielding ability": 9,
@@ -1632,7 +1812,8 @@
         147
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "57": {
       "stats": {
@@ -1681,7 +1862,8 @@
         63
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "58": {
       "stats": {
@@ -1692,15 +1874,15 @@
         "baserunning ability": 0,
         "slap contact size": 68,
         "charge contact size": 50,
-        "slap hit power": 30,
-        "charge hit power": 50,
+        "slap hit power": 40,
+        "charge hit power": 55,
         "hit trajectory": "Medium",
         "bunting": 50,
         "speed": 55,
-        "outfield throwing speed": 40,
+        "outfield throwing speed": 50,
         "fielding": 75,
-        "displayed pitching": 5,
-        "displayed batting": 5,
+        "displayed pitching": 7,
+        "displayed batting": 6,
         "displayed fielding": 7,
         "displayed speed": 5,
         "curveball speed": 126,
@@ -1730,11 +1912,12 @@
         18
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "66": {
       "stats": {
-        "player class": "Speed",
+        "player class": "Power",
         "pitching stamina": 47,
         "weight": 0,
         "fielding ability": 9,
@@ -1799,7 +1982,8 @@
         39
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "166": {
       "stats": {
@@ -1844,7 +2028,8 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "59": {
       "stats": {
@@ -1896,12 +2081,13 @@
         66
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "60": {
       "stats": {
         "player class": "Power",
-        "pitching stamina": 68,
+        "pitching stamina": 73,
         "weight": 3,
         "fielding ability": 8,
         "baserunning ability": 0,
@@ -1948,7 +2134,8 @@
         66
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "61": {
       "stats": {
@@ -2000,7 +2187,8 @@
         66
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "62": {
       "stats": {
@@ -2052,7 +2240,8 @@
         66
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "143": {
       "stats": {
@@ -2105,7 +2294,8 @@
         66
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "63": {
       "stats": {
@@ -2161,18 +2351,19 @@
         66
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "7": {
       "stats": {
-        "player class": "Speed",
+        "player class": "Technique",
         "pitching stamina": 60,
         "weight": 2,
         "fielding ability": 3,
         "baserunning ability": 0,
         "slap contact size": 55,
         "charge contact size": 35,
-        "slap hit power": 30,
+        "slap hit power": 35,
         "charge hit power": 45,
         "hit trajectory": "Medium",
         "bunting": 40,
@@ -2183,9 +2374,9 @@
         "displayed batting": 4,
         "displayed fielding": 6,
         "displayed speed": 9,
-        "curveball speed": 126,
+        "curveball speed": 121,
         "charge pitch speed": 135,
-        "curve": 40
+        "curve": 85
       },
       "goodChemistryIds": [
         1,
@@ -2233,11 +2424,12 @@
         38
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "67": {
       "stats": {
-        "player class": "Speed",
+        "player class": "Power",
         "pitching stamina": 60,
         "weight": 2,
         "fielding ability": 3,
@@ -2245,7 +2437,7 @@
         "slap contact size": 60,
         "charge contact size": 45,
         "slap hit power": 30,
-        "charge hit power": 45,
+        "charge hit power": 50,
         "hit trajectory": "Medium",
         "bunting": 35,
         "speed": 80,
@@ -2306,7 +2498,8 @@
         38
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "68": {
       "stats": {
@@ -2315,15 +2508,15 @@
         "weight": 2,
         "fielding ability": 3,
         "baserunning ability": 0,
-        "slap contact size": 50,
+        "slap contact size": 55,
         "charge contact size": 40,
         "slap hit power": 25,
         "charge hit power": 35,
         "hit trajectory": "Medium",
         "bunting": 35,
         "speed": 80,
-        "outfield throwing speed": 35,
-        "fielding": 50,
+        "outfield throwing speed": 40,
+        "fielding": 60,
         "displayed pitching": 4,
         "displayed batting": 2,
         "displayed fielding": 6,
@@ -2379,23 +2572,24 @@
         38
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "69": {
       "stats": {
-        "player class": "Speed",
+        "player class": "Technique",
         "pitching stamina": 60,
         "weight": 2,
         "fielding ability": 3,
         "baserunning ability": 0,
         "slap contact size": 60,
         "charge contact size": 45,
-        "slap hit power": 30,
-        "charge hit power": 45,
+        "slap hit power": 35,
+        "charge hit power": 55,
         "hit trajectory": "Medium",
         "bunting": 40,
-        "speed": 75,
-        "outfield throwing speed": 35,
+        "speed": 70,
+        "outfield throwing speed": 40,
         "fielding": 50,
         "displayed pitching": 3,
         "displayed batting": 4,
@@ -2452,24 +2646,25 @@
         38
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "70": {
       "stats": {
-        "player class": "Speed",
+        "player class": "Balanced",
         "pitching stamina": 60,
         "weight": 2,
         "fielding ability": 3,
         "baserunning ability": 0,
         "slap contact size": 55,
         "charge contact size": 45,
-        "slap hit power": 30,
-        "charge hit power": 40,
+        "slap hit power": 35,
+        "charge hit power": 45,
         "hit trajectory": "Medium",
         "bunting": 35,
         "speed": 80,
-        "outfield throwing speed": 35,
-        "fielding": 50,
+        "outfield throwing speed": 40,
+        "fielding": 55,
         "displayed pitching": 3,
         "displayed batting": 3,
         "displayed fielding": 6,
@@ -2524,7 +2719,8 @@
         38
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "71": {
       "stats": {
@@ -2535,12 +2731,12 @@
         "baserunning ability": 0,
         "slap contact size": 55,
         "charge contact size": 45,
-        "slap hit power": 30,
+        "slap hit power": 35,
         "charge hit power": 40,
         "hit trajectory": "Medium",
         "bunting": 35,
-        "speed": 85,
-        "outfield throwing speed": 35,
+        "speed": 90,
+        "outfield throwing speed": 45,
         "fielding": 50,
         "displayed pitching": 2,
         "displayed batting": 3,
@@ -2597,7 +2793,8 @@
         38
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "139": {
       "stats": {
@@ -2663,7 +2860,8 @@
         38
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "140": {
       "stats": {
@@ -2730,7 +2928,8 @@
         38
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "18": {
       "stats": {
@@ -2740,7 +2939,7 @@
         "fielding ability": 4,
         "baserunning ability": 0,
         "slap contact size": 60,
-        "charge contact size": 40,
+        "charge contact size": 45,
         "slap hit power": 48,
         "charge hit power": 78,
         "hit trajectory": "Medium",
@@ -2796,12 +2995,13 @@
         58
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "14": {
       "stats": {
         "player class": "Speed",
-        "pitching stamina": 52,
+        "pitching stamina": 57,
         "weight": 0,
         "fielding ability": 0,
         "baserunning ability": 7,
@@ -2854,7 +3054,8 @@
         176
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "30": {
       "stats": {
@@ -2912,7 +3113,8 @@
         176
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "31": {
       "stats": {
@@ -2970,7 +3172,8 @@
         176
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "32": {
       "stats": {
@@ -3028,12 +3231,13 @@
         176
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "33": {
       "stats": {
         "player class": "Speed",
-        "pitching stamina": 52,
+        "pitching stamina": 57,
         "weight": 0,
         "fielding ability": 0,
         "baserunning ability": 7,
@@ -3085,7 +3289,8 @@
         176
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "141": {
       "stats": {
@@ -3098,7 +3303,7 @@
         "charge contact size": 25,
         "slap hit power": 40,
         "charge hit power": 60,
-        "hit trajectory": "Medium",
+        "hit trajectory": "High",
         "bunting": 30,
         "speed": 75,
         "outfield throwing speed": 55,
@@ -3143,7 +3348,8 @@
         176
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "16": {
       "stats": {
@@ -3154,13 +3360,13 @@
         "baserunning ability": 7,
         "slap contact size": 70,
         "charge contact size": 50,
-        "slap hit power": 20,
-        "charge hit power": 30,
+        "slap hit power": 25,
+        "charge hit power": 45,
         "hit trajectory": "Medium",
         "bunting": 30,
         "speed": 80,
         "outfield throwing speed": 30,
-        "fielding": 40,
+        "fielding": 50,
         "displayed pitching": 5,
         "displayed batting": 3,
         "displayed fielding": 4,
@@ -3205,20 +3411,21 @@
         176
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "29": {
       "stats": {
-        "player class": "Balanced",
-        "pitching stamina": 33,
+        "player class": "Technique",
+        "pitching stamina": 60,
         "weight": 0,
         "fielding ability": 0,
         "baserunning ability": 7,
         "slap contact size": 65,
         "charge contact size": 45,
-        "slap hit power": 20,
-        "charge hit power": 30,
-        "hit trajectory": "Medium",
+        "slap hit power": 25,
+        "charge hit power": 45,
+        "hit trajectory": "High",
         "bunting": 50,
         "speed": 35,
         "outfield throwing speed": 60,
@@ -3268,7 +3475,8 @@
         176
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "13": {
       "stats": {
@@ -3326,7 +3534,8 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "43": {
       "stats": {
@@ -3384,7 +3593,8 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "144": {
       "stats": {
@@ -3442,7 +3652,8 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "21": {
       "stats": {
@@ -3500,7 +3711,8 @@
         29
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "44": {
       "stats": {
@@ -3558,7 +3770,8 @@
         29
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "150": {
       "stats": {
@@ -3616,7 +3829,8 @@
         29
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "49": {
       "stats": {
@@ -3681,7 +3895,8 @@
         40
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "50": {
       "stats": {
@@ -3746,12 +3961,13 @@
         40
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "51": {
       "stats": {
         "player class": "Balanced",
-        "pitching stamina": 44,
+        "pitching stamina": 49,
         "weight": 1,
         "fielding ability": 0,
         "baserunning ability": 1,
@@ -3764,7 +3980,7 @@
         "speed": 50,
         "outfield throwing speed": 70,
         "fielding": 38,
-        "displayed pitching": 5,
+        "displayed pitching": 7,
         "displayed batting": 7,
         "displayed fielding": 4,
         "displayed speed": 5,
@@ -3811,7 +4027,8 @@
         40
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "52": {
       "stats": {
@@ -3876,7 +4093,8 @@
         40
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "146": {
       "stats": {
@@ -3946,7 +4164,8 @@
         40
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "147": {
       "stats": {
@@ -4017,24 +4236,25 @@
         40
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "17": {
       "stats": {
-        "player class": "Technique",
+        "player class": "Balanced",
         "pitching stamina": 62,
         "weight": 1,
         "fielding ability": 1,
         "baserunning ability": 0,
-        "slap contact size": 60,
-        "charge contact size": 40,
-        "slap hit power": 35,
-        "charge hit power": 55,
+        "slap contact size": 65,
+        "charge contact size": 45,
+        "slap hit power": 40,
+        "charge hit power": 60,
         "hit trajectory": "Medium",
         "bunting": 44,
-        "speed": 45,
-        "outfield throwing speed": 55,
-        "fielding": 70,
+        "speed": 50,
+        "outfield throwing speed": 60,
+        "fielding": 75,
         "displayed pitching": 4,
         "displayed batting": 5,
         "displayed fielding": 7,
@@ -4089,7 +4309,8 @@
         140
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "45": {
       "stats": {
@@ -4098,13 +4319,13 @@
         "weight": 1,
         "fielding ability": 1,
         "baserunning ability": 0,
-        "slap contact size": 55,
-        "charge contact size": 35,
-        "slap hit power": 30,
-        "charge hit power": 50,
+        "slap contact size": 60,
+        "charge contact size": 40,
+        "slap hit power": 35,
+        "charge hit power": 55,
         "hit trajectory": "Medium",
         "bunting": 44,
-        "speed": 45,
+        "speed": 65,
         "outfield throwing speed": 55,
         "fielding": 70,
         "displayed pitching": 5,
@@ -4161,31 +4382,32 @@
         140
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "46": {
       "stats": {
-        "player class": "Technique",
-        "pitching stamina": 62,
+        "player class": "Speed",
+        "pitching stamina": 67,
         "weight": 1,
         "fielding ability": 1,
         "baserunning ability": 0,
         "slap contact size": 55,
         "charge contact size": 35,
-        "slap hit power": 30,
+        "slap hit power": 55,
         "charge hit power": 50,
         "hit trajectory": "Medium",
         "bunting": 44,
         "speed": 55,
         "outfield throwing speed": 55,
         "fielding": 70,
-        "displayed pitching": 4,
+        "displayed pitching": 7,
         "displayed batting": 4,
         "displayed fielding": 7,
         "displayed speed": 5,
-        "curveball speed": 116,
-        "charge pitch speed": 130,
-        "curve": 42
+        "curveball speed": 126,
+        "charge pitch speed": 140,
+        "curve": 67
       },
       "goodChemistryIds": [
         11,
@@ -4233,19 +4455,20 @@
         140
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "47": {
       "stats": {
-        "player class": "Technique",
+        "player class": "Power",
         "pitching stamina": 62,
         "weight": 1,
         "fielding ability": 1,
         "baserunning ability": 0,
         "slap contact size": 60,
-        "charge contact size": 40,
-        "slap hit power": 35,
-        "charge hit power": 55,
+        "charge contact size": 50,
+        "slap hit power": 40,
+        "charge hit power": 65,
         "hit trajectory": "Medium",
         "bunting": 44,
         "speed": 55,
@@ -4305,7 +4528,8 @@
         140
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "48": {
       "stats": {
@@ -4315,13 +4539,13 @@
         "fielding ability": 1,
         "baserunning ability": 0,
         "slap contact size": 55,
-        "charge contact size": 35,
-        "slap hit power": 30,
+        "charge contact size": 40,
+        "slap hit power": 35,
         "charge hit power": 50,
         "hit trajectory": "Medium",
         "bunting": 44,
-        "speed": 45,
-        "outfield throwing speed": 55,
+        "speed": 55,
+        "outfield throwing speed": 70,
         "fielding": 75,
         "displayed pitching": 4,
         "displayed batting": 4,
@@ -4376,7 +4600,8 @@
         140
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "151": {
       "stats": {
@@ -4453,7 +4678,8 @@
         140
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "152": {
       "stats": {
@@ -4531,12 +4757,13 @@
         140
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "34": {
       "stats": {
         "player class": "Balanced",
-        "pitching stamina": 31,
+        "pitching stamina": 41,
         "weight": 2,
         "fielding ability": 5,
         "baserunning ability": 0,
@@ -4601,12 +4828,13 @@
         140
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "35": {
       "stats": {
         "player class": "Balanced",
-        "pitching stamina": 31,
+        "pitching stamina": 41,
         "weight": 2,
         "fielding ability": 5,
         "baserunning ability": 0,
@@ -4671,12 +4899,13 @@
         140
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "36": {
       "stats": {
         "player class": "Balanced",
-        "pitching stamina": 31,
+        "pitching stamina": 41,
         "weight": 2,
         "fielding ability": 5,
         "baserunning ability": 0,
@@ -4741,12 +4970,13 @@
         140
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "37": {
       "stats": {
         "player class": "Balanced",
-        "pitching stamina": 31,
+        "pitching stamina": 41,
         "weight": 2,
         "fielding ability": 5,
         "baserunning ability": 0,
@@ -4811,7 +5041,8 @@
         140
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "153": {
       "stats": {
@@ -4886,7 +5117,8 @@
         140
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "154": {
       "stats": {
@@ -4962,7 +5194,8 @@
         140
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "28": {
       "stats": {
@@ -5025,7 +5258,8 @@
         149
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "53": {
       "stats": {
@@ -5035,7 +5269,7 @@
         "fielding ability": 7,
         "baserunning ability": 0,
         "slap contact size": 55,
-        "charge contact size": 20,
+        "charge contact size": 25,
         "slap hit power": 10,
         "charge hit power": 88,
         "hit trajectory": "High",
@@ -5087,20 +5321,21 @@
         149
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "54": {
       "stats": {
         "player class": "Power",
-        "pitching stamina": 69,
+        "pitching stamina": 74,
         "weight": 3,
         "fielding ability": 7,
         "baserunning ability": 0,
         "slap contact size": 55,
-        "charge contact size": 20,
+        "charge contact size": 25,
         "slap hit power": 10,
         "charge hit power": 85,
-        "hit trajectory": "Medium",
+        "hit trajectory": "High",
         "bunting": 10,
         "speed": 30,
         "outfield throwing speed": 80,
@@ -5149,7 +5384,8 @@
         149
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "145": {
       "stats": {
@@ -5217,19 +5453,20 @@
         149
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "15": {
       "stats": {
         "player class": "Speed",
-        "pitching stamina": 43,
+        "pitching stamina": 50,
         "weight": 1,
         "fielding ability": 0,
         "baserunning ability": 4,
         "slap contact size": 75,
         "charge contact size": 55,
-        "slap hit power": 20,
-        "charge hit power": 30,
+        "slap hit power": 30,
+        "charge hit power": 40,
         "hit trajectory": "Medium",
         "bunting": 40,
         "speed": 44,
@@ -5298,7 +5535,8 @@
         140
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "38": {
       "stats": {
@@ -5311,7 +5549,7 @@
         "charge contact size": 45,
         "slap hit power": 50,
         "charge hit power": 70,
-        "hit trajectory": "Medium",
+        "hit trajectory": "High",
         "bunting": 20,
         "speed": 40,
         "outfield throwing speed": 70,
@@ -5370,7 +5608,8 @@
         159
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "156": {
       "stats": {
@@ -5424,7 +5663,8 @@
         38
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "157": {
       "stats": {
@@ -5478,7 +5718,8 @@
         38
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "158": {
       "stats": {
@@ -5532,7 +5773,8 @@
         38
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "159": {
       "stats": {
@@ -5586,7 +5828,8 @@
         38
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "160": {
       "stats": {
@@ -5638,12 +5881,13 @@
         162
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "22": {
       "stats": {
         "player class": "Speed",
-        "pitching stamina": 67,
+        "pitching stamina": 72,
         "weight": 4,
         "fielding ability": 11,
         "baserunning ability": 0,
@@ -5695,7 +5939,8 @@
         39
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "23": {
       "stats": {
@@ -5752,7 +5997,8 @@
         39
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "24": {
       "stats": {
@@ -5809,7 +6055,8 @@
         39
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "142": {
       "stats": {
@@ -5865,12 +6112,13 @@
         39
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "25": {
       "stats": {
         "player class": "Balanced",
-        "pitching stamina": 42,
+        "pitching stamina": 47,
         "weight": 1,
         "fielding ability": 10,
         "baserunning ability": 0,
@@ -5880,13 +6128,13 @@
         "charge hit power": 40,
         "hit trajectory": "Medium",
         "bunting": 40,
-        "speed": 70,
+        "speed": 99,
         "outfield throwing speed": 40,
         "fielding": 40,
         "displayed pitching": 5,
         "displayed batting": 4,
         "displayed fielding": 4,
-        "displayed speed": 7,
+        "displayed speed": 10,
         "curveball speed": 116,
         "charge pitch speed": 138,
         "curve": 58
@@ -5917,7 +6165,8 @@
         39
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "26": {
       "stats": {
@@ -5932,13 +6181,13 @@
         "charge hit power": 40,
         "hit trajectory": "Medium",
         "bunting": 40,
-        "speed": 70,
+        "speed": 99,
         "outfield throwing speed": 40,
         "fielding": 45,
         "displayed pitching": 4,
         "displayed batting": 4,
         "displayed fielding": 5,
-        "displayed speed": 7,
+        "displayed speed": 10,
         "curveball speed": 120,
         "charge pitch speed": 132,
         "curve": 49
@@ -5969,7 +6218,8 @@
         39
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "27": {
       "stats": {
@@ -5984,13 +6234,13 @@
         "charge hit power": 45,
         "hit trajectory": "Medium",
         "bunting": 45,
-        "speed": 70,
+        "speed": 99,
         "outfield throwing speed": 45,
         "fielding": 40,
         "displayed pitching": 4,
         "displayed batting": 5,
         "displayed fielding": 4,
-        "displayed speed": 7,
+        "displayed speed": 10,
         "curveball speed": 120,
         "charge pitch speed": 132,
         "curve": 49
@@ -6021,7 +6271,8 @@
         39
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "148": {
       "stats": {
@@ -6079,7 +6330,8 @@
         39
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "149": {
       "stats": {
@@ -6137,7 +6389,8 @@
         39
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "163": {
       "stats": {
@@ -6188,7 +6441,8 @@
         20
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "41": {
       "stats": {
@@ -6198,16 +6452,16 @@
         "fielding ability": 10,
         "baserunning ability": 0,
         "slap contact size": 60,
-        "charge contact size": 40,
-        "slap hit power": 20,
-        "charge hit power": 40,
+        "charge contact size": 45,
+        "slap hit power": 30,
+        "charge hit power": 45,
         "hit trajectory": "Medium",
         "bunting": 90,
-        "speed": 40,
-        "outfield throwing speed": 50,
+        "speed": 60,
+        "outfield throwing speed": 70,
         "fielding": 60,
         "displayed pitching": 6,
-        "displayed batting": 3,
+        "displayed batting": 4,
         "displayed fielding": 6,
         "displayed speed": 4,
         "curveball speed": 90,
@@ -6253,7 +6507,8 @@
         142
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "174": {
       "stats": {
@@ -6318,7 +6573,8 @@
         142
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "42": {
       "stats": {
@@ -6329,15 +6585,15 @@
         "baserunning ability": 0,
         "slap contact size": 60,
         "charge contact size": 40,
-        "slap hit power": 20,
+        "slap hit power": 30,
         "charge hit power": 40,
         "hit trajectory": "Medium",
         "bunting": 50,
-        "speed": 50,
-        "outfield throwing speed": 45,
+        "speed": 55,
+        "outfield throwing speed": 55,
         "fielding": 65,
         "displayed pitching": 6,
-        "displayed batting": 3,
+        "displayed batting": 4,
         "displayed fielding": 7,
         "displayed speed": 5,
         "curveball speed": 110,
@@ -6379,7 +6635,8 @@
         29
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "176": {
       "stats": {
@@ -6440,7 +6697,8 @@
         29
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "19": {
       "stats": {
@@ -6453,7 +6711,7 @@
         "charge contact size": 45,
         "slap hit power": 30,
         "charge hit power": 50,
-        "hit trajectory": "Medium",
+        "hit trajectory": "High",
         "bunting": 60,
         "speed": 70,
         "outfield throwing speed": 50,
@@ -6498,7 +6756,8 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "178": {
       "stats": {
@@ -6556,7 +6815,8 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "39": {
       "stats": {
@@ -6623,7 +6883,8 @@
         149
       ],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "55": {
       "stats": {
@@ -6672,7 +6933,8 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "175": {
       "stats": {
@@ -6732,11 +6994,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "56": {
       "stats": {
-        "player class": "Balanced",
+        "player class": "Technique",
         "pitching stamina": 57,
         "weight": 2,
         "fielding ability": 0,
@@ -6747,13 +7010,13 @@
         "charge hit power": 50,
         "hit trajectory": "Medium",
         "bunting": 60,
-        "speed": 50,
+        "speed": 85,
         "outfield throwing speed": 50,
         "fielding": 50,
         "displayed pitching": 6,
         "displayed batting": 4,
         "displayed fielding": 5,
-        "displayed speed": 6,
+        "displayed speed": 8,
         "curveball speed": 100,
         "charge pitch speed": 112,
         "curve": 46
@@ -6787,7 +7050,8 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "177": {
       "stats": {
@@ -6841,7 +7105,8 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
-      "miiColorProfile": false
+      "miiColorProfile": false,
+      "statsSource": "custom game DOL"
     },
     "72": {
       "stats": {
@@ -6895,7 +7160,8 @@
         76,
         118
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "73": {
       "stats": {
@@ -6949,7 +7215,8 @@
         76,
         118
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "74": {
       "stats": {
@@ -7003,7 +7270,8 @@
         76,
         118
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "75": {
       "stats": {
@@ -7057,7 +7325,8 @@
         76,
         118
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "76": {
       "stats": {
@@ -7111,7 +7380,8 @@
         75,
         118
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "118": {
       "stats": {
@@ -7165,7 +7435,8 @@
         75,
         76
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "77": {
       "stats": {
@@ -7205,7 +7476,8 @@
         119,
         120
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "78": {
       "stats": {
@@ -7245,7 +7517,8 @@
         119,
         120
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "79": {
       "stats": {
@@ -7285,7 +7558,8 @@
         119,
         120
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "119": {
       "stats": {
@@ -7325,7 +7599,8 @@
         79,
         120
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "120": {
       "stats": {
@@ -7365,7 +7640,8 @@
         79,
         119
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "80": {
       "stats": {
@@ -7413,7 +7689,8 @@
         121,
         136
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "81": {
       "stats": {
@@ -7461,7 +7738,8 @@
         121,
         136
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "82": {
       "stats": {
@@ -7509,7 +7787,8 @@
         121,
         136
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "83": {
       "stats": {
@@ -7557,7 +7836,8 @@
         121,
         136
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "121": {
       "stats": {
@@ -7605,7 +7885,8 @@
         83,
         136
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "136": {
       "stats": {
@@ -7653,7 +7934,8 @@
         83,
         121
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "84": {
       "stats": {
@@ -7692,7 +7974,8 @@
         122,
         123
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "85": {
       "stats": {
@@ -7731,7 +8014,8 @@
         122,
         123
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "86": {
       "stats": {
@@ -7770,7 +8054,8 @@
         122,
         123
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "122": {
       "stats": {
@@ -7809,7 +8094,8 @@
         86,
         123
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "123": {
       "stats": {
@@ -7848,7 +8134,8 @@
         86,
         122
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "87": {
       "stats": {
@@ -7900,7 +8187,8 @@
         91,
         124
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "88": {
       "stats": {
@@ -7952,7 +8240,8 @@
         91,
         124
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "89": {
       "stats": {
@@ -8004,7 +8293,8 @@
         91,
         124
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "90": {
       "stats": {
@@ -8056,7 +8346,8 @@
         91,
         124
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "91": {
       "stats": {
@@ -8108,7 +8399,8 @@
         90,
         124
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "124": {
       "stats": {
@@ -8160,7 +8452,8 @@
         90,
         91
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "97": {
       "stats": {
@@ -8204,7 +8497,8 @@
         100,
         126
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "98": {
       "stats": {
@@ -8248,7 +8542,8 @@
         100,
         126
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "99": {
       "stats": {
@@ -8292,7 +8587,8 @@
         100,
         126
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "100": {
       "stats": {
@@ -8336,7 +8632,8 @@
         99,
         126
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "126": {
       "stats": {
@@ -8380,7 +8677,8 @@
         99,
         100
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "92": {
       "stats": {
@@ -8434,7 +8732,8 @@
         96,
         125
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "93": {
       "stats": {
@@ -8488,7 +8787,8 @@
         96,
         125
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "94": {
       "stats": {
@@ -8542,7 +8842,8 @@
         96,
         125
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "95": {
       "stats": {
@@ -8596,7 +8897,8 @@
         96,
         125
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "96": {
       "stats": {
@@ -8650,7 +8952,8 @@
         95,
         125
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "125": {
       "stats": {
@@ -8704,7 +9007,8 @@
         95,
         96
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "101": {
       "stats": {
@@ -8750,7 +9054,8 @@
         127,
         137
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "102": {
       "stats": {
@@ -8796,7 +9101,8 @@
         127,
         137
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "103": {
       "stats": {
@@ -8842,7 +9148,8 @@
         127,
         137
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "104": {
       "stats": {
@@ -8888,7 +9195,8 @@
         127,
         137
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "127": {
       "stats": {
@@ -8934,7 +9242,8 @@
         104,
         137
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "137": {
       "stats": {
@@ -8980,7 +9289,8 @@
         104,
         127
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "105": {
       "stats": {
@@ -9021,7 +9331,8 @@
         128,
         129
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "106": {
       "stats": {
@@ -9062,7 +9373,8 @@
         128,
         129
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "107": {
       "stats": {
@@ -9103,7 +9415,8 @@
         128,
         129
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "128": {
       "stats": {
@@ -9144,7 +9457,8 @@
         107,
         129
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "129": {
       "stats": {
@@ -9185,7 +9499,8 @@
         107,
         128
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "108": {
       "stats": {
@@ -9229,7 +9544,8 @@
         131,
         132
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "109": {
       "stats": {
@@ -9273,7 +9589,8 @@
         131,
         132
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "110": {
       "stats": {
@@ -9317,7 +9634,8 @@
         131,
         132
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "130": {
       "stats": {
@@ -9361,7 +9679,8 @@
         131,
         132
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "131": {
       "stats": {
@@ -9405,7 +9724,8 @@
         130,
         132
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "132": {
       "stats": {
@@ -9449,7 +9769,8 @@
         130,
         131
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "111": {
       "stats": {
@@ -9493,7 +9814,8 @@
         134,
         138
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "112": {
       "stats": {
@@ -9537,7 +9859,8 @@
         134,
         138
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "113": {
       "stats": {
@@ -9581,7 +9904,8 @@
         134,
         138
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "133": {
       "stats": {
@@ -9625,7 +9949,8 @@
         134,
         138
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "134": {
       "stats": {
@@ -9669,7 +9994,8 @@
         133,
         138
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "138": {
       "stats": {
@@ -9713,7 +10039,8 @@
         133,
         134
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "114": {
       "stats": {
@@ -9755,7 +10082,8 @@
         117,
         135
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "115": {
       "stats": {
@@ -9797,7 +10125,8 @@
         117,
         135
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "116": {
       "stats": {
@@ -9839,7 +10168,8 @@
         117,
         135
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "117": {
       "stats": {
@@ -9881,7 +10211,8 @@
         116,
         135
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     },
     "135": {
       "stats": {
@@ -9923,7 +10254,8 @@
         116,
         117
       ],
-      "miiColorProfile": true
+      "miiColorProfile": false,
+      "statsSource": "league workbook"
     }
   }
 }
