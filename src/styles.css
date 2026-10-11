@@ -73,3 +73,39 @@
 .ssl-stat-table td.roster-number{white-space:nowrap;overflow-wrap:normal;word-break:normal;font-variant-numeric:tabular-nums}
 
 .league-sidebar form select{width:100%;padding:10px 12px;border:1px solid #cfd6e1;background:white;color:#10244b;margin-bottom:12px}
+
+/* Scouting data shares the roster's stable identities and in-game portraits. */
+.player-data-panel .table-tools {flex-wrap:wrap;gap:16px}
+.player-data-panel select {padding:10px 12px;border:1px solid #d9dee8;border-radius:4px;background:#fff;color:#192440}
+.player-data-table {width:max-content;min-width:100%;table-layout:auto}
+.player-data-table th,.player-data-table td {min-width:116px;padding:14px 18px;vertical-align:top}
+.player-data-table th:first-child,.player-data-table td:first-child {min-width:58px;width:58px;white-space:nowrap}
+.player-data-table .sticky-player,.player-data-table .player-cell {position:sticky;left:0;min-width:248px;width:248px;background:white;z-index:2;box-shadow:2px 0 0 #e5e8ee}
+.player-data-table th.sticky-player {z-index:5;background:#10244b;color:white}
+.player-data-name {display:flex;align-items:center;gap:10px;text-align:left;border:0;background:none;color:inherit;cursor:pointer;padding:0;width:100%;font:inherit}
+.player-data-name strong {line-height:1.4}
+.player-data-name:hover strong {color:#cc3338}
+.player-data-name:focus-visible {outline:2px solid #cc3338;outline-offset:5px}
+.chemistry-table td:nth-child(n+4),.chemistry-table th:nth-child(n+4) {min-width:320px;max-width:440px;white-space:normal}
+.chem-names {display:flex;flex-wrap:wrap;gap:6px;line-height:1.4}
+.chem-names>span {background:#edf0f6;border-radius:4px;padding:4px 7px;font-size:13px;color:#192440}
+.chemistry-table small {display:block;margin-bottom:8px}
+.player-data-expanded {border-top:1px solid #e5e8ee;border-bottom:1px solid #e5e8ee;padding:22px;background:#f8f9fb}
+.player-data-expanded>.outline-btn {display:flex;align-items:center;gap:6px;margin-left:auto;margin-bottom:14px}
+.player-data-bio {display:flex;align-items:center;gap:18px;margin-bottom:20px}
+.player-data-bio h3 {margin:0 0 5px;font-size:24px}
+.player-data-bio p {margin:0;color:#65718a}
+.player-data-groups {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.player-data-details h4 {margin:0 0 12px;text-transform:uppercase;color:#192440}
+.player-data-details dl {margin:0}
+.player-data-details dl>div {display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid #e1e5ed;padding:8px 0;font-size:14px}
+.player-data-details dd {margin:0;font-weight:700;white-space:nowrap}
+.chem-section {margin-top:24px}
+.profile-game-data {margin:20px 0;border:1px solid #e1e5ed;padding:16px}
+.profile-game-data summary {cursor:pointer;font-weight:700;color:#192440}
+.profile-game-data .player-data-details {margin-top:20px}
+.profile-game-data .player-data-groups {grid-template-columns:1fr}
+@media(max-width:800px) {.player-data-groups {grid-template-columns:1fr}.player-data-table .sticky-player,.player-data-table .player-cell {min-width:210px;width:210px}.player-data-expanded {padding:16px}}
+
+.player-data-table .player-data-name strong {max-width:none;flex:1}
+.player-data-table .player-data-name .player-avatar {flex-shrink:0;margin-right:0}

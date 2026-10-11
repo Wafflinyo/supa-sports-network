@@ -1,3 +1,4 @@
+import PlayerData from './PlayerData.jsx'
 import playerPool from './players.json'
 import React, { useState, useRef, useEffect } from 'react'
 import test from './temporary-league.json'
@@ -121,6 +122,7 @@ function PopulatedTestingLeague({ PlayerAvatar }) {
     {tab==='Standings' && <>
       <section className="panel test-team"><div className="section-title"><h2>LEAGUE STANDINGS</h2></div><div className="table-scroll"><table className="fantasy-simple-table"><thead><tr><th>Team</th><th>GP</th><th>W</th><th>L</th><th>T</th><th>Runs for</th><th>Runs against</th></tr></thead><tbody>{[...test.teams].sort((a,b)=>results.standings[b.id].wins-results.standings[a.id].wins || (results.standings[b.id].runsFor-results.standings[b.id].runsAgainst)-(results.standings[a.id].runsFor-results.standings[a.id].runsAgainst)).map(team=><tr key={team.id}><td>{team.name}</td>{['played','wins','losses','ties','runsFor','runsAgainst'].map(key=><td key={key}>{results.standings[team.id][key]}</td>)}</tr>)}</tbody></table></div></section>
     </>}
+    {tab==='Player Data' && <PlayerData/>}
     {(tab==='Player Stats' || isFantasyStats) && <section className="panel test-team test-stats"><div className="section-title"><h2>{isFantasyStats?'FANTASY STATS':'TEST PLAYER STATS'}</h2></div>
       {!isFantasyStats && <div className="subnav stat-tabs">{Object.keys(statGroups).map(group=><button key={group} className={group===statGroup?'active':''} onClick={()=>setStatGroup(group)}>{group}</button>)}</div>}
       <div className="stat-view-switch">{['Totals','Averages per Game'].map(view=><button key={view} className={statView===view?'active':''} onClick={()=>setStatView(view)}>{view==='Totals'?'Totals':'Averages'}</button>)}</div>
@@ -162,7 +164,7 @@ function EmptyTestingLeague() {
     <div className="test-summary panel testing-summary">{['league teams','rostered players','scheduled games','fantasy teams'].map(label=><div key={label}><strong>0</strong><span>{label}</span></div>)}</div>
     <div className="subnav test-tabs">{leagueTabs.map(name=><button key={name} className={section===name?'active':''} onClick={()=>setSection(name)}>{name}</button>)}</div>
     {fantasy && <div className="subnav test-fantasy-tabs" aria-label="Testing fantasy navigation">{fantasyTabs.map(name=><button key={name} className={fantasyTab===name?'active':''} onClick={()=>setFantasyTab(name)}>{name}</button>)}</div>}
-    {fantasy && current==='Rules & Point System' ? <FantasyRules/> : ['SSL Playoffs','Voting'].includes(current) ? <ClosedSeasonRoom kind={current}/> : <section className="panel basic-panel"><div className="empty"><h3>{fantasy?'Fantasy ':''}{current} — no test data</h3><p>There are no test teams, drafts, games, results, or fantasy scores. This tab is ready for a new testing setup.</p></div></section>}
+    {current==='Player Data' ? <PlayerData/> : fantasy && current==='Rules & Point System' ? <FantasyRules/> : ['SSL Playoffs','Voting'].includes(current) ? <ClosedSeasonRoom kind={current}/> : <section className="panel basic-panel"><div className="empty"><h3>{fantasy?'Fantasy ':''}{current} — no test data</h3><p>There are no test teams, drafts, games, results, or fantasy scores. This tab is ready for a new testing setup.</p></div></section>}
   </>
 }
 

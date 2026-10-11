@@ -2,7 +2,7 @@
   {
     "id": 1,
     "name": "Mario",
-    "class": "Power",
+    "class": "Balanced",
     "color": "Red",
     "source": "Mario",
     "gameCharacterId": 0,
@@ -50,7 +50,7 @@
   {
     "id": 11,
     "name": "Wario",
-    "class": "Power",
+    "class": "Technique",
     "color": "Yellow",
     "source": "Mario",
     "gameCharacterId": 10,
@@ -62,7 +62,7 @@
   {
     "id": 12,
     "name": "Waluigi",
-    "class": "Speed",
+    "class": "Technique",
     "color": "Purple",
     "source": "Mario",
     "gameCharacterId": 11,
@@ -74,7 +74,7 @@
   {
     "id": 5,
     "name": "Peach",
-    "class": "Technique",
+    "class": "Balanced",
     "color": "Pink",
     "source": "Mario",
     "gameCharacterId": 4,
@@ -86,7 +86,7 @@
   {
     "id": 6,
     "name": "Daisy",
-    "class": "Balanced",
+    "class": "Power",
     "color": "Orange",
     "source": "Mario",
     "gameCharacterId": 5,
@@ -314,7 +314,7 @@
   {
     "id": 40,
     "name": "Dixie Kong",
-    "class": "Technique",
+    "class": "Balanced",
     "color": "Pink",
     "source": "Mario",
     "gameCharacterId": 39,
@@ -350,7 +350,7 @@
   {
     "id": 66,
     "name": "Baby DK",
-    "class": "Power",
+    "class": "Speed",
     "color": "Brown",
     "source": "Mario",
     "gameCharacterId": 65,
@@ -449,7 +449,7 @@
   {
     "id": 7,
     "name": "Yoshi",
-    "class": "Technique",
+    "class": "Speed",
     "color": "Light Green",
     "source": "Mario",
     "gameCharacterId": 6,
@@ -461,7 +461,7 @@
   {
     "id": 67,
     "name": "Red Yoshi",
-    "class": "Power",
+    "class": "Speed",
     "color": "Red",
     "source": "Mario",
     "gameCharacterId": 66,
@@ -485,7 +485,7 @@
   {
     "id": 69,
     "name": "Yellow Yoshi",
-    "class": "Technique",
+    "class": "Speed",
     "color": "Yellow",
     "source": "Mario",
     "gameCharacterId": 68,
@@ -497,7 +497,7 @@
   {
     "id": 70,
     "name": "Light Blue Yoshi",
-    "class": "Balanced",
+    "class": "Speed",
     "color": "Light Blue",
     "source": "Mario",
     "gameCharacterId": 69,
@@ -641,7 +641,7 @@
   {
     "id": 29,
     "name": "Toadsworth",
-    "class": "Technique",
+    "class": "Balanced",
     "color": "Brown",
     "source": "Mario",
     "gameCharacterId": 28,
@@ -721,15 +721,17 @@
   },
   {
     "id": 150,
-    "name": "Yellow Paratroopa",
+    "name": "Blue Paratroopa",
     "class": "Balanced",
-    "color": "Yellow",
+    "color": "Blue",
     "source": "Mario",
     "gameCharacterId": 112,
-    "portrait": "portraits/character-select.png",
+    "portrait": "portraits/blue-paratroopa.png",
     "kind": "character",
-    "portraitIndex": 82,
-    "rosterOrder": 60
+    "rosterOrder": 60,
+    "rioAliases": [
+      "Yellow Paratroopa"
+    ]
   },
   {
     "id": 49,
@@ -806,7 +808,7 @@
   {
     "id": 17,
     "name": "Shy Guy",
-    "class": "Balanced",
+    "class": "Technique",
     "color": "Red",
     "source": "Mario",
     "gameCharacterId": 16,
@@ -830,7 +832,7 @@
   {
     "id": 46,
     "name": "Yellow Shy Guy",
-    "class": "Speed",
+    "class": "Technique",
     "color": "Yellow",
     "source": "Mario",
     "gameCharacterId": 45,
@@ -842,7 +844,7 @@
   {
     "id": 47,
     "name": "Green Shy Guy",
-    "class": "Power",
+    "class": "Technique",
     "color": "Green",
     "source": "Mario",
     "gameCharacterId": 46,
@@ -1236,6 +1238,17 @@
     "rosterOrder": 101
   },
   {
+    "id": 174,
+    "name": "Bone Goomba",
+    "class": "Balanced",
+    "color": "Green",
+    "source": "Mario",
+    "gameCharacterId": 103,
+    "portrait": "portraits/bone-goomba.png",
+    "kind": "character",
+    "rosterOrder": 102
+  },
+  {
     "id": 42,
     "name": "Paragoomba",
     "class": "Balanced",
@@ -1245,7 +1258,18 @@
     "portrait": "portraits/character-select.png",
     "kind": "character",
     "portraitIndex": 41,
-    "rosterOrder": 102
+    "rosterOrder": 103
+  },
+  {
+    "id": 176,
+    "name": "Paragloomba",
+    "class": "Technique",
+    "color": "Blue",
+    "source": "Mario",
+    "gameCharacterId": 105,
+    "portrait": "portraits/paragloomba.png",
+    "kind": "character",
+    "rosterOrder": 104
   },
   {
     "id": 19,
@@ -1257,7 +1281,21 @@
     "portrait": "portraits/character-select.png",
     "kind": "character",
     "portraitIndex": 18,
-    "rosterOrder": 103
+    "rosterOrder": 105
+  },
+  {
+    "id": 178,
+    "name": "Flower Fields Monty",
+    "class": "Power",
+    "color": "Green",
+    "source": "Mario",
+    "gameCharacterId": 107,
+    "portrait": "portraits/flower-fields-monty.png",
+    "kind": "character",
+    "rioAliases": [
+      "Flower Field Monty"
+    ],
+    "rosterOrder": 106
   },
   {
     "id": 39,
@@ -1269,7 +1307,7 @@
     "portrait": "portraits/character-select.png",
     "kind": "character",
     "portraitIndex": 38,
-    "rosterOrder": 104
+    "rosterOrder": 107
   },
   {
     "id": 55,
@@ -1281,19 +1319,41 @@
     "portrait": "portraits/character-select.png",
     "kind": "character",
     "portraitIndex": 54,
-    "rosterOrder": 105
+    "rosterOrder": 108
+  },
+  {
+    "id": 175,
+    "name": "Tropical Wiggler",
+    "class": "Speed",
+    "color": "Light Blue",
+    "source": "Mario",
+    "gameCharacterId": 104,
+    "portrait": "portraits/tropical-wiggler.png",
+    "kind": "character",
+    "rosterOrder": 109
   },
   {
     "id": 56,
     "name": "Blooper",
-    "class": "Technique",
+    "class": "Balanced",
     "color": "White",
     "source": "Mario",
     "gameCharacterId": 55,
     "portrait": "portraits/character-select.png",
     "kind": "character",
     "portraitIndex": 55,
-    "rosterOrder": 106
+    "rosterOrder": 110
+  },
+  {
+    "id": 177,
+    "name": "Bubble Blooper",
+    "class": "Technique",
+    "color": "Light Blue",
+    "source": "Mario",
+    "gameCharacterId": 106,
+    "portrait": "portraits/bubble-blooper.png",
+    "kind": "character",
+    "rosterOrder": 111
   },
   {
     "id": 72,
@@ -1302,7 +1362,7 @@
     "color": "Red",
     "source": "GM",
     "kind": "mii",
-    "rosterOrder": 107
+    "rosterOrder": 112
   },
   {
     "id": 73,
@@ -1312,7 +1372,7 @@
     "source": "Mario",
     "kind": "mii",
     "portraitName": "Pauline",
-    "rosterOrder": 108
+    "rosterOrder": 113
   },
   {
     "id": 74,
@@ -1321,7 +1381,7 @@
     "color": "Red",
     "source": "Food",
     "kind": "mii",
-    "rosterOrder": 109
+    "rosterOrder": 114
   },
   {
     "id": 75,
@@ -1330,7 +1390,7 @@
     "color": "Red",
     "source": "DC",
     "kind": "mii",
-    "rosterOrder": 110
+    "rosterOrder": 115
   },
   {
     "id": 76,
@@ -1339,7 +1399,7 @@
     "color": "Red",
     "source": "Pokemon",
     "kind": "mii",
-    "rosterOrder": 111
+    "rosterOrder": 116
   },
   {
     "id": 118,
@@ -1348,7 +1408,7 @@
     "color": "Red",
     "source": "Resident Evil",
     "kind": "mii",
-    "rosterOrder": 112
+    "rosterOrder": 117
   },
   {
     "id": 77,
@@ -1357,7 +1417,7 @@
     "color": "Orange",
     "source": "Dragon Ball",
     "kind": "mii",
-    "rosterOrder": 113
+    "rosterOrder": 118
   },
   {
     "id": 78,
@@ -1366,7 +1426,7 @@
     "color": "Orange",
     "source": "Splatoon",
     "kind": "mii",
-    "rosterOrder": 114
+    "rosterOrder": 119
   },
   {
     "id": 79,
@@ -1375,7 +1435,7 @@
     "color": "Orange",
     "source": "Cartoon",
     "kind": "mii",
-    "rosterOrder": 115
+    "rosterOrder": 120
   },
   {
     "id": 119,
@@ -1384,7 +1444,7 @@
     "color": "Orange",
     "source": "Garfield",
     "kind": "mii",
-    "rosterOrder": 116
+    "rosterOrder": 121
   },
   {
     "id": 120,
@@ -1393,7 +1453,7 @@
     "color": "Orange",
     "source": "Pokemon",
     "kind": "mii",
-    "rosterOrder": 117
+    "rosterOrder": 122
   },
   {
     "id": 80,
@@ -1402,7 +1462,7 @@
     "color": "Yellow",
     "source": "Cartoon",
     "kind": "mii",
-    "rosterOrder": 118
+    "rosterOrder": 123
   },
   {
     "id": 81,
@@ -1411,7 +1471,7 @@
     "color": "Yellow",
     "source": "Bejeweled",
     "kind": "mii",
-    "rosterOrder": 119
+    "rosterOrder": 124
   },
   {
     "id": 82,
@@ -1420,7 +1480,7 @@
     "color": "Yellow",
     "source": "Food",
     "kind": "mii",
-    "rosterOrder": 120
+    "rosterOrder": 125
   },
   {
     "id": 83,
@@ -1429,7 +1489,7 @@
     "color": "Yellow",
     "source": "Red Dead Redemption",
     "kind": "mii",
-    "rosterOrder": 121
+    "rosterOrder": 126
   },
   {
     "id": 121,
@@ -1438,7 +1498,7 @@
     "color": "Yellow",
     "source": "GM",
     "kind": "mii",
-    "rosterOrder": 122
+    "rosterOrder": 127
   },
   {
     "id": 136,
@@ -1447,7 +1507,7 @@
     "color": "Yellow",
     "source": "FNAF",
     "kind": "mii",
-    "rosterOrder": 123
+    "rosterOrder": 128
   },
   {
     "id": 84,
@@ -1456,7 +1516,7 @@
     "color": "Light Green",
     "source": "GM",
     "kind": "mii",
-    "rosterOrder": 124
+    "rosterOrder": 129
   },
   {
     "id": 85,
@@ -1465,7 +1525,7 @@
     "color": "Light Green",
     "source": "Homestuck",
     "kind": "mii",
-    "rosterOrder": 125
+    "rosterOrder": 130
   },
   {
     "id": 86,
@@ -1474,7 +1534,7 @@
     "color": "Light Green",
     "source": "Scooby Doo",
     "kind": "mii",
-    "rosterOrder": 126
+    "rosterOrder": 131
   },
   {
     "id": 122,
@@ -1483,7 +1543,7 @@
     "color": "Light Green",
     "source": "Basketball",
     "kind": "mii",
-    "rosterOrder": 127
+    "rosterOrder": 132
   },
   {
     "id": 123,
@@ -1492,7 +1552,7 @@
     "color": "Light Green",
     "source": "Mortal Kombat",
     "kind": "mii",
-    "rosterOrder": 128
+    "rosterOrder": 133
   },
   {
     "id": 87,
@@ -1501,7 +1561,7 @@
     "color": "Green",
     "source": "Pokemon",
     "kind": "mii",
-    "rosterOrder": 129
+    "rosterOrder": 134
   },
   {
     "id": 88,
@@ -1510,7 +1570,7 @@
     "color": "Green",
     "source": "Cartoon",
     "kind": "mii",
-    "rosterOrder": 130
+    "rosterOrder": 135
   },
   {
     "id": 89,
@@ -1519,7 +1579,7 @@
     "color": "Green",
     "source": "I don't know, I can't see him",
     "kind": "mii",
-    "rosterOrder": 131
+    "rosterOrder": 136
   },
   {
     "id": 90,
@@ -1528,7 +1588,7 @@
     "color": "Green",
     "source": "Animal Crossing",
     "kind": "mii",
-    "rosterOrder": 132
+    "rosterOrder": 137
   },
   {
     "id": 91,
@@ -1537,7 +1597,7 @@
     "color": "Green",
     "source": "Undertale",
     "kind": "mii",
-    "rosterOrder": 133
+    "rosterOrder": 138
   },
   {
     "id": 124,
@@ -1546,7 +1606,7 @@
     "color": "Green",
     "source": "Street Fighter",
     "kind": "mii",
-    "rosterOrder": 134
+    "rosterOrder": 139
   },
   {
     "id": 97,
@@ -1555,7 +1615,7 @@
     "color": "Light Blue",
     "source": "GM",
     "kind": "mii",
-    "rosterOrder": 135
+    "rosterOrder": 140
   },
   {
     "id": 98,
@@ -1565,7 +1625,7 @@
     "source": "Mario",
     "kind": "mii",
     "portraitName": "Rosalina",
-    "rosterOrder": 136
+    "rosterOrder": 141
   },
   {
     "id": 99,
@@ -1574,7 +1634,7 @@
     "color": "Light Blue",
     "source": "Deltarune",
     "kind": "mii",
-    "rosterOrder": 137
+    "rosterOrder": 142
   },
   {
     "id": 100,
@@ -1584,7 +1644,7 @@
     "source": "Food",
     "kind": "mii",
     "portraitName": "Wendy",
-    "rosterOrder": 138
+    "rosterOrder": 143
   },
   {
     "id": 126,
@@ -1593,7 +1653,7 @@
     "color": "Light Blue",
     "source": "GM",
     "kind": "mii",
-    "rosterOrder": 139
+    "rosterOrder": 144
   },
   {
     "id": 92,
@@ -1602,7 +1662,7 @@
     "color": "Blue",
     "source": "Jimmy Neutron",
     "kind": "mii",
-    "rosterOrder": 140
+    "rosterOrder": 145
   },
   {
     "id": 93,
@@ -1611,7 +1671,7 @@
     "color": "Blue",
     "source": "Metroid",
     "kind": "mii",
-    "rosterOrder": 141
+    "rosterOrder": 146
   },
   {
     "id": 94,
@@ -1620,7 +1680,7 @@
     "color": "Blue",
     "source": "Minecraft",
     "kind": "mii",
-    "rosterOrder": 142
+    "rosterOrder": 147
   },
   {
     "id": 95,
@@ -1629,7 +1689,7 @@
     "color": "Blue",
     "source": "Cartoon",
     "kind": "mii",
-    "rosterOrder": 143
+    "rosterOrder": 148
   },
   {
     "id": 96,
@@ -1638,7 +1698,7 @@
     "color": "Blue",
     "source": "Unknown",
     "kind": "mii",
-    "rosterOrder": 144
+    "rosterOrder": 149
   },
   {
     "id": 125,
@@ -1647,7 +1707,7 @@
     "color": "Blue",
     "source": "Halo",
     "kind": "mii",
-    "rosterOrder": 145
+    "rosterOrder": 150
   },
   {
     "id": 101,
@@ -1656,7 +1716,7 @@
     "color": "Pink",
     "source": "Better Call Saul",
     "kind": "mii",
-    "rosterOrder": 146
+    "rosterOrder": 151
   },
   {
     "id": 102,
@@ -1665,7 +1725,7 @@
     "color": "Pink",
     "source": "Cartoon",
     "kind": "mii",
-    "rosterOrder": 147
+    "rosterOrder": 152
   },
   {
     "id": 103,
@@ -1674,7 +1734,7 @@
     "color": "Pink",
     "source": "Cartoon",
     "kind": "mii",
-    "rosterOrder": 148
+    "rosterOrder": 153
   },
   {
     "id": 104,
@@ -1683,7 +1743,7 @@
     "color": "Pink",
     "source": "Earthbound",
     "kind": "mii",
-    "rosterOrder": 149
+    "rosterOrder": 154
   },
   {
     "id": 127,
@@ -1692,7 +1752,7 @@
     "color": "Pink",
     "source": "Totally not Jung Kook from BTS",
     "kind": "mii",
-    "rosterOrder": 150
+    "rosterOrder": 155
   },
   {
     "id": 137,
@@ -1701,7 +1761,7 @@
     "color": "Pink",
     "source": "Rose",
     "kind": "mii",
-    "rosterOrder": 151
+    "rosterOrder": 156
   },
   {
     "id": 105,
@@ -1710,7 +1770,7 @@
     "color": "Purple",
     "source": "Left for Dead",
     "kind": "mii",
-    "rosterOrder": 152
+    "rosterOrder": 157
   },
   {
     "id": 106,
@@ -1719,7 +1779,7 @@
     "color": "Purple",
     "source": "Legend of Zelda",
     "kind": "mii",
-    "rosterOrder": 153
+    "rosterOrder": 158
   },
   {
     "id": 107,
@@ -1728,7 +1788,7 @@
     "color": "Purple",
     "source": "Fast Food",
     "kind": "mii",
-    "rosterOrder": 154
+    "rosterOrder": 159
   },
   {
     "id": 128,
@@ -1737,7 +1797,7 @@
     "color": "Purple",
     "source": "FNAF",
     "kind": "mii",
-    "rosterOrder": 155
+    "rosterOrder": 160
   },
   {
     "id": 129,
@@ -1746,7 +1806,7 @@
     "color": "Purple",
     "source": "Street Fighter",
     "kind": "mii",
-    "rosterOrder": 156
+    "rosterOrder": 161
   },
   {
     "id": 108,
@@ -1755,7 +1815,7 @@
     "color": "Brown",
     "source": "Scooby Doo ",
     "kind": "mii",
-    "rosterOrder": 157
+    "rosterOrder": 162
   },
   {
     "id": 109,
@@ -1764,7 +1824,7 @@
     "color": "Brown",
     "source": "Mr. Bean",
     "kind": "mii",
-    "rosterOrder": 158
+    "rosterOrder": 163
   },
   {
     "id": 110,
@@ -1773,7 +1833,7 @@
     "color": "Brown",
     "source": "Paper Mario ",
     "kind": "mii",
-    "rosterOrder": 159
+    "rosterOrder": 164
   },
   {
     "id": 130,
@@ -1782,7 +1842,7 @@
     "color": "Brown",
     "source": "Donkey Kong",
     "kind": "mii",
-    "rosterOrder": 160
+    "rosterOrder": 165
   },
   {
     "id": 131,
@@ -1791,7 +1851,7 @@
     "color": "Brown",
     "source": "Marvel",
     "kind": "mii",
-    "rosterOrder": 161
+    "rosterOrder": 166
   },
   {
     "id": 132,
@@ -1800,7 +1860,7 @@
     "color": "Brown",
     "source": "Wherever Horses Come From",
     "kind": "mii",
-    "rosterOrder": 162
+    "rosterOrder": 167
   },
   {
     "id": 111,
@@ -1809,7 +1869,7 @@
     "color": "White",
     "source": "Himself",
     "kind": "mii",
-    "rosterOrder": 163
+    "rosterOrder": 168
   },
   {
     "id": 112,
@@ -1818,7 +1878,7 @@
     "color": "White",
     "source": "Breaking Bad",
     "kind": "mii",
-    "rosterOrder": 164
+    "rosterOrder": 169
   },
   {
     "id": 113,
@@ -1827,7 +1887,7 @@
     "color": "White",
     "source": "Vocaloid ",
     "kind": "mii",
-    "rosterOrder": 165
+    "rosterOrder": 170
   },
   {
     "id": 133,
@@ -1836,7 +1896,7 @@
     "color": "White",
     "source": "WorldofTShirts",
     "kind": "mii",
-    "rosterOrder": 166
+    "rosterOrder": 171
   },
   {
     "id": 134,
@@ -1845,7 +1905,7 @@
     "color": "White",
     "source": "Donkey Kong",
     "kind": "mii",
-    "rosterOrder": 167
+    "rosterOrder": 172
   },
   {
     "id": 138,
@@ -1854,7 +1914,7 @@
     "color": "White",
     "source": "Plane",
     "kind": "mii",
-    "rosterOrder": 168
+    "rosterOrder": 173
   },
   {
     "id": 114,
@@ -1863,7 +1923,7 @@
     "color": "Black",
     "source": "Breaking Bad",
     "kind": "mii",
-    "rosterOrder": 169
+    "rosterOrder": 174
   },
   {
     "id": 115,
@@ -1872,7 +1932,7 @@
     "color": "Black",
     "source": "Pokemon ",
     "kind": "mii",
-    "rosterOrder": 170
+    "rosterOrder": 175
   },
   {
     "id": 116,
@@ -1881,7 +1941,7 @@
     "color": "Black",
     "source": "Smashy Bros",
     "kind": "mii",
-    "rosterOrder": 171
+    "rosterOrder": 176
   },
   {
     "id": 117,
@@ -1890,7 +1950,7 @@
     "color": "Black",
     "source": "Da Vinci ",
     "kind": "mii",
-    "rosterOrder": 172
+    "rosterOrder": 177
   },
   {
     "id": 135,
@@ -1899,6 +1959,6 @@
     "color": "Black",
     "source": "Rap",
     "kind": "mii",
-    "rosterOrder": 173
+    "rosterOrder": 178
   }
 ]

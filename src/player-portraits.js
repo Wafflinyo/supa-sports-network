@@ -25,6 +25,12 @@ const portraits = new Map(sheets.flatMap(([file, width, height, x, firstY, names
 const playersById = new Map(playerPool.map(player => [player.id, player]))
 export function playerPortraitStyle(player, size) {
   const identity = playersById.get(player.id) || player
+  if (identity.portrait && identity.portraitIndex == null) return {
+    backgroundImage: `url(${import.meta.env.BASE_URL}${identity.portrait})`,
+    backgroundSize: 'contain',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+  }
   if (identity.portrait) return {
     backgroundImage: `url(${import.meta.env.BASE_URL}${identity.portrait})`,
     backgroundSize: `${480 * size / 51}px ${561 * size / 51}px`,

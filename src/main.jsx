@@ -1,3 +1,4 @@
+import PlayerData from './PlayerData.jsx'
 import React, { useEffect, useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createClient } from '@supabase/supabase-js'
@@ -194,6 +195,7 @@ function App() {
           <div className="side-stack"><div className="panel compact"><SectionTitle kicker="ON DECK" right={<CalendarDays size={19}/>}>UPCOMING MATCHES</SectionTitle><Empty title="Schedule coming soon">Matchups will appear when the season schedule is set.</Empty></div><div className="panel compact"><SectionTitle kicker="FINAL SCORES" right={<Trophy size={19}/>}>RECENT RESULTS</SectionTitle><Empty icon={Trophy} title="No games yet">Results will appear after the first game is uploaded.</Empty></div></div></div>
         <div className="home-bottom"><div className="panel news-panel"><SectionTitle kicker="FROM AROUND THE LEAGUE">LATEST NEWS</SectionTitle><div className="news-item"><span className="news-mark">★</span><div><small>LEAGUE UPDATE</small><h3>The player pool is ready</h3><p>Browse all {players.length} players before teams and the season schedule are announced.</p></div><button aria-label="Browse players" onClick={() => go('Player Stats')}>›</button></div></div><div className="panel standings-panel"><SectionTitle kicker="THE RACE" right={<button className="text-link" onClick={() => go('Standings')}>FULL STANDINGS ›</button>}>STANDINGS</SectionTitle><Empty icon={Shield} title="Teams coming soon">Standings begin when teams and results are added.</Empty></div></div>
       </>}
+      {page === 'Player Data' && <PlayerData/>}
       {page === 'Player Stats' && <>
         <div className="page-heading"><span className="eyebrow dark">THE PLAYER POOL</span><h1>PLAYER STATS</h1><p>{players.length} players from the supplied master sheet. Game statistics will appear after verified results are uploaded.</p></div>
         <div className="subnav stat-tabs" role="tablist" aria-label="Player stat categories">{Object.keys(statGroups).map(category => <button key={category} role="tab" aria-selected={statTab === category} className={statTab === category ? 'active' : ''} onClick={() => { setStatTab(category); setSort({ key: 'id', direction: 'asc' }) }}>{category}</button>)}</div>
