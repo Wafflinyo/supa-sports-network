@@ -1,7 +1,7 @@
 {
   "source": {
     "label": "Current SSL league setup",
-    "baselineSha256": "e5a4617758ae8fc6ea2a1fe04bfe70eae2a1746cd826afdf3ea039af3b07f94a",
+    "baselineSha256": "540e885949d4c7b271be917dc16f39028b6419f997e3b99c7669bed59f816043",
     "leagueWorkbook": {
       "name": "Untitled spreadsheet-3.xlsx",
       "sha256": "85c05eeacdfd591d5f8c377440d96c6a6f44b1c8f7338ef5795a020ff41442be",
@@ -160,6 +160,9 @@
           "charge hit power": 58
         },
         "141": {
+          "hit trajectory": "High"
+        },
+        "143": {
           "hit trajectory": "High"
         }
       }
@@ -2254,7 +2257,7 @@
         "charge contact size": 35,
         "slap hit power": 55,
         "charge hit power": 70,
-        "hit trajectory": "Medium",
+        "hit trajectory": "High",
         "bunting": 20,
         "speed": 40,
         "outfield throwing speed": 82,

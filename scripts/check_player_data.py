@@ -32,6 +32,7 @@ print('178 players verified: stable IDs, family order, Rio aliases, portraits, a
 by_name={p['name']:p for p in players}
 assert data[str(by_name['Green Shy Guy']['id'])]['stats']['player class']=='Power'
 assert data[str(by_name['White Toad']['id'])]['stats']['hit trajectory']=='High'
+assert data[str(by_name['Purple Kritter']['id'])]['stats']['hit trajectory']=='High'
 assert data[str(by_name['Mario']['id'])]['stats']['player class']=='Power'
 assert data[str(by_name['Wario']['id'])]['stats']['hit trajectory']=='High'
 assert all(r['stats']['hit trajectory'] in ['Medium','High'] for r in data.values())
