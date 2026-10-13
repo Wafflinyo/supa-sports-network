@@ -1,7 +1,8 @@
 """Export the SSL editor's actual DOL values and chemistry to the website.
 Usage: python scripts/export_player_data.py /path/main.dol /path/SSL-Editor.html
 Use --bone-bat-adjustment only for the SSL-Gear/Tune baseline.
-Original roster values come from the required edited Game Data workbook.
+Original stock character values come from the edited Game Data workbook.
+Named Mii league profiles are preserved independently from their display names.
 Custom additions and chemistry come from the supplied DOL.
 Approved trajectory and Bone Goomba changes are applied last.
 No game binaries are stored in this repository.
@@ -38,6 +39,7 @@ def export(dol_path, editor_path, bone_bat_adjustment=False, league_stats_path=N
         assert value in [0,1,2], (a,b,value)
         return value
     players=json.loads((ROOT/'src/players.json').read_text())
+    previous=json.loads((ROOT/'src/player-data.json').read_text())
     def cid(p): return p['gameCharacterId'] if p['kind']=='character' else 77+COLORS.index(p['color'])
     workbook=openpyxl.load_workbook(league_stats_path,data_only=True,read_only=True)
     sheet=workbook['Game Data']
@@ -57,7 +59,9 @@ def export(dol_path, editor_path, bone_bat_adjustment=False, league_stats_path=N
                 if other['kind']=='character': assert chemistry(a,cid(other))==chemistry(a+12,cid(other))
         if a==103 and bone_bat_adjustment:
             values.update({'slap contact size':60,'charge contact size':40,'slap hit power':45,'charge hit power':58})
-        if p['id']<=138:
+        if p['kind']=='mii':
+            values=previous['players'][str(p['id'])]['stats'].copy()
+        if p['kind']=='character' and p['id']<=71:
             name=(p.get('portraitName',p['name']) if p['kind']=='mii' else p['name']).strip().casefold()
             if name not in names: raise ValueError(f"League workbook has no row for {p['name']}")
             row=names[name]
@@ -77,14 +81,15 @@ def export(dol_path, editor_path, bone_bat_adjustment=False, league_stats_path=N
             if other['id']==p['id']: continue
             if p['kind']==other['kind']=='mii' and p['color']==other['color']:
                 assert chemistry(a,a+12)==2
-                conditional.append(other['id']);continue
+                if other['id'] in previous['players'][str(p['id'])]['conditionalGoodChemistryIds']: conditional.append(other['id'])
+                continue
             value=chemistry(a,cid(other))
             (good if value==2 else bad if value==0 else []).append(other['id'])
-        records[str(p['id'])]={'stats':values,'goodChemistryIds':good,'badChemistryIds':bad,'conditionalGoodChemistryIds':conditional,'miiColorProfile':False,'statsSource':'league workbook' if p['id']<=138 else 'custom game DOL'}
+        records[str(p['id'])]={'stats':values,'goodChemistryIds':good,'badChemistryIds':bad,'conditionalGoodChemistryIds':conditional,'miiColorProfile':False,'statsSource':'current league Mii profile' if p['kind']=='mii' else 'league workbook' if p['id']<=71 else 'custom game DOL'}
         p['class']=values['player class']
     (ROOT/'src/players.json').write_text(json.dumps(players,indent=2)+'\n')
-    assert len(covered)==138
-    data={'source':{'label':adjustments['label'],'baselineSha256':hashlib.sha256(binary).hexdigest(),'leagueWorkbook':{'name':Path(league_stats_path).name,'sha256':hashlib.sha256(Path(league_stats_path).read_bytes()).hexdigest(),'coveredPlayerIds':covered},'adjustments':adjustments,'miiNote':'Named Mii stats follow the edited league roster. Same-color Mii chemistry requires opposite genders.'},'players':records}
+    assert len(covered)==71
+    data={'source':{'label':adjustments['label'],'baselineSha256':hashlib.sha256(binary).hexdigest(),'leagueWorkbook':{'name':Path(league_stats_path).name,'sha256':hashlib.sha256(Path(league_stats_path).read_bytes()).hexdigest(),'coveredPlayerIds':covered},'adjustments':adjustments,'miiDatabase':previous['source'].get('miiDatabase'),'miiNote':previous['source']['miiNote']},'players':records}
     (ROOT/'src/player-data.json').write_text(json.dumps(data,indent=2)+'\n')
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)

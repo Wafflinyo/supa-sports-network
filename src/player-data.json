@@ -77,8 +77,6 @@
         39,
         55,
         56,
-        72,
-        73,
         74,
         75,
         76,
@@ -92,9 +90,7 @@
         81,
         82,
         83,
-        121,
         136,
-        84,
         85,
         86,
         122,
@@ -105,21 +101,16 @@
         90,
         91,
         124,
-        97,
-        98,
-        99,
-        100,
-        126,
         92,
         93,
         94,
         95,
-        96,
         125,
+        99,
+        100,
         101,
         102,
         103,
-        104,
         127,
         137,
         105,
@@ -129,11 +120,9 @@
         129,
         108,
         109,
-        110,
         130,
         131,
         132,
-        111,
         112,
         113,
         133,
@@ -142,8 +131,7 @@
         114,
         115,
         116,
-        117,
-        135
+        117
       ]
     },
     "adjustments": {
@@ -167,7 +155,10 @@
         }
       }
     },
-    "miiNote": "Named Mii stats follow the edited league roster. Same-color Mii chemistry requires opposite genders."
+    "miiNote": "Mii names, colors, genders and portraits follow the current Wii database. Same-color Mii chemistry applies to opposite genders.",
+    "miiDatabase": {
+      "count": 70
+    }
   },
   "players": {
     "1": {
@@ -224,12 +215,12 @@
         27,
         148,
         149,
-        72,
-        73,
+        180,
         74,
         75,
         76,
-        118
+        118,
+        191
       ],
       "badChemistryIds": [
         11,
@@ -361,12 +352,12 @@
         23,
         24,
         142,
-        72,
-        73,
+        180,
         74,
         75,
         76,
-        118
+        118,
+        191
       ],
       "badChemistryIds": [
         10,
@@ -510,7 +501,7 @@
         81,
         82,
         83,
-        121,
+        183,
         136
       ],
       "badChemistryIds": [
@@ -622,10 +613,10 @@
         27,
         148,
         149,
+        184,
         101,
         102,
         103,
-        104,
         127,
         137
       ],
@@ -689,6 +680,7 @@
         78,
         79,
         119,
+        187,
         120
       ],
       "badChemistryIds": [
@@ -734,11 +726,12 @@
         158,
         159,
         160,
-        97,
-        98,
+        179,
+        181,
         99,
         100,
-        126
+        189,
+        193
       ],
       "badChemistryIds": [
         10,
@@ -781,12 +774,12 @@
         4,
         40,
         16,
-        72,
-        73,
+        180,
         74,
         75,
         76,
-        118
+        118,
+        191
       ],
       "badChemistryIds": [
         10,
@@ -843,10 +836,10 @@
         141,
         16,
         29,
+        184,
         101,
         102,
         103,
-        104,
         127,
         137
       ],
@@ -917,6 +910,7 @@
         78,
         79,
         119,
+        187,
         120
       ],
       "badChemistryIds": [
@@ -992,11 +986,12 @@
         174,
         42,
         176,
+        185,
         114,
         115,
         116,
         117,
-        135
+        192
       ],
       "badChemistryIds": [
         1,
@@ -1082,11 +1077,12 @@
         176,
         56,
         177,
+        185,
         114,
         115,
         116,
         117,
-        135
+        192
       ],
       "badChemistryIds": [
         1,
@@ -1144,11 +1140,12 @@
         21,
         44,
         150,
-        97,
-        98,
+        179,
+        181,
         99,
         100,
-        126
+        189,
+        193
       ],
       "badChemistryIds": [
         1,
@@ -1206,9 +1203,9 @@
         153,
         154,
         39,
-        84,
         85,
         86,
+        188,
         122,
         123
       ],
@@ -1275,7 +1272,7 @@
         81,
         82,
         83,
-        121,
+        183,
         136
       ],
       "badChemistryIds": [
@@ -1331,7 +1328,7 @@
         93,
         94,
         95,
-        96,
+        182,
         125
       ],
       "badChemistryIds": [
@@ -1379,11 +1376,12 @@
         147,
         19,
         178,
+        185,
         114,
         115,
         116,
         117,
-        135
+        192
       ],
       "badChemistryIds": [
         2,
@@ -1481,10 +1479,10 @@
         165,
         18,
         15,
+        184,
         101,
         102,
         103,
-        104,
         127,
         137
       ],
@@ -1537,6 +1535,7 @@
         78,
         79,
         119,
+        187,
         120
       ],
       "badChemistryIds": [
@@ -1590,10 +1589,10 @@
         48,
         151,
         152,
+        184,
         101,
         102,
         103,
-        104,
         127,
         137
       ],
@@ -1638,11 +1637,12 @@
         38,
         19,
         178,
+        185,
         114,
         115,
         116,
         117,
-        135
+        192
       ],
       "badChemistryIds": [
         1,
@@ -1698,10 +1698,10 @@
         66,
         108,
         109,
-        110,
         130,
         131,
-        132
+        132,
+        190
       ],
       "badChemistryIds": [
         59,
@@ -1793,10 +1793,10 @@
         58,
         66,
         18,
+        184,
         101,
         102,
         103,
-        104,
         127,
         137
       ],
@@ -1850,11 +1850,12 @@
         66,
         19,
         178,
-        97,
-        98,
+        179,
+        181,
         99,
         100,
-        126
+        189,
+        193
       ],
       "badChemistryIds": [
         59,
@@ -1899,11 +1900,12 @@
         40,
         57,
         66,
-        97,
-        98,
+        179,
+        181,
         99,
         100,
-        126
+        189,
+        193
       ],
       "badChemistryIds": [
         59,
@@ -1962,10 +1964,10 @@
         140,
         108,
         109,
-        110,
         130,
         131,
-        132
+        132,
+        190
       ],
       "badChemistryIds": [
         10,
@@ -2023,9 +2025,9 @@
         33,
         141,
         163,
-        84,
         85,
         86,
+        188,
         122,
         123
       ],
@@ -2125,7 +2127,7 @@
         93,
         94,
         95,
-        96,
+        182,
         125
       ],
       "badChemistryIds": [
@@ -2174,12 +2176,12 @@
         70,
         71,
         15,
-        72,
-        73,
+        180,
         74,
         75,
         76,
-        118
+        118,
+        191
       ],
       "badChemistryIds": [
         3,
@@ -2229,10 +2231,10 @@
         15,
         108,
         109,
-        110,
         130,
         131,
-        132
+        132,
+        190
       ],
       "badChemistryIds": [
         3,
@@ -2400,9 +2402,9 @@
         157,
         158,
         159,
-        84,
         85,
         86,
+        188,
         122,
         123
       ],
@@ -2473,12 +2475,12 @@
         157,
         158,
         159,
-        72,
-        73,
+        180,
         74,
         75,
         76,
-        118
+        118,
+        191
       ],
       "badChemistryIds": [
         167,
@@ -2551,7 +2553,7 @@
         93,
         94,
         95,
-        96,
+        182,
         125
       ],
       "badChemistryIds": [
@@ -2625,7 +2627,7 @@
         81,
         82,
         83,
-        121,
+        183,
         136
       ],
       "badChemistryIds": [
@@ -2695,11 +2697,12 @@
         157,
         158,
         159,
-        97,
-        98,
+        179,
+        181,
         99,
         100,
-        126
+        189,
+        193
       ],
       "badChemistryIds": [
         167,
@@ -2768,10 +2771,10 @@
         157,
         158,
         159,
+        184,
         101,
         102,
         103,
-        104,
         127,
         137
       ],
@@ -2836,11 +2839,12 @@
         157,
         158,
         159,
+        185,
         114,
         115,
         116,
         117,
-        135
+        192
       ],
       "badChemistryIds": [
         167,
@@ -2903,7 +2907,7 @@
         157,
         158,
         159,
-        111,
+        186,
         112,
         113,
         133,
@@ -2984,10 +2988,10 @@
         39,
         56,
         177,
+        184,
         101,
         102,
         103,
-        104,
         127,
         137
       ],
@@ -3037,12 +3041,12 @@
         23,
         24,
         142,
-        72,
-        73,
+        180,
         74,
         75,
         76,
-        118
+        118,
+        191
       ],
       "badChemistryIds": [
         10,
@@ -3100,7 +3104,7 @@
         93,
         94,
         95,
-        96,
+        182,
         125
       ],
       "badChemistryIds": [
@@ -3159,7 +3163,7 @@
         81,
         82,
         83,
-        121,
+        183,
         136
       ],
       "badChemistryIds": [
@@ -3331,7 +3335,7 @@
         23,
         24,
         142,
-        111,
+        186,
         112,
         113,
         133,
@@ -3396,10 +3400,10 @@
         27,
         148,
         149,
+        184,
         101,
         102,
         103,
-        104,
         127,
         137
       ],
@@ -3462,10 +3466,10 @@
         149,
         108,
         109,
-        110,
         130,
         131,
-        132
+        132,
+        190
       ],
       "badChemistryIds": [
         10,
@@ -3587,12 +3591,12 @@
         174,
         42,
         176,
-        72,
-        73,
+        180,
         74,
         75,
         76,
-        118
+        118,
+        191
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
@@ -3650,7 +3654,7 @@
         93,
         94,
         95,
-        96,
+        182,
         125
       ],
       "badChemistryIds": [],
@@ -3703,12 +3707,12 @@
         174,
         42,
         176,
-        72,
-        73,
+        180,
         74,
         75,
         76,
-        118
+        118,
+        191
       ],
       "badChemistryIds": [
         29
@@ -3825,7 +3829,7 @@
         93,
         94,
         95,
-        96,
+        182,
         125
       ],
       "badChemistryIds": [
@@ -3884,7 +3888,7 @@
         154,
         15,
         38,
-        111,
+        186,
         112,
         113,
         133,
@@ -4016,12 +4020,12 @@
         154,
         15,
         38,
-        72,
-        73,
+        180,
         74,
         75,
         76,
-        118
+        118,
+        191
       ],
       "badChemistryIds": [
         2,
@@ -4086,7 +4090,7 @@
         93,
         94,
         95,
-        96,
+        182,
         125
       ],
       "badChemistryIds": [
@@ -4153,7 +4157,7 @@
         107,
         128,
         129,
-        111,
+        186,
         112,
         113,
         133,
@@ -4223,9 +4227,9 @@
         81,
         82,
         83,
-        121,
+        183,
         136,
-        111,
+        186,
         112,
         113,
         133,
@@ -4290,12 +4294,12 @@
         39,
         56,
         177,
-        72,
-        73,
+        180,
         74,
         75,
         76,
-        118
+        118,
+        191
       ],
       "badChemistryIds": [
         8,
@@ -4367,7 +4371,7 @@
         93,
         94,
         95,
-        96,
+        182,
         125
       ],
       "badChemistryIds": [
@@ -4440,7 +4444,7 @@
         81,
         82,
         83,
-        121,
+        183,
         136
       ],
       "badChemistryIds": [
@@ -4582,11 +4586,12 @@
         39,
         56,
         177,
+        185,
         114,
         115,
         116,
         117,
-        135
+        192
       ],
       "badChemistryIds": [
         8,
@@ -4654,17 +4659,18 @@
         39,
         56,
         177,
-        72,
-        73,
+        180,
         74,
         75,
         76,
         118,
-        97,
-        98,
+        191,
+        179,
+        181,
         99,
         100,
-        126
+        189,
+        193
       ],
       "badChemistryIds": [
         8,
@@ -4732,18 +4738,18 @@
         39,
         56,
         177,
-        72,
-        73,
+        180,
         74,
         75,
         76,
         118,
+        191,
         108,
         109,
-        110,
         130,
         131,
-        132
+        132,
+        190
       ],
       "badChemistryIds": [
         8,
@@ -4815,7 +4821,7 @@
         93,
         94,
         95,
-        96,
+        182,
         125
       ],
       "badChemistryIds": [
@@ -4882,12 +4888,12 @@
         54,
         145,
         15,
-        72,
-        73,
+        180,
         74,
         75,
         76,
-        118
+        118,
+        191
       ],
       "badChemistryIds": [
         8,
@@ -5028,7 +5034,7 @@
         81,
         82,
         83,
-        121,
+        183,
         136
       ],
       "badChemistryIds": [
@@ -5099,12 +5105,13 @@
         78,
         79,
         119,
+        187,
         120,
         92,
         93,
         94,
         95,
-        96,
+        182,
         125
       ],
       "badChemistryIds": [
@@ -5175,12 +5182,12 @@
         93,
         94,
         95,
-        96,
+        182,
         125,
+        184,
         101,
         102,
         103,
-        104,
         127,
         137
       ],
@@ -5309,12 +5316,12 @@
         174,
         42,
         176,
-        72,
-        73,
+        180,
         74,
         75,
         76,
-        118
+        118,
+        191
       ],
       "badChemistryIds": [
         25,
@@ -5376,7 +5383,7 @@
         93,
         94,
         95,
-        96,
+        182,
         125
       ],
       "badChemistryIds": [
@@ -5441,11 +5448,12 @@
         90,
         91,
         124,
-        97,
-        98,
+        179,
+        181,
         99,
         100,
-        126
+        189,
+        193
       ],
       "badChemistryIds": [
         6,
@@ -5515,7 +5523,7 @@
         38,
         56,
         177,
-        111,
+        186,
         112,
         113,
         133,
@@ -5581,7 +5589,7 @@
         39,
         55,
         175,
-        111,
+        186,
         112,
         113,
         133,
@@ -5656,7 +5664,7 @@
         81,
         82,
         83,
-        121,
+        183,
         136
       ],
       "badChemistryIds": [
@@ -5711,7 +5719,7 @@
         93,
         94,
         95,
-        96,
+        182,
         125
       ],
       "badChemistryIds": [
@@ -5817,12 +5825,12 @@
         140,
         160,
         163,
-        72,
-        73,
+        180,
         74,
         75,
         76,
-        118
+        118,
+        191
       ],
       "badChemistryIds": [
         10,
@@ -5932,7 +5940,7 @@
         93,
         94,
         95,
-        96,
+        182,
         125
       ],
       "badChemistryIds": [
@@ -5986,12 +5994,12 @@
         149,
         55,
         175,
-        72,
-        73,
+        180,
         74,
         75,
         76,
-        118
+        118,
+        191
       ],
       "badChemistryIds": [
         20,
@@ -6048,7 +6056,7 @@
         81,
         82,
         83,
-        121,
+        183,
         136
       ],
       "badChemistryIds": [
@@ -6106,6 +6114,7 @@
         78,
         79,
         119,
+        187,
         120
       ],
       "badChemistryIds": [
@@ -6156,7 +6165,7 @@
         93,
         94,
         95,
-        96,
+        182,
         125
       ],
       "badChemistryIds": [
@@ -6205,12 +6214,12 @@
         24,
         142,
         163,
-        72,
-        73,
+        180,
         74,
         75,
         76,
-        118
+        118,
+        191
       ],
       "badChemistryIds": [
         20,
@@ -6315,13 +6324,13 @@
         81,
         82,
         83,
-        121,
+        183,
         136,
         92,
         93,
         94,
         95,
-        96,
+        182,
         125
       ],
       "badChemistryIds": [
@@ -6374,12 +6383,12 @@
         93,
         94,
         95,
-        96,
+        182,
         125,
+        184,
         101,
         102,
         103,
-        104,
         127,
         137
       ],
@@ -6433,11 +6442,12 @@
         149,
         56,
         177,
+        185,
         114,
         115,
         116,
         117,
-        135
+        192
       ],
       "badChemistryIds": [
         10,
@@ -6490,10 +6500,10 @@
         178,
         108,
         109,
-        110,
         130,
         131,
-        132
+        132,
+        190
       ],
       "badChemistryIds": [
         14,
@@ -6622,10 +6632,10 @@
         178,
         108,
         109,
-        110,
         130,
         131,
-        132
+        132,
+        190
       ],
       "badChemistryIds": [
         14,
@@ -6686,7 +6696,7 @@
         93,
         94,
         95,
-        96,
+        182,
         125
       ],
       "badChemistryIds": [
@@ -6752,10 +6762,10 @@
         177,
         108,
         109,
-        110,
         130,
         131,
-        132
+        132,
+        190
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
@@ -6862,9 +6872,9 @@
         175,
         56,
         177,
-        84,
         85,
         86,
+        188,
         122,
         123
       ],
@@ -6931,7 +6941,7 @@
         81,
         82,
         83,
-        121,
+        183,
         136
       ],
       "badChemistryIds": [],
@@ -6977,23 +6987,24 @@
         39,
         56,
         177,
-        72,
-        73,
+        180,
         74,
         75,
         76,
         118,
+        191,
         80,
         81,
         82,
         83,
-        121,
+        183,
         136,
-        97,
-        98,
+        179,
+        181,
         99,
         100,
-        126
+        189,
+        193
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
@@ -7044,7 +7055,7 @@
         39,
         55,
         175,
-        111,
+        186,
         112,
         113,
         133,
@@ -7100,18 +7111,19 @@
         39,
         55,
         175,
-        97,
-        98,
+        179,
+        181,
         99,
         100,
-        126
+        189,
+        193
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
       "statsSource": "custom game DOL"
     },
-    "72": {
+    "180": {
       "stats": {
         "player class": "Balanced",
         "pitching stamina": 75,
@@ -7157,69 +7169,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        73,
         74,
-        75,
         76,
-        118
+        191
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
-    },
-    "73": {
-      "stats": {
-        "player class": "Balanced",
-        "pitching stamina": 75,
-        "weight": 2,
-        "fielding ability": 12,
-        "baserunning ability": 0,
-        "slap contact size": 65,
-        "charge contact size": 45,
-        "slap hit power": 45,
-        "charge hit power": 65,
-        "hit trajectory": "Medium",
-        "bunting": 40,
-        "speed": 60,
-        "outfield throwing speed": 60,
-        "fielding": 60,
-        "displayed pitching": 6,
-        "displayed batting": 6,
-        "displayed fielding": 6,
-        "displayed speed": 6,
-        "curveball speed": 130,
-        "charge pitch speed": 142,
-        "curve": 50
-      },
-      "goodChemistryIds": [
-        1,
-        8,
-        161,
-        61,
-        67,
-        14,
-        43,
-        21,
-        51,
-        17,
-        151,
-        152,
-        35,
-        53,
-        159,
-        23,
-        26,
-        175
-      ],
-      "badChemistryIds": [],
-      "conditionalGoodChemistryIds": [
-        72,
-        74,
-        75,
-        76,
-        118
-      ],
-      "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "74": {
       "stats": {
@@ -7267,14 +7222,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        72,
-        73,
+        180,
         75,
-        76,
         118
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "75": {
       "stats": {
@@ -7322,14 +7275,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        72,
-        73,
         74,
         76,
-        118
+        191
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "76": {
       "stats": {
@@ -7377,14 +7328,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        72,
-        73,
-        74,
+        180,
         75,
         118
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "118": {
       "stats": {
@@ -7432,14 +7381,65 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        72,
-        73,
         74,
-        75,
-        76
+        76,
+        191
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
+    },
+    "191": {
+      "stats": {
+        "player class": "Balanced",
+        "pitching stamina": 75,
+        "weight": 2,
+        "fielding ability": 12,
+        "baserunning ability": 0,
+        "slap contact size": 65,
+        "charge contact size": 45,
+        "slap hit power": 45,
+        "charge hit power": 65,
+        "hit trajectory": "Medium",
+        "bunting": 40,
+        "speed": 60,
+        "outfield throwing speed": 60,
+        "fielding": 60,
+        "displayed pitching": 6,
+        "displayed batting": 6,
+        "displayed fielding": 6,
+        "displayed speed": 6,
+        "curveball speed": 130,
+        "charge pitch speed": 142,
+        "curve": 50
+      },
+      "goodChemistryIds": [
+        1,
+        8,
+        161,
+        61,
+        67,
+        14,
+        43,
+        21,
+        51,
+        17,
+        151,
+        152,
+        35,
+        53,
+        159,
+        23,
+        26,
+        175
+      ],
+      "badChemistryIds": [],
+      "conditionalGoodChemistryIds": [
+        180,
+        75,
+        118
+      ],
+      "miiColorProfile": false,
+      "statsSource": "current league Mii profile"
     },
     "77": {
       "stats": {
@@ -7475,12 +7475,11 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
         78,
-        79,
-        119,
+        187,
         120
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "78": {
       "stats": {
@@ -7517,11 +7516,10 @@
       "conditionalGoodChemistryIds": [
         77,
         79,
-        119,
-        120
+        119
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "79": {
       "stats": {
@@ -7556,13 +7554,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        77,
         78,
-        119,
+        187,
         120
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "119": {
       "stats": {
@@ -7597,13 +7594,52 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        77,
         78,
-        79,
+        187,
         120
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
+    },
+    "187": {
+      "stats": {
+        "player class": "Balanced",
+        "pitching stamina": 75,
+        "weight": 2,
+        "fielding ability": 12,
+        "baserunning ability": 0,
+        "slap contact size": 65,
+        "charge contact size": 45,
+        "slap hit power": 45,
+        "charge hit power": 65,
+        "hit trajectory": "Medium",
+        "bunting": 40,
+        "speed": 60,
+        "outfield throwing speed": 60,
+        "fielding": 60,
+        "displayed pitching": 6,
+        "displayed batting": 6,
+        "displayed fielding": 6,
+        "displayed speed": 6,
+        "curveball speed": 130,
+        "charge pitch speed": 142,
+        "curve": 50
+      },
+      "goodChemistryIds": [
+        6,
+        65,
+        164,
+        153,
+        142
+      ],
+      "badChemistryIds": [],
+      "conditionalGoodChemistryIds": [
+        77,
+        79,
+        119
+      ],
+      "miiColorProfile": false,
+      "statsSource": "current league Mii profile"
     },
     "120": {
       "stats": {
@@ -7639,12 +7675,11 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
         77,
-        78,
         79,
         119
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "80": {
       "stats": {
@@ -7687,13 +7722,11 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
         81,
-        82,
         83,
-        121,
         136
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "81": {
       "stats": {
@@ -7737,12 +7770,10 @@
       "conditionalGoodChemistryIds": [
         80,
         82,
-        83,
-        121,
-        136
+        183
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "82": {
       "stats": {
@@ -7784,14 +7815,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        80,
         81,
         83,
-        121,
         136
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "83": {
       "stats": {
@@ -7834,15 +7863,13 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
         80,
-        81,
         82,
-        121,
-        136
+        183
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
-    "121": {
+    "183": {
       "stats": {
         "player class": "Balanced",
         "pitching stamina": 75,
@@ -7882,14 +7909,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        80,
         81,
-        82,
         83,
         136
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "136": {
       "stats": {
@@ -7932,53 +7957,11 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
         80,
-        81,
         82,
-        83,
-        121
+        183
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
-    },
-    "84": {
-      "stats": {
-        "player class": "Balanced",
-        "pitching stamina": 75,
-        "weight": 2,
-        "fielding ability": 12,
-        "baserunning ability": 0,
-        "slap contact size": 65,
-        "charge contact size": 45,
-        "slap hit power": 45,
-        "charge hit power": 65,
-        "hit trajectory": "Medium",
-        "bunting": 40,
-        "speed": 60,
-        "outfield throwing speed": 60,
-        "fielding": 60,
-        "displayed pitching": 6,
-        "displayed batting": 6,
-        "displayed fielding": 6,
-        "displayed speed": 6,
-        "curveball speed": 130,
-        "charge pitch speed": 142,
-        "curve": 50
-      },
-      "goodChemistryIds": [
-        168,
-        166,
-        7,
-        39
-      ],
-      "badChemistryIds": [],
-      "conditionalGoodChemistryIds": [
-        85,
-        86,
-        122,
-        123
-      ],
-      "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "85": {
       "stats": {
@@ -8012,13 +7995,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        84,
         86,
-        122,
-        123
+        188,
+        122
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "86": {
       "stats": {
@@ -8052,13 +8034,49 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        84,
         85,
-        122,
         123
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
+    },
+    "188": {
+      "stats": {
+        "player class": "Balanced",
+        "pitching stamina": 75,
+        "weight": 2,
+        "fielding ability": 12,
+        "baserunning ability": 0,
+        "slap contact size": 65,
+        "charge contact size": 45,
+        "slap hit power": 45,
+        "charge hit power": 65,
+        "hit trajectory": "Medium",
+        "bunting": 40,
+        "speed": 60,
+        "outfield throwing speed": 60,
+        "fielding": 60,
+        "displayed pitching": 6,
+        "displayed batting": 6,
+        "displayed fielding": 6,
+        "displayed speed": 6,
+        "curveball speed": 130,
+        "charge pitch speed": 142,
+        "curve": 50
+      },
+      "goodChemistryIds": [
+        168,
+        166,
+        7,
+        39
+      ],
+      "badChemistryIds": [],
+      "conditionalGoodChemistryIds": [
+        85,
+        123
+      ],
+      "miiColorProfile": false,
+      "statsSource": "current league Mii profile"
     },
     "122": {
       "stats": {
@@ -8092,13 +8110,11 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        84,
         85,
-        86,
         123
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "123": {
       "stats": {
@@ -8132,13 +8148,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        84,
-        85,
         86,
+        188,
         122
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "87": {
       "stats": {
@@ -8185,13 +8200,11 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
         88,
-        89,
         90,
-        91,
         124
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "88": {
       "stats": {
@@ -8239,12 +8252,10 @@
       "conditionalGoodChemistryIds": [
         87,
         89,
-        90,
-        91,
-        124
+        91
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "89": {
       "stats": {
@@ -8290,14 +8301,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        87,
         88,
         90,
-        91,
         124
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "90": {
       "stats": {
@@ -8344,13 +8353,11 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
         87,
-        88,
         89,
-        91,
-        124
+        91
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "91": {
       "stats": {
@@ -8396,14 +8403,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        87,
         88,
-        89,
         90,
         124
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "124": {
       "stats": {
@@ -8450,238 +8455,11 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
         87,
-        88,
         89,
-        90,
         91
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
-    },
-    "97": {
-      "stats": {
-        "player class": "Balanced",
-        "pitching stamina": 75,
-        "weight": 2,
-        "fielding ability": 12,
-        "baserunning ability": 0,
-        "slap contact size": 65,
-        "charge contact size": 45,
-        "slap hit power": 45,
-        "charge hit power": 65,
-        "hit trajectory": "Medium",
-        "bunting": 40,
-        "speed": 60,
-        "outfield throwing speed": 60,
-        "fielding": 60,
-        "displayed pitching": 6,
-        "displayed batting": 6,
-        "displayed fielding": 6,
-        "displayed speed": 6,
-        "curveball speed": 130,
-        "charge pitch speed": 142,
-        "curve": 50
-      },
-      "goodChemistryIds": [
-        155,
-        167,
-        57,
-        58,
-        70,
-        151,
-        145,
-        175,
-        177
-      ],
-      "badChemistryIds": [],
-      "conditionalGoodChemistryIds": [
-        98,
-        99,
-        100,
-        126
-      ],
-      "miiColorProfile": false,
-      "statsSource": "league workbook"
-    },
-    "98": {
-      "stats": {
-        "player class": "Balanced",
-        "pitching stamina": 75,
-        "weight": 2,
-        "fielding ability": 12,
-        "baserunning ability": 0,
-        "slap contact size": 65,
-        "charge contact size": 45,
-        "slap hit power": 45,
-        "charge hit power": 65,
-        "hit trajectory": "Medium",
-        "bunting": 40,
-        "speed": 60,
-        "outfield throwing speed": 60,
-        "fielding": 60,
-        "displayed pitching": 6,
-        "displayed batting": 6,
-        "displayed fielding": 6,
-        "displayed speed": 6,
-        "curveball speed": 130,
-        "charge pitch speed": 142,
-        "curve": 50
-      },
-      "goodChemistryIds": [
-        155,
-        167,
-        57,
-        58,
-        70,
-        151,
-        145,
-        175,
-        177
-      ],
-      "badChemistryIds": [],
-      "conditionalGoodChemistryIds": [
-        97,
-        99,
-        100,
-        126
-      ],
-      "miiColorProfile": false,
-      "statsSource": "league workbook"
-    },
-    "99": {
-      "stats": {
-        "player class": "Balanced",
-        "pitching stamina": 75,
-        "weight": 2,
-        "fielding ability": 12,
-        "baserunning ability": 0,
-        "slap contact size": 65,
-        "charge contact size": 45,
-        "slap hit power": 45,
-        "charge hit power": 65,
-        "hit trajectory": "Medium",
-        "bunting": 40,
-        "speed": 60,
-        "outfield throwing speed": 60,
-        "fielding": 60,
-        "displayed pitching": 6,
-        "displayed batting": 6,
-        "displayed fielding": 6,
-        "displayed speed": 6,
-        "curveball speed": 130,
-        "charge pitch speed": 142,
-        "curve": 50
-      },
-      "goodChemistryIds": [
-        155,
-        167,
-        57,
-        58,
-        70,
-        151,
-        145,
-        175,
-        177
-      ],
-      "badChemistryIds": [],
-      "conditionalGoodChemistryIds": [
-        97,
-        98,
-        100,
-        126
-      ],
-      "miiColorProfile": false,
-      "statsSource": "league workbook"
-    },
-    "100": {
-      "stats": {
-        "player class": "Balanced",
-        "pitching stamina": 75,
-        "weight": 2,
-        "fielding ability": 12,
-        "baserunning ability": 0,
-        "slap contact size": 65,
-        "charge contact size": 45,
-        "slap hit power": 45,
-        "charge hit power": 65,
-        "hit trajectory": "Medium",
-        "bunting": 40,
-        "speed": 60,
-        "outfield throwing speed": 60,
-        "fielding": 60,
-        "displayed pitching": 6,
-        "displayed batting": 6,
-        "displayed fielding": 6,
-        "displayed speed": 6,
-        "curveball speed": 130,
-        "charge pitch speed": 142,
-        "curve": 50
-      },
-      "goodChemistryIds": [
-        155,
-        167,
-        57,
-        58,
-        70,
-        151,
-        145,
-        175,
-        177
-      ],
-      "badChemistryIds": [],
-      "conditionalGoodChemistryIds": [
-        97,
-        98,
-        99,
-        126
-      ],
-      "miiColorProfile": false,
-      "statsSource": "league workbook"
-    },
-    "126": {
-      "stats": {
-        "player class": "Balanced",
-        "pitching stamina": 75,
-        "weight": 2,
-        "fielding ability": 12,
-        "baserunning ability": 0,
-        "slap contact size": 65,
-        "charge contact size": 45,
-        "slap hit power": 45,
-        "charge hit power": 65,
-        "hit trajectory": "Medium",
-        "bunting": 40,
-        "speed": 60,
-        "outfield throwing speed": 60,
-        "fielding": 60,
-        "displayed pitching": 6,
-        "displayed batting": 6,
-        "displayed fielding": 6,
-        "displayed speed": 6,
-        "curveball speed": 130,
-        "charge pitch speed": 142,
-        "curve": 50
-      },
-      "goodChemistryIds": [
-        155,
-        167,
-        57,
-        58,
-        70,
-        151,
-        145,
-        175,
-        177
-      ],
-      "badChemistryIds": [],
-      "conditionalGoodChemistryIds": [
-        97,
-        98,
-        99,
-        100
-      ],
-      "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "92": {
       "stats": {
@@ -8730,13 +8508,11 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
         93,
-        94,
         95,
-        96,
         125
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "93": {
       "stats": {
@@ -8786,12 +8562,10 @@
       "conditionalGoodChemistryIds": [
         92,
         94,
-        95,
-        96,
-        125
+        182
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "94": {
       "stats": {
@@ -8839,14 +8613,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        92,
         93,
         95,
-        96,
         125
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "95": {
       "stats": {
@@ -8895,15 +8667,13 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
         92,
-        93,
         94,
-        96,
-        125
+        182
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
-    "96": {
+    "182": {
       "stats": {
         "player class": "Balanced",
         "pitching stamina": 75,
@@ -8949,14 +8719,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        92,
         93,
-        94,
         95,
         125
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "125": {
       "stats": {
@@ -9005,13 +8773,320 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
         92,
-        93,
         94,
-        95,
-        96
+        182
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
+    },
+    "179": {
+      "stats": {
+        "player class": "Balanced",
+        "pitching stamina": 75,
+        "weight": 2,
+        "fielding ability": 12,
+        "baserunning ability": 0,
+        "slap contact size": 65,
+        "charge contact size": 45,
+        "slap hit power": 45,
+        "charge hit power": 65,
+        "hit trajectory": "Medium",
+        "bunting": 40,
+        "speed": 60,
+        "outfield throwing speed": 60,
+        "fielding": 60,
+        "displayed pitching": 6,
+        "displayed batting": 6,
+        "displayed fielding": 6,
+        "displayed speed": 6,
+        "curveball speed": 130,
+        "charge pitch speed": 142,
+        "curve": 50
+      },
+      "goodChemistryIds": [
+        155,
+        167,
+        57,
+        58,
+        70,
+        151,
+        145,
+        175,
+        177
+      ],
+      "badChemistryIds": [],
+      "conditionalGoodChemistryIds": [
+        100,
+        189,
+        193
+      ],
+      "miiColorProfile": false,
+      "statsSource": "current league Mii profile"
+    },
+    "181": {
+      "stats": {
+        "player class": "Balanced",
+        "pitching stamina": 75,
+        "weight": 2,
+        "fielding ability": 12,
+        "baserunning ability": 0,
+        "slap contact size": 65,
+        "charge contact size": 45,
+        "slap hit power": 45,
+        "charge hit power": 65,
+        "hit trajectory": "Medium",
+        "bunting": 40,
+        "speed": 60,
+        "outfield throwing speed": 60,
+        "fielding": 60,
+        "displayed pitching": 6,
+        "displayed batting": 6,
+        "displayed fielding": 6,
+        "displayed speed": 6,
+        "curveball speed": 130,
+        "charge pitch speed": 142,
+        "curve": 50
+      },
+      "goodChemistryIds": [
+        155,
+        167,
+        57,
+        58,
+        70,
+        151,
+        145,
+        175,
+        177
+      ],
+      "badChemistryIds": [],
+      "conditionalGoodChemistryIds": [
+        100,
+        189,
+        193
+      ],
+      "miiColorProfile": false,
+      "statsSource": "current league Mii profile"
+    },
+    "99": {
+      "stats": {
+        "player class": "Balanced",
+        "pitching stamina": 75,
+        "weight": 2,
+        "fielding ability": 12,
+        "baserunning ability": 0,
+        "slap contact size": 65,
+        "charge contact size": 45,
+        "slap hit power": 45,
+        "charge hit power": 65,
+        "hit trajectory": "Medium",
+        "bunting": 40,
+        "speed": 60,
+        "outfield throwing speed": 60,
+        "fielding": 60,
+        "displayed pitching": 6,
+        "displayed batting": 6,
+        "displayed fielding": 6,
+        "displayed speed": 6,
+        "curveball speed": 130,
+        "charge pitch speed": 142,
+        "curve": 50
+      },
+      "goodChemistryIds": [
+        155,
+        167,
+        57,
+        58,
+        70,
+        151,
+        145,
+        175,
+        177
+      ],
+      "badChemistryIds": [],
+      "conditionalGoodChemistryIds": [
+        100,
+        189,
+        193
+      ],
+      "miiColorProfile": false,
+      "statsSource": "current league Mii profile"
+    },
+    "100": {
+      "stats": {
+        "player class": "Balanced",
+        "pitching stamina": 75,
+        "weight": 2,
+        "fielding ability": 12,
+        "baserunning ability": 0,
+        "slap contact size": 65,
+        "charge contact size": 45,
+        "slap hit power": 45,
+        "charge hit power": 65,
+        "hit trajectory": "Medium",
+        "bunting": 40,
+        "speed": 60,
+        "outfield throwing speed": 60,
+        "fielding": 60,
+        "displayed pitching": 6,
+        "displayed batting": 6,
+        "displayed fielding": 6,
+        "displayed speed": 6,
+        "curveball speed": 130,
+        "charge pitch speed": 142,
+        "curve": 50
+      },
+      "goodChemistryIds": [
+        155,
+        167,
+        57,
+        58,
+        70,
+        151,
+        145,
+        175,
+        177
+      ],
+      "badChemistryIds": [],
+      "conditionalGoodChemistryIds": [
+        179,
+        181,
+        99
+      ],
+      "miiColorProfile": false,
+      "statsSource": "current league Mii profile"
+    },
+    "189": {
+      "stats": {
+        "player class": "Balanced",
+        "pitching stamina": 75,
+        "weight": 2,
+        "fielding ability": 12,
+        "baserunning ability": 0,
+        "slap contact size": 65,
+        "charge contact size": 45,
+        "slap hit power": 45,
+        "charge hit power": 65,
+        "hit trajectory": "Medium",
+        "bunting": 40,
+        "speed": 60,
+        "outfield throwing speed": 60,
+        "fielding": 60,
+        "displayed pitching": 6,
+        "displayed batting": 6,
+        "displayed fielding": 6,
+        "displayed speed": 6,
+        "curveball speed": 130,
+        "charge pitch speed": 142,
+        "curve": 50
+      },
+      "goodChemistryIds": [
+        155,
+        167,
+        57,
+        58,
+        70,
+        151,
+        145,
+        175,
+        177
+      ],
+      "badChemistryIds": [],
+      "conditionalGoodChemistryIds": [
+        179,
+        181,
+        99
+      ],
+      "miiColorProfile": false,
+      "statsSource": "current league Mii profile"
+    },
+    "193": {
+      "stats": {
+        "player class": "Balanced",
+        "pitching stamina": 75,
+        "weight": 2,
+        "fielding ability": 12,
+        "baserunning ability": 0,
+        "slap contact size": 65,
+        "charge contact size": 45,
+        "slap hit power": 45,
+        "charge hit power": 65,
+        "hit trajectory": "Medium",
+        "bunting": 40,
+        "speed": 60,
+        "outfield throwing speed": 60,
+        "fielding": 60,
+        "displayed pitching": 6,
+        "displayed batting": 6,
+        "displayed fielding": 6,
+        "displayed speed": 6,
+        "curveball speed": 130,
+        "charge pitch speed": 142,
+        "curve": 50
+      },
+      "goodChemistryIds": [
+        155,
+        167,
+        57,
+        58,
+        70,
+        151,
+        145,
+        175,
+        177
+      ],
+      "badChemistryIds": [],
+      "conditionalGoodChemistryIds": [
+        179,
+        181,
+        99
+      ],
+      "miiColorProfile": false,
+      "statsSource": "current league Mii profile"
+    },
+    "184": {
+      "stats": {
+        "player class": "Balanced",
+        "pitching stamina": 75,
+        "weight": 2,
+        "fielding ability": 12,
+        "baserunning ability": 0,
+        "slap contact size": 65,
+        "charge contact size": 45,
+        "slap hit power": 45,
+        "charge hit power": 65,
+        "hit trajectory": "Medium",
+        "bunting": 40,
+        "speed": 60,
+        "outfield throwing speed": 60,
+        "fielding": 60,
+        "displayed pitching": 6,
+        "displayed batting": 6,
+        "displayed fielding": 6,
+        "displayed speed": 6,
+        "curveball speed": 130,
+        "charge pitch speed": 142,
+        "curve": 50
+      },
+      "goodChemistryIds": [
+        5,
+        64,
+        173,
+        165,
+        40,
+        71,
+        18,
+        16,
+        154,
+        149
+      ],
+      "badChemistryIds": [],
+      "conditionalGoodChemistryIds": [
+        101,
+        103,
+        127
+      ],
+      "miiColorProfile": false,
+      "statsSource": "current league Mii profile"
     },
     "101": {
       "stats": {
@@ -9051,14 +9126,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
+        184,
         102,
-        103,
-        104,
-        127,
         137
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "102": {
       "stats": {
@@ -9100,12 +9173,10 @@
       "conditionalGoodChemistryIds": [
         101,
         103,
-        104,
-        127,
-        137
+        127
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "103": {
       "stats": {
@@ -9145,61 +9216,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        101,
+        184,
         102,
-        104,
-        127,
         137
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
-    },
-    "104": {
-      "stats": {
-        "player class": "Balanced",
-        "pitching stamina": 75,
-        "weight": 2,
-        "fielding ability": 12,
-        "baserunning ability": 0,
-        "slap contact size": 65,
-        "charge contact size": 45,
-        "slap hit power": 45,
-        "charge hit power": 65,
-        "hit trajectory": "Medium",
-        "bunting": 40,
-        "speed": 60,
-        "outfield throwing speed": 60,
-        "fielding": 60,
-        "displayed pitching": 6,
-        "displayed batting": 6,
-        "displayed fielding": 6,
-        "displayed speed": 6,
-        "curveball speed": 130,
-        "charge pitch speed": 142,
-        "curve": 50
-      },
-      "goodChemistryIds": [
-        5,
-        64,
-        173,
-        165,
-        40,
-        71,
-        18,
-        16,
-        154,
-        149
-      ],
-      "badChemistryIds": [],
-      "conditionalGoodChemistryIds": [
-        101,
-        102,
-        103,
-        127,
-        137
-      ],
-      "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "127": {
       "stats": {
@@ -9239,14 +9261,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        101,
+        184,
         102,
-        103,
-        104,
         137
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "137": {
       "stats": {
@@ -9287,13 +9307,11 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
         101,
-        102,
         103,
-        104,
         127
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "105": {
       "stats": {
@@ -9330,12 +9348,10 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
         106,
-        107,
-        128,
         129
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "106": {
       "stats": {
@@ -9373,11 +9389,10 @@
       "conditionalGoodChemistryIds": [
         105,
         107,
-        128,
-        129
+        128
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "107": {
       "stats": {
@@ -9413,13 +9428,11 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        105,
         106,
-        128,
         129
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "128": {
       "stats": {
@@ -9455,13 +9468,11 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        105,
         106,
-        107,
         129
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "129": {
       "stats": {
@@ -9498,12 +9509,11 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
         105,
-        106,
         107,
         128
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "108": {
       "stats": {
@@ -9541,14 +9551,11 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        109,
-        110,
-        130,
         131,
         132
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "109": {
       "stats": {
@@ -9586,59 +9593,11 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        108,
-        110,
-        130,
         131,
         132
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
-    },
-    "110": {
-      "stats": {
-        "player class": "Balanced",
-        "pitching stamina": 75,
-        "weight": 2,
-        "fielding ability": 12,
-        "baserunning ability": 0,
-        "slap contact size": 65,
-        "charge contact size": 45,
-        "slap hit power": 45,
-        "charge hit power": 65,
-        "hit trajectory": "Medium",
-        "bunting": 40,
-        "speed": 60,
-        "outfield throwing speed": 60,
-        "fielding": 60,
-        "displayed pitching": 6,
-        "displayed batting": 6,
-        "displayed fielding": 6,
-        "displayed speed": 6,
-        "curveball speed": 130,
-        "charge pitch speed": 142,
-        "curve": 50
-      },
-      "goodChemistryIds": [
-        3,
-        66,
-        62,
-        29,
-        152,
-        41,
-        42,
-        19
-      ],
-      "badChemistryIds": [],
-      "conditionalGoodChemistryIds": [
-        108,
-        109,
-        130,
-        131,
-        132
-      ],
-      "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "130": {
       "stats": {
@@ -9676,14 +9635,11 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        108,
-        109,
-        110,
         131,
         132
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "131": {
       "stats": {
@@ -9723,12 +9679,11 @@
       "conditionalGoodChemistryIds": [
         108,
         109,
-        110,
         130,
-        132
+        190
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "132": {
       "stats": {
@@ -9768,14 +9723,55 @@
       "conditionalGoodChemistryIds": [
         108,
         109,
-        110,
         130,
-        131
+        190
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
-    "111": {
+    "190": {
+      "stats": {
+        "player class": "Balanced",
+        "pitching stamina": 75,
+        "weight": 2,
+        "fielding ability": 12,
+        "baserunning ability": 0,
+        "slap contact size": 65,
+        "charge contact size": 45,
+        "slap hit power": 45,
+        "charge hit power": 65,
+        "hit trajectory": "Medium",
+        "bunting": 40,
+        "speed": 60,
+        "outfield throwing speed": 60,
+        "fielding": 60,
+        "displayed pitching": 6,
+        "displayed batting": 6,
+        "displayed fielding": 6,
+        "displayed speed": 6,
+        "curveball speed": 130,
+        "charge pitch speed": 142,
+        "curve": 50
+      },
+      "goodChemistryIds": [
+        3,
+        66,
+        62,
+        29,
+        152,
+        41,
+        42,
+        19
+      ],
+      "badChemistryIds": [],
+      "conditionalGoodChemistryIds": [
+        131,
+        132
+      ],
+      "miiColorProfile": false,
+      "statsSource": "current league Mii profile"
+    },
+    "186": {
       "stats": {
         "player class": "Balanced",
         "pitching stamina": 75,
@@ -9811,14 +9807,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        112,
         113,
-        133,
         134,
         138
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "112": {
       "stats": {
@@ -9856,14 +9850,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        111,
         113,
-        133,
         134,
         138
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "113": {
       "stats": {
@@ -9901,14 +9893,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        111,
+        186,
         112,
-        133,
-        134,
-        138
+        133
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "133": {
       "stats": {
@@ -9946,14 +9936,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        111,
-        112,
         113,
         134,
         138
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "134": {
       "stats": {
@@ -9991,14 +9979,12 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        111,
+        186,
         112,
-        113,
-        133,
-        138
+        133
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "138": {
       "stats": {
@@ -10036,14 +10022,53 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        111,
+        186,
         112,
-        113,
-        133,
-        134
+        133
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
+    },
+    "185": {
+      "stats": {
+        "player class": "Balanced",
+        "pitching stamina": 75,
+        "weight": 2,
+        "fielding ability": 12,
+        "baserunning ability": 0,
+        "slap contact size": 65,
+        "charge contact size": 45,
+        "slap hit power": 45,
+        "charge hit power": 65,
+        "hit trajectory": "Medium",
+        "bunting": 40,
+        "speed": 60,
+        "outfield throwing speed": 60,
+        "fielding": 60,
+        "displayed pitching": 6,
+        "displayed batting": 6,
+        "displayed fielding": 6,
+        "displayed speed": 6,
+        "curveball speed": 130,
+        "charge pitch speed": 142,
+        "curve": 50
+      },
+      "goodChemistryIds": [
+        10,
+        20,
+        171,
+        162,
+        139,
+        48,
+        163
+      ],
+      "badChemistryIds": [],
+      "conditionalGoodChemistryIds": [
+        115,
+        117
+      ],
+      "miiColorProfile": false,
+      "statsSource": "current league Mii profile"
     },
     "114": {
       "stats": {
@@ -10081,12 +10106,10 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
         115,
-        116,
-        117,
-        135
+        117
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "115": {
       "stats": {
@@ -10123,13 +10146,13 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
+        185,
         114,
         116,
-        117,
-        135
+        192
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "116": {
       "stats": {
@@ -10166,13 +10189,11 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        114,
         115,
-        117,
-        135
+        117
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
     "117": {
       "stats": {
@@ -10209,15 +10230,15 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
+        185,
         114,
-        115,
         116,
-        135
+        192
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     },
-    "135": {
+    "192": {
       "stats": {
         "player class": "Balanced",
         "pitching stamina": 75,
@@ -10252,13 +10273,11 @@
       ],
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [
-        114,
         115,
-        116,
         117
       ],
       "miiColorProfile": false,
-      "statsSource": "league workbook"
+      "statsSource": "current league Mii profile"
     }
   }
 }

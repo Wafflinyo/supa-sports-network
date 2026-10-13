@@ -1356,41 +1356,64 @@
     "rosterOrder": 111
   },
   {
-    "id": 72,
-    "name": "Cap",
+    "id": 180,
+    "name": "Betty Boop",
     "class": "Balanced",
     "color": "Red",
-    "source": "GM",
+    "source": "Wii Mii database",
     "kind": "mii",
-    "rosterOrder": 112
-  },
-  {
-    "id": 73,
-    "name": "Pauline (Mii)",
-    "class": "Balanced",
-    "color": "Red",
-    "source": "Mario",
-    "kind": "mii",
-    "portraitName": "Pauline",
-    "rosterOrder": 113
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rosterOrder": 112,
+    "portraitIndex": 0,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 74,
-    "name": "Burger King",
+    "name": "BurgerKing",
     "class": "Balanced",
     "color": "Red",
     "source": "Food",
     "kind": "mii",
-    "rosterOrder": 114
+    "rosterOrder": 113,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [
+      "Burger King"
+    ],
+    "portraitIndex": 1,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 75,
-    "name": "Harley Quinn",
+    "name": "Harley",
     "class": "Balanced",
     "color": "Red",
     "source": "DC",
     "kind": "mii",
-    "rosterOrder": 115
+    "rosterOrder": 114,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [
+      "Harley Quinn"
+    ],
+    "portraitIndex": 2,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 76,
@@ -1399,7 +1422,17 @@
     "color": "Red",
     "source": "Pokemon",
     "kind": "mii",
-    "rosterOrder": 116
+    "rosterOrder": 115,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 3,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 118,
@@ -1408,7 +1441,35 @@
     "color": "Red",
     "source": "Resident Evil",
     "kind": "mii",
-    "rosterOrder": 117
+    "rosterOrder": 116,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 4,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
+  },
+  {
+    "id": 191,
+    "name": "Ironman",
+    "class": "Balanced",
+    "color": "Red",
+    "source": "Wii Mii database",
+    "kind": "mii",
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rosterOrder": 117,
+    "portraitIndex": 5,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 77,
@@ -1417,7 +1478,17 @@
     "color": "Orange",
     "source": "Dragon Ball",
     "kind": "mii",
-    "rosterOrder": 118
+    "rosterOrder": 118,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 6,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 78,
@@ -1426,7 +1497,17 @@
     "color": "Orange",
     "source": "Splatoon",
     "kind": "mii",
-    "rosterOrder": 119
+    "rosterOrder": 119,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 7,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 79,
@@ -1435,7 +1516,17 @@
     "color": "Orange",
     "source": "Cartoon",
     "kind": "mii",
-    "rosterOrder": 120
+    "rosterOrder": 120,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 8,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 119,
@@ -1444,7 +1535,35 @@
     "color": "Orange",
     "source": "Garfield",
     "kind": "mii",
-    "rosterOrder": 121
+    "rosterOrder": 121,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 9,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
+  },
+  {
+    "id": 187,
+    "name": "Velma",
+    "class": "Balanced",
+    "color": "Orange",
+    "source": "Wii Mii database",
+    "kind": "mii",
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rosterOrder": 122,
+    "portraitIndex": 10,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 120,
@@ -1453,16 +1572,38 @@
     "color": "Orange",
     "source": "Pokemon",
     "kind": "mii",
-    "rosterOrder": 122
+    "rosterOrder": 123,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 11,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 80,
-    "name": "Nigel Thornberry",
+    "name": "Nigel",
     "class": "Balanced",
     "color": "Yellow",
     "source": "Cartoon",
     "kind": "mii",
-    "rosterOrder": 123
+    "rosterOrder": 124,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [
+      "Nigel Thornberry"
+    ],
+    "portraitIndex": 12,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 81,
@@ -1471,34 +1612,77 @@
     "color": "Yellow",
     "source": "Bejeweled",
     "kind": "mii",
-    "rosterOrder": 124
+    "rosterOrder": 125,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 13,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 82,
-    "name": "Ronald McDonald",
+    "name": "Ronald",
     "class": "Balanced",
     "color": "Yellow",
     "source": "Food",
     "kind": "mii",
-    "rosterOrder": 125
+    "rosterOrder": 126,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [
+      "Ronald McDonald"
+    ],
+    "portraitIndex": 14,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 83,
-    "name": "Sadie Adler",
+    "name": "Sadie",
     "class": "Balanced",
     "color": "Yellow",
     "source": "Red Dead Redemption",
     "kind": "mii",
-    "rosterOrder": 126
+    "rosterOrder": 127,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [
+      "Sadie Adler"
+    ],
+    "portraitIndex": 15,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
-    "id": 121,
-    "name": "Waffle",
+    "id": 183,
+    "name": "Charlie B",
     "class": "Balanced",
     "color": "Yellow",
-    "source": "GM",
+    "source": "Wii Mii database",
     "kind": "mii",
-    "rosterOrder": 127
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rosterOrder": 128,
+    "portraitIndex": 16,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 136,
@@ -1507,25 +1691,38 @@
     "color": "Yellow",
     "source": "FNAF",
     "kind": "mii",
-    "rosterOrder": 128
-  },
-  {
-    "id": 84,
-    "name": "Narf",
-    "class": "Balanced",
-    "color": "Light Green",
-    "source": "GM",
-    "kind": "mii",
-    "rosterOrder": 129
+    "rosterOrder": 129,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 17,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 85,
-    "name": "Jade Harley",
+    "name": "Jade",
     "class": "Balanced",
     "color": "Light Green",
     "source": "Homestuck",
     "kind": "mii",
-    "rosterOrder": 130
+    "rosterOrder": 130,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [
+      "Jade Harley"
+    ],
+    "portraitIndex": 18,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 86,
@@ -1534,25 +1731,77 @@
     "color": "Light Green",
     "source": "Scooby Doo",
     "kind": "mii",
-    "rosterOrder": 131
+    "rosterOrder": 131,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 19,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
+  },
+  {
+    "id": 188,
+    "name": "Paul",
+    "class": "Balanced",
+    "color": "Light Green",
+    "source": "Wii Mii database",
+    "kind": "mii",
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rosterOrder": 132,
+    "portraitIndex": 20,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 122,
-    "name": "Derrick White",
+    "name": "Derrick",
     "class": "Balanced",
     "color": "Light Green",
     "source": "Basketball",
     "kind": "mii",
-    "rosterOrder": 132
+    "rosterOrder": 133,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [
+      "Derrick White"
+    ],
+    "portraitIndex": 21,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 123,
-    "name": "Sonya Blade",
+    "name": "Sonya",
     "class": "Balanced",
     "color": "Light Green",
     "source": "Mortal Kombat",
     "kind": "mii",
-    "rosterOrder": 133
+    "rosterOrder": 134,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [
+      "Sonya Blade"
+    ],
+    "portraitIndex": 22,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 87,
@@ -1561,7 +1810,17 @@
     "color": "Green",
     "source": "Pokemon",
     "kind": "mii",
-    "rosterOrder": 134
+    "rosterOrder": 135,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 23,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 88,
@@ -1570,7 +1829,17 @@
     "color": "Green",
     "source": "Cartoon",
     "kind": "mii",
-    "rosterOrder": 135
+    "rosterOrder": 136,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 24,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 89,
@@ -1579,7 +1848,17 @@
     "color": "Green",
     "source": "I don't know, I can't see him",
     "kind": "mii",
-    "rosterOrder": 136
+    "rosterOrder": 137,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 25,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 90,
@@ -1588,7 +1867,17 @@
     "color": "Green",
     "source": "Animal Crossing",
     "kind": "mii",
-    "rosterOrder": 137
+    "rosterOrder": 138,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 26,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 91,
@@ -1597,72 +1886,59 @@
     "color": "Green",
     "source": "Undertale",
     "kind": "mii",
-    "rosterOrder": 138
+    "rosterOrder": 139,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 27,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 124,
-    "name": "Cammy White",
+    "name": "Cammy",
     "class": "Balanced",
     "color": "Green",
     "source": "Street Fighter",
     "kind": "mii",
-    "rosterOrder": 139
-  },
-  {
-    "id": 97,
-    "name": "Comet",
-    "class": "Balanced",
-    "color": "Light Blue",
-    "source": "GM",
-    "kind": "mii",
-    "rosterOrder": 140
-  },
-  {
-    "id": 98,
-    "name": "Rosalina (Mii)",
-    "class": "Balanced",
-    "color": "Light Blue",
-    "source": "Mario",
-    "kind": "mii",
-    "portraitName": "Rosalina",
-    "rosterOrder": 141
-  },
-  {
-    "id": 99,
-    "name": "Sans",
-    "class": "Balanced",
-    "color": "Light Blue",
-    "source": "Deltarune",
-    "kind": "mii",
-    "rosterOrder": 142
-  },
-  {
-    "id": 100,
-    "name": "Wendy (Mii)",
-    "class": "Balanced",
-    "color": "Light Blue",
-    "source": "Food",
-    "kind": "mii",
-    "portraitName": "Wendy",
-    "rosterOrder": 143
-  },
-  {
-    "id": 126,
-    "name": "OAO",
-    "class": "Balanced",
-    "color": "Light Blue",
-    "source": "GM",
-    "kind": "mii",
-    "rosterOrder": 144
+    "rosterOrder": 140,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [
+      "Cammy White"
+    ],
+    "portraitIndex": 28,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 92,
-    "name": "Sheen Estevez",
+    "name": "Sheen",
     "class": "Balanced",
     "color": "Blue",
     "source": "Jimmy Neutron",
     "kind": "mii",
-    "rosterOrder": 145
+    "rosterOrder": 141,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [
+      "Sheen Estevez"
+    ],
+    "portraitIndex": 29,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 93,
@@ -1671,7 +1947,17 @@
     "color": "Blue",
     "source": "Metroid",
     "kind": "mii",
-    "rosterOrder": 146
+    "rosterOrder": 142,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 30,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 94,
@@ -1680,7 +1966,17 @@
     "color": "Blue",
     "source": "Minecraft",
     "kind": "mii",
-    "rosterOrder": 147
+    "rosterOrder": 143,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 31,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 95,
@@ -1689,16 +1985,35 @@
     "color": "Blue",
     "source": "Cartoon",
     "kind": "mii",
-    "rosterOrder": 148
+    "rosterOrder": 144,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 32,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
-    "id": 96,
-    "name": "PANCAKE!?!",
+    "id": 182,
+    "name": "Vegeta",
     "class": "Balanced",
     "color": "Blue",
-    "source": "Unknown",
+    "source": "Wii Mii database",
     "kind": "mii",
-    "rosterOrder": 149
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rosterOrder": 145,
+    "portraitIndex": 33,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 125,
@@ -1707,16 +2022,166 @@
     "color": "Blue",
     "source": "Halo",
     "kind": "mii",
-    "rosterOrder": 150
+    "rosterOrder": 146,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 34,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
+  },
+  {
+    "id": 179,
+    "name": "Frozone",
+    "class": "Balanced",
+    "color": "Light Blue",
+    "source": "Wii Mii database",
+    "kind": "mii",
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rosterOrder": 147,
+    "portraitIndex": 35,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
+  },
+  {
+    "id": 181,
+    "name": "Mr. Beast",
+    "class": "Balanced",
+    "color": "Light Blue",
+    "source": "Wii Mii database",
+    "kind": "mii",
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rosterOrder": 148,
+    "portraitIndex": 36,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
+  },
+  {
+    "id": 99,
+    "name": "Sans",
+    "class": "Balanced",
+    "color": "Light Blue",
+    "source": "Deltarune",
+    "kind": "mii",
+    "rosterOrder": 149,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 37,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
+  },
+  {
+    "id": 100,
+    "name": "Wendy",
+    "class": "Balanced",
+    "color": "Light Blue",
+    "source": "Food",
+    "kind": "mii",
+    "rosterOrder": 150,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 38,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
+  },
+  {
+    "id": 189,
+    "name": "Lois G",
+    "class": "Balanced",
+    "color": "Light Blue",
+    "source": "Wii Mii database",
+    "kind": "mii",
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rosterOrder": 151,
+    "portraitIndex": 39,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
+  },
+  {
+    "id": 193,
+    "name": "Katara",
+    "class": "Balanced",
+    "color": "Light Blue",
+    "source": "Wii Mii database",
+    "kind": "mii",
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rosterOrder": 152,
+    "portraitIndex": 40,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
+  },
+  {
+    "id": 184,
+    "name": "Cookn Mama",
+    "class": "Balanced",
+    "color": "Pink",
+    "source": "Wii Mii database",
+    "kind": "mii",
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rosterOrder": 153,
+    "portraitIndex": 41,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 101,
-    "name": "Saul Goodman",
+    "name": "Saul",
     "class": "Balanced",
     "color": "Pink",
     "source": "Better Call Saul",
     "kind": "mii",
-    "rosterOrder": 151
+    "rosterOrder": 154,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [
+      "Saul Goodman"
+    ],
+    "portraitIndex": 42,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 102,
@@ -1725,25 +2190,38 @@
     "color": "Pink",
     "source": "Cartoon",
     "kind": "mii",
-    "rosterOrder": 152
+    "rosterOrder": 155,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 43,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 103,
-    "name": "Timmy Turner",
+    "name": "Timmy",
     "class": "Balanced",
     "color": "Pink",
     "source": "Cartoon",
     "kind": "mii",
-    "rosterOrder": 153
-  },
-  {
-    "id": 104,
-    "name": "Paula",
-    "class": "Balanced",
-    "color": "Pink",
-    "source": "Earthbound",
-    "kind": "mii",
-    "rosterOrder": 154
+    "rosterOrder": 156,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [
+      "Timmy Turner"
+    ],
+    "portraitIndex": 44,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 127,
@@ -1752,7 +2230,17 @@
     "color": "Pink",
     "source": "Totally not Jung Kook from BTS",
     "kind": "mii",
-    "rosterOrder": 155
+    "rosterOrder": 157,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 45,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 137,
@@ -1761,7 +2249,17 @@
     "color": "Pink",
     "source": "Rose",
     "kind": "mii",
-    "rosterOrder": 156
+    "rosterOrder": 158,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 46,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 105,
@@ -1770,7 +2268,17 @@
     "color": "Purple",
     "source": "Left for Dead",
     "kind": "mii",
-    "rosterOrder": 157
+    "rosterOrder": 159,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 47,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 106,
@@ -1779,7 +2287,17 @@
     "color": "Purple",
     "source": "Legend of Zelda",
     "kind": "mii",
-    "rosterOrder": 158
+    "rosterOrder": 160,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 48,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 107,
@@ -1788,16 +2306,38 @@
     "color": "Purple",
     "source": "Fast Food",
     "kind": "mii",
-    "rosterOrder": 159
+    "rosterOrder": 161,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 49,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 128,
-    "name": "William Afton",
+    "name": "William",
     "class": "Balanced",
     "color": "Purple",
     "source": "FNAF",
     "kind": "mii",
-    "rosterOrder": 160
+    "rosterOrder": 162,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [
+      "William Afton"
+    ],
+    "portraitIndex": 50,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 129,
@@ -1806,16 +2346,38 @@
     "color": "Purple",
     "source": "Street Fighter",
     "kind": "mii",
-    "rosterOrder": 161
+    "rosterOrder": 163,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 51,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 108,
-    "name": "Scooby Doo",
+    "name": "Scooby-Doo",
     "class": "Balanced",
     "color": "Brown",
     "source": "Scooby Doo ",
     "kind": "mii",
-    "rosterOrder": 162
+    "rosterOrder": 164,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [
+      "Scooby Doo"
+    ],
+    "portraitIndex": 52,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 109,
@@ -1824,34 +2386,59 @@
     "color": "Brown",
     "source": "Mr. Bean",
     "kind": "mii",
-    "rosterOrder": 163
-  },
-  {
-    "id": 110,
-    "name": "Goombella",
-    "class": "Balanced",
-    "color": "Brown",
-    "source": "Paper Mario ",
-    "kind": "mii",
-    "rosterOrder": 164
+    "rosterOrder": 165,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 53,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 130,
-    "name": "Cranky Kong",
+    "name": "Cranky",
     "class": "Balanced",
     "color": "Brown",
     "source": "Donkey Kong",
     "kind": "mii",
-    "rosterOrder": 165
+    "rosterOrder": 166,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [
+      "Cranky Kong"
+    ],
+    "portraitIndex": 54,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 131,
-    "name": "Squirrel Girl",
+    "name": "Sq. Girl",
     "class": "Balanced",
     "color": "Brown",
     "source": "Marvel",
     "kind": "mii",
-    "rosterOrder": 166
+    "rosterOrder": 167,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [
+      "Squirrel Girl"
+    ],
+    "portraitIndex": 55,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 132,
@@ -1860,34 +2447,95 @@
     "color": "Brown",
     "source": "Wherever Horses Come From",
     "kind": "mii",
-    "rosterOrder": 167
+    "rosterOrder": 168,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 56,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
-    "id": 111,
-    "name": "Steve Harvey",
+    "id": 190,
+    "name": "Dino",
+    "class": "Balanced",
+    "color": "Brown",
+    "source": "Wii Mii database",
+    "kind": "mii",
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rosterOrder": 169,
+    "portraitIndex": 57,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
+  },
+  {
+    "id": 186,
+    "name": "Hank Hill",
     "class": "Balanced",
     "color": "White",
-    "source": "Himself",
+    "source": "Wii Mii database",
     "kind": "mii",
-    "rosterOrder": 168
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rosterOrder": 170,
+    "portraitIndex": 58,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 112,
-    "name": "Walter White",
+    "name": "Walter",
     "class": "Balanced",
     "color": "White",
     "source": "Breaking Bad",
     "kind": "mii",
-    "rosterOrder": 169
+    "rosterOrder": 171,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [
+      "Walter White"
+    ],
+    "portraitIndex": 59,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 113,
-    "name": "Hatsune Miku",
+    "name": "Miku",
     "class": "Balanced",
     "color": "White",
     "source": "Vocaloid ",
     "kind": "mii",
-    "rosterOrder": 170
+    "rosterOrder": 172,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [
+      "Hatsune Miku"
+    ],
+    "portraitIndex": 60,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 133,
@@ -1896,25 +2544,77 @@
     "color": "White",
     "source": "WorldofTShirts",
     "kind": "mii",
-    "rosterOrder": 171
+    "rosterOrder": 173,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 61,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 134,
-    "name": "Wrinkly Kong",
+    "name": "Wrinkly",
     "class": "Balanced",
     "color": "White",
     "source": "Donkey Kong",
     "kind": "mii",
-    "rosterOrder": 172
+    "rosterOrder": 174,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [
+      "Wrinkly Kong"
+    ],
+    "portraitIndex": 62,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 138,
-    "name": "Amelia Earhart",
+    "name": "Amelia",
     "class": "Balanced",
     "color": "White",
     "source": "Plane",
     "kind": "mii",
-    "rosterOrder": 173
+    "rosterOrder": 175,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [
+      "Amelia Earhart"
+    ],
+    "portraitIndex": 63,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
+  },
+  {
+    "id": 185,
+    "name": "Batman",
+    "class": "Balanced",
+    "color": "Black",
+    "source": "Wii Mii database",
+    "kind": "mii",
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rosterOrder": 176,
+    "portraitIndex": 64,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 114,
@@ -1923,7 +2623,17 @@
     "color": "Black",
     "source": "Breaking Bad",
     "kind": "mii",
-    "rosterOrder": 174
+    "rosterOrder": 177,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 65,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 115,
@@ -1932,16 +2642,38 @@
     "color": "Black",
     "source": "Pokemon ",
     "kind": "mii",
-    "rosterOrder": 175
+    "rosterOrder": 178,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 66,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 116,
-    "name": "Masahiro Sakurai",
+    "name": "Sakurai",
     "class": "Balanced",
     "color": "Black",
     "source": "Smashy Bros",
     "kind": "mii",
-    "rosterOrder": 176
+    "rosterOrder": 179,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [
+      "Masahiro Sakurai"
+    ],
+    "portraitIndex": 67,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
     "id": 117,
@@ -1950,15 +2682,34 @@
     "color": "Black",
     "source": "Da Vinci ",
     "kind": "mii",
-    "rosterOrder": 177
+    "rosterOrder": 180,
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rioAliases": [],
+    "portraitIndex": 68,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   },
   {
-    "id": 135,
-    "name": "Mario Judah",
+    "id": 192,
+    "name": "Harvey",
     "class": "Balanced",
     "color": "Black",
-    "source": "Rap",
+    "source": "Wii Mii database",
     "kind": "mii",
-    "rosterOrder": 178
+    "portrait": "portraits/mii-roster-606c707bd9be.webp",
+    "rosterOrder": 181,
+    "portraitIndex": 69,
+    "portraitSheet": {
+      "width": 1920,
+      "height": 1344,
+      "columns": 10,
+      "cellWidth": 192,
+      "cellHeight": 192
+    }
   }
 ]

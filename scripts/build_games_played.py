@@ -19,9 +19,7 @@ OUTPUT = Path(sys.argv[2]) if len(sys.argv) > 2 else ROOT / "src" / "games-playe
 
 def build_counts():
     roster = json.loads((ROOT / "src" / "players.json").read_text(encoding="utf-8"))
-    ids_by_name = {player["name"].strip().casefold(): player["id"] for player in roster}
-    if len(ids_by_name) != len(roster):
-        raise ValueError("The player roster has duplicate names; game appearances cannot be matched safely.")
+    # Namesakes are resolved against scheduled IDs (or explicit per-row IDs).
 
     files = sorted(SOURCE.glob("*.xlsx"))
     schedule = json.loads((ROOT / "games" / "schedule.json").read_text(encoding="utf-8"))

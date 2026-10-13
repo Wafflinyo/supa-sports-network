@@ -14,8 +14,7 @@ rules = json.loads((ROOT / 'src/fantasy-rules.json').read_text())
 roster = json.loads((ROOT / 'src/players.json').read_text())
 from player_identity import resolve_player
 
-by_name = {p['name'].strip().casefold(): p['id'] for p in roster}
-assert len(by_name) == len(roster), 'Player names must be unique or explicitly mapped'
+# resolve_player uses scheduled IDs; a shared display name never chooses a player implicitly.
 
 BAT = {'singles': 'Singles', 'doubles': 'Doubles', 'triples': 'Triples', 'homeRuns': 'Home Runs',
        'runs': 'Runs', 'rbi': 'RBI', 'walks': 'Walks', 'hitByPitch': 'Hit By Pitch',

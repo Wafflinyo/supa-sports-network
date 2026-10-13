@@ -8,7 +8,7 @@ import math
 from collections import Counter
 from pathlib import Path
 from rio_workbook import read_rio_workbook
-from build_fantasy_games import score_report, rows_by_heading, num, by_name
+from build_fantasy_games import score_report, rows_by_heading, num
 from player_identity import resolve_player
 
 ROOT = Path(__file__).resolve().parents[1]

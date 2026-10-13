@@ -31,11 +31,15 @@ export function playerPortraitStyle(player, size) {
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
   }
-  if (identity.portrait) return {
-    backgroundImage: `url(${import.meta.env.BASE_URL}${identity.portrait})`,
-    backgroundSize: `${480 * size / 51}px ${561 * size / 51}px`,
-    backgroundPosition: `${(size - 48 * size / 51) / 2 - identity.portraitIndex % 10 * 48 * size / 51}px ${-Math.floor(identity.portraitIndex / 10) * size}px`,
-    backgroundRepeat: 'no-repeat',
+  if (identity.portrait) {
+    const sheet = identity.portraitSheet || {width:480,height:561,columns:10,cellWidth:48,cellHeight:51}
+    const scale = size / sheet.cellHeight
+    return {
+      backgroundImage: `url(${import.meta.env.BASE_URL}${identity.portrait})`,
+      backgroundSize: `${sheet.width * scale}px ${sheet.height * scale}px`,
+      backgroundPosition: `${(size - sheet.cellWidth * scale) / 2 - identity.portraitIndex % sheet.columns * sheet.cellWidth * scale}px ${-Math.floor(identity.portraitIndex / sheet.columns) * size}px`,
+      backgroundRepeat: 'no-repeat',
+    }
   }
   const portrait = portraits.get(identity.portraitName || identity.name)
   if (!portrait) return null
