@@ -783,7 +783,7 @@
   },
   {
     "id": 146,
-    "name": "Purple Bones",
+    "name": "Purple Dry Bones",
     "class": "Balanced",
     "color": "Purple",
     "source": "Mario",
@@ -791,11 +791,14 @@
     "portrait": "portraits/character-select.png",
     "kind": "character",
     "portraitIndex": 78,
-    "rosterOrder": 65
+    "rosterOrder": 65,
+    "rioAliases": [
+      "Purple Bones"
+    ]
   },
   {
     "id": 147,
-    "name": "Yellow Bones",
+    "name": "Yellow Dry Bones",
     "class": "Balanced",
     "color": "Yellow",
     "source": "Mario",
@@ -803,7 +806,10 @@
     "portrait": "portraits/character-select.png",
     "kind": "character",
     "portraitIndex": 79,
-    "rosterOrder": 66
+    "rosterOrder": 66,
+    "rioAliases": [
+      "Yellow Bones"
+    ]
   },
   {
     "id": 17,
