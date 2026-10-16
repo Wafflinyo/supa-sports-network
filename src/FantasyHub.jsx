@@ -2,7 +2,7 @@ import {PlayerPortrait} from './PlayerPortrait.jsx'
 import React, { useEffect, useMemo, useState } from 'react'
 import { CalendarDays, LockKeyhole, Search, Trophy } from 'lucide-react'
 import { matchupPairs, matchupScore, previousWeek, rules, sumScores, weekKey } from './fantasy-scoring.js'
-import games from './fantasy-games.json'
+import storedGames from './fantasy-games.json'
 
 const tabs = ['Matchups', 'Schedule', 'Standings', 'Player Stats', 'Free Agency', 'Draft']
 const labels = {
@@ -35,7 +35,8 @@ export function FantasyRules() {
   </div>
 }
 
-export function FantasyLeague({ initialLeague, user, supabase, players, onLeagueRefresh }) {
+export function FantasyLeague({ initialLeague, user, supabase, players, liveGames=[], eligibleIds=new Set(), onLeagueRefresh }) {
+  const games=[...storedGames,...liveGames]
   const [league, setLeague] = useState(initialLeague)
   const [tab, setTab] = useState('Matchups')
   const [members, setMembers] = useState([])
@@ -115,7 +116,7 @@ export function FantasyLeague({ initialLeague, user, supabase, players, onLeague
   const locked = playerId => schedule.some(s => s.player_id === playerId &&
     weekKey(new Date(s.starts_at)) === currentWeek && new Date(s.starts_at).getTime() <= now)
   const drafted = new Set(picks.map(p => p.player_id))
-  const available = players.filter(p => !drafted.has(p.id) && `${p.name} ${p.class}`.toLowerCase().includes(draftQuery.toLowerCase()))
+  const available = players.filter(p => !drafted.has(p.id) && eligibleIds.has(p.id) && `${p.name} ${p.class}`.toLowerCase().includes(draftQuery.toLowerCase()))
   const managerCount = order.length
   const nextPick = picks.length + 1
   const roundIndex = managerCount ? Math.floor((nextPick - 1) / managerCount) : 0
@@ -180,6 +181,6 @@ export function FantasyLeague({ initialLeague, user, supabase, players, onLeague
       <div className="draft-search"><Search size={18}/><input placeholder="Search players" value={draftQuery} onChange={e => setDraftQuery(e.target.value)}/></div>
       <div className="fantasy-player-list">{players.filter(p => p.name.toLowerCase().includes(draftQuery.toLowerCase())).map(p => <div key={p.id}><span className="portrait-label"><PlayerPortrait player={p}/>{p.name}</span><strong>{formatScore(sumScores(scoringGames, p.id, currentWeek))}</strong></div>)}</div></div>}
     {tab === 'Free Agency' && <div className="fantasy-content"><div className="fantasy-section-head"><h3>Available players</h3></div><p className="fantasy-hint">Drafted players belong to their fantasy teams. Free agent claims and trades will open with transaction rules.</p>
-      <div className="fantasy-player-list">{players.filter(p => !drafted.has(p.id)).map(p => <div key={p.id}><span className="portrait-label"><PlayerPortrait player={p}/>{p.name}</span><small>{p.class}</small></div>)}</div></div>}
+      <div className="fantasy-player-list">{players.filter(p => !drafted.has(p.id) && eligibleIds.has(p.id)).map(p => <div key={p.id}><span className="portrait-label"><PlayerPortrait player={p}/>{p.name}</span><small>{p.class}</small></div>)}</div></div>}
   </>
 }

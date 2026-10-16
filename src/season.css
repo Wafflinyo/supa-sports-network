@@ -1,0 +1,400 @@
+.season-box {
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.season-box h2 {
+  font-size: 25px;
+  margin: 0 0 15px;
+}
+.season-box h3,
+.season-game h3 {
+  margin: 14px 0;
+}
+.season-box p,
+.season-game p {
+  line-height: 1.55;
+  color: #5d6780;
+}
+.season-form {
+  display: grid;
+  gap: 15px;
+  max-width: 760px;
+}
+.season-form label,
+.season-box label,
+.report-import label,
+.season-selector label {
+  display: grid;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.season-box input,
+.season-box select,
+.season-box textarea,
+.season-game select,
+.season-game input,
+.season-selector select {
+  padding: 11px;
+  border: 1px solid #c8ceda;
+  border-radius: 4px;
+  font: inherit;
+  background: white;
+  color: #172440;
+  max-width: 100%;
+  min-width: 0;
+}
+.season-box textarea {
+  min-height: 70px;
+}
+.season-inline {
+  display: flex;
+  gap: 10px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+.season-inline > * {
+  min-width: 0;
+}
+.season-inline label {
+  flex: 1;
+}
+.season-team-checks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+.season-team-checks label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.season-team-checks input {
+  width: 19px;
+  height: 19px;
+}
+.season-options {
+  display: grid;
+  gap: 10px;
+}
+.season-options > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  background: #f1f3f8;
+  flex-wrap: wrap;
+}
+.season-selector {
+  margin: 0 0 20px;
+}
+.season-selector label {
+  max-width: 400px;
+}
+.season-prompt {
+  border-left: 5px solid #d12f35;
+  background: #fff3d0;
+  padding: 18px 24px;
+  margin-bottom: 24px;
+}
+.season-prompt button {
+  margin: 5px 10px 0 0;
+}
+.season-error {
+  border: 1px solid #cc3434;
+  background: #fff2f2;
+  padding: 15px;
+}
+.season-saved {
+  background: #e8f3e9;
+  color: #24532b;
+  padding: 12px;
+}
+.season-team-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+.season-team {
+  padding: 18px;
+  margin-bottom: 16px;
+}
+.season-team summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  font-weight: 800;
+}
+.season-team summary:before {
+  content: "▸";
+  color: #d12f35;
+}
+.season-team[open] summary:before {
+  content: "▾";
+}
+.season-team summary small {
+  font-weight: 400;
+  margin-left: auto;
+}
+.roster-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 7px 0;
+}
+.roster-line .portrait-label {
+  flex: 1;
+}
+.season-team .portrait-label {
+  padding: 5px 0;
+}
+.season-lineup {
+  max-width: 800px;
+  margin: 16px 0;
+}
+.lineup-row {
+  display: grid;
+  grid-template-columns: 26px minmax(110px, 1fr) 100px;
+  align-items: center;
+  gap: 10px;
+  margin: 7px 0;
+}
+.lineup-row select {
+  padding: 10px;
+  border: 1px solid #c8ceda;
+  min-width: 0;
+  max-width: 100%;
+  background: white;
+}
+.season-game {
+  padding: 22px;
+  margin-bottom: 16px;
+}
+.season-game h3 {
+  font-size: 24px;
+}
+.season-game h3 b {
+  font-size: 14px;
+  color: #7a8396;
+  margin: 0 8px;
+}
+.season-game details {
+  margin: 15px 0;
+}
+.season-table {
+  overflow: auto;
+  max-width: 100%;
+  margin: 16px 0;
+}
+.season-table table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.season-table th {
+  background: #172440;
+  color: white;
+  text-align: right;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+.season-table td,
+.season-table th {
+  padding: 13px 16px;
+  border-bottom: 1px solid #dfe3eb;
+}
+.season-table td {
+  text-align: right;
+  background: white;
+}
+.season-table td:first-child,
+.season-table th:first-child {
+  position: sticky;
+  left: 0;
+  text-align: left;
+  z-index: 1;
+  min-width: 170px;
+}
+.season-table th:first-child {
+  z-index: 2;
+}
+.season-table tr:nth-child(even) td {
+  background: #f6f7fa;
+}
+.season-table .portrait-label {
+  justify-content: start;
+}
+.lottery-reveal {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: #152342;
+  color: #fff;
+  padding: 25px;
+  margin: 20px 0;
+}
+.lottery-ball {
+  display: grid;
+  place-items: center;
+  border: 8px double #e1ad25;
+  background: #ffdb56;
+  color: #182440;
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  font-size: 30px;
+  flex-shrink: 0;
+  animation: ball-in 1.6s ease infinite;
+}
+.lottery-reveal img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+}
+.season-draft-order {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+.pick-clock {
+  font: 700 48px monospace;
+  margin: 20px 0;
+}
+.pick-clock small {
+  display: block;
+  font: 700 12px sans-serif;
+  letter-spacing: 2px;
+}
+.trade-compose {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.trade-asset {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px;
+  background: #eef1f7;
+  margin-bottom: 8px;
+}
+.season-offer {
+  padding: 18px 0;
+  border-bottom: 1px solid #d9deea;
+}
+.season-offer li {
+  margin: 8px 0;
+  line-height: 1.5;
+}
+.season-player-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+.season-player-list > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  border: 1px solid #dfe3eb;
+  padding: 12px;
+}
+.season-player-list .portrait-label {
+  flex: 1;
+}
+.season-player-list > div > span:nth-child(2) {
+  font-size: 12px;
+  color: #69748b;
+}
+.season-home {
+  margin-bottom: 24px;
+}
+.report-import {
+  border-top: 2px solid #e0e4ee;
+  margin-top: 20px;
+  padding-top: 20px;
+}
+.report-import label {
+  margin: 15px 0;
+}
+.season-box button:disabled,
+.season-game button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.season-box summary {
+  cursor: pointer;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.season-box .outline-btn,
+.season-box .red-btn {
+  margin-top: 8px;
+  margin-right: 8px;
+}
+@keyframes ball-in {
+  0% {
+    transform: rotate(-12deg) scale(0.94);
+  }
+  50% {
+    transform: rotate(12deg) scale(1);
+  }
+  100% {
+    transform: rotate(-12deg) scale(0.94);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lottery-ball {
+    animation: none;
+  }
+}
+@media (max-width: 700px) {
+  .season-box,
+  .season-game {
+    padding: 16px;
+  }
+  .season-team-columns {
+    grid-template-columns: 1fr;
+  }
+  .trade-compose {
+    grid-template-columns: 1fr;
+  }
+  .season-inline {
+    align-items: stretch;
+  }
+  .season-inline > * {
+    width: 100%;
+    flex: auto;
+  }
+  .lottery-reveal {
+    padding: 15px;
+    gap: 12px;
+  }
+  .lottery-ball {
+    width: 60px;
+    height: 60px;
+  }
+  .lineup-row {
+    grid-template-columns: 22px minmax(100px, 1fr) 75px;
+  }
+  .season-player-list {
+    grid-template-columns: 1fr;
+  }
+  .season-team-checks {
+    grid-template-columns: 1fr;
+  }
+  .season-table td,
+  .season-table th {
+    padding: 11px;
+  }
+}

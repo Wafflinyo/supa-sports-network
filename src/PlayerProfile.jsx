@@ -9,9 +9,9 @@ const groups = [
   ['Fielding', [['putouts','Putouts / Game',2],['assists','Assists / Game',2]]],
   ['Pitching', [['pitchStrikeouts','Strikeouts / Game',2],['era7','ERA (7 Innings)',2]]],
 ]
-export default function PlayerProfile({player, PlayerAvatar, onClose}) {
+export default function PlayerProfile({player, PlayerAvatar, onClose,careerSeasons=[]}) {
   const dialog=useRef(null)
-  const career=playerCareer(player.id, archive.seasons)
+  const career=playerCareer(player.id, [...archive.seasons,...careerSeasons])
   useEffect(()=>{
     const previous=document.activeElement
     dialog.current.showModal()
