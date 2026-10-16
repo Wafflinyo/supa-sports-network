@@ -43,10 +43,10 @@ try {
   await page.getByLabel('To',{exact:true}).selectOption('team1')
   await page.getByLabel('Player',{exact:true}).selectOption('38')
   await page.getByRole('button',{name:'ADD TO OFFER',exact:true}).click()
-  await page.getByLabel('Asset',{exact:true}).selectOption('coin')
+  await page.getByLabel('Trade asset type',{exact:true}).selectOption('coin')
   await page.getByRole('spinbutton').fill('5')
   await page.getByRole('button',{name:'ADD TO OFFER',exact:true}).click()
-  await page.getByLabel('Note',{exact:true}).fill('Would you swap King Boo and 5 Star Coins for Bowser?')
+  await page.getByLabel('Trade note',{exact:true}).fill('Would you swap King Boo and 5 Star Coins for Bowser?')
  }
  for(const width of [320,360,390,430,768,1280]){
   await page.setViewportSize({width,height:900})

@@ -1756,6 +1756,7 @@ function Trades({ league: l, messages = false }) {
                   <label>
                     Asset
                     <select
+                      aria-label="Trade asset type"
                       value={move.kind}
                       onChange={(e) =>
                         setMove({ ...move, kind: e.target.value, id: "" })
@@ -1850,6 +1851,7 @@ function Trades({ league: l, messages = false }) {
                   Note
                   <textarea
                     maxLength={1000}
+                    aria-label="Trade note"
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                   />
