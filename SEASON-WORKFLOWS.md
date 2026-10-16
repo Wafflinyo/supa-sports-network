@@ -43,3 +43,9 @@ All-Star voting accepts one editable ballot per signed-in account, with nine dis
 Attach a YouTube premiere URL to each game. The commissioner may upload Rio results before airing; viewers and GMs cannot read the report payload before release. Automatic release happens at the exact configured video-end time, visible on the next site refresh (about eight seconds); manual release requires commissioner confirmation after premiere start. If a premiere moves, update its broadcast time/end or mark it postponed to hold release. This implementation does not automatically detect YouTube’s actual end time.
 
 Dolphin crashes, lost recordings, and replay/forfeit rules remain commissioner decisions. A postponement announcement and revised date can be published through the game’s broadcast controls without exposing results.
+
+## Fantasy season eligibility
+
+Fantasy creation and draft starts are blocked on the server until the associated SSL draft is finished and all twelve franchises have at least eleven players. Each fantasy league binds to one SSL season. Completing its fantasy draft fixes its scoring activation timestamp and first eligible week. Before SSL Week 1, the league receives all 22 regular-season weeks; midseason leagues receive only the remaining weeks through Week 22. Games starting before fantasy activation, older SSL seasons and playoff games do not score. A late-start league’s earlier weeks have no matchup records or lineup rows.
+
+The fantasy Schedule tab lists its weekly head-to-head pairings. New leagues, draft starts and lineup swaps close after the associated regular season; standings remain viewable. A season calendar published after the fantasy draft still anchors the first matchup to SSL Week 1 or the activation week, whichever is later.

@@ -30,6 +30,8 @@ export function fantasyGames(seasons) {
     s.schedulePublished
       ? s.games.map((g) => ({
           id: "ssl:" + g.id,
+          seasonId: s.id,
+          phase: g.phase,
           startsAt: g.startsAt,
           playerScores: Object.fromEntries(
             (g.stage === "final" ? g.result?.players || [] : []).map((p) => [
