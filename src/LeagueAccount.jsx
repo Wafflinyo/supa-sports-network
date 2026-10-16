@@ -6,6 +6,7 @@ export function AccountDialog({supabase,session,onClose,onAccess}) {
  const [username,setUsername]=useState('')
  const [password,setPassword]=useState('')
  const [code,setCode]=useState('')
+ const [showCode,setShowCode]=useState(false)
  const [busy,setBusy]=useState(false)
  const [message,setMessage]=useState('')
  const [access,setAccess]=useState({role:'participant'})
@@ -43,10 +44,10 @@ export function AccountDialog({supabase,session,onClose,onAccess}) {
  return <div className="modal-backdrop" onClick={onClose}><div className="modal auth-modal" role="dialog" aria-modal="true" aria-label="League account" onClick={e=>e.stopPropagation()}>
   <button className="close" aria-label="Close" onClick={onClose}><X/></button><CircleUserRound size={34} color="#d9232e"/>
   <h2>{session?'YOUR ACCOUNT':mode==='signup'?'CREATE AN ACCOUNT':'SIGN IN TO THE LEAGUE'}</h2>
-  {session?<p>Signed in as <strong>{session.user.email?.split('@')[0]}</strong>. Current access: <strong>{access.role}</strong>{access.team?` — ${access.team}`:''}.</p>:<><div className="stat-view-switch">{['login','signup'].map(m=><button key={m} className={mode===m?'active':''} onClick={()=>{setMode(m);setMessage('')}}>{m==='login'?'SIGN IN':'CREATE ACCOUNT'}</button>)}</div><p>No email required. Leave the code blank for fantasy participation.</p></>}
+  {session?<p>Signed in as <strong>{session.user.email?.split('@')[0]}</strong>. Current access: <strong>{access.role}</strong>{access.team?` — ${access.team}`:''}.</p>:<><div className="stat-view-switch">{['login','signup'].map(m=><button key={m} className={mode===m?'active':''} onClick={()=>{setMode(m);setMessage('')}}>{m==='login'?'SIGN IN':'CREATE ACCOUNT'}</button>)}</div><p>No email required. Leave the code blank for ordinary fantasy access. GM and commissioner codes apply to this sign-in only.</p></>}
   <form onSubmit={submit}>
    {!session&&<><label htmlFor="account-username">USERNAME</label><input id="account-username" required pattern="[A-Za-z0-9_]{3,24}" minLength={3} maxLength={24} autoComplete="username" value={username} onChange={e=>setUsername(e.target.value)} placeholder="3–24 letters, numbers or underscores"/><label htmlFor="account-password">PASSWORD</label><input id="account-password" type="password" required minLength={10} maxLength={128} autoComplete={mode==='signup'?'new-password':'current-password'} value={password} onChange={e=>setPassword(e.target.value)}/></>}
-   <label htmlFor="account-code">GM / COMMISSIONER CODE (OPTIONAL)</label><input id="account-code" type="password" autoComplete="off" value={code} onChange={e=>setCode(e.target.value)} placeholder="Leave blank for ordinary access"/>
+   <label htmlFor="account-code">GM / COMMISSIONER CODE (OPTIONAL)</label><input id="account-code" type={showCode?"text":"password"} autoComplete="off" autoCapitalize="characters" spellCheck={false} value={code} onChange={e=>setCode(e.target.value)} placeholder="COMM-XXXX-XXXX or GM-XXXX-XXXX"/><button type="button" className="text-link" aria-controls="account-code" aria-pressed={showCode} onClick={()=>setShowCode(!showCode)}>{showCode?"HIDE CODE":"SHOW CODE"}</button><p className="setup-note">Required each sign-in for GM/commissioner tools. Use Update Session Access to enable tools without logging out. Blank = ordinary access.</p>
    <button disabled={busy||!supabase} className="red-btn">{busy?'PLEASE WAIT…':session?'UPDATE SESSION ACCESS':mode==='signup'?'CREATE ACCOUNT':'SIGN IN'}</button>
   </form>
   {!session&&mode==='signup'&&<p className="setup-note">Keep your password safe. Email password recovery is not available for username-only accounts.</p>}
@@ -66,8 +67,16 @@ export function CommissionerCodes({supabase,onAccess}){
   if(r.error){setMessage(r.error.message);if(r.error.message.includes('Commissioner')) onAccess({role:'participant'});return}
   setNewCode(r.data);await load()
  }
+ async function regenerateCommissioner(){
+  setBusy(true);setMessage('');setNewCode(null)
+  const r=await supabase.rpc('regenerate_commissioner_code')
+  setBusy(false)
+  if(r.error){setMessage(r.error.message);return}
+  setNewCode(r.data);setMessage('Your new commissioner code is ready. The old code is invalid; this session remains active.')
+ }
  return <section className="panel access-panel"><div className="section-title"><div><small>COMMISSIONER CONTROLS</small><h2>GM ACCESS CODES</h2></div></div><div className="access-content">
   <p>Assign each slot to one team. Before a GM has chosen a name, you can use a temporary label such as “Team Slot 1” to issue their code. Creating or regenerating a code immediately invalidates its old code and removes GM access from every session using it. Their accounts and fantasy teams remain intact.</p>
+  <p>New codes are short and easy to type: GM-XXXX-XXXX or COMM-XXXX-XXXX. Existing GM codes still work until you regenerate them.</p><div className="gm-code-row"><strong>COMMISSIONER CODE</strong><p>Make a new short code. Other commissioner sessions will need the new code; your current session stays active.</p><button className="outline-btn" disabled={busy} onClick={regenerateCommissioner}>REGENERATE COMMISSIONER CODE</button></div>
   <p>New codes appear once here. Share a team's code privately with its GM; they may share it with their coaches. Each person uses their own account.</p>
   {newCode&&<div className="code-receipt" role="status"><strong>{newCode.team} — new code</strong><code>{newCode.code}</code><button className="outline-btn" onClick={()=>navigator.clipboard.writeText(newCode.code).then(()=>setMessage('Code copied.')).catch(()=>setMessage('Select the code above and copy it.'))}>COPY CODE</button><button className="text-link" onClick={()=>setNewCode(null)}>HIDE CODE</button></div>}
   <div className="gm-code-grid">{rows.map(row=><div key={row.slot} className="gm-code-row"><label htmlFor={`gm-slot-${row.slot}`}>GM SLOT {row.slot}</label><input id={`gm-slot-${row.slot}`} maxLength={80} value={names[row.slot]||''} onChange={e=>setNames({...names,[row.slot]:e.target.value})} placeholder="Team name or temporary slot label"/><span>{row.team?`Code version ${row.version}`:'Inactive — no team assigned'}</span><button className="outline-btn" disabled={busy||(names[row.slot]||'').trim().length<2} onClick={()=>regenerate(row)}>{row.team?'REGENERATE GM CODE':'CREATE GM CODE'}</button></div>)}</div>

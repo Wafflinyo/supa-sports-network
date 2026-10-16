@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
     "test:season": "SSL_TIMELINE_TEST=1 SSL_RULES_TEST=1 node tests/season-workflow.mjs && node tests/rio-import.mjs",
-    "test:pwa": "node tests/pwa.mjs"
+    "test:pwa": "node tests/pwa.mjs",
+    "test:access": "node tests/access-codes.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.117.2",

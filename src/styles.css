@@ -109,3 +109,5 @@
 
 .player-data-table .player-data-name strong {max-width:none;flex:1}
 .player-data-table .player-data-name .player-avatar {flex-shrink:0;margin-right:0}
+
+.auth-modal{max-height:calc(100dvh - 32px);overflow-y:auto}
