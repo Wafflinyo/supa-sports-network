@@ -11,7 +11,7 @@ let source=await fs.readFile(path.join(root,'src/SeasonLeague.jsx'),'utf8')
 for(const name of ['Draft','Trades','LineupEditor']) source=source.replace('function '+name+'(', 'export function '+name+'(')
 await fs.writeFile(copy,source)
 await fs.writeFile(path.join(preview,'index.html'),'<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>SSL sample GM screens</title></head><body><div id="root"></div><script type="module" src="/.mobile-preview/entry.jsx"></script></body></html>')
-await fs.writeFile(path.join(preview,'entry.jsx'),"import React,{useState} from 'react';\nimport {createRoot} from 'react-dom/client';\nimport {Draft,Trades,LineupEditor} from '../src/__ui-screenshot-SeasonLeague.jsx';\nimport pool from '../src/players.json';\nimport '../src/styles.css';import '../src/season.css';import '../src/mobile.css';\nconst mode=new URLSearchParams(location.search).get('mode')||'draft';\nconst names=['Delfino Plaza Pirates',\"Yoshi’s Island Eggsplorers\",'Diamond City Gold Diggers','Bowser Castle Bombers','Luigi Mansion Ghosts','Peach Gardens Monarchs','Wario City Wildcards','DK Jungle Swingers','Toad Town Toadstools','Sarasaland Sun Kings','Rogueport Rascals','Galaxy Star Chasers'];\nconst teams=names.map((name,i)=>({id:'team'+(i+1),slot:i+1,name,conference:i<6?'supa':'galaxy',logoPath:null}));\nconst rosterA=[1,2,5,6,10,20,3,4,7,18,14,13],rosterB=[55,56,38,39,28,53,54,59,57,40,41,42],used=new Set([...rosterA,...rosterB]),rest=pool.filter(p=>!used.has(p.id));\nconst rosters=Object.fromEntries(teams.map((t,i)=>[t.id,i===0?rosterA:i===1?rosterB:rest.slice((i-2)*12,(i-1)*12).map(p=>p.id)]));\nconst positions=['P','C','1B','2B','3B','SS','LF','CF','RF'],defaults=Object.fromEntries(teams.map(t=>[t.id,{starters:rosters[t.id].slice(0,9).map((player,i)=>({player,position:positions[i]})),bench:rosters[t.id].slice(9)}]));\nconst now=Date.parse('2026-10-16T19:00:47Z');\nconst draftPicks=Array.from({length:24},(_,i)=>{const team=teams[i<12?i:23-i];return{number:i+1,round:i<12?1:2,team:team.id,player:rosters[team.id][i<12?0:1],seconds:38+i,pickedAt:new Date(now-60000).toISOString()}});\nconst base={id:'sample-season',number:1,name:'S1 · SAMPLE ONLY',status:mode==='draft'?'drafting':'regular',teams,rosters:mode==='draft'?Object.fromEntries(teams.map(t=>[t.id,rosters[t.id].slice(0,2)])):rosters,defaults,needsDefault:[],games:[],order:teams.map(t=>t.id),picks:mode==='draft'?draftPicks:[],draftAt:new Date(now-60000).toISOString(),lotteryAt:new Date(now-1260000).toISOString(),paused:false,pickStartedAt:new Date(now-47000).toISOString(),pickElapsed:0,baseDraftRounds:11,nextPick:{team:teams[0].id,round:3,cursor:24},tradingOpen:mode!=='draft',extensionsOpen:false,weekOne:'2026-10-18',transactions:[],pickAssets:teams.flatMap(t=>Array.from({length:11},(_,i)=>({id:t.id+'pick'+i,round:i+1,owner:t.id,originalTeam:t.id}))),starCoins:{balances:Object.fromEntries(teams.map(t=>[t.id,{available:55,reserved:0,spent:0,transfers:0}]))}};\nconst offer={id:'sample-offer',status:'pending',createdAt:new Date(now-300000).toISOString(),accepted:['team1'],body:{sender:'team1',teams:['team1','team2'],moves:[{kind:'player',from:'team1',to:'team2',id:10},{kind:'player',from:'team2',to:'team1',id:38},{kind:'coin',from:'team2',to:'team1',quantity:5}],note:'Would you swap King Boo and 5 Star Coins for Bowser?'}};\nfunction App(){const [notice,setNotice]=useState('');const mine=mode==='receive'?teams[1]:teams[0];const league={season:base,seasons:[base],myTeam:mine,access:{role:'gm',slot:mine.slot},now,busy:false,inbox:mode==='receive'?[offer]:[],notice,error:'',setSelected:()=>{},supabase:{storage:{from:()=>({getPublicUrl:()=>({data:{publicUrl:'/sluggers-supa-league-logo.svg'}})})}},act:async(op)=>{setNotice('Sample '+op+' submitted — no live data changed.');return true}};\nreturn <main className=\"container page-content\"><div className=\"page-heading\"><span className=\"eyebrow dark\">SAMPLE GM VIEW · NO LIVE DATA</span><h1>{mode==='draft'?'DRAFT ROOM':mode==='receive'?'MESSAGES':mode==='lineup'?'GAME LINEUP':'TRANSACTIONS'}</h1><p>{mine.name}</p></div>{notice&&<p role=\"status\" className=\"season-saved\">{notice}</p>}{mode==='draft'?<Draft league={league}/>:mode==='lineup'?<section className=\"panel season-box\"><LineupEditor league={league} team={mine.id}/></section>:<Trades league={league} messages={mode==='receive'}/>}</main>};\ncreateRoot(document.getElementById('root')).render(<App/>);\n")
+await fs.writeFile(path.join(preview,'entry.jsx'),"import React,{useState} from 'react';\nimport {createRoot} from 'react-dom/client';\nimport {Draft,Trades,LineupEditor} from '../src/__ui-screenshot-SeasonLeague.jsx';\nimport pool from '../src/players.json';\nimport '../src/styles.css';import '../src/season.css';import '../src/mobile.css';\nconst mode=new URLSearchParams(location.search).get('mode')||'draft';\nconst names=['Delfino Plaza Pirates',\"Yoshi\u2019s Island Eggsplorers\",'Diamond City Gold Diggers','Bowser Castle Bombers','Luigi Mansion Ghosts','Peach Gardens Monarchs','Wario City Wildcards','DK Jungle Swingers','Toad Town Toadstools','Sarasaland Sun Kings','Rogueport Rascals','Galaxy Star Chasers'];\nconst teams=names.map((name,i)=>({id:'team'+(i+1),slot:i+1,name,conference:i<6?'supa':'galaxy',logoPath:null}));\nconst rosterA=[1,2,5,6,10,20,3,4,7,18,14,13],rosterB=[55,56,38,39,28,53,54,59,57,40,41,42],used=new Set([...rosterA,...rosterB]),rest=pool.filter(p=>!used.has(p.id));\nconst rosters=Object.fromEntries(teams.map((t,i)=>[t.id,i===0?rosterA:i===1?rosterB:rest.slice((i-2)*12,(i-1)*12).map(p=>p.id)]));\nconst positions=['P','C','1B','2B','3B','SS','LF','CF','RF'],defaults=Object.fromEntries(teams.map(t=>[t.id,{starters:rosters[t.id].slice(0,9).map((player,i)=>({player,position:positions[i]})),bench:rosters[t.id].slice(9)}]));\nconst now=Date.parse('2026-10-16T19:00:47Z');\nconst draftPicks=Array.from({length:24},(_,i)=>{const team=teams[i<12?i:23-i];return{number:i+1,round:i<12?1:2,team:team.id,player:rosters[team.id][i<12?0:1],seconds:38+i,pickedAt:new Date(now-60000).toISOString()}});\nconst base={id:'sample-season',number:1,name:'S1 \u00b7 SAMPLE ONLY',status:mode==='draft'?'drafting':'regular',teams,rosters:mode==='draft'?Object.fromEntries(teams.map(t=>[t.id,rosters[t.id].slice(0,2)])):rosters,defaults,needsDefault:[],games:[],order:teams.map(t=>t.id),picks:mode==='draft'?draftPicks:[],draftAt:new Date(now-60000).toISOString(),lotteryAt:new Date(now-1260000).toISOString(),paused:false,pickStartedAt:new Date(now-47000).toISOString(),pickElapsed:0,baseDraftRounds:11,nextPick:{team:teams[0].id,round:3,cursor:24},tradingOpen:mode!=='draft',extensionsOpen:false,weekOne:'2026-10-18',transactions:[],pickAssets:teams.flatMap(t=>Array.from({length:11},(_,i)=>({id:t.id+'pick'+i,round:i+1,owner:t.id,originalTeam:t.id}))),starCoins:{balances:Object.fromEntries(teams.map(t=>[t.id,{available:55,reserved:0,spent:0,transfers:0}]))}};\nconst offer={id:'sample-offer',status:'pending',createdAt:new Date(now-300000).toISOString(),accepted:['team1'],body:{sender:'team1',teams:['team1','team2'],moves:[{kind:'player',from:'team1',to:'team2',id:10},{kind:'player',from:'team2',to:'team1',id:38},{kind:'coin',from:'team2',to:'team1',quantity:5}],note:'Would you swap King Boo and 5 Star Coins for Bowser?'}};\nconst scenario=new URLSearchParams(location.search).get('scenario'); if(scenario==='paused')base.paused=true; if(scenario==='other-turn'||scenario==='commissioner')base.nextPick.team='team2';\nfunction App(){const [notice,setNotice]=useState('');const mine=mode==='receive'?teams[1]:teams[0];const league={season:base,seasons:[base],myTeam:mine,access:{role:scenario==='viewer'?'viewer':scenario==='commissioner'?'commissioner':'gm',slot:mine.slot},now,busy:false,inbox:mode==='receive'?[offer]:[],notice,error:'',setSelected:()=>{},supabase:{storage:{from:()=>({getPublicUrl:()=>({data:{publicUrl:'/sluggers-supa-league-logo.svg'}})})}},act:async(op,payload)=>{if(op==='pick'){base.rosters[base.nextPick.team].push(payload.player);base.picks.push({number:25,round:3,team:base.nextPick.team,player:payload.player,seconds:47});base.nextPick={team:'team2',round:3,cursor:25};}setNotice('Sample '+op+' submitted \u2014 no live data changed.');return true}};\nreturn <main className=\"container page-content\"><div className=\"page-heading\"><span className=\"eyebrow dark\">SAMPLE GM VIEW \u00b7 NO LIVE DATA</span><h1>{mode==='draft'?'DRAFT ROOM':mode==='receive'?'MESSAGES':mode==='lineup'?'GAME LINEUP':'TRANSACTIONS'}</h1><p>{mine.name}</p></div>{notice&&<p role=\"status\" className=\"season-saved\">{notice}</p>}{mode==='draft'?<Draft league={league}/>:mode==='lineup'?<section className=\"panel season-box\"><LineupEditor league={league} team={mine.id}/></section>:<Trades league={league} messages={mode==='receive'}/>}</main>};\ncreateRoot(document.getElementById('root')).render(<App/>);\n")
 let server,browser,page
 const results=[],errors=[]
 try {
@@ -53,7 +53,32 @@ try {
   for(const mode of ['draft','propose','receive','lineup']){
    await page.goto('http://127.0.0.1:4197/.mobile-preview/?mode='+mode,{waitUntil:'networkidle'})
    await page.getByRole('heading',{name:mode==='draft'?'DRAFT ROOM':mode==='receive'?'MESSAGES':mode==='lineup'?'GAME LINEUP':'TRANSACTIONS',exact:true}).waitFor()
-   if(mode==='draft')await page.getByLabel('Draft player',{exact:true}).selectOption({index:1})
+   if(mode==='draft'){
+    const cards=page.locator('.draft-player-card')
+    assert.equal(await cards.count(),await page.evaluate(()=>document.querySelector('.draft-pool-count').textContent.match(/(\d+) shown/)[1]).then(Number))
+    assert.equal(await page.locator('.draft-player-card.is-drafted').count(),24)
+    assert((await page.locator('.draft-picks-scroll tbody tr').first().textContent()).includes('#24'))
+    await page.getByLabel('Filter draft round',{exact:true}).selectOption('1')
+    assert.equal(await page.locator('.draft-picks-scroll tbody tr').count(),12)
+    await page.getByLabel('Filter draft round',{exact:true}).selectOption('all')
+    await page.getByLabel('Search draft players',{exact:true}).fill('Mario')
+    assert((await cards.count())>0)
+    await page.getByLabel('Search draft players',{exact:true}).fill('')
+    await page.getByLabel('Filter draft class',{exact:true}).selectOption('Power')
+    assert((await cards.count())>0)
+    await page.getByLabel('Filter draft class',{exact:true}).selectOption('All classes')
+    await page.locator('.draft-player-card.is-drafted').first().click()
+    assert.equal(await page.getByRole('dialog').getByRole('button',{name:/^DRAFT /}).isDisabled(),true)
+    await fit('draft-profile-'+width)
+    await page.keyboard.press('Escape')
+    assert.equal(await page.getByRole('dialog').count(),0)
+    await page.locator('.draft-player-card:not(.is-drafted)').first().click()
+    await page.getByRole('heading',{name:'Good chemistry',exact:true}).waitFor()
+    assert.equal(await page.getByRole('dialog').getByRole('button',{name:/^DRAFT /}).isEnabled(),true)
+    await fit('available-profile-'+width)
+    if([390,1280].includes(width))await page.screenshot({path:path.join(output,'draft-profile-'+(width===390?'phone':'desktop')+'.png'),fullPage:true,animations:'disabled'})
+    await page.getByRole('button',{name:'CLOSE PLAYER',exact:true}).click()
+   }
    if(mode==='propose')await fillOffer()
    await fit(mode+'-'+width)
    if(width<=430){
@@ -72,10 +97,19 @@ try {
     await page.getByRole('button',{name:'SUBMIT COUNTEROFFER',exact:true}).waitFor()
    }
    if(width===390&&mode==='draft'){
-    await page.getByRole('button',{name:'SUBMIT PICK',exact:true}).click()
+    await page.locator('.draft-player-card:not(.is-drafted)').first().click()
+    await page.getByRole('dialog').getByRole('button',{name:/^DRAFT /}).click()
     await page.getByRole('status').filter({hasText:'Sample pick submitted'}).waitFor()
+    assert.equal(await page.locator('.draft-player-card.is-drafted').count(),25)
+    assert((await page.locator('.draft-picks-scroll tbody tr').first().textContent()).includes('#25'))
    }
   }
+ }
+ for(const scenario of ['paused','viewer','other-turn','commissioner']){
+  await page.goto('http://127.0.0.1:4197/.mobile-preview/?mode=draft&scenario='+scenario,{waitUntil:'networkidle'})
+  await page.locator('.draft-player-card:not(.is-drafted)').first().click()
+  assert.equal(await page.getByRole('dialog').getByRole('button',{name:/^DRAFT /}).isEnabled(),scenario==='commissioner','Pick permissions: '+scenario)
+  await page.keyboard.press('Escape')
  }
  for(const width of [320,390,430]){
   await page.setViewportSize({width,height:844})

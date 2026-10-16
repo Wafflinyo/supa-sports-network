@@ -1,3 +1,4 @@
+import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
 import {StarBalance,StarSelections} from './StarCoins.jsx';
 import {
   SeasonRuleControls,
@@ -663,8 +664,6 @@ function Voting({ league: l }) {
 }
 function Draft({ league: l }) {
   const s = l.season,
-    [chosen, setChosen] = useState(""),
-    [query, setQuery] = useState(""),
     [reveal, setReveal] = useState(0);
   useEffect(() => {
     if (!s?.order?.length) return;
@@ -688,12 +687,7 @@ function Draft({ league: l }) {
     next = s.picks.length,
     owner = s.nextPick?.team,
     t = s.teams.find((t) => t.id === owner),
-    mine = l.access.role === "commissioner" || l.myTeam?.id === owner,
-    used = new Set(Object.values(s.rosters).flat()),
-    available = pool.filter(
-      (p) =>
-        !used.has(p.id) && p.name.toLowerCase().includes(query.toLowerCase()),
-    );
+    mine = l.access.role === "commissioner" || l.myTeam?.id === owner;
   if (!open)
     return (
       <>
@@ -784,41 +778,7 @@ function Draft({ league: l }) {
                 ? " · ROSTER FILL"
                 : ` / ${12 * (s.baseDraftRounds || 11)} main-round picks`}
             </p>
-            {mine && !s.paused ? (
-              <div className="season-inline">
-                <input
-                  aria-label="Search draft players"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search available players"
-                />
-                <select
-                  aria-label="Draft player"
-                  value={chosen}
-                  onChange={(e) => setChosen(e.target.value)}
-                >
-                  <option value="">Select player</option>
-                  {available.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} · {p.class}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  className="red-btn"
-                  disabled={l.busy || !chosen}
-                  onClick={async () => {
-                    if (await l.act("pick", { player: Number(chosen) }))
-                      setChosen("");
-                  }}
-                >
-                  SUBMIT PICK
-                  {l.access.role === "commissioner" ? " / PICK FOR TEAM" : ""}
-                </button>
-              </div>
-            ) : (
-              <p>Waiting for {t?.name} to pick.</p>
-            )}
+            {!mine && <p>Waiting for {t?.name} to pick. Browse the player pool below.</p>}
             {l.access.role === "commissioner" && (
               <button
                 className="outline-btn"
@@ -858,7 +818,9 @@ function Draft({ league: l }) {
             save your starting nine, batting order, positions and bench.
           </p>
         )}
+        <DraftPlayers league={l} />
       </Box>
+      <DraftPickBoard season={s} />
       <Box title="PICK TIMES & RESULTS">
         <div className="season-table">
           <table>
@@ -890,35 +852,7 @@ function Draft({ league: l }) {
             </tbody>
           </table>
         </div>
-        <details>
-          <summary>ALL DRAFT PICKS ({s.picks.length})</summary>
-          <div className="season-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>Pick</th>
-                  <th>Round</th>
-                  <th>Team</th>
-                  <th>Player</th>
-                  <th>Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                {s.picks.map((p) => (
-                  <tr key={p.number}>
-                    <td>{p.number}</td>
-                    <td>{p.round}</td>
-                    <td>{s.teams.find((t) => t.id === p.team)?.name}</td>
-                    <td>
-                      <Player id={p.player} />
-                    </td>
-                    <td>{clock(p.seconds)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </details>
+
       </Box>
       <Teams league={l} />
     </>
