@@ -1,0 +1,5 @@
+create or replace function league_private.ssl_points(stats jsonb,one_pitcher boolean,shutout boolean) returns numeric language plpgsql immutable set search_path='' as $$
+declare weights jsonb := '{"singles": 1, "doubles": 2, "triples": 3, "homeRuns": 4, "runs": 1, "rbi": 1, "batWalks": 0.5, "hitByPitch": 0.5, "stolenBases": 2, "caughtStealing": -1, "batStrikeouts": -2, "doublePlaysHitInto": -1, "grandSlams": 2, "putouts": 1, "assists": 0.75, "buddyJumpPutouts": 2, "doublePlays": 1, "triplePlays": 2, "bobbles": -2, "outs": 0.75, "pitchStrikeouts": 3, "hitsAllowed": -0.25, "earnedRuns": -1, "hrAllowed": -0.5, "pitchWalks": -0.5, "beanBalls": -0.5, "pickoffs": 2}';total numeric:=0;k text;v jsonb;outs integer:=coalesce((stats->>'outs')::integer,0);begin
+ for k,v in select * from jsonb_each(weights) loop total:=total+coalesce((stats->>k)::numeric,0)*(v::text)::numeric;end loop;
+ if outs>=9 then total:=total+1;end if;if one_pitcher and outs>0 then total:=total+2;end if;if shutout then total:=total+3;end if;return total;end$$;
+revoke all on function league_private.ssl_points(jsonb,boolean,boolean) from public,anon,authenticated;

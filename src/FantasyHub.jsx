@@ -108,7 +108,7 @@ export function FantasyRules() {
           ))}
         </div>
         <p>
-          A team shutout adds +1 point to every player who played for the team
+          A team shutout adds {points(rules.team.shutoutBonus)} points to every player who played for the team
           that allowed zero runs in a finished game. It stacks with other points
           and pitching bonuses. Only fantasy starters contribute to matchup
           totals.

@@ -41,7 +41,7 @@
     "completeGameBonus": 2
   },
   "team": {
-    "shutoutBonus": 1
+    "shutoutBonus": 3
   },
   "allowedTeamSizes": [
     6,
