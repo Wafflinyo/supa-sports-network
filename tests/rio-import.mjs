@@ -91,3 +91,29 @@ assert.equal(validLineup(season, a, { starters: [], bench: [] }), false);
 console.log(
   "PASS: actual Rio XLSX, 18 participants, 9–11 score, Birdo 10 outs / 3 K, Wiggler 4 outs / 11 HA, team standings and fantasy projection.",
 );
+
+// Duplicate Rio names must not duplicate the same pitcher's statistics.
+const duplicate = structuredClone({ ...preview, file: undefined });
+const pitched = duplicate.rows.find((r) => r.chosen === ids.get("Birdo")),
+  other = duplicate.rows.find(
+    (r) => r.label === pitched.label && r.chosen !== pitched.chosen,
+  );
+pitched.player = "Green Mii (M)";
+other.player = "Green Mii (M)";
+const resultWithMii = buildReport(duplicate, labels[0], season, game, players);
+assert.equal(
+  resultWithMii.players.find((p) => p.player === other.chosen).stats.outs,
+  report.players.find((p) => p.player === other.chosen).stats.outs,
+);
+assert.equal(
+  resultWithMii.players.find((p) => p.player === pitched.chosen).stats.outs,
+  10,
+);
+duplicate.pitch.find((p) => p.chosen === pitched.chosen).chosen = "";
+assert.throws(
+  () => buildReport(duplicate, labels[0], season, game, players),
+  /Map pitching row/,
+);
+console.log(
+  "PASS: duplicate Mii report names cannot duplicate pitching stats; unmapped pitchers block posting.",
+);

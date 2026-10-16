@@ -255,7 +255,18 @@ export async function readRio(file, season, game, players) {
     ).join(""),
     labels,
     rows: targetRows,
-    pitch,
+    pitch: pitch.map((r) => {
+      const matches = targetRows.filter(
+        (b) =>
+          normalize(b.player) === normalize(r.player) &&
+          (!r.team || String(r.team) === b.label),
+      );
+      return {
+        ...r,
+        label: String(r.team || matches[0]?.label || ""),
+        chosen: matches.length === 1 ? matches[0].chosen : "",
+      };
+    }),
   };
 }
 export function buildReport(preview, awayLabel, season, game, players, mvp) {
@@ -295,11 +306,7 @@ export function buildReport(preview, awayLabel, season, game, players, mvp) {
     stats.plateAppearances =
       stats.plateAppearances ||
       stats.atBats + stats.batWalks + stats.hitByPitch + stats.sacFlys;
-    const pitching = preview.pitch.filter(
-      (x) =>
-        normalize(x.player) === normalize(r.player) &&
-        (!x.team || String(x.team) === r.label),
-    );
+    const pitching = preview.pitch.filter((x) => Number(x.chosen) === player);
     if (pitching.length > 1)
       throw Error(`Ambiguous pitching row for ${r.player}.`);
     if (pitching[0]) {
@@ -324,6 +331,18 @@ export function buildReport(preview, awayLabel, season, game, players, mvp) {
   }
   if (new Set(result.map((x) => x.player)).size !== result.length)
     throw Error("A player was mapped more than once.");
+  for (const pitcher of preview.pitch) {
+    if (
+      !pitcher.chosen ||
+      !result.some(
+        (p) =>
+          p.player === Number(pitcher.chosen) && p.team === pickTeam(pitcher),
+      )
+    )
+      throw Error(
+        `Map pitching row ${pitcher.row} (${pitcher.player}) to the correct participating player.`,
+      );
+  }
   return {
     fingerprint: preview.fingerprint,
     filename: preview.filename,

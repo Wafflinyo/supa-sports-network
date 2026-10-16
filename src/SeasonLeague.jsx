@@ -1248,6 +1248,12 @@ function Schedule({ league: l, commissioner = false }) {
                           </p>
                         ),
                       )}
+                      <p>
+                        <strong>Bench:</strong>{" "}
+                        {(g.lineups[id] || s.defaults[id])?.bench
+                          .map(name)
+                          .join(" · ") || "Not submitted"}
+                      </p>
                     </div>
                   ))}
                 </details>
@@ -1377,6 +1383,77 @@ function ReportImport({ league: l, game, onDone }) {
               </tbody>
             </table>
           </div>
+          <h4>REVIEW PITCHERS</h4>
+          <p>
+            Assign each pitching row to one player. Two Miis with the same
+            report name must be mapped separately.
+          </p>
+          <div className="season-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Rio pitcher</th>
+                  <th>Team</th>
+                  <th>IP</th>
+                  <th>K</th>
+                  <th>SSL player</th>
+                </tr>
+              </thead>
+              <tbody>
+                {preview.pitch.map((r, i) => {
+                  const team = r.label === awayLabel ? game.away : game.home;
+                  return (
+                    <tr key={i}>
+                      <td>{r.player}</td>
+                      <td>{r.label}</td>
+                      <td>{Number(r.inningspitched).toFixed(2)}</td>
+                      <td>{r.strikeouts || 0}</td>
+                      <td>
+                        <select
+                          aria-label={`Map pitcher row ${r.row}`}
+                          value={r.chosen}
+                          onChange={(e) =>
+                            setPreview((p) => ({
+                              ...p,
+                              pitch: p.pitch.map((v, j) =>
+                                i === j
+                                  ? { ...v, chosen: Number(e.target.value) }
+                                  : v,
+                              ),
+                            }))
+                          }
+                        >
+                          <option value="">Choose pitcher</option>
+                          {(
+                            game.frozenRosters?.[team] ||
+                            rosterOf(l.season, team)
+                          ).map((id) => (
+                            <option key={id} value={id}>
+                              {name(id)}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <h4>FINAL SCORE REVIEW</h4>
+          {preview.labels.map((label) => (
+            <p key={label}>
+              {label}:{" "}
+              {preview.rows
+                .filter((r) => r.label === label)
+                .reduce((n, r) => n + Number(r.runs || 0), 0)}{" "}
+              runs ·{" "}
+              {preview.rows
+                .filter((r) => r.label === label)
+                .reduce((n, r) => n + Number(r.hits || 0), 0)}{" "}
+              hits
+            </p>
+          ))}
           <label>
             Game MVP (optional)
             <select value={mvp} onChange={(e) => setMvp(e.target.value)}>
@@ -1392,7 +1469,11 @@ function ReportImport({ league: l, game, onDone }) {
           </label>
           <button
             className="red-btn"
-            disabled={l.busy || preview.rows.some((r) => !r.chosen)}
+            disabled={
+              l.busy ||
+              preview.rows.some((r) => !r.chosen) ||
+              preview.pitch.some((r) => !r.chosen)
+            }
             onClick={async () => {
               try {
                 const report = buildReport(
