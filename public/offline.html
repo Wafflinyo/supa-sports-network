@@ -1,0 +1,7 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#10244b"><title>Reconnect · Supa Sports Network</title><style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#10244b;color:#fff;font:16px system-ui,sans-serif;padding:24px}main{max-width:480px;text-align:center}small{color:#ffce35;font-weight:800;letter-spacing:.15em}h1{font-size:clamp(30px,8vw,46px);line-height:1.05;margin:22px 0}p{color:#ccd6e8;line-height:1.65}button{border:0;border-radius:5px;background:#ffce35;color:#10244b;font:800 16px system-ui;padding:14px 24px;cursor:pointer;margin-top:16px}#status{font-size:14px;min-height:24px}
+</style></head><body><main><small>SUPA SPORTS NETWORK</small><h1>LET’S GET YOU<br>BACK IN THE GAME.</h1><p>You’re offline. Connect to the internet to see league updates, sign in, or make changes to your team.</p><button type="button" id="retry">TRY AGAIN</button><p id="status" role="status"></p></main><script>
+document.querySelector('#retry').addEventListener('click',()=>{document.querySelector('#status').textContent='Reconnecting…';window.location.reload()});
+window.addEventListener('online',()=>window.location.reload());
+</script></body></html>

@@ -1,0 +1,18 @@
+{
+  "id": "./",
+  "name": "Supa Sports Network",
+  "short_name": "Supa Sports",
+  "description": "Sluggers Supa League scores, teams, player data, drafts and fantasy leagues.",
+  "lang": "en",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#10244b",
+  "theme_color": "#10244b",
+  "categories": ["sports", "entertainment"],
+  "icons": [
+    { "src": "app/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "app/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "app/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
