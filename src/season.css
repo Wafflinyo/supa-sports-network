@@ -465,3 +465,7 @@
     animation: none;
   }
 }
+
+details.fantasy-schedule-row { display: block; }
+details.fantasy-schedule-row > summary { cursor: pointer; font-weight: 800; color: #162b4e; }
+details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
