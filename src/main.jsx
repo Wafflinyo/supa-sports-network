@@ -9,7 +9,6 @@ import playerPool from './players.json'
 import gamesPlayed from './games-played.json'
 import { playerPortraitStyle } from './player-portraits.js'
 import { FantasyLeague, FantasyRules } from './FantasyHub.jsx'
-import TemporaryLeague from './TemporaryLeague.jsx'
 import { leagueTabs } from './navigation.js'
 import { AccountDialog } from './LeagueAccount.jsx'
 import PlayerProfile from './PlayerProfile.jsx'
@@ -25,7 +24,7 @@ function PlayerAvatar({ player, size = 38 }) {
   const portrait = playerPortraitStyle(player, size)
   return <span className={`player-avatar${portrait ? ' has-portrait' : ''}`} style={{ width: size, height: size, flex: `0 0 ${size}px`, ...portrait }} aria-hidden="true">{portrait ? null : player.name.slice(0, 1)}</span>
 }
-const nav = [...leagueTabs, 'Test Week']
+const nav = leagueTabs
 // Project Rio's export headings, grouped for browsing. Helper columns are export internals.
 const statGroups = {
   'Offensive Stats': [
@@ -95,7 +94,7 @@ function SectionTitle({ kicker, children, right }) {
   return <div className="section-title"><div><small>{kicker}</small><h2>{children}</h2></div>{right}</div>
 }
 function App() {
-  const [page, setPage] = useState(window.location.hash === '#test-week' ? 'Test Week' : 'Home')
+  const [page, setPage] = useState('Home')
   const [rulesOpen, setRulesOpen] = useState(false)
   const [menu, setMenu] = useState(false)
   const [session, setSession] = useState(null)
@@ -189,7 +188,7 @@ function App() {
     return comparison ? (activeSort.direction === 'asc' ? comparison : -comparison) : a.rosterOrder - b.rosterOrder
   }), [query, sort, statTab, statView,players])
   function sortBy(key) { setSort(s => ({ key, direction: s.key === key && s.direction === 'desc' ? 'asc' : 'desc' })) }
-  function go(next) { if ((next === 'Commissioner Tools' && !isCommissioner)||(next==='Team Tools'&&!isGM)||(next==='Messages'&&!isGM&&!isCommissioner)) return; window.history.replaceState(null, '', next === 'Test Week' ? '#test-week' : window.location.pathname); setPage(next); setMenu(false); setMessage(''); window.scrollTo({top: 0, behavior: 'smooth'}) }
+  function go(next) { if ((next === 'Commissioner Tools' && !isCommissioner)||(next==='Team Tools'&&!isGM)||(next==='Messages'&&!isGM&&!isCommissioner)) return; window.history.replaceState(null, '', window.location.pathname); setPage(next); setMenu(false); setMessage(''); window.scrollTo({top: 0, behavior: 'smooth'}) }
   const logo = `${import.meta.env.BASE_URL}sluggers-supa-league-logo.svg`
   return <>
     <div className="topline"><div className="container topline-inner"><span><i className="live-dot"/> SLUGGERS SUPA LEAGUE</span><span>THE LEAGUE STARTS HERE <b>★</b></span><button onClick={() => setAuthOpen(true)}>{session ? session.user.email?.split('@')[0] : 'SIGN IN / JOIN'}</button></div></div>
@@ -198,7 +197,6 @@ function App() {
     <main className="container page-content"><SeasonPrompts league={seasonLeague} go={go}/>{seasonPages.includes(page)&&(page==='Teams'&&!seasonLeague.season?<OfficialTeams teams={officialTeams} loading={teamsLoading} message={teamsMessage} supabase={supabase}/>:<SeasonPage page={page} league={seasonLeague}/>)}
       {page === 'Commissioner Tools' && isCommissioner && <><div className="page-heading"><span className="eyebrow dark">LEAGUE ADMINISTRATION</span><h1>COMMISSIONER TOOLS</h1></div><div className="subnav">{['Season Management','Teams, Locations & Access'].map(t=><button key={t} className={commissionerTab===t?'active':''} onClick={()=>setCommissionerTab(t)}>{t}</button>)}</div>{commissionerTab==='Season Management'?<SeasonWorkspace league={seasonLeague} registeredTeams={officialTeams}/>:<CommissionerWorkspace supabase={supabase} access={access} teams={officialTeams} onChange={loadOfficialTeams} onAccess={setAccess}/>}</>}
       {page==='Team Tools' && isGM && <><div className="page-heading"><span className="eyebrow dark">YOUR CLUB</span><h1>TEAM TOOLS</h1></div><SeasonTeamTools league={seasonLeague}/><details className="panel season-box"><summary>TEAM NAME, HOME LOCATION & LOGO</summary><TeamSetup key={access.slot} supabase={supabase} access={access} teams={officialTeams} onChange={loadOfficialTeams} onAccess={setAccess}/></details></>}
-      {page === 'Test Week' && <TemporaryLeague PlayerAvatar={PlayerAvatar}/>}
       {page === 'Home' && <><SeasonHome league={seasonLeague} go={go}/>
         <div className="home-grid"><div className="hero"><div className="hero-content"><span className="eyebrow">WELCOME TO THE LEAGUE</span><h1>THE GAME<br/><span>STARTS HERE.</span></h1><p>Follow every game, explore the player pool, and manage your fantasy league in one place.</p><button className="yellow-btn" onClick={() => go('Player Stats')}>EXPLORE PLAYERS <span>›</span></button></div><div className="hero-number">01</div></div>
           <div className="side-stack"><div className="panel compact"><SectionTitle kicker="ON DECK" right={<CalendarDays size={19}/>}>UPCOMING MATCHES</SectionTitle>{seasonLeague.season?<p className="season-box">{seasonLeague.season.games.filter(g=>g.stage!=='final').length} upcoming games · <button className="text-link" onClick={()=>go('Schedule')}>VIEW SCHEDULE ›</button></p>:<Empty title="Schedule coming soon">Matchups will appear when the season schedule is set.</Empty>}</div><div className="panel compact"><SectionTitle kicker="FINAL SCORES" right={<Trophy size={19}/>}>RECENT RESULTS</SectionTitle>{seasonLeague.season?<p className="season-box">{seasonLeague.season.games.filter(g=>g.stage==='final').length} completed games · <button className="text-link" onClick={()=>go('Schedule')}>VIEW RESULTS ›</button></p>:<Empty icon={Trophy} title="No games yet">Results will appear after the first game is uploaded.</Empty>}</div></div></div>
@@ -218,7 +216,6 @@ function App() {
       {page === 'Sluggers Fantasy' && <>
         <div className="page-heading fantasy-heading"><span className="eyebrow dark">PLAY WITH FRIENDS</span><h1>SLUGGERS FANTASY</h1><p>Draft your team, set your weekly lineup, and follow head-to-head matchups.</p><button className="outline-btn rules-toggle" onClick={() => setRulesOpen(!rulesOpen)} aria-expanded={rulesOpen} aria-controls="fantasy-rules">{rulesOpen ? 'HIDE' : 'FANTASY'} RULES & POINT SYSTEM</button></div>
         {rulesOpen && <FantasyRules/>}
-        <div className="panel test-undrafted"><h2>TEMPORARY FANTASY TEST</h2><p>View the eight drafted teams, weekly head-to-head scores, and league game reports.</p><button className="outline-btn" onClick={() => go('Test Week')}>OPEN TEST WEEK</button></div>
         {!session ? <div className="panel gateway"><div className="gateway-icon">★</div><h2>YOUR LEAGUE IS WAITING</h2><p>Sign in with your username to create a fantasy league or join one with an invite code.</p><button className="red-btn" onClick={() => setAuthOpen(true)}>SIGN IN TO FANTASY</button>{!supabase && <p className="setup-note">Account setup is pending for this site.</p>}</div> :
           <div className="fantasy-layout"><aside className="panel league-sidebar"><SectionTitle kicker="YOUR FANTASY">LEAGUES</SectionTitle>{leagues.map(l => <button key={l.id} className={`league-choice ${selectedLeague?.id === l.id ? 'selected' : ''}`} onClick={() => setSelectedLeague(l)}><span>★</span>{l.name}</button>)}{!leagues.length && <p className="muted">No leagues yet. Create one or enter an invite code.</p>}<form onSubmit={createLeague}><label htmlFor="league-name">CREATE A LEAGUE</label><input id="league-name" required maxLength={60} value={leagueName} onChange={e => setLeagueName(e.target.value)} placeholder="League name"/><label htmlFor="league-size">NUMBER OF TEAMS</label><select id="league-size" value={leagueSize} onChange={e=>setLeagueSize(Number(e.target.value))}>{[6,8,10].map(n=><option key={n} value={n}>{n} teams</option>)}</select><button disabled={busy} className="red-btn">CREATE LEAGUE</button></form><form onSubmit={joinLeague}><label htmlFor="invite-code">JOIN WITH A CODE</label><input id="invite-code" required value={joinCode} onChange={e => setJoinCode(e.target.value)} placeholder="Invite code"/><button disabled={busy} className="outline-btn">JOIN LEAGUE</button></form></aside><div className="panel fantasy-main">{selectedLeague ? <FantasyLeague key={selectedLeague.id} initialLeague={selectedLeague} user={session.user} supabase={supabase} players={players} liveGames={liveGames} eligibleIds={fantasyEligible} onLeagueRefresh={loadLeagues}/> : <Empty icon={Trophy} title="Create or join a league">Your fantasy league will appear here.</Empty>}</div></div>}{message && <p className="inline-message" role="status">{message}</p>}
       </>}
