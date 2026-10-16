@@ -1,0 +1,11 @@
+.league-rules-sections { display:grid; gap:14px; }
+.league-rule-section summary { display:flex; align-items:center; gap:16px; padding:20px; cursor:pointer; list-style:none; }
+.league-rule-section summary::-webkit-details-marker { display:none; }
+.league-rule-section summary::after { content:'+'; margin-left:auto; font-size:26px; font-weight:700; }
+.league-rule-section[open] summary::after { content:'−'; }
+.league-rule-section summary h2 { margin:0; font-size:23px; }
+.league-rule-number { color:var(--red,#d73336); font-weight:800; font-size:18px; min-width:28px; }
+.league-rule-body { padding:0 24px 18px; max-width:940px; line-height:1.75; }
+.league-rule-body p { margin:0 0 15px; }
+.league-rule-section summary:focus-visible { outline:3px solid #d73336; outline-offset:2px; }
+@media(max-width:600px) { .league-rule-section summary { padding:16px; gap:10px; } .league-rule-section summary h2 { font-size:20px; } .league-rule-body { padding:0 16px 12px; } }

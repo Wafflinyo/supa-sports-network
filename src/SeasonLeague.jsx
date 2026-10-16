@@ -2318,10 +2318,10 @@ export const seasonPages = [
   "Teams",
   "Team Stats",
   "Transactions",
-  "SSL Playoffs",
+  "Playoff Bracket",
   "Voting",
   "SSL History",
-  "SSL Draft Room",
+  "Draft Room",
   "Free Agency",
   "Messages",
 ];
@@ -2344,13 +2344,13 @@ export function SeasonPage({ page, league: l }) {
           <PublicBallots league={l} />
           <Voting league={l} />
         </>
-      ) : page === "SSL Draft Room" ? (
+      ) : page === "Draft Room" ? (
         <Draft league={l} />
       ) : page === "Free Agency" ? (
         <FreeAgency league={l} />
       ) : page === "SSL History" ? (
         <History league={l} />
-      ) : page === "SSL Playoffs" ? (
+      ) : page === "Playoff Bracket" ? (
         l.season &&
         ["postseason", "retention", "offseason", "archived"].includes(
           l.season.status,
@@ -2403,7 +2403,7 @@ export function SeasonHome({ league: l, go }) {
         <button
           className="outline-btn"
           onClick={() =>
-            go(s.status === "drafting" ? "SSL Draft Room" : "Schedule")
+            go(s.status === "drafting" ? "Draft Room" : "Schedule")
           }
         >
           OPEN {s.status === "drafting" ? "DRAFT ROOM" : "SCHEDULE"}
