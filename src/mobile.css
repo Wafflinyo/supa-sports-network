@@ -59,3 +59,30 @@ button:focus-visible, a:focus-visible, summary:focus-visible, select:focus-visib
  .auth-modal, .career-profile { max-width:calc(100vw - 24px); max-height:calc(100dvh - 24px); overflow-y:auto; }
  .footer-inner { padding-bottom:env(safe-area-inset-bottom); }
 }
+
+/* Native player dialogs must stay fixed to the viewport, including landscape. */
+dialog.career-profile {
+ position:fixed; inset:0; margin:auto; transform:none;
+ width:min(720px,calc(100% - 24px)); max-width:calc(100% - 24px);
+ height:fit-content; max-height:calc(100vh - 24px);
+ max-height:calc(100dvh - 24px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
+ overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch;
+ padding:0; box-sizing:border-box;
+}
+.career-profile-toolbar {
+ position:sticky; top:0; z-index:5; display:flex; justify-content:flex-end;
+ background:white; border-bottom:1px solid #e1e5ed; padding:6px 12px;
+}
+.career-profile-toolbar .close {
+ position:static; display:flex; align-items:center; gap:6px; min-height:44px;
+ padding:8px 12px; font-size:14px; font-weight:800; color:#10244b;
+}
+.career-profile-content {padding:20px 24px 24px; min-width:0; overflow-wrap:anywhere;}
+@media(max-width:520px) {
+ .career-profile-content {padding:16px;}
+ .career-profile .player-modal-heading {gap:12px;padding-right:0;flex-wrap:wrap;}
+ .career-profile .player-modal-heading h2 {font-size:30px;}
+}
+@media(max-width:360px) {
+ .career-profile .career-average-grid {grid-template-columns:1fr;}
+}
