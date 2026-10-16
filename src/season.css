@@ -398,3 +398,70 @@
     padding: 11px;
   }
 }
+.contract-extensions > label,
+.contract-extensions > div > label {
+  margin: 16px 0;
+}
+.contract-extensions label {
+  margin: 14px 0;
+}
+.contract-chance {
+  background: #f0f3f9;
+  border-left: 5px solid #f2cc43;
+  padding: 18px;
+  margin: 20px 0;
+  max-width: 650px;
+}
+.contract-chance dl {
+  margin: 12px 0;
+}
+.contract-chance dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 10px 0;
+}
+.contract-chance dd {
+  font-weight: 800;
+  margin: 0;
+}
+.contract-total {
+  border-top: 2px solid #ccd3e3;
+  font-size: 20px;
+  font-weight: 800;
+}
+.contract-decision {
+  padding: 22px;
+  margin: 20px 0;
+  background: #eef2fa;
+  border: 1px solid #c5cee1;
+}
+.contract-decision.accepted {
+  background: #e7f4e9;
+  border-color: #7eb98b;
+}
+.contract-decision.declined {
+  background: #fff1dc;
+  border-color: #d6ac6a;
+}
+.contract-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #bcc7df;
+  border-top-color: #d23035;
+  border-radius: 50%;
+  margin-right: 12px;
+  vertical-align: middle;
+  animation: contract-spin 0.8s linear infinite;
+}
+@keyframes contract-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .contract-spinner {
+    animation: none;
+  }
+}

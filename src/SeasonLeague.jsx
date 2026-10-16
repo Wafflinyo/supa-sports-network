@@ -1,3 +1,4 @@
+import ContractExtensions from "./ContractExtensions.jsx";
 import {
   SeasonCalendar,
   NextSeason,
@@ -109,7 +110,7 @@ export function useSeasonLeague(supabase, access) {
       if (operation === "create") setSelected(r.data.id);
       await refresh();
       setNotice("Saved.");
-      return true;
+      return r.data || true;
     } catch (e) {
       setError(e.message);
       return false;
@@ -1142,6 +1143,22 @@ function Schedule({ league: l, commissioner = false }) {
                 onChange={(e) => setForm({ ...form, startsAt: e.target.value })}
               />
             </label>
+            {s.status === "postseason" && (
+              <label>
+                Playoff round
+                <select
+                  aria-label="Playoff round"
+                  value={form.playoffRound || "quarterfinal"}
+                  onChange={(e) =>
+                    setForm({ ...form, playoffRound: e.target.value })
+                  }
+                >
+                  <option value="quarterfinal">Quarterfinals · top 8</option>
+                  <option value="semifinal">Semifinals</option>
+                  <option value="final">Finals</option>
+                </select>
+              </label>
+            )}
             <label>
               Series / game label
               <input
@@ -1889,190 +1906,8 @@ function Trades({ league: l, messages = false }) {
     </>
   );
 }
-function Extensions({ league: l }) {
-  const s = l.season,
-    [team, setTeam] = useActingTeam(l),
-    [player, setPlayer] = useState("");
-  if (!s)
-    return (
-      <Box title="EXTENSIONS">
-        <p>No season yet.</p>
-      </Box>
-    );
-  const repeats =
-      s.extensionHistory?.find(
-        (h) => h.franchise === team && h.player === Number(player),
-      )?.accepted || 0,
-    rank = standings(s),
-    bonus =
-      s.champion === team
-        ? 20
-        : s.finalist === team
-          ? 15
-          : s.games.some(
-                (g) =>
-                  g.phase === "playoffs" && [g.away, g.home].includes(team),
-              )
-            ? 10
-            : 0,
-    penalty = rank.at(-1)?.id === team ? 10 : 0,
-    chance = !repeats
-      ? 100
-      : Math.max(
-          0,
-          Math.min(
-            100,
-            ([85, 70, 50, 25][repeats - 1] ?? 15) + bonus - penalty,
-          ),
-        ),
-    balance = s.contractBalances?.find((x) => x.team === team)?.tokens || 0;
-  return (
-    <>
-      <SeasonCalendar league={l} />
-      <Box title="ONE-SEASON EXTENSION CONTRACTS">
-        <p>
-          Three contracts per franchise become available after the Week 12 trade
-          deadline. Unused contracts carry over and may be traded. A rejected
-          offer still consumes a contract. Only accepted extensions advance that
-          franchise’s repeat history, which persists through rebrands, GM
-          changes and player departures.
-        </p>
-        <div className="season-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Accepted extensions before this offer</th>
-                <th>Base acceptance</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                [0, "100%"],
-                [1, "85%"],
-                [2, "70%"],
-                [3, "50%"],
-                [4, "25%"],
-                ["5+", "15%"],
-              ].map(([n, c]) => (
-                <tr key={n}>
-                  <td>{n}</td>
-                  <td>{c}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p>
-          Highest finish bonus only: playoffs +10, finalist +15, champion +20
-          percentage points (maximum 100%). Last in regular-season standings:
-          −10. The first extension is guaranteed. One offer per player and
-          franchise each season window. Offers use the odds earned when
-          submitted; later bonuses do not reroll an earlier decision.
-        </p>
-        {l.access.role === "commissioner" && (
-          <TeamChooser
-            s={s}
-            value={team}
-            onChange={(v) => {
-              setTeam(v);
-              setPlayer("");
-            }}
-          />
-        )}
-        {team && (
-          <>
-            <h3>
-              {balance} UNUSED CONTRACT{balance === 1 ? "" : "S"}
-            </h3>
-            {s.extensionsOpen &&
-            ["regular", "postseason", "retention"].includes(s.status) ? (
-              <>
-                <label>
-                  Player
-                  <select
-                    value={player}
-                    onChange={(e) => setPlayer(e.target.value)}
-                  >
-                    <option value="">Choose player</option>
-                    {rosterOf(s, team)
-                      .filter(
-                        (id) =>
-                          !s.extensionOffers.some(
-                            (o) => o.franchise === team && o.player === id,
-                          ),
-                      )
-                      .map((id) => (
-                        <option key={id} value={id}>
-                          {name(id)}
-                        </option>
-                      ))}
-                  </select>
-                </label>
-                {player && (
-                  <p>
-                    {repeats} prior accepted extension(s) with this franchise ·{" "}
-                    {chance}% acceptance chance.
-                  </p>
-                )}
-                <button
-                  className="red-btn"
-                  disabled={l.busy || !player || balance < 1}
-                  onClick={async () => {
-                    if (
-                      confirm(
-                        `Spend one contract on ${name(player)}? Acceptance chance: ${chance}%. Rejection also uses the contract.`,
-                      ) &&
-                      (await l.act("extension", {
-                        team,
-                        player: Number(player),
-                      }))
-                    )
-                      setPlayer("");
-                  }}
-                >
-                  OFFER ONE-SEASON EXTENSION
-                </button>
-              </>
-            ) : (
-              <p>
-                Extensions open after the Week 12 trade deadline and close two
-                weeks after the championship. Unsigned players leave at the
-                cutoff, and unused contracts carry over.
-              </p>
-            )}
-          </>
-        )}
-        <div className="season-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Player</th>
-                <th>Franchise</th>
-                <th>Chance</th>
-                <th>Result</th>
-              </tr>
-            </thead>
-            <tbody>
-              {s.extensionOffers?.map((o) => (
-                <tr key={o.franchise + o.player}>
-                  <td>
-                    <Player id={o.player} />
-                  </td>
-                  <td>{s.teams.find((t) => t.id === o.franchise)?.name}</td>
-                  <td>{o.chance}%</td>
-                  <td>
-                    {o.accepted
-                      ? "SIGNED FOR NEXT SEASON"
-                      : "DECLINED · CONTRACT CONSUMED"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Box>
-    </>
-  );
+function Extensions({ league }) {
+  return <ContractExtensions league={league} />;
 }
 function FreeAgency({ league: l }) {
   const s = l.season,
@@ -2187,7 +2022,8 @@ function Standings({ league: l }) {
       </div>
       <p>
         Ordered by winning percentage, then run differential, then franchise
-        slot. Regular-season results only.
+        slot. Regular-season results only. The top eight teams qualify for
+        playoffs.
       </p>
     </Box>
   );

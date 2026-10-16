@@ -18,10 +18,14 @@ A trade may leave fewer than eleven players. That team must sign free agents or 
 
 ## Extensions
 
-Each franchise receives three one-season extension contracts after the Week 12 trade deadline. Offers are allowed from then until two weeks after the championship ends. Unused contracts carry over and can be traded. Retained players are additional to the eleven new draft picks. The first accepted extension with a franchise is guaranteed. Subsequent offers use 85%, 70%, 50%, 25%, then 15%. Add only the highest finish bonus: playoffs +10, finalist +15, champion +20 percentage points; last in the regular-season standings subtracts ten. Cap at 100%.
+Each franchise receives three one-season extension contracts after the Week 12 trade deadline, capped at five unused contracts total. Carryover 0 → 3, 1 → 4, and 2–5 → 5. Trades cannot exceed the cap. Offers remain open until two weeks after the championship ends. Retained players are additional to the eleven new draft picks.
+
+Base odds for the next accepted extension are 1st 100%, 2nd 85%, 3rd 70%, 4th 50%, 5th 25%, then 15%. Add only the highest earned finish bonus: making playoffs +5, semifinals +10, finals +15, champion +20 percentage points. The top eight teams qualify. Final regular-season places 9–10 subtract ten, 11th subtracts fifteen, and 12th subtracts twenty. Final chances are base plus modifier, capped from 0% to 100%. Final-standing penalties begin after the regular season ends.
 
 Each offer consumes one contract even if rejected. Only an accepted offer increases the player/franchise repeat count. One offer per player/franchise/season window; odds reflect achievements earned when the offer is submitted, without rerolls from later bonuses; the result is stored and cannot be rerolled. Stable franchise IDs preserve history through departure, rebrand or GM replacement. Shared GM codes grant the same team permissions to all authorized holders. Public visitors can view league data but cannot change it.
 
 ## Validation
 
 `npm run test:season` runs an isolated in-memory Postgres league through setup, 132 picks, default lineups, trade approval and roster refill, pick limits, corrected results, postseason, accepted/rejected extensions and S2 carryover. It checks ordinary-account and anonymous restrictions without touching the live database. Set `SSL_RIO_FIXTURE` to a local Project Rio XLSX to run the real workbook import regression as well.
+
+Select an available contract, then a rostered player. The server previews the next extension number, base, finish adjustment and total chance without spending anything. Apply consumes one contract and stores the decision atomically; the screen reveals acceptance or free agency after a short pause. Changed odds require a new review. Repeated clicks or reloads cannot reroll the offer.

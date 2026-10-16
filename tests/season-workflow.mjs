@@ -328,4 +328,6 @@ await expectFail(
 await db.exec("reset role");
 if (process.env.SSL_TIMELINE_TEST)
   await (await import("./season-timeline.mjs")).testTimeline(db);
+if (process.env.SSL_TIMELINE_TEST)
+  await (await import("./contracts.mjs")).testContracts(db);
 await db.close();
