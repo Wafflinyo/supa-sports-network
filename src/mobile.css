@@ -1,0 +1,61 @@
+/* Phone layouts shared by the app and browser version. */
+button, a, summary, input, select, textarea { touch-action: manipulation; }
+button:focus-visible, a:focus-visible, summary:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible { outline:3px solid #d9232e; outline-offset:3px; }
+.trade-composer { margin-bottom:20px; }
+.trade-composer > summary, .draft-order-details > summary { cursor:pointer; font-weight:800; padding:14px 0; color:#10244b; }
+.trade-composer:not([open]) { padding:0 16px; border:1px solid #d8dde6; background:white; }
+.trade-composer > .season-box { margin-bottom:0; }
+.new-trade-composer > summary { display:none; }
+@media(max-width:700px) {
+ html { -webkit-text-size-adjust:100%; scroll-padding-top:92px; }
+ .container { width:calc(100% - 24px); min-width:0; }
+ .topline { height:44px; }
+ .topline button { min-height:44px; }
+ .masthead { position:sticky; top:0; z-index:50; }
+ .masthead-inner { min-height:80px; gap:8px; }
+ .brand { flex:1; min-width:0; }
+ .brand img { width:48px; height:64px; }
+ .brand strong { font-size:clamp(20px,5.2vw,26px); line-height:1.08; }
+ .brand small { letter-spacing:.1em; line-height:1.4; }
+ .mobile-menu { display:flex; align-items:center; justify-content:center; gap:5px; min-width:76px; min-height:48px; padding:8px 4px; font-size:12px; font-weight:800; }
+ .mobile-menu svg { flex:none; width:22px; }
+ .nav.open { position:sticky; top:80px; z-index:49; box-shadow:0 8px 18px #10244b22; }
+ .nav-inner { grid-template-columns:repeat(2,minmax(0,1fr)); max-height:calc(100dvh - 124px); overscroll-behavior:contain; scrollbar-gutter:stable; }
+ .nav button { min-height:48px; padding:12px 10px; white-space:normal; overflow-wrap:anywhere; font-size:16px; line-height:1.25; }
+ .page-content { padding-top:12px; padding-bottom:calc(30px + env(safe-area-inset-bottom)); }
+ .page-content > *, .season-box, .season-game, .season-form, .season-lineup, .trade-compose > *, .season-inline > *, .season-team-columns > *, .fantasy-layout > *, .lineup-grid > * { min-width:0; }
+ .page-heading { padding:15px 0 20px; }
+ .page-heading h1 { font-size:clamp(32px,8.5vw,48px); line-height:1.05; overflow-wrap:anywhere; }
+ .page-heading p { font-size:15px; }
+ .season-box, .season-game { padding:14px; }
+ .season-box h2, .season-game h3, .season-offer h3 { overflow-wrap:anywhere; }
+ .season-box h2 { font-size:23px; }
+ .page-content button, .page-content summary, .subnav button { min-height:44px; }
+ .page-content input:not([type=checkbox]):not([type=radio]), .page-content select, .page-content textarea, .auth-modal input, .auth-modal select, .auth-modal textarea { font-size:16px; line-height:1.4; min-height:44px; max-width:100%; }
+ .page-content input[type=checkbox], .page-content input[type=radio] { width:20px; height:20px; padding:0; flex-shrink:0; }
+ .season-team-checks label, .star-player-grid label { min-height:48px; }
+ .season-inline { gap:10px; }
+ .season-inline > button, .season-inline > label, .season-inline > input, .season-inline > select { width:100%; }
+ .season-box .outline-btn, .season-box .red-btn, .season-game .outline-btn, .season-game .red-btn { max-width:100%; white-space:normal; overflow-wrap:anywhere; line-height:1.3; }
+ .season-lineup > button, .trade-compose > button { width:100%; margin-right:0; }
+ .lineup-row { grid-template-columns:20px minmax(0,1fr) 64px; gap:7px; }
+ .lineup-row select { padding:9px 6px; }
+ .trade-compose, .lineup-grid { grid-template-columns:minmax(0,1fr); }
+ .trade-asset { align-items:flex-start; flex-wrap:wrap; }
+ .trade-asset > span { flex:1 1 180px; overflow-wrap:anywhere; }
+ .trade-asset > button { flex:0 0 auto; }
+ .season-offer ul { padding-left:20px; }
+ .season-offer li, .season-offer p { overflow-wrap:anywhere; }
+ .lottery-reveal { flex-wrap:wrap; gap:12px; padding:14px; }
+ .lottery-reveal strong { flex:1 1 140px; overflow-wrap:anywhere; }
+ .season-draft-order, .star-player-grid { grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); }
+ .star-selections { padding:12px; }
+ .star-balance { gap:8px 12px; padding:12px; }
+ .star-player-grid label { padding:10px 8px; }
+ .star-player-grid label > span { min-width:0; overflow-wrap:anywhere; }
+ .subnav { flex-wrap:wrap; overflow:visible; }
+ .subnav button { flex:1 1 130px; white-space:normal; }
+ .table-scroll, .season-table { max-width:100%; overflow-x:auto; overscroll-behavior-x:contain; -webkit-overflow-scrolling:touch; }
+ .auth-modal, .career-profile { max-width:calc(100vw - 24px); max-height:calc(100dvh - 24px); overflow-y:auto; }
+ .footer-inner { padding-bottom:env(safe-area-inset-bottom); }
+}

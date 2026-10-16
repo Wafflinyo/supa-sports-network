@@ -738,6 +738,7 @@ function Draft({ league: l }) {
           fill teams below 11, skipping full teams.
         </p>
         {s.number>1 && <p>Returning-season lottery: 12th seed 55% · 11th 25% · 10th 15% · 9th 5% for first pick. Winners are removed before the next weighted draw. Seeds 8 through 1 receive picks 5 through 12, then the order snakes.</p>}
+        <details className="draft-order-details" open={s.status === "scheduled"}><summary>DRAFT ORDER · {s.order.length || 12} TEAMS</summary>
         {!s.order.length ? (
           <p>Waiting for the scheduled lottery time.</p>
         ) : (
@@ -770,6 +771,7 @@ function Draft({ league: l }) {
             </div>
           </>
         )}
+        </details>
         {s.status === "drafting" && (
           <>
             <div className="pick-clock" aria-live="off">
@@ -852,7 +854,7 @@ function Draft({ league: l }) {
           "archived",
         ].includes(s.status) && (
           <p>
-            Draft complete. Review each roster below, then open Team Tools to
+            Draft complete. Review each roster below, then open GM Tools to
             save your starting nine, batting order, positions and bench.
           </p>
         )}
@@ -1679,7 +1681,7 @@ function Trades({ league: l, messages = false }) {
     <>
       {can && (
         <>
-          <Box title={messages ? "TRADE MESSAGES" : "PROPOSE A TRADE"}>
+          <details className={`trade-composer ${messages ? "inbox-composer" : "new-trade-composer"}`} open={!messages || !!counter}><summary>WRITE A NEW OFFER / COUNTEROFFER</summary><Box title={messages ? "TRADE MESSAGES" : "PROPOSE A TRADE"}>
             {admin && (
               <TeamChooser
                 s={s}
@@ -1695,7 +1697,7 @@ function Trades({ league: l, messages = false }) {
                   commissioner approval. Keep at least nine next-season picks.
                   Rosters below 11 must be filled immediately after the trade.
                 </p>
-                <div className="season-team-checks">
+                <details className="trade-participants"><summary>PARTICIPATING TEAMS ({participants.length})</summary><div className="season-team-checks">
                   {s.teams.map((t) => (
                     <label key={t.id}>
                       <input
@@ -1715,6 +1717,7 @@ function Trades({ league: l, messages = false }) {
                     </label>
                   ))}
                 </div>
+                </details><p>{participants.map(teamName).join(" · ")}</p>
                 <div className="trade-compose">
                   <label>
                     From
@@ -1887,6 +1890,7 @@ function Trades({ league: l, messages = false }) {
               </p>
             )}
           </Box>
+          </details>
           <Box title="YOUR TRADE INBOX">
             {!l.inbox.length && <p>No offers yet.</p>}
             {l.inbox.map((o) => (

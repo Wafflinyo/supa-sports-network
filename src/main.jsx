@@ -18,6 +18,7 @@ import PlayerProfile from './PlayerProfile.jsx'
 import {OfficialTeams,TeamSetup,CommissionerWorkspace,teamLogo} from './TeamIdentity.jsx'
 import connection from './supabase-config.json'
 import './styles.css'
+import './mobile.css'
 
 const url = import.meta.env.VITE_SUPABASE_URL || connection.url
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || connection.publishableKey
@@ -99,6 +100,7 @@ function App() {
   const [page, setPage] = useState('Home')
   const [rulesOpen, setRulesOpen] = useState(false)
   const [menu, setMenu] = useState(false)
+  useEffect(()=>{if(!menu)return;const close=e=>{if(e.key==='Escape')setMenu(false)};document.addEventListener('keydown',close);return()=>document.removeEventListener('keydown',close)},[menu])
   const [session, setSession] = useState(null)
   const [authOpen, setAuthOpen] = useState(false)
   const [access, setAccess] = useState({role:'viewer'})
@@ -194,8 +196,8 @@ function App() {
   const logo = `${import.meta.env.BASE_URL}sluggers-supa-league-logo.svg`
   return <>
     <div className="topline"><div className="container topline-inner"><span><i className="live-dot"/> SLUGGERS SUPA LEAGUE</span><span>THE LEAGUE STARTS HERE <b>★</b></span><button onClick={() => setAuthOpen(true)}>{session ? session.user.email?.split('@')[0] : 'SIGN IN / JOIN'}</button></div></div>
-    <header className="masthead"><div className="container masthead-inner"><button className="brand" onClick={() => go('Home')}><img src={logo} alt="Sluggers Supa League logo"/><span><strong>SLUGGERS <em>SUPA</em> LEAGUE</strong><small>THE OFFICIAL LEAGUE HUB</small></span></button><button className="mobile-menu" aria-label="Open menu" onClick={() => setMenu(!menu)}>{menu ? <X/> : <Menu/>}</button><div className="masthead-right"><span className="league-tag">MARIO SUPER SLUGGERS</span><span className="badge-star">★</span></div></div></header>
-    <nav className={`nav ${menu ? 'open' : ''}`} aria-label="Main navigation"><div className="container nav-inner">{visibleNav.map(n => <button key={n} className={page === n ? 'active' : ''} onClick={() => go(n)}>{n}</button>)}</div></nav>
+    <header className="masthead"><div className="container masthead-inner"><button className="brand" onClick={() => go('Home')}><img src={logo} alt="Sluggers Supa League logo"/><span><strong>SLUGGERS <em>SUPA</em> LEAGUE</strong><small>THE OFFICIAL LEAGUE HUB</small></span></button><button className="mobile-menu" aria-label={menu ? "Close menu" : "Open menu"} aria-expanded={menu} aria-controls="league-main-navigation" onClick={() => setMenu(!menu)}>{menu ? <X/> : <Menu/>}<span>MENU</span></button><div className="masthead-right"><span className="league-tag">MARIO SUPER SLUGGERS</span><span className="badge-star">★</span></div></div></header>
+    <nav id="league-main-navigation" className={`nav ${menu ? 'open' : ''}`} aria-label="Main navigation"><div className="container nav-inner">{visibleNav.map(n => <button key={n} className={page === n ? 'active' : ''} aria-current={page === n ? 'page' : undefined} onClick={() => go(n)}>{n}</button>)}</div></nav>
     <main className="container page-content"><SeasonPrompts league={seasonLeague} go={go}/>{seasonPages.includes(page)&&canViewLeaguePage(page, !!session, access.role)&&(page==='Teams'&&!seasonLeague.season?<OfficialTeams teams={officialTeams} loading={teamsLoading} message={teamsMessage} supabase={supabase}/>:<SeasonPage page={page} league={seasonLeague}/>)}
       {page === 'Commissioner Tools' && isCommissioner && <><div className="page-heading"><span className="eyebrow dark">LEAGUE ADMINISTRATION</span><h1>COMMISSIONER TOOLS</h1></div><div className="subnav">{['Season Management','Teams, Locations & Access'].map(t=><button key={t} className={commissionerTab===t?'active':''} onClick={()=>setCommissionerTab(t)}>{t}</button>)}</div>{commissionerTab==='Season Management'?<SeasonWorkspace league={seasonLeague} registeredTeams={officialTeams}/>:<CommissionerWorkspace supabase={supabase} access={access} teams={officialTeams} onChange={loadOfficialTeams} onAccess={setAccess}/>}</>}
       {page==='GM Tools' && isGM && <><div className="page-heading"><span className="eyebrow dark">YOUR CLUB</span><h1>GM TOOLS</h1></div><SeasonTeamTools league={seasonLeague}/><details className="panel season-box"><summary>TEAM NAME, HOME LOCATION & LOGO</summary><TeamSetup key={access.slot} supabase={supabase} access={access} teams={officialTeams} onChange={loadOfficialTeams} onAccess={setAccess}/></details></>}

@@ -39,6 +39,20 @@ jobs:
           GITHUB_PAGES_BASE: /${{ github.event.repository.name }}/
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      - name: Install browser for mobile checks
+        run: |
+          npm install --prefix "$RUNNER_TEMP/ssn-browser" --no-save playwright@1.56.1
+          "$RUNNER_TEMP/ssn-browser/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Verify mobile workflows and capture sample screenshots
+        run: node scripts/capture-mobile-workflows.mjs
+        env:
+          SSN_PLAYWRIGHT_MODULE: ${{ runner.temp }}/ssn-browser/node_modules/playwright
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ssl-draft-trade-screenshots
+          path: dist/ui-screenshots/
+          retention-days: 30
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

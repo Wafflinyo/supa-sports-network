@@ -65,7 +65,7 @@ export function NextSeason({ league: l }) {
       <p>
         {ready
           ? "This archives the completed season in SSL History and begins the next season’s preparation. Games do not start yet."
-          : "Next-season setup unlocks when the two-week extension period ends."}
+          : "Next-season setup unlocks when the extension period ends."}
       </p>
       <form
         className="season-form"
