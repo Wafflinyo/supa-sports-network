@@ -48,8 +48,9 @@ export function SeasonCalendar({ league: l }) {
       </p>
       <p>
         Extensions open after the trade deadline. At the cutoff, unsigned
-        players leave and unused contracts carry over. Offseason trades reopen
-        then, continuing through next-season preparation until the draft begins.
+        players leave and unused contracts expire. Each season gets three fresh
+        contracts. Offseason trades reopen then, continuing through next-season
+        preparation until the draft begins.
       </p>
     </Box>
   );

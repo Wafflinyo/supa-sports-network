@@ -122,7 +122,7 @@ function App() {
     setTeamsLoading(false)
   }
   useEffect(()=>{loadOfficialTeams();const timer=setInterval(loadOfficialTeams,15000);return()=>clearInterval(timer)},[])
-  const seasonLeague=useSeasonLeague(supabase,access)
+  const seasonLeague=useSeasonLeague(supabase,{...access,signedIn:!!session})
   const seasonStats=useMemo(()=>aggregate(seasonLeague.season),[seasonLeague.season])
   const players=useMemo(()=>basePlayers.map(p=>{const stats=seasonStats[p.id];return {...p,...stats,stats,team:seasonLeague.season?.teams.find(t=>seasonLeague.season.rosters[t.id]?.includes(p.id))?.name,perGame:stats?Object.fromEntries(Object.entries(stats).filter(([,v])=>typeof v==='number').map(([k,v])=>[k,perGameOnly.has(k)&&k!=='inningsPitched'?v:v/stats.gamesPlayed])):null}}),[seasonStats,seasonLeague.season])
   const careerSeasons=useMemo(()=>seasonLeague.seasons.map(s=>({id:s.id,playerStats:aggregate(s)})),[seasonLeague.seasons])

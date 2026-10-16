@@ -1,3 +1,10 @@
+import {
+  SeasonRuleControls,
+  PublicBallots,
+  BroadcastControls,
+  PlayoffPanel,
+  conferences,
+} from "./SeasonRules.jsx";
 import ContractExtensions from "./ContractExtensions.jsx";
 import {
   SeasonCalendar,
@@ -109,7 +116,13 @@ export function useSeasonLeague(supabase, access) {
       if (r.error) throw r.error;
       if (operation === "create") setSelected(r.data.id);
       await refresh();
-      setNotice("Saved.");
+      setNotice(
+        operation === "result"
+          ? "Report saved privately. Lineups are locked; results release after the premiere."
+          : operation === "add_player"
+            ? "Player successfully added. Update your default lineup."
+            : "Saved.",
+      );
       return r.data || true;
     } catch (e) {
       setError(e.message);
@@ -283,6 +296,7 @@ export function SeasonWorkspace({ league, registeredTeams }) {
       <SeasonFeedback league={l} />
       {tab === "Season Setup" && (
         <>
+          <SeasonRuleControls league={l} />
           <Box title="SET UP A SEASON">
             <p>
               Creates the next season in preparation. Games do not start until
@@ -359,7 +373,10 @@ export function SeasonWorkspace({ league, registeredTeams }) {
                     </button>
                   </>
                 ) : (
-                  <p>{s.teams.length} teams · 11-round snake draft</p>
+                  <p>
+                    {s.teams.length} teams · {s.baseDraftRounds || 11}-round
+                    snake draft
+                  </p>
                 )}
               </Box>
               {["setup", "poll"].includes(s.status) && (
@@ -668,16 +685,7 @@ function Draft({ league: l }) {
     );
   const open = s.draftAt && l.now >= new Date(s.draftAt).getTime() - 3600000,
     next = s.picks.length,
-    original =
-      s.order?.[Math.floor(next / 12) % 2 ? 11 - (next % 12) : next % 12],
-    owner =
-      s.number === 1
-        ? original
-        : (s.currentPickAssets || []).find(
-            (a) =>
-              a.originalTeam === original &&
-              a.round === Math.floor(next / 12) + 1,
-          )?.owner || original,
+    owner = s.nextPick?.team,
     t = s.teams.find((t) => t.id === owner),
     mine = l.access.role === "commissioner" || l.myTeam?.id === owner,
     used = new Set(Object.values(s.rosters).flat()),
@@ -711,14 +719,22 @@ function Draft({ league: l }) {
         title={
           s.status === "drafting"
             ? `ON THE CLOCK: ${t?.name || ""}`
-            : s.picks.length === 132
+            : [
+                  "postdraft",
+                  "regular",
+                  "postseason",
+                  "retention",
+                  "offseason",
+                  "archived",
+                ].includes(s.status)
               ? "DRAFT SUMMARY"
               : "DRAFT LOTTERY"
         }
       >
         <p>
-          Draft begins {time(s.draftAt)} · lottery {time(s.lotteryAt)} · 11
-          rounds · snake order
+          Draft begins {time(s.draftAt)} · lottery {time(s.lotteryAt)} ·{" "}
+          {s.baseDraftRounds || 11} rounds · snake order. Supplemental rounds
+          fill teams below 11, skipping full teams.
         </p>
         {!s.order.length ? (
           <p>Waiting for the scheduled lottery time.</p>
@@ -759,7 +775,10 @@ function Draft({ league: l }) {
               <small>{s.paused ? "PAUSED" : "ELAPSED · NO TIME LIMIT"}</small>
             </div>
             <p>
-              Round {Math.floor(next / 12) + 1} · Pick {next + 1}/132
+              Round {s.nextPick?.round} · Pick {next + 1}
+              {s.nextPick?.supplemental
+                ? " · ROSTER FILL"
+                : ` / ${12 * (s.baseDraftRounds || 11)} main-round picks`}
             </p>
             {mine && !s.paused ? (
               <div className="season-inline">
@@ -822,7 +841,14 @@ function Draft({ league: l }) {
               CORRECT LAST PICK
             </button>
           )}
-        {s.picks.length === 132 && (
+        {[
+          "postdraft",
+          "regular",
+          "postseason",
+          "retention",
+          "offseason",
+          "archived",
+        ].includes(s.status) && (
           <p>
             Draft complete. Review each roster below, then open Team Tools to
             save your starting nine, batting order, positions and bench.
@@ -1058,7 +1084,10 @@ function Teams({ league: l }) {
                     />
                   )}{" "}
                   {t.name}
-                  <small>{rosterOf(s, t.id).length} players</small>
+                  <small>
+                    {conferences[t.conference] || "Conference pending"} ·{" "}
+                    {rosterOf(s, t.id).length} players
+                  </small>
                 </summary>
                 {s.defaults[t.id]?.starters.map((p, i) => (
                   <div className="roster-line" key={p.player}>
@@ -1105,6 +1134,7 @@ function Schedule({ league: l, commissioner = false }) {
     <>
       <SeasonCalendar league={l} />
       {admin && <ScheduleGenerator league={l} />}
+      {admin && s.status === "postseason" && <PlayoffPanel league={l} />}
       {admin && (
         <Box title="ENTER & PUBLISH SCHEDULE">
           <form
@@ -1120,6 +1150,40 @@ function Schedule({ league: l, commissioner = false }) {
                 setForm({ ...form, startsAt: "", label: "" });
             }}
           >
+            {s.status === "postseason" && (
+              <label>
+                Playoff series
+                <select
+                  required
+                  value={form.seriesId || ""}
+                  onChange={(e) => {
+                    const x = s.playoffSeries.find(
+                      (x) => x.id === e.target.value,
+                    );
+                    const number =
+                      s.games.filter((g) => g.seriesId === x?.id).length + 1;
+                    setForm({
+                      ...form,
+                      seriesId: x?.id || "",
+                      playoffRound: x?.round,
+                      home: number % 2 ? x?.high : x?.low,
+                      away: number % 2 ? x?.low : x?.high,
+                      label: `${x?.round} · Game ${number}`,
+                    });
+                  }}
+                >
+                  <option value="">Choose series</option>
+                  {(s.playoffSeries || [])
+                    .filter((x) => !x.winner)
+                    .map((x) => (
+                      <option key={x.id} value={x.id}>
+                        {s.teams.find((t) => t.id === x.high)?.name} vs{" "}
+                        {s.teams.find((t) => t.id === x.low)?.name}
+                      </option>
+                    ))}
+                </select>
+              </label>
+            )}
             <div className="season-inline">
               <TeamChooser
                 s={s}
@@ -1207,22 +1271,31 @@ function Schedule({ league: l, commissioner = false }) {
           <section className="panel season-game" key={g.id}>
             <div>
               <small>
+                {g.postponed ? "POSTPONED · " : ""}
                 {g.label || g.phase} · {time(g.startsAt)}
               </small>
               <h3>
                 {s.teams.find((t) => t.id === g.away)?.name} <b>AT</b>{" "}
                 {s.teams.find((t) => t.id === g.home)?.name}
               </h3>
+              {g.announcement && <p>{g.announcement}</p>}
+              {g.youtubeUrl && (
+                <a href={g.youtubeUrl} target="_blank" rel="noreferrer">
+                  Watch on Supa League TV
+                </a>
+              )}
               <strong>
                 {g.stage === "final"
                   ? `${g.result.scores[g.away]} – ${g.result.scores[g.home]}`
-                  : g.stage.toUpperCase()}
+                  : g.stage === "recorded"
+                    ? "AWAITING PREMIERE RESULT RELEASE · LINEUPS LOCKED"
+                    : g.stage.toUpperCase()}
               </strong>
             </div>
             {team &&
               [g.away, g.home].includes(team) &&
-              g.stage === "scheduled" &&
-              l.now < new Date(g.startsAt) && (
+              (g.stage === "scheduled" || g.stage === "live") &&
+              !g.lockedAt && (
                 <button
                   className="outline-btn"
                   onClick={() => setEditing(editing === g.id ? null : g.id)}
@@ -1232,27 +1305,21 @@ function Schedule({ league: l, commissioner = false }) {
               )}
             {admin && (
               <div className="season-inline">
-                {g.stage === "scheduled" ? (
-                  <button
-                    className="red-btn"
-                    disabled={
-                      l.busy || !["regular", "postseason"].includes(s.status)
-                    }
-                    onClick={() => l.act("start_game", { game: g.id })}
-                  >
-                    MARK GAME STARTED & LOCK LINEUPS
-                  </button>
-                ) : (
-                  <button
-                    className="red-btn"
-                    onClick={() =>
-                      setReportGame(reportGame === g.id ? null : g.id)
-                    }
-                  >
-                    {g.stage === "final"
-                      ? "REPLACE / CORRECT RESULT"
-                      : "UPLOAD PROJECT RIO XLSX"}
-                  </button>
+                <button
+                  className="red-btn"
+                  disabled={
+                    l.busy || !["regular", "postseason"].includes(s.status)
+                  }
+                  onClick={() =>
+                    setReportGame(reportGame === g.id ? null : g.id)
+                  }
+                >
+                  {["recorded", "final"].includes(g.stage)
+                    ? "REPLACE / CORRECT REPORT"
+                    : "UPLOAD PROJECT RIO XLSX & LOCK LINEUPS"}
+                </button>
+                {!["final", "cancelled"].includes(g.stage) && (
+                  <BroadcastControls league={l} game={g} />
                 )}
                 {g.stage === "scheduled" && (
                   <details>
@@ -1544,7 +1611,7 @@ function ReportImport({ league: l, game, onDone }) {
               }
             }}
           >
-            POST VERIFIED RESULT
+            SAVE PRIVATE REPORT & LOCK LINEUPS
           </button>
         </>
       )}
@@ -1685,9 +1752,6 @@ function Trades({ league: l, messages = false }) {
                     >
                       <option value="player">Player</option>
                       <option value="pick">Next-season draft pick</option>
-                      <option value="contract">
-                        Unused extension contract
-                      </option>
                     </select>
                   </label>
                   {move.kind === "contract" ? (
@@ -1910,6 +1974,8 @@ function Extensions({ league }) {
   return <ContractExtensions league={league} />;
 }
 function FreeAgency({ league: l }) {
+  const [signing, setSigning] = useState(null),
+    [drop, setDrop] = useState("");
   const s = l.season,
     [team, setTeam] = useActingTeam(l),
     [query, setQuery] = useState("");
@@ -1926,9 +1992,10 @@ function FreeAgency({ league: l }) {
           <TeamChooser s={s} value={team} onChange={setTeam} />
         )}
         <p>
-          Minimum roster: 11 players. Following a trade that leaves fewer than
-          11, sign free agents or randomly fill the exact number needed, then
-          update your default lineup.
+          Roster size: 11–14 players. Free agents are first come, first served.
+          At 14, select a player to drop in the same signing. Following a trade
+          that leaves fewer than 11, sign free agents or randomly fill the exact
+          number needed, then update your default lineup.
         </p>
         {can && (
           <>
@@ -1957,6 +2024,51 @@ function FreeAgency({ league: l }) {
             </details>
           </>
         )}
+        {signing && (
+          <div
+            role="dialog"
+            aria-label="Swap free agent into full roster"
+            className="report-import"
+          >
+            <h3>ROSTER FULL · SIGN {name(signing)}</h3>
+            <p>
+              Select one player to drop. The drop and signing happen together.
+            </p>
+            <select
+              aria-label="Player to drop"
+              value={drop}
+              onChange={(e) => setDrop(e.target.value)}
+            >
+              <option value="">Select player to drop</option>
+              {rosterOf(s, team).map((id) => (
+                <option key={id} value={id}>
+                  {name(id)}
+                </option>
+              ))}
+            </select>
+            <button
+              className="red-btn"
+              disabled={l.busy || !drop}
+              onClick={async () => {
+                if (
+                  await l.act("add_player", {
+                    team,
+                    player: signing,
+                    dropPlayer: Number(drop),
+                  })
+                ) {
+                  setSigning(null);
+                  setDrop("");
+                }
+              }}
+            >
+              DROP & SIGN
+            </button>
+            <button className="outline-btn" onClick={() => setSigning(null)}>
+              CANCEL
+            </button>
+          </div>
+        )}
         <input
           aria-label="Search free agents"
           placeholder="Search available players"
@@ -1978,7 +2090,10 @@ function FreeAgency({ league: l }) {
                   <button
                     className="outline-btn"
                     disabled={l.busy}
-                    onClick={() => l.act("add_player", { team, player: p.id })}
+                    onClick={() => {
+                      if (rosterOf(s, team).length >= 14) setSigning(p.id);
+                      else l.act("add_player", { team, player: p.id });
+                    }}
                   >
                     SIGN PLAYER
                   </button>
@@ -1991,8 +2106,33 @@ function FreeAgency({ league: l }) {
   );
 }
 function Standings({ league: l }) {
+  const [view, setView] = useState("overall");
   return (
     <Box title="REGULAR-SEASON STANDINGS">
+      <div className="subnav">
+        {[
+          ["overall", "Overall"],
+          ["supa", "Supa Conference"],
+          ["galaxy", "Galaxy Conference"],
+        ].map(([v, label]) => (
+          <button
+            key={v}
+            className={view === v ? "active" : ""}
+            onClick={() => setView(v)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      {view !== "overall" && (
+        <p>
+          {conferences[view]}
+          {l.season?.conferenceChampions?.[view]
+            ? ` · Conference Champions: ${l.season.teams.find((t) => t.id === l.season.conferenceChampions[view])?.name}`
+            : " · Conference champion awarded at regular-season end"}
+        </p>
+      )}
+
       <div className="season-table">
         <table>
           <thead>
@@ -2005,18 +2145,25 @@ function Standings({ league: l }) {
             </tr>
           </thead>
           <tbody>
-            {standings(l.season).map((t) => (
-              <tr key={t.id}>
-                <td>{t.name}</td>
-                <td>{t.wins + t.losses}</td>
-                <td>{t.wins}</td>
-                <td>{t.losses}</td>
-                <td>{t.pct.toFixed(3)}</td>
-                <td>{t.runsFor}</td>
-                <td>{t.runsAgainst}</td>
-                <td>{t.runsFor - t.runsAgainst}</td>
-              </tr>
-            ))}
+            {standings(l.season)
+              .filter((t) => view === "overall" || t.conference === view)
+              .map((t) => (
+                <tr key={t.id}>
+                  <td>
+                    {t.name}
+                    <small style={{ display: "block" }}>
+                      {conferences[t.conference] || "Conference pending"}
+                    </small>
+                  </td>
+                  <td>{t.wins + t.losses}</td>
+                  <td>{t.wins}</td>
+                  <td>{t.losses}</td>
+                  <td>{t.pct.toFixed(3)}</td>
+                  <td>{t.runsFor}</td>
+                  <td>{t.runsAgainst}</td>
+                  <td>{t.runsFor - t.runsAgainst}</td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
@@ -2193,7 +2340,10 @@ export function SeasonPage({ page, league: l }) {
       ) : page === "Team Stats" ? (
         <TeamStats league={l} />
       ) : page === "Voting" ? (
-        <Voting league={l} />
+        <>
+          <PublicBallots league={l} />
+          <Voting league={l} />
+        </>
       ) : page === "SSL Draft Room" ? (
         <Draft league={l} />
       ) : page === "Free Agency" ? (
@@ -2206,7 +2356,7 @@ export function SeasonPage({ page, league: l }) {
           l.season.status,
         ) ? (
           <>
-            <p>Playoff games and series are entered by the commissioner.</p>
+            <PlayoffPanel league={l} />
             <Schedule
               league={{
                 ...l,
@@ -2247,7 +2397,8 @@ export function SeasonHome({ league: l, go }) {
     <div className="season-home">
       <Box title={`${s.name} · ${s.status.toUpperCase()}`}>
         <p>
-          {s.teams.length} teams · {s.picks.length}/132 draft picks
+          {s.teams.length} teams · {s.picks.length} draft picks ·{" "}
+          {s.baseDraftRounds || 11} main rounds
         </p>
         <button
           className="outline-btn"
@@ -2257,6 +2408,17 @@ export function SeasonHome({ league: l, go }) {
         >
           OPEN {s.status === "drafting" ? "DRAFT ROOM" : "SCHEDULE"}
         </button>
+        {s.awardsAnnouncement && (
+          <p style={{ whiteSpace: "pre-wrap" }}>{s.awardsAnnouncement}</p>
+        )}
+        {s.games
+          .filter((g) => g.announcement)
+          .map((g) => (
+            <p key={"news" + g.id}>
+              <strong>{g.postponed ? "POSTPONED: " : "LEAGUE UPDATE: "}</strong>
+              {g.announcement}
+            </p>
+          ))}
         {upcoming.map((g) => (
           <p key={g.id}>
             {s.teams.find((t) => t.id === g.away)?.name} at{" "}

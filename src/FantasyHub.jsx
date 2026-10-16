@@ -25,7 +25,7 @@ export function FantasyRules() {
       </div>
       <p>Head-to-head matchups run Sunday at 12:00 a.m. through Saturday at 11:59:59 p.m. Eastern Time. The higher starter point total wins. A game belongs to the week in which it starts.</p>
       <p>The draft is ten rounds with a snake order. All seven starter spots are open: a starter earns batting, fielding, and pitching points. Every completed game they play during the week counts. Bench players earn no matchup points.</p>
-      <p>You may swap one starter with one bench player at any time before either has started a game that week. A player locks in their starter or bench spot when their first game of the week starts. Lineups carry into the next week and unlock Sunday.</p>
+      <p>You may swap one starter with one bench player while both are unlocked. Uploading an official SSL game report locks its players for that premiere’s fantasy week, even while results remain private. Points appear after the premiere ends and results release. Lineups carry into the next week and unlock Sunday.</p>
       <div className="rules-tables">{[['Batting', rules.batting], ['Fielding', rules.fielding], ['Pitching', rules.pitching], ['Team bonuses', rules.team]].map(([area, weights]) =>
         <section key={area}><h3>{area}</h3><table><tbody>{Object.entries(weights).map(([key, weight]) =>
           <tr key={key}><td>{label(key)}</td><td>{points(weight)}</td></tr>)}</tbody></table></section>)}</div>
@@ -62,7 +62,7 @@ export function FantasyLeague({ initialLeague, user, supabase, players, liveGame
         supabase.from('fantasy_memberships').select('user_id,joined_at,role').eq('league_id', id).order('joined_at'),
         supabase.from('fantasy_draft_order').select('user_id,slot').eq('league_id', id).order('slot'),
         supabase.from('fantasy_draft_picks').select('pick_number,user_id,player_id,picked_at').eq('league_id', id).order('pick_number'),
-        supabase.from('fantasy_player_schedule').select('player_id,starts_at'),
+        supabase.from('fantasy_player_schedule').select('player_id,starts_at,locked_at'),
       ])
       if (!live) return
       const failure = [l,m,o,p,s].find(x => x.error)
@@ -114,7 +114,7 @@ export function FantasyLeague({ initialLeague, user, supabase, players, liveGame
   const myRoster = picks.filter(p => p.user_id === user.id)
   const mine = lineups.filter(x => x.user_id === user.id && x.week_start === currentWeek)
   const locked = playerId => schedule.some(s => s.player_id === playerId &&
-    weekKey(new Date(s.starts_at)) === currentWeek && new Date(s.starts_at).getTime() <= now)
+    weekKey(new Date(s.starts_at)) === currentWeek && s.locked_at && new Date(s.locked_at).getTime() <= now)
   const drafted = new Set(picks.map(p => p.player_id))
   const available = players.filter(p => !drafted.has(p.id) && eligibleIds.has(p.id) && `${p.name} ${p.class}`.toLowerCase().includes(draftQuery.toLowerCase()))
   const managerCount = order.length

@@ -330,4 +330,5 @@ if (process.env.SSL_TIMELINE_TEST)
   await (await import("./season-timeline.mjs")).testTimeline(db);
 if (process.env.SSL_TIMELINE_TEST)
   await (await import("./contracts.mjs")).testContracts(db);
+if (process.env.SSL_RULES_TEST) await (await import('./season-rules.mjs')).testSeasonRules(db);
 await db.close();

@@ -112,9 +112,9 @@ export default function ContractExtensions({ league: l }) {
       <section className="panel season-box contract-extensions">
         <h2>ONE-SEASON EXTENSION CONTRACTS</h2>
         <p>
-          Three contracts are added each season when extensions open, capped at
-          five total. Carrying over 0 gives 3; carrying over 1 gives 4; carrying
-          over 2 or more gives 5. Incoming trades must also respect the cap.
+          Each team receives three contracts when the season’s extension window
+          opens. The maximum is three. Unused contracts expire at the cutoff;
+          contracts cannot be traded.
         </p>
         <details>
           <summary>ACCEPTANCE RULES</summary>
@@ -152,7 +152,7 @@ export default function ContractExtensions({ league: l }) {
         )}
         {allowed && team && (
           <>
-            <h3>{balance} / 5 CONTRACTS AVAILABLE</h3>
+            <h3>{balance} / 3 CONTRACTS AVAILABLE</h3>
             {open ? (
               <>
                 <label>

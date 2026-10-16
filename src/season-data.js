@@ -32,7 +32,7 @@ export function fantasyGames(seasons) {
           id: "ssl:" + g.id,
           startsAt: g.startsAt,
           playerScores: Object.fromEntries(
-            (g.result?.players || []).map((p) => [
+            (g.stage === "final" ? g.result?.players || [] : []).map((p) => [
               p.player,
               { total: p.fantasyPoints },
             ]),
