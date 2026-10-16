@@ -7,7 +7,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test:season": "node tests/season-workflow.mjs && node tests/rio-import.mjs"
+    "test:season": "SSL_TIMELINE_TEST=1 node tests/season-workflow.mjs && node tests/rio-import.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.117.2",

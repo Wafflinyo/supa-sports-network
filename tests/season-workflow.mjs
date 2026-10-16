@@ -28,7 +28,10 @@ try {
   console.error("SCHEMA ERROR", e.message, e.position);
   throw e;
 }
-for(const migration of fs.readdirSync('supabase/migrations').filter(p=>p.endsWith('ssl_fantasy_roster_eligibility.sql')))await db.exec(fs.readFileSync('supabase/migrations/'+migration,'utf8'));
+for (const migration of fs
+  .readdirSync("supabase/migrations")
+  .filter((p) => p.endsWith("ssl_fantasy_roster_eligibility.sql")))
+  await db.exec(fs.readFileSync("supabase/migrations/" + migration, "utf8"));
 console.log("Schema loaded");
 const actor = "11111111-1111-4111-8111-111111111111";
 await db.query(
@@ -305,7 +308,10 @@ await expectFail(
   () => manage("create", null, { name: "illegal" }),
   "ordinary user writing season",
 );
-await expectFail(()=>db.query('select league_private.make_fantasy_pick($1,193)',[sid]),'fantasy drafting an unrostered character');
+await expectFail(
+  () => db.query("select league_private.make_fantasy_pick($1,193)", [sid]),
+  "fantasy drafting an unrostered character",
+);
 console.log(
   "PASS: season lifecycle, 132 picks, snake, paused and early picks, GM isolation, trade/refill, results/correction, playoff extensions and carryover.",
 );
@@ -320,4 +326,6 @@ await expectFail(
   "anonymous write RPC",
 );
 await db.exec("reset role");
+if (process.env.SSL_TIMELINE_TEST)
+  await (await import("./season-timeline.mjs")).testTimeline(db);
 await db.close();
