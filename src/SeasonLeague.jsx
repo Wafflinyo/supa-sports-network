@@ -1,3 +1,4 @@
+import {StarBalance,StarSelections} from './StarCoins.jsx';
 import {
   SeasonRuleControls,
   PublicBallots,
@@ -736,6 +737,7 @@ function Draft({ league: l }) {
           {s.baseDraftRounds || 11} rounds · snake order. Supplemental rounds
           fill teams below 11, skipping full teams.
         </p>
+        {s.number>1 && <p>Returning-season lottery: 12th seed 55% · 11th 25% · 10th 15% · 9th 5% for first pick. Winners are removed before the next weighted draw. Seeds 8 through 1 receive picks 5 through 12, then the order snakes.</p>}
         {!s.order.length ? (
           <p>Waiting for the scheduled lottery time.</p>
         ) : (
@@ -924,6 +926,7 @@ function LineupEditor({ league: l, team, game, onDone }) {
   const s = l.season,
     initial = game?.lineups?.[team] || s.defaults?.[team],
     roster = rosterOf(s, team),
+    [stars,setStars] = useState(game?.starRequests?.[team]||[]),
     [slots, setSlots] = useState(
       positions.map(
         (pos, i) => initial?.starters?.[i] || { player: "", position: pos },
@@ -938,6 +941,7 @@ function LineupEditor({ league: l, team, game, onDone }) {
       ),
     [team, game?.id],
   );
+  useEffect(()=>setStars(game?.starRequests?.[team]||[]),[team,game?.id]);
   const lineup = {
       starters: slots.map((x) => ({ ...x, player: Number(x.player) })),
       bench: roster.filter((p) => !slots.some((x) => Number(x.player) === p)),
@@ -952,6 +956,7 @@ function LineupEditor({ league: l, team, game, onDone }) {
           await l.act(game ? "game_lineup" : "default_lineup", {
             team,
             game: game?.id,
+            stars,
             lineup,
           })
         )
@@ -978,7 +983,7 @@ function LineupEditor({ league: l, team, game, onDone }) {
             <option value="">Choose player</option>
             {roster.map((p) => (
               <option key={p} value={p}>
-                {name(p)}
+                {name(p)}{game?.id && s.starCoins?.games?.[game.id]?.[team]?.recharging?.includes(p) ? " ↻ Recharge · 6 coins" : ""}
               </option>
             ))}
           </select>
@@ -999,6 +1004,7 @@ function LineupEditor({ league: l, team, game, onDone }) {
           </select>
         </div>
       ))}
+      {game ? <StarSelections season={s} team={team} game={game} selected={stars} onChange={setStars} disabled={l.busy}/> : <><StarBalance season={s} team={team}/><p>Star selections are made separately for each game; default lineups do not automatically spend coins.</p></>}
       <h4>BENCH</h4>
       <p>
         {lineup.bench.map(name).join(" · ") ||
@@ -1018,6 +1024,7 @@ function LineupEditor({ league: l, team, game, onDone }) {
                 team,
                 game: game.id,
                 useDefault: true,
+                stars,
               })
             )
               onDone?.();
@@ -1359,6 +1366,7 @@ function Schedule({ league: l, commissioner = false }) {
                   {[g.away, g.home].map((id) => (
                     <div key={id}>
                       <h4>{s.teams.find((t) => t.id === id)?.name}</h4>
+                      <p><strong>★ Stars:</strong> {(g.starRequests?.[id]||[]).map(name).join(" · ")||"None"} · {s.starCoins?.games?.[g.id]?.[id]?.cost||0} coins {s.starCoins?.games?.[g.id]?.[id]?.status||"reserved"}</p>
                       {(g.lineups[id] || s.defaults[id])?.starters.map(
                         (p, i) => (
                           <p key={i}>
@@ -1649,8 +1657,8 @@ function Trades({ league: l, messages = false }) {
     description = (m) =>
       m.kind === "player"
         ? name(m.id)
-        : m.kind === "contract"
-          ? `${m.quantity} unused extension contract(s)`
+        : m.kind === "coin"
+          ? `${m.quantity} Star Coin(s)`
           : (() => {
               const a = s.pickAssets.find((p) => p.id === m.id);
               return `S${s.tradePickSeason || s.number + 1} · Round ${a?.round || "?"} · ${teamName(a?.originalTeam)}`;
@@ -1752,17 +1760,17 @@ function Trades({ league: l, messages = false }) {
                     >
                       <option value="player">Player</option>
                       <option value="pick">Next-season draft pick</option>
+                      <option value="coin">Star Coins</option>
                     </select>
                   </label>
-                  {move.kind === "contract" ? (
+                  {move.kind === "coin" ? (
                     <label>
-                      Contracts
+                      Star Coins
                       <input
                         type="number"
                         min="1"
                         max={
-                          s.contractBalances.find((x) => x.team === move.from)
-                            ?.tokens || 0
+                          s.starCoins?.balances?.[move.from]?.available || 0
                         }
                         value={move.quantity}
                         onChange={(e) =>
@@ -1803,7 +1811,7 @@ function Trades({ league: l, messages = false }) {
                       !move.from ||
                       !move.to ||
                       move.from === move.to ||
-                      (move.kind !== "contract" && !move.id)
+                      (move.kind !== "coin" && !move.id)
                     }
                     onClick={() => {
                       setMoves((a) => [

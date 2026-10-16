@@ -37,7 +37,7 @@ export function SeasonCalendar({ league: l }) {
         Extensions close:{" "}
         {s.extensionClosesAt
           ? time(s.extensionClosesAt)
-          : "Two weeks after the championship ends"}
+          : "One calendar month after the championship ends"}
       </p>
       <p>
         <strong>
@@ -47,7 +47,7 @@ export function SeasonCalendar({ league: l }) {
         {s.status === "offseason" ? " · OFFSEASON" : ""}
       </p>
       <p>
-        Extensions open after the trade deadline. At the cutoff, unsigned
+        Extensions open after the championship. All teams using or voiding their contracts closes the window early; otherwise it closes after one calendar month. At the cutoff, unsigned
         players leave and unused contracts expire. Each season gets three fresh
         contracts. Offseason trades reopen then, continuing through next-season
         preparation until the draft begins.

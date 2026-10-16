@@ -20,7 +20,7 @@ export default function ContractExtensions({ league: l }) {
     balance = s?.contractBalances?.find((x) => x.team === team)?.tokens || 0,
     open =
       s?.extensionsOpen &&
-      ["regular", "postseason", "retention"].includes(s.status),
+      s.status === "retention",
     allowed = ["gm", "commissioner"].includes(l.access.role);
   useEffect(() => {
     setContract("");
@@ -193,7 +193,7 @@ export default function ContractExtensions({ league: l }) {
                         .filter(
                           (id) =>
                             !s.extensionOffers.some(
-                              (o) => o.franchise === team && o.player === id,
+                              (o) => o.franchise === team && o.player === id && o.accepted,
                             ),
                         )
                         .map((id) => (
@@ -255,12 +255,12 @@ export default function ContractExtensions({ league: l }) {
               </>
             ) : (
               <p>
-                Extensions open after the Week 12 trade deadline and close two
-                weeks after the championship.
+                Extensions open after the championship and close one calendar month later, or earlier once all teams finish their decisions.
               </p>
             )}
           </>
         )}
+        {allowed && open && team && balance>0 && <button className="outline-btn" disabled={pending||l.busy} onClick={()=>{if(confirm("Void all remaining extension contracts for this team? These contracts will be forfeited.")) l.act("void_extensions",{team});}}>VOID REMAINING EXTENSIONS ({balance})</button>}
         {pending && (
           <div className="contract-decision waiting" role="status">
             <span className="contract-spinner" aria-hidden="true" />
@@ -299,7 +299,7 @@ export default function ContractExtensions({ league: l }) {
             <tbody>
               {!pending &&
                 s.extensionOffers?.map((o) => (
-                  <tr key={o.franchise + o.player}>
+                  <tr key={o.attempt || o.franchise + o.player}>
                     <td>
                       <span className="portrait-label">
                         <PlayerPortrait
