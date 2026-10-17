@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 export const conferenceInfo={
- supa:{name:'Supa Mario Conference',short:'SMC',image:'/conference-supa.png',fallback:'/conference-supa.svg'},
- galaxy:{name:'Mario Galaxy Conference',short:'MGC',image:'/conference-galaxy.png',fallback:'/conference-galaxy.svg'}
+ supa:{name:'Supa Mario Conference',short:'SMC',image:'/conference-supa.webp',fallback:'/conference-supa.svg'},
+ galaxy:{name:'Mario Galaxy Conference',short:'MGC',image:'/conference-galaxy.webp',fallback:'/conference-galaxy.svg'}
 }
 export function ConferenceMark({id,size=42}){
  const [failed,setFailed]=useState(false)
