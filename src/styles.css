@@ -111,3 +111,11 @@
 .player-data-table .player-data-name .player-avatar {flex-shrink:0;margin-right:0}
 
 .auth-modal{max-height:calc(100dvh - 32px);overflow-y:auto}
+
+/* Optional GM first-login team setup */
+.gm-welcome-card{padding:24px;margin-bottom:20px;border-left:5px solid #d9232e}
+.gm-welcome-card h2{font-family:'Barlow Condensed',Impact,sans-serif;font-size:clamp(29px,5vw,42px);margin:9px 0}
+.gm-welcome-card p{color:#43516b;line-height:1.6;max-width:780px}
+.gm-welcome-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+#gm-team-identity{scroll-margin-top:20px}
+@media(max-width:520px){.gm-welcome-card{padding:19px}.gm-welcome-actions button{flex:1 1 170px}}
