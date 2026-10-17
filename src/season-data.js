@@ -126,7 +126,7 @@ export function standings(season) {
       (a, b) =>
         b.pct - a.pct ||
         b.runsFor - b.runsAgainst - (a.runsFor - a.runsAgainst) ||
-        a.runsAgainst - b.runsAgainst || a.slot - b.slot,
+        a.runsAgainst - b.runsAgainst,
     );
 }
 const normalize = (x) =>
