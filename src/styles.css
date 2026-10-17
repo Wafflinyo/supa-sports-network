@@ -152,3 +152,7 @@
 .standings-conference-banner>.conference-mark{width:80px!important;height:80px!important}
 .standings-overall-logos .conference-mark{width:48px!important;height:48px!important}
 }
+/* Overall view uses the league crest; conference emblems appear beside teams. */
+.ssl-standings-logo{display:block;object-fit:contain;flex-shrink:0}
+.standings-team-name .conference-mark{width:28px;height:28px}
+@media(max-width:620px){.standings-conference-nav .ssl-standings-logo{width:46px;height:46px}.standings-conference-banner>.ssl-standings-logo{width:80px;height:80px}}
