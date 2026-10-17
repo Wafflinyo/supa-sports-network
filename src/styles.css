@@ -132,3 +132,23 @@
 .conference-auto-note{padding:15px;margin-bottom:14px;background:#f5f8fc;border-left:4px solid #1d4f95}
 .conference-auto-note p{margin:6px 0;color:#4a5c73}
 @media(max-width:580px){.standings-conference-heading{font-size:19px!important}.standings-conference-heading .conference-mark{width:64px;height:64px}.standings-team-name{min-width:148px}}
+
+/* Visible conference branding above and inside the standings tabs. */
+.standings-conference-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.standings-conference-nav button{cursor:pointer;min-width:0;padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px;border:2px solid #d7deea;background:#fff;color:#10244b;font:800 16px 'Barlow Condensed',Impact,sans-serif}
+.standings-conference-nav button.active{border-color:#d9232e;background:#fff5f2;box-shadow:0 3px 0 #d9232e}
+.standings-conference-nav button strong{text-align:center}
+.standings-all-logo{display:grid;place-items:center;width:60px;height:60px;background:#11264e;color:#ffd53d;border:3px solid #e5b329;clip-path:polygon(50% 0%,95% 25%,95% 75%,50% 100%,5% 75%,5% 25%);font-size:24px}
+.standings-conference-banner{display:flex;align-items:center;gap:24px;padding:22px;margin-bottom:22px;border:1px solid #d6deeb;background:linear-gradient(115deg,#f8faff,#eef4fd)}
+.standings-conference-banner h3{font:900 clamp(26px,4vw,41px) 'Barlow Condensed',Impact,sans-serif;color:#10244b;margin:6px 0}
+.standings-conference-banner p{margin:0!important}
+.standings-overall-logos{display:flex;align-items:center;gap:8px}
+.standings-empty{text-align:center;padding:24px!important;color:#596a85}
+@media(max-width:620px){
+.standings-conference-nav{gap:6px}
+.standings-conference-nav button{font-size:13px;padding:9px 4px;gap:5px;line-height:1.12}
+.standings-conference-nav .conference-mark,.standings-all-logo{width:46px!important;height:46px!important;font-size:19px}
+.standings-conference-banner{gap:12px;padding:12px}
+.standings-conference-banner>.conference-mark{width:80px!important;height:80px!important}
+.standings-overall-logos .conference-mark{width:48px!important;height:48px!important}
+}
