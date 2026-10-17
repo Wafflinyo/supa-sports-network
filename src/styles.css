@@ -119,3 +119,16 @@
 .gm-welcome-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
 #gm-team-identity{scroll-margin-top:20px}
 @media(max-width:520px){.gm-welcome-card{padding:19px}.gm-welcome-actions button{flex:1 1 170px}}
+
+/* Conference branding and GM conference selection */
+.conference-mark{display:inline-block;vertical-align:middle;flex-shrink:0}
+.conference-pick{display:flex;align-items:center;gap:12px;padding:11px 14px;border:1px solid #cbd4e1;background:#f5f8fc;flex-wrap:wrap}
+.conference-pick strong{font-family:'Barlow Condensed',sans-serif;font-size:23px}
+.conference-pick span{color:#617086;font-size:12px;font-weight:700}
+.official-team-card small{display:flex;align-items:center;gap:8px}
+.standings-team-name{display:flex;align-items:center;gap:9px;min-width:185px}
+.standings-conference-heading{display:flex;align-items:center;gap:15px;font-size:23px!important;font-weight:800;color:#10244b!important}
+.season-team summary small .conference-mark{margin-right:5px}
+.conference-auto-note{padding:15px;margin-bottom:14px;background:#f5f8fc;border-left:4px solid #1d4f95}
+.conference-auto-note p{margin:6px 0;color:#4a5c73}
+@media(max-width:580px){.standings-conference-heading{font-size:19px!important}.standings-conference-heading .conference-mark{width:64px;height:64px}.standings-team-name{min-width:148px}}
