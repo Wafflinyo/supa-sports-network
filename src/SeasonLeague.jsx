@@ -16,6 +16,7 @@ import {
 import React, { useState, useEffect, useMemo } from "react";
 import pool from "./players.json";
 import { teamLogo } from "./TeamIdentity.jsx";
+import { ConferenceMark } from './ConferenceMark.jsx';
 import { PlayerPortrait } from "./PlayerPortrait.jsx";
 import {
   rosterOf,
@@ -342,7 +343,7 @@ export function SeasonWorkspace({ league, registeredTeams }) {
             <>
               <Box title={`${s.name} · ${s.status.toUpperCase()}`}>
                 <p>
-                  Registered teams are managed in Team Setup. All 12 need a team name, home location and logo before you can open the draft-date poll.
+                  Registered teams are managed in Team Setup. All 12 need a team name, home location, logo, and conference selection before you can open the draft-date poll.
                 </p>
                 <p role="status"><strong>{registeredTeams.length}/12 teams registered.</strong> {registeredTeams.length < 12 ? `Waiting on ${12-registeredTeams.length} more team${12-registeredTeams.length===1?'':'s'} before draft-day voting can open.` : 'All teams registered! You can select them and open the draft-date poll.'}</p>
                 {["setup", "poll"].includes(s.status) ? (
@@ -365,7 +366,7 @@ export function SeasonWorkspace({ league, registeredTeams }) {
                         </label>
                       ))}
                     </div>
-                    <p>{slots.length}/12 selected</p>
+                    <p>{slots.length}/12 selected · Supa: {registeredTeams.filter(t=>slots.includes(t.slot)&&t.conference==='supa').length}/6 · Galaxy: {registeredTeams.filter(t=>slots.includes(t.slot)&&t.conference==='galaxy').length}/6</p>
                     <button
                       className="red-btn"
                       disabled={l.busy}
@@ -434,7 +435,7 @@ export function SeasonWorkspace({ league, registeredTeams }) {
                     </label>
                     <button
                       className="red-btn"
-                      disabled={l.busy || s.teams.length !== 12}
+                      disabled={l.busy || s.teams.length !== 12 || !s.conferencesSet}
                     >
                       OPEN / REPLACE POLL
                     </button>
@@ -1028,7 +1029,7 @@ function Teams({ league: l }) {
                   )}{" "}
                   {t.name}
                   <small>
-                    {conferences[t.conference] || "Conference pending"} ·{" "}
+                    <ConferenceMark id={t.conference} size={29}/>{conferences[t.conference] || "Conference pending"} ·{" "}
                     {rosterOf(s, t.id).length} players
                   </small>
                 </summary>
@@ -2073,7 +2074,8 @@ function Standings({ league: l }) {
         ))}
       </div>
       {view !== "overall" && (
-        <p>
+        <p className="standings-conference-heading">
+          <ConferenceMark id={view} size={83}/>
           {conferences[view]}
           {l.season?.conferenceChampions?.[view]
             ? ` · Conference Champions: ${l.season.teams.find((t) => t.id === l.season.conferenceChampions[view])?.name}`
@@ -2098,10 +2100,10 @@ function Standings({ league: l }) {
               .map((t) => (
                 <tr key={t.id}>
                   <td>
-                    {t.name}
+                    <span className="standings-team-name"><ConferenceMark id={t.conference} size={36}/><span>{t.name}
                     <small style={{ display: "block" }}>
                       {conferences[t.conference] || "Conference pending"}
-                    </small>
+                    </small></span></span>
                   </td>
                   <td>{t.wins + t.losses}</td>
                   <td>{t.wins}</td>
