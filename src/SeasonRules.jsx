@@ -35,42 +35,7 @@ export function SeasonRuleControls({ league: l }) {
   if (!s || l.access.role !== "commissioner") return null;
   return (
     <Box title="CONFERENCES, VOTING & AWARDS">
-      <details>
-        <summary>ASSIGN CONFERENCES · {selected.length}/6 SUPA</summary>
-        <p>
-          Select six Supa teams. The other six become Galaxy. Save before
-          opening the draft-date poll.
-        </p>
-        <div className="season-team-checks">
-          {s.teams.map((t) => (
-            <label key={t.id}>
-              <input
-                type="checkbox"
-                checked={selected.includes(t.id)}
-                onChange={() =>
-                  setSelected((v) =>
-                    v.includes(t.id)
-                      ? v.filter((x) => x !== t.id)
-                      : [...v, t.id],
-                  )
-                }
-              />
-              {t.name}
-            </label>
-          ))}
-        </div>
-        <button
-          className="red-btn"
-          disabled={
-            l.busy ||
-            selected.length !== 6 ||
-            !["setup", "poll", "scheduled", "postdraft"].includes(s.status)
-          }
-          onClick={() => l.act("conferences", { supa: selected })}
-        >
-          SAVE 6 + 6 CONFERENCES
-        </button>
-      </details>
+      <div className="conference-auto-note"><strong>CONFERENCES · AUTOMATIC</strong><p>GMs select their conference during team creation. There are six spots in Supa Mario and six in Mario Galaxy. Conference selections carry into the season automatically, so no manual assignment is needed.</p><p>Current season: {s.teams.filter(t=>t.conference==='supa').length}/6 Supa Mario · {s.teams.filter(t=>t.conference==='galaxy').length}/6 Mario Galaxy</p></div>
       <details>
         <summary>OPEN ALL-STAR / AWARD VOTING</summary>
         <form
