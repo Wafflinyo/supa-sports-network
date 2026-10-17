@@ -104,6 +104,8 @@ function App() {
   const [session, setSession] = useState(null)
   const [authOpen, setAuthOpen] = useState(false)
   const [access, setAccess] = useState({role:'viewer'})
+  const [teamSetupExpanded,setTeamSetupExpanded] = useState(false)
+  const [teamWelcomeSeen,setTeamWelcomeSeen] = useState(false)
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
   const [leagues, setLeagues] = useState([])
@@ -135,8 +137,23 @@ function App() {
   const [commissionerTab,setCommissionerTab]=useState('Season Management')
   const isCommissioner = Boolean(session && access.role === 'commissioner')
   const isGM=Boolean(session && access.role==='gm')
+  const gmTeamRegistered = officialTeams.some(t => t.slot === Number(access.slot))
+  const gmNeedsTeam = isGM && !teamsLoading && !teamsMessage && !gmTeamRegistered
   const visibleNav = visibleLeagueTabs(!!session, access.role)
 
+  useEffect(() => {
+    if (!session || access.role !== 'gm') {
+      setTeamWelcomeSeen(false)
+      setTeamSetupExpanded(false)
+    }
+  }, [session?.user?.id,access.role])
+  useEffect(() => {
+    if (!gmNeedsTeam || teamWelcomeSeen) return
+    setTeamWelcomeSeen(true)
+    setTeamSetupExpanded(true)
+    setPage('GM Tools')
+    setMenu(false)
+  }, [gmNeedsTeam,teamWelcomeSeen])
   useEffect(() => {
     if (!canViewLeaguePage(page, !!session, access.role)) {
       setPage('Home')
@@ -198,9 +215,22 @@ function App() {
     <div className="topline"><div className="container topline-inner"><span><i className="live-dot"/> SLUGGERS SUPA LEAGUE</span><span>THE LEAGUE STARTS HERE <b>★</b></span><button onClick={() => setAuthOpen(true)}>{session ? session.user.email?.split('@')[0] : 'SIGN IN / JOIN'}</button></div></div>
     <header className="masthead"><div className="container masthead-inner"><button className="brand" onClick={() => go('Home')}><img src={logo} alt="Sluggers Supa League logo"/><span><strong>SLUGGERS <em>SUPA</em> LEAGUE</strong><small>THE OFFICIAL LEAGUE HUB</small></span></button><button className="mobile-menu" aria-label={menu ? "Close menu" : "Open menu"} aria-expanded={menu} aria-controls="league-main-navigation" onClick={() => setMenu(!menu)}>{menu ? <X/> : <Menu/>}<span>MENU</span></button><div className="masthead-right"><span className="league-tag">MARIO SUPER SLUGGERS</span><span className="badge-star">★</span></div></div></header>
     <nav id="league-main-navigation" className={`nav ${menu ? 'open' : ''}`} aria-label="Main navigation"><div className="container nav-inner">{visibleNav.map(n => <button key={n} className={page === n ? 'active' : ''} aria-current={page === n ? 'page' : undefined} onClick={() => go(n)}>{n}</button>)}</div></nav>
-    <main className="container page-content"><SeasonPrompts league={seasonLeague} go={go}/>{seasonPages.includes(page)&&canViewLeaguePage(page, !!session, access.role)&&(page==='Teams'&&!seasonLeague.season?<OfficialTeams teams={officialTeams} loading={teamsLoading} message={teamsMessage} supabase={supabase}/>:<SeasonPage page={page} league={seasonLeague}/>)}
+    <main className="container page-content"><SeasonPrompts league={seasonLeague} go={go}/>
+      {gmNeedsTeam && page !== 'GM Tools' && <aside className="season-prompt" aria-label="Team registration reminder"><strong>YOUR TEAM STILL NEEDS TO BE CREATED</strong><p>You can explore the site, but all 12 teams need a name, home location and logo before the league can schedule its draft. Go to <strong>GM Tools → Team Name, Home Location & Logo</strong> whenever you're ready.</p><button className="red-btn" onClick={()=>{setTeamSetupExpanded(true);go('GM Tools')}}>FINISH TEAM SETUP</button></aside>}{seasonPages.includes(page)&&canViewLeaguePage(page, !!session, access.role)&&(page==='Teams'&&!seasonLeague.season?<OfficialTeams teams={officialTeams} loading={teamsLoading} message={teamsMessage} supabase={supabase}/>:<SeasonPage page={page} league={seasonLeague}/>)}
       {page === 'Commissioner Tools' && isCommissioner && <><div className="page-heading"><span className="eyebrow dark">LEAGUE ADMINISTRATION</span><h1>COMMISSIONER TOOLS</h1></div><div className="subnav">{['Season Management','Teams, Locations & Access'].map(t=><button key={t} className={commissionerTab===t?'active':''} onClick={()=>setCommissionerTab(t)}>{t}</button>)}</div>{commissionerTab==='Season Management'?<SeasonWorkspace league={seasonLeague} registeredTeams={officialTeams}/>:<CommissionerWorkspace supabase={supabase} access={access} teams={officialTeams} onChange={loadOfficialTeams} onAccess={setAccess}/>}</>}
-      {page==='GM Tools' && isGM && <><div className="page-heading"><span className="eyebrow dark">YOUR CLUB</span><h1>GM TOOLS</h1></div><SeasonTeamTools league={seasonLeague}/><details className="panel season-box"><summary>TEAM NAME, HOME LOCATION & LOGO</summary><TeamSetup key={access.slot} supabase={supabase} access={access} teams={officialTeams} onChange={loadOfficialTeams} onAccess={setAccess}/></details></>}
+      {page==='GM Tools' && isGM && <><div className="page-heading"><span className="eyebrow dark">YOUR CLUB</span><h1>GM TOOLS</h1></div>
+        {gmNeedsTeam && <section className="panel gm-welcome-card" aria-label="Create your SSL team">
+          <span className="eyebrow dark">FIRST STEP · TEAM IDENTITY</span>
+          <h2>CREATE YOUR TEAM WHEN YOU'RE READY</h2>
+          <p>Pick a Mario-universe home location, name your team, and upload your logo below. You don't have to finish right now! Come back at any time through <strong>GM Tools → Team Name, Home Location & Logo</strong>.</p>
+          <p><strong>Before we can set a draft day:</strong> all 12 GMs must have registered teams, including their names, home locations and logos. The commissioner can't open the draft-date poll until everyone is finished.</p>
+          <div className="gm-welcome-actions">
+            <button className="red-btn" onClick={()=>{setTeamSetupExpanded(true);document.getElementById('gm-team-identity')?.scrollIntoView({behavior:'smooth',block:'start'})}}>CREATE MY TEAM</button>
+            <button className="outline-btn" onClick={()=>{setTeamSetupExpanded(false);go('Home')}}>SET UP LATER</button>
+          </div>
+        </section>}
+        <details id="gm-team-identity" className="panel season-box" open={teamSetupExpanded} onToggle={e=>setTeamSetupExpanded(e.currentTarget.open)}><summary>TEAM NAME, HOME LOCATION & LOGO</summary><TeamSetup key={access.slot} supabase={supabase} access={access} teams={officialTeams} onChange={loadOfficialTeams} onAccess={setAccess}/></details>
+        <SeasonTeamTools league={seasonLeague}/></>}
       {page === 'Home' && <><SeasonHome league={seasonLeague} go={go}/>
         <div className="home-grid"><div className="hero"><div className="hero-content"><span className="eyebrow">WELCOME TO THE LEAGUE</span><h1>THE GAME<br/><span>STARTS HERE.</span></h1><p>Follow every game, explore the player pool, and manage your fantasy league in one place.</p><button className="yellow-btn" onClick={() => go('Player Stats')}>EXPLORE PLAYERS <span>›</span></button></div><div className="hero-number">01</div></div>
           <div className="side-stack"><div className="panel compact"><SectionTitle kicker="ON DECK" right={<CalendarDays size={19}/>}>UPCOMING MATCHES</SectionTitle>{seasonLeague.season?<p className="season-box">{seasonLeague.season.games.filter(g=>g.stage!=='final').length} upcoming games · <button className="text-link" onClick={()=>go('Schedule')}>VIEW SCHEDULE ›</button></p>:<Empty title="Schedule coming soon">Matchups will appear when the season schedule is set.</Empty>}</div><div className="panel compact"><SectionTitle kicker="FINAL SCORES" right={<Trophy size={19}/>}>RECENT RESULTS</SectionTitle>{seasonLeague.season?<p className="season-box">{seasonLeague.season.games.filter(g=>g.stage==='final').length} completed games · <button className="text-link" onClick={()=>go('Schedule')}>VIEW RESULTS ›</button></p>:<Empty icon={Trophy} title="No games yet">Results will appear after the first game is uploaded.</Empty>}</div></div></div>
@@ -229,7 +259,7 @@ function App() {
     <PwaInstall/>
     <footer><div className="container footer-inner"><span>SLUGGERS <b>SUPA</b> LEAGUE</span><small>LEAGUE DATA AND FANTASY HUB</small></div></footer>
     {selectedPlayer && <PlayerProfile careerSeasons={careerSeasons} player={players.find(p=>p.id===selectedPlayer.id)||selectedPlayer} PlayerAvatar={PlayerAvatar} onClose={() => setSelectedPlayer(null)}/>}
-    {authOpen && <AccountDialog supabase={supabase} session={session} onClose={() => setAuthOpen(false)} onAccess={setAccess}/>}
+    {authOpen && <AccountDialog supabase={supabase} session={session} onClose={() => setAuthOpen(false)} onAccess={next=>{setAccess(next);if(next.role==='gm')setTeamWelcomeSeen(false)}}/>}
   </>
 }
 function BasicPage({ kicker, title, icon, empty, detail }) { return <><div className="page-heading"><span className="eyebrow dark">{kicker}</span><h1>{title}</h1></div><div className="panel basic-panel"><Empty icon={icon} title={empty}>{detail}</Empty></div></> }
