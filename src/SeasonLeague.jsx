@@ -342,9 +342,9 @@ export function SeasonWorkspace({ league, registeredTeams }) {
             <>
               <Box title={`${s.name} · ${s.status.toUpperCase()}`}>
                 <p>
-                  Registered teams are managed in Team Setup. Select all 12
-                  before opening the draft-date vote.
+                  Registered teams are managed in Team Setup. All 12 need a team name, home location and logo before you can open the draft-date poll.
                 </p>
+                <p role="status"><strong>{registeredTeams.length}/12 teams registered.</strong> {registeredTeams.length < 12 ? `Waiting on ${12-registeredTeams.length} more team${12-registeredTeams.length===1?'':'s'} before draft-day voting can open.` : 'All teams registered! You can select them and open the draft-date poll.'}</p>
                 {["setup", "poll"].includes(s.status) ? (
                   <>
                     <div className="season-team-checks">
