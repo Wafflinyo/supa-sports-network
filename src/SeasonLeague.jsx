@@ -2065,7 +2065,7 @@ function Standings({ league: l }) {
     <Box title="REGULAR-SEASON STANDINGS">
       <div className="standings-conference-nav" role="group" aria-label="Select standings conference">
         <button type="button" className={view==="overall"?"active":""} aria-pressed={view==="overall"} onClick={()=>setView("overall")}>
-          <span className="standings-all-logo">SSL</span><strong>Overall</strong>
+          <img className="ssl-standings-logo" src={import.meta.env.BASE_URL + "sluggers-supa-league-logo.svg"} width={60} height={60} alt="Sluggers Supa League logo"/><strong>Overall</strong>
         </button>
         {(["supa","galaxy"]).map(k=>(
           <button type="button" key={k} className={view===k?"active":""} aria-pressed={view===k} onClick={()=>setView(k)}>
@@ -2075,10 +2075,7 @@ function Standings({ league: l }) {
       </div>
       <div className="standings-conference-banner" aria-live="polite">
         {view === "overall" ? (
-          <div className="standings-overall-logos">
-            <ConferenceMark id="supa" size={94}/>
-            <ConferenceMark id="galaxy" size={94}/>
-          </div>
+          <img className="ssl-standings-logo" src={import.meta.env.BASE_URL + "sluggers-supa-league-logo.svg"} width={118} height={118} alt="Sluggers Supa League logo"/>
         ) : <ConferenceMark id={view} size={118}/>}
         <div>
           <span className="eyebrow dark">{view === "overall" ? "BOTH CONFERENCES" : "SIX TEAMS · ONE CHAMPION"}</span>
@@ -2097,7 +2094,7 @@ function Standings({ league: l }) {
           <tbody>
             {rows.map(t=>(
               <tr key={t.id}>
-                <td><span className="standings-team-name"><ConferenceMark id={t.conference} size={36}/><span>{t.name}<small style={{display:"block"}}>{conferences[t.conference]||"Conference pending"}</small></span></span></td>
+                <td><span className="standings-team-name"><ConferenceMark id={t.conference} size={28}/><span>{t.name}<small style={{display:"block"}}>{conferences[t.conference]||"Conference pending"}</small></span></span></td>
                 <td>{t.wins+t.losses}</td><td>{t.wins}</td><td>{t.losses}</td>
                 <td>{t.pct.toFixed(3)}</td><td>{t.runsFor}</td><td>{t.runsAgainst}</td>
                 <td>{t.runsFor-t.runsAgainst}</td>
@@ -2109,7 +2106,7 @@ function Standings({ league: l }) {
           </tbody>
         </table>
       </div>
-      <p>Ordered by winning percentage, run differential, then franchise slot. The top eight overall teams qualify for playoffs.</p>
+      <p>Ordered by winning percentage, then run differential, then fewer runs allowed. The top eight overall teams qualify for playoffs.</p>
     </Box>
   );
 }
