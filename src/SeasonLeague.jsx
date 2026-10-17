@@ -2056,72 +2056,60 @@ function FreeAgency({ league: l }) {
 }
 function Standings({ league: l }) {
   const [view, setView] = useState("overall");
+  const name = view === "overall" ? "League Overall" : conferences[view];
+  const champ = view !== "overall" && l.season?.conferenceChampions?.[view]
+    ? l.season.teams.find(t=>t.id===l.season.conferenceChampions[view])?.name
+    : null;
+  const rows = standings(l.season).filter(t=>view==="overall"||t.conference===view);
   return (
     <Box title="REGULAR-SEASON STANDINGS">
-      <div className="subnav">
-        {[
-          ["overall", "Overall"],
-          ["supa", "Supa Conference"],
-          ["galaxy", "Galaxy Conference"],
-        ].map(([v, label]) => (
-          <button
-            key={v}
-            className={view === v ? "active" : ""}
-            onClick={() => setView(v)}
-          >
-            {label}
+      <div className="standings-conference-nav" role="group" aria-label="Select standings conference">
+        <button type="button" className={view==="overall"?"active":""} aria-pressed={view==="overall"} onClick={()=>setView("overall")}>
+          <span className="standings-all-logo">SSL</span><strong>Overall</strong>
+        </button>
+        {(["supa","galaxy"]).map(k=>(
+          <button type="button" key={k} className={view===k?"active":""} aria-pressed={view===k} onClick={()=>setView(k)}>
+            <ConferenceMark id={k} size={60}/><strong>{conferences[k]}</strong>
           </button>
         ))}
       </div>
-      {view !== "overall" && (
-        <p className="standings-conference-heading">
-          <ConferenceMark id={view} size={83}/>
-          {conferences[view]}
-          {l.season?.conferenceChampions?.[view]
-            ? ` · Conference Champions: ${l.season.teams.find((t) => t.id === l.season.conferenceChampions[view])?.name}`
-            : " · Conference champion awarded at regular-season end"}
-        </p>
-      )}
-
+      <div className="standings-conference-banner" aria-live="polite">
+        {view === "overall" ? (
+          <div className="standings-overall-logos">
+            <ConferenceMark id="supa" size={94}/>
+            <ConferenceMark id="galaxy" size={94}/>
+          </div>
+        ) : <ConferenceMark id={view} size={118}/>}
+        <div>
+          <span className="eyebrow dark">{view === "overall" ? "BOTH CONFERENCES" : "SIX TEAMS · ONE CHAMPION"}</span>
+          <h3>{name}</h3>
+          <p>{view==="overall" ? "All twelve SSL teams in one table."
+            : champ ? `Conference Champions: ${champ}`
+            : "Conference champion awarded at regular-season end"}
+          </p>
+        </div>
+      </div>
       <div className="season-table">
         <table>
           <thead>
-            <tr>
-              {["Team", "GP", "W", "L", "Win %", "RF", "RA", "Diff"].map(
-                (x) => (
-                  <th key={x}>{x}</th>
-                ),
-              )}
-            </tr>
+            <tr>{["Team","GP","W","L","Win %","RF","RA","Diff"].map(x=><th key={x}>{x}</th>)}</tr>
           </thead>
           <tbody>
-            {standings(l.season)
-              .filter((t) => view === "overall" || t.conference === view)
-              .map((t) => (
-                <tr key={t.id}>
-                  <td>
-                    <span className="standings-team-name"><ConferenceMark id={t.conference} size={36}/><span>{t.name}
-                    <small style={{ display: "block" }}>
-                      {conferences[t.conference] || "Conference pending"}
-                    </small></span></span>
-                  </td>
-                  <td>{t.wins + t.losses}</td>
-                  <td>{t.wins}</td>
-                  <td>{t.losses}</td>
-                  <td>{t.pct.toFixed(3)}</td>
-                  <td>{t.runsFor}</td>
-                  <td>{t.runsAgainst}</td>
-                  <td>{t.runsFor - t.runsAgainst}</td>
-                </tr>
-              ))}
+            {rows.map(t=>(
+              <tr key={t.id}>
+                <td><span className="standings-team-name"><ConferenceMark id={t.conference} size={36}/><span>{t.name}<small style={{display:"block"}}>{conferences[t.conference]||"Conference pending"}</small></span></span></td>
+                <td>{t.wins+t.losses}</td><td>{t.wins}</td><td>{t.losses}</td>
+                <td>{t.pct.toFixed(3)}</td><td>{t.runsFor}</td><td>{t.runsAgainst}</td>
+                <td>{t.runsFor-t.runsAgainst}</td>
+              </tr>
+            ))}
+            {!rows.length && <tr><td colSpan={8} className="standings-empty">
+              {l.season ? "No teams assigned to this conference yet." : "Teams will appear here after GM registration and season setup."}
+            </td></tr>}
           </tbody>
         </table>
       </div>
-      <p>
-        Ordered by winning percentage, then run differential, then franchise
-        slot. Regular-season results only. The top eight teams qualify for
-        playoffs.
-      </p>
+      <p>Ordered by winning percentage, run differential, then franchise slot. The top eight overall teams qualify for playoffs.</p>
     </Box>
   );
 }
