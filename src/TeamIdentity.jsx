@@ -51,6 +51,7 @@ export function TeamSetup({supabase,access,teams,onChange,onAccess,initialSlot=1
 
 function CommissionerTeamEditor({supabase,access,teams,onChange,onAccess}) {
  const [selectedSlot,setSelectedSlot]=useState(null)
+ useEffect(()=>{if(selectedSlot!==null)document.getElementById('commissioner-team-editor')?.scrollIntoView({behavior:'smooth',block:'start'})},[selectedSlot])
  const registered=[...teams].sort((a,b)=>a.slot-b.slot)
  return <>
   <section className="panel identity-panel">
