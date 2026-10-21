@@ -156,3 +156,16 @@
 .ssl-standings-logo{display:block;object-fit:contain;flex-shrink:0}
 .standings-team-name .conference-mark{width:28px;height:28px}
 @media(max-width:620px){.standings-conference-nav .ssl-standings-logo{width:46px;height:46px}.standings-conference-banner>.ssl-standings-logo{width:80px;height:80px}}
+
+
+/* SSL scouting / lineup labels for pitcher substitution planning. */
+.pitcher-priority-badge{display:inline-flex;align-items:center;justify-content:center;min-width:40px;padding:3px 8px;border-radius:5px;font-size:12px;font-weight:900;letter-spacing:.04em;line-height:1.4;white-space:nowrap}
+.pitcher-priority-badge.p1p{background:#192440;color:#fff;border:1px solid #192440}
+.pitcher-priority-badge.p2p{background:#edf3ff;color:#1b4781;border:1px solid #9bbce4}
+.priority-profile-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:7px;font-size:13px;color:#455571}
+.pitcher-priority-explainer{padding:12px 16px;background:#f2f5fa;color:#243550;border-left:3px solid #213e68;border-radius:4px;margin:14px 0;line-height:1.6}
+.player-data-details dd{white-space:normal;text-align:right;overflow-wrap:anywhere}
+.player-data-table td:has(.pitcher-priority-badge){text-align:center;vertical-align:middle}
+.draft-priority-tag{display:block;margin-top:4px;font-size:12px;font-weight:800;color:#203a69}
+.season-lineup .priority-lineup-help{margin:8px 0 14px;padding:10px 12px;background:#edf3ff;border-left:3px solid #2d527d;color:#20334d;line-height:1.55}
+.season-lineup .priority-lineup-help strong{font-weight:900}
