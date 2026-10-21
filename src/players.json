@@ -62,7 +62,7 @@
   {
     "id": 12,
     "name": "Waluigi",
-    "class": "Speed",
+    "class": "Technique",
     "color": "Purple",
     "source": "Mario",
     "gameCharacterId": 11,
@@ -74,7 +74,7 @@
   {
     "id": 5,
     "name": "Peach",
-    "class": "Technique",
+    "class": "Balanced",
     "color": "Pink",
     "source": "Mario",
     "gameCharacterId": 4,
@@ -122,7 +122,7 @@
   {
     "id": 64,
     "name": "Baby Peach",
-    "class": "Balanced",
+    "class": "Technique",
     "color": "Pink",
     "source": "Mario",
     "gameCharacterId": 63,
@@ -266,7 +266,7 @@
   {
     "id": 165,
     "name": "Pom Pom",
-    "class": "Technique",
+    "class": "Balanced",
     "color": "Pink",
     "source": "Mario",
     "gameCharacterId": 127,
@@ -314,7 +314,7 @@
   {
     "id": 40,
     "name": "Dixie Kong",
-    "class": "Technique",
+    "class": "Balanced",
     "color": "Pink",
     "source": "Mario",
     "gameCharacterId": 39,
@@ -350,7 +350,7 @@
   {
     "id": 66,
     "name": "Baby DK",
-    "class": "Power",
+    "class": "Balanced",
     "color": "Brown",
     "source": "Mario",
     "gameCharacterId": 65,
@@ -449,7 +449,7 @@
   {
     "id": 7,
     "name": "Yoshi",
-    "class": "Technique",
+    "class": "Speed",
     "color": "Light Green",
     "source": "Mario",
     "gameCharacterId": 6,
@@ -473,7 +473,7 @@
   {
     "id": 68,
     "name": "Blue Yoshi",
-    "class": "Speed",
+    "class": "Balanced",
     "color": "Blue",
     "source": "Mario",
     "gameCharacterId": 67,
@@ -485,7 +485,7 @@
   {
     "id": 69,
     "name": "Yellow Yoshi",
-    "class": "Technique",
+    "class": "Speed",
     "color": "Yellow",
     "source": "Mario",
     "gameCharacterId": 68,
@@ -814,7 +814,7 @@
   {
     "id": 17,
     "name": "Shy Guy",
-    "class": "Balanced",
+    "class": "Technique",
     "color": "Red",
     "source": "Mario",
     "gameCharacterId": 16,
@@ -826,7 +826,7 @@
   {
     "id": 45,
     "name": "Blue Shy Guy",
-    "class": "Technique",
+    "class": "Balanced",
     "color": "Blue",
     "source": "Mario",
     "gameCharacterId": 44,
@@ -961,7 +961,7 @@
   {
     "id": 154,
     "name": "Pink Magikoopa",
-    "class": "Balanced",
+    "class": "Technique",
     "color": "Pink",
     "source": "Mario",
     "gameCharacterId": 116,
@@ -1330,7 +1330,7 @@
   {
     "id": 175,
     "name": "Tropical Wiggler",
-    "class": "Speed",
+    "class": "Technique",
     "color": "Light Blue",
     "source": "Mario",
     "gameCharacterId": 104,
@@ -1341,7 +1341,7 @@
   {
     "id": 56,
     "name": "Blooper",
-    "class": "Technique",
+    "class": "Balanced",
     "color": "White",
     "source": "Mario",
     "gameCharacterId": 55,
