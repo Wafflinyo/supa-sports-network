@@ -18,6 +18,8 @@ import pool from "./players.json";
 import { teamLogo } from "./TeamIdentity.jsx";
 import { ConferenceMark } from './ConferenceMark.jsx';
 import { PlayerPortrait } from "./PlayerPortrait.jsx";
+import playerData from "./player-data.json";
+import { pitcherPriorityText } from "./player-roles.js";
 import {
   rosterOf,
   validLineup,
@@ -31,6 +33,7 @@ import {
 } from "./season-data.js";
 import "./season.css";
 const byPlayer = new Map(pool.map((p) => [p.id, p]));
+const pitcherTag = (id) => pitcherPriorityText(byPlayer.get(Number(id)), playerData.players[Number(id)]);
 const time = (v) =>
   v
     ? new Intl.DateTimeFormat("en-US", {
@@ -902,6 +905,7 @@ function LineupEditor({ league: l, team, game, onDone }) {
     >
       <h3>{game ? "GAME LINEUP" : "DEFAULT LINEUP"}</h3>
       <p>Rows are the batting order. Assign every fielding position once.</p>
+      <p className="priority-lineup-help"><strong>Pitcher change priority:</strong> P1P captains first, P2P (7+ pitching) next, otherwise random. This is an SSL planning guide; this website does not change Dolphin AI.</p>
       {slots.map((x, i) => (
         <div className="lineup-row" key={i}>
           <b>{i + 1}</b>
@@ -920,7 +924,7 @@ function LineupEditor({ league: l, team, game, onDone }) {
             <option value="">Choose player</option>
             {roster.map((p) => (
               <option key={p} value={p}>
-                {name(p)}{game?.id && s.starCoins?.games?.[game.id]?.[team]?.recharging?.includes(p) ? " ↻ Recharge · 6 coins" : ""}
+                {name(p)}{pitcherTag(p) !== "—" ? " · " + pitcherTag(p) : ""}{game?.id && s.starCoins?.games?.[game.id]?.[team]?.recharging?.includes(p) ? " ↻ Recharge · 6 coins" : ""}
               </option>
             ))}
           </select>
@@ -944,7 +948,7 @@ function LineupEditor({ league: l, team, game, onDone }) {
       {game ? <StarSelections season={s} team={team} game={game} selected={stars} onChange={setStars} disabled={l.busy}/> : <><StarBalance season={s} team={team}/><p>Star selections are made separately for each game; default lineups do not automatically spend coins.</p></>}
       <h4>BENCH</h4>
       <p>
-        {lineup.bench.map(name).join(" · ") ||
+        {lineup.bench.map(id => name(id) + (pitcherTag(id) !== "—" ? " (" + pitcherTag(id) + ")" : "")).join(" · ") ||
           "Choose all nine starters first."}
       </p>
       <button className="red-btn" disabled={l.busy || !valid}>
