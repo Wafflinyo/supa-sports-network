@@ -2,6 +2,8 @@ import React, {useEffect, useRef, useState} from 'react';
 import pool from './players.json';
 import {PlayerPortrait} from './PlayerPortrait.jsx';
 import {PlayerDataDetails} from './PlayerData.jsx';
+import data from './player-data.json';
+import {pitcherPriorityFor} from './player-roles.js';
 import './draft-players.css';
 
 export function DraftPlayers({league:l}) {
@@ -26,7 +28,7 @@ export function DraftPlayers({league:l}) {
   function close(){setSelected(null);opener.current?.focus();}
   return <section className="draft-player-browser" aria-label="Draft player pool">
     <h2>PLAYER POOL</h2>
-    <p>Tap a player for ratings, hidden stats and chemistry. Gray cards are already on a roster.</p>
+    <p>Tap a player for ratings, named abilities, and chemistry. P1P captains have first pitcher-change priority; P2P (7+ pitching) are next. Gray cards are already on a roster.</p>
     <div className="draft-pool-filters">
       <label>Search players<input aria-label="Search draft players" placeholder="Search players" value={query} onChange={e=>setQuery(e.target.value)}/></label>
       <label>Class<select aria-label="Filter draft class" value={category} onChange={e=>setCategory(e.target.value)}>{['All classes','Balanced','Power','Speed','Technique'].map(c=><option key={c}>{c}</option>)}</select></label>
@@ -34,7 +36,7 @@ export function DraftPlayers({league:l}) {
     <p className="draft-pool-count">{pool.length-ownership.size} available · {filtered.length} shown · {ownership.size} on rosters</p>
     <div className="draft-player-grid" tabIndex={0} aria-label="Scrollable draft players">
       {filtered.map(p=><button type="button" key={p.id} className={`draft-player-card${ownership.has(p.id)?' is-drafted':''}`} aria-label={`View ${p.name}${ownership.has(p.id)?' · drafted by '+ownership.get(p.id):' · available'}`} onClick={e=>{opener.current=e.currentTarget;setSelected(p);}}>
-        <PlayerPortrait player={p} size={56}/><strong>{p.name}</strong><span>{p.class}</span><small>{ownership.has(p.id)?'DRAFTED · '+ownership.get(p.id):'AVAILABLE'}</small>
+        <PlayerPortrait player={p} size={56}/><strong>{p.name}</strong><span>{p.class}</span>{pitcherPriorityFor(p,data.players[p.id]) && <span className="draft-priority-tag" title={pitcherPriorityFor(p,data.players[p.id]).label}>{pitcherPriorityFor(p,data.players[p.id]).code} · {pitcherPriorityFor(p,data.players[p.id]).label}</span>}<small>{ownership.has(p.id)?'DRAFTED · '+ownership.get(p.id):'AVAILABLE'}</small>
       </button>)}
       {!filtered.length&&<p>No players match these filters.</p>}
     </div>
