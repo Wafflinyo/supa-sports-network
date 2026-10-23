@@ -48,7 +48,7 @@ const sections = [
   ['Trades and deadlines', [
     'Trades may include players, eligible next-season draft picks and available Star Coins. Extension contracts cannot be traded. Two or more teams may participate.',
     'Every involved GM must accept before the commissioner gives final approval. Approval checks asset ownership, roster and pick restrictions, coin availability, and locked-game conflicts. Player trades require default-lineup review.',
-    'A franchise receives eleven tradable player picks plus one nontradeable Stadium Pick. A trade must leave it with at least nine player picks; with its stage pick it always starts the next draft with at least ten total selections. Stadium and supplemental picks cannot be traded.',
+    'A franchise receives eleven tradable player picks plus one nontradeable Stadium Pick. A trade must leave it with at least nine player picks; with its Stadium Pick it always starts the next draft with at least ten total selections. Stadium and supplemental picks cannot be traded.',
     'Trading opens after the draft and establishment of rosters and default lineups. The regular-season deadline is Saturday of Week 12 at 11:59:59 p.m. Eastern. Trading stays closed for the rest of the regular season, playoffs and extension window. Offseason trading opens when extensions close and continues until the next draft starts.'
   ]],
   ['All-Star voting and awards', [
@@ -79,7 +79,7 @@ const sections = [
     'Correcting a report replaces that game’s contribution instead of adding a duplicate game. Postponements are announced on Home and Schedule. Hidden results remain held until the revised release.'
   ]],
   ['Offseason and next season', [
-    'After the championship, GMs use or void extension contracts. The window closes when all teams finish, or at the one-month deadline. Unretained players leave, and offseason trades open.',
+    'After the championship, GMs use or void extension contracts. The window closes when all teams finish, or at the one-month deadline. Unretained players and Stadiums leave, and offseason trades open.',
     'The commissioner then uses Set Up Next Season to prepare the new draft and archive the completed season in SSL History. Records, awards and extension history remain attached to the franchise. Accepted retains and eligible assets carry into the next season; Star Coins reset to 55.'
   ]],
   ['Sluggers Fantasy', [
