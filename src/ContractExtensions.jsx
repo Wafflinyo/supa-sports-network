@@ -11,6 +11,8 @@ export default function ContractExtensions({ league: l }) {
     [acting, setActing] = useState(""),
     [contract, setContract] = useState(""),
     [player, setPlayer] = useState(""),
+    [assetType, setAssetType] = useState("player"),
+    [stadium, setStadium] = useState(""),
     [quote, setQuote] = useState(null),
     [error, setError] = useState(""),
     [pending, setPending] = useState(false),
@@ -23,9 +25,15 @@ export default function ContractExtensions({ league: l }) {
       s?.extensionsOpen &&
       s.status === "retention",
     allowed = ["gm", "commissioner"].includes(l.access.role);
+  const ownedStadiums = [...new Set([...(s?.retainedStadiums?.[team] || []), ...(s?.picks || []).filter(p => p.team === team && p.kind === "stage").map(p => p.stage)])];
+  const stadiumOffers = s?.stadiumExtensionOffers || [];
+  const chosen = assetType === "stadium" ? stadium : player;
+  const chosenName = assetType === "stadium" ? stadium : name(player);
   useEffect(() => {
     setContract("");
     setPlayer("");
+    setStadium("");
+    setAssetType("player");
     setQuote(null);
     setResult(null);
   }, [team, s?.id]);
@@ -36,65 +44,47 @@ export default function ContractExtensions({ league: l }) {
     let active = true;
     setQuote(null);
     setError("");
-    if (!player || !team || !s || !allowed) return;
+    if (!chosen || !team || !s || !allowed) return;
     setLoading(true);
-    l.supabase
-      .rpc("ssl_extension_preview", {
-        season: s.id,
-        team,
-        player: Number(player),
-      })
-      .then((r) => {
-        if (!active) return;
-        if (r.error) setError(r.error.message);
-        else setQuote(r.data);
-        setLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, [
-    s?.id,
-    team,
-    player,
-    s?.status,
-    s?.games?.length,
-    s?.champion,
-    s?.finalist,
-    s?.extensionOffers?.length,
-    balance,
-    allowed,
-  ]);
+    const rpc = assetType === "stadium" ? "ssl_stadium_extension_preview" : "ssl_extension_preview";
+    const args = assetType === "stadium"
+      ? { season: s.id, team, stadium }
+      : { season: s.id, team, player: Number(player) };
+    l.supabase.rpc(rpc, args).then(r => {
+      if (!active) return;
+      if (r.error) setError(r.error.message);
+      else setQuote(r.data);
+      setLoading(false);
+    });
+    return () => { active = false; };
+  }, [s?.id, team, player, stadium, assetType, s?.status, s?.games?.length,
+      s?.champion, s?.finalist, s?.extensionOffers?.length,
+      s?.stadiumExtensionOffers?.length, balance, allowed]);
   async function apply() {
-    if (applying.current || !quote) return;
+    if (applying.current || !quote || !chosen) return;
     applying.current = true;
     setPending(true);
     setResult(null);
     setError("");
-    const chosen = Number(player),
-      label = name(chosen);
+    const type = assetType;
+    const label = chosenName;
     try {
       const [r] = await Promise.all([
-        l.act("extension", {
+        l.act(type === "stadium" ? "extension_stadium" : "extension", {
           team,
-          player: chosen,
+          ...(type === "stadium" ? { stadium } : { player: Number(player) }),
           quoteFingerprint: quote.fingerprint,
         }),
-        new Promise((resolve) => setTimeout(resolve, 1600)),
+        new Promise(resolve => setTimeout(resolve, 1600)),
       ]);
       if (r && typeof r.accepted === "boolean") {
-        setResult({
-          player: chosen,
-          name: label,
-          accepted: r.accepted,
-          chance: r.quote.total,
-        });
+        setResult({ type, name: label, accepted: r.accepted, chance: r.quote.total });
         setContract("");
         setPlayer("");
-      } else
-        setError(
-          "The contract was not applied. Review the message above, then select the player again to refresh the odds.",
-        );
+        setStadium("");
+      } else {
+        setError("The contract was not applied. Review the error and refresh the acceptance chance.");
+      }
     } finally {
       applying.current = false;
       setPending(false);
@@ -113,8 +103,8 @@ export default function ContractExtensions({ league: l }) {
       <section className="panel season-box contract-extensions">
         <h2>ONE-SEASON EXTENSION CONTRACTS</h2>
         <p>
-          Each team receives three contracts when the season’s extension window
-          opens. The maximum is three. Unused contracts expire at the cutoff;
+          Each team receives three extension contracts shared between players and Stadiums when the season’s extension window
+          opens. The maximum is three total. Unused contracts expire at the cutoff;
           contracts cannot be traded.
         </p>
         <details>
@@ -122,7 +112,7 @@ export default function ContractExtensions({ league: l }) {
           <p>
             Base odds by next extension number: 1st 100%, 2nd 85%, 3rd 70%, 4th
             50%, 5th 25%, 6th and later 15%. Only accepted contracts advance
-            this franchise’s history with the player.
+            this franchise’s history with the player or Stadium.
           </p>
           <p>
             Top eight qualify for playoffs. Highest finish bonus only: playoffs
@@ -178,39 +168,45 @@ export default function ContractExtensions({ league: l }) {
                   </select>
                 </label>
                 {contract && (
-                  <label>
-                    Select player
-                    <select
-                      aria-label="Select extension player"
-                      disabled={pending}
-                      value={player}
-                      onChange={(e) => {
-                        setPlayer(e.target.value);
-                        setResult(null);
-                      }}
-                    >
-                      <option value="">Choose a player</option>
-                      {(s.rosters[team] || [])
-                        .filter(
-                          (id) =>
-                            !s.extensionOffers.some(
-                              (o) => o.franchise === team && o.player === id && o.accepted,
-                            ),
-                        )
-                        .map((id) => (
-                          <option key={id} value={id}>
-                            {name(id)}
-                          </option>
-                        ))}
-                    </select>
-                  </label>
+                  <>
+                    <label>Extension target
+                      <select aria-label="Extension target type" disabled={pending}
+                        value={assetType}
+                        onChange={ev => { setAssetType(ev.target.value); setPlayer(""); setStadium(""); setQuote(null); setResult(null); }}>
+                        <option value="player">Player</option>
+                        <option value="stadium">Stadium</option>
+                      </select>
+                    </label>
+                    {assetType === "player" ? (
+                      <label>Select player
+                        <select aria-label="Select extension player" disabled={pending} value={player}
+                          onChange={ev => { setPlayer(ev.target.value); setResult(null); }}>
+                          <option value="">Choose a player</option>
+                          {(s.rosters[team] || [])
+                            .filter(id => !s.extensionOffers?.some(o => o.franchise === team && o.player === id && o.accepted))
+                            .map(id => <option key={id} value={id}>{name(id)}</option>)}
+                        </select>
+                      </label>
+                    ) : (
+                      <label>Select Stadium
+                        <select aria-label="Select extension Stadium" disabled={pending} value={stadium}
+                          onChange={ev => { setStadium(ev.target.value); setResult(null); }}>
+                          <option value="">Choose a Stadium</option>
+                          {ownedStadiums
+                            .filter(x => !stadiumOffers.some(o => o.franchise === team && o.stadium === x && o.accepted))
+                            .map(x => <option key={x} value={x}>{x}</option>)}
+                        </select>
+                        {!ownedStadiums.length && <small>This team has no Stadium yet.</small>}
+                      </label>
+                    )}
+                  </>
                 )}
-                {loading && player && !pending && (
+                {loading && chosen && !pending && (
                   <p role="status">Calculating acceptance chance…</p>
                 )}
                 {quote && !pending && (
                   <div className="contract-chance" aria-live="polite">
-                    <h3>{name(player)}</h3>
+                    <h3>{chosenName}</h3>
                     <dl>
                       <div>
                         <dt>{ordinal(quote.ordinal)} repeat / extension</dt>
@@ -230,7 +226,7 @@ export default function ContractExtensions({ league: l }) {
                     </dl>
                     <p>
                       Applying consumes one contract immediately, even if the
-                      player chooses free agency. Previewing consumes nothing.
+                      player or Stadium is not retained. Previewing consumes nothing.
                     </p>
                   </div>
                 )}
@@ -245,13 +241,13 @@ export default function ContractExtensions({ league: l }) {
                     pending ||
                     l.busy ||
                     !contract ||
-                    !player ||
+                    !chosen ||
                     !quote ||
                     balance < 1
                   }
                   onClick={apply}
                 >
-                  {pending ? "PLAYER IS CONSIDERING…" : "APPLY CONTRACT"}
+                  {pending ? "CONTRACT DECISION IN PROGRESS…" : "APPLY CONTRACT"}
                 </button>
               </>
             ) : (
@@ -265,7 +261,7 @@ export default function ContractExtensions({ league: l }) {
         {pending && (
           <div className="contract-decision waiting" role="status">
             <span className="contract-spinner" aria-hidden="true" />
-            The player is considering the contract…
+            The extension offer is being decided…
           </div>
         )}
         {result && !pending && (
@@ -274,13 +270,13 @@ export default function ContractExtensions({ league: l }) {
             role="status"
           >
             <h3>
-              {result.accepted ? "CONTRACT ACCEPTED" : "TESTING FREE AGENCY"}
+              {result.accepted ? "CONTRACT ACCEPTED" : "EXTENSION DECLINED"}
             </h3>
             <p>
               {result.name}{" "}
               {result.accepted
                 ? "has accepted the one-season extension!"
-                : "has decided to test out free agency."}
+                : result.type === "stadium" ? "will not be retained for next season." : "has decided to test out free agency."}
             </p>
             <p>
               One contract consumed · Acceptance chance was {result.chance}%.
@@ -291,32 +287,28 @@ export default function ContractExtensions({ league: l }) {
           <table>
             <thead>
               <tr>
-                <th>Player</th>
+                <th>Player / Stadium</th>
                 <th>Franchise</th>
                 <th>Chance</th>
                 <th>Decision</th>
               </tr>
             </thead>
             <tbody>
-              {!pending &&
-                s.extensionOffers?.map((o) => (
-                  <tr key={o.attempt || o.franchise + o.player}>
-                    <td>
-                      <span className="portrait-label">
-                        <PlayerPortrait
-                          player={pool.find((p) => p.id === o.player)}
-                        />
-                        {name(o.player)}
-                      </span>
-                    </td>
-                    <td>{s.teams.find((t) => t.id === o.franchise)?.name}</td>
-                    <td>{o.chance}%</td>
-                    <td>
-                      {o.accepted ? "Accepted" : "Testing free agency"} ·
-                      contract consumed
-                    </td>
-                  </tr>
-                ))}
+              {!pending && [
+                ...(s.extensionOffers || []).map(o => ({...o, type: "player"})),
+                ...stadiumOffers.map(o => ({...o, type: "stadium"})),
+              ].map(o => (
+                <tr key={o.type + "-" + (o.attempt || o.franchise + (o.player || o.stadium))}>
+                  <td><span className="portrait-label">
+                    {o.type === "stadium" ? <><strong>STADIUM · </strong>{o.stadium}</> : <>
+                      <PlayerPortrait player={pool.find(p => p.id === o.player)}/>{name(o.player)}
+                    </>}
+                  </span></td>
+                  <td>{s.teams.find(t => t.id === o.franchise)?.name}</td>
+                  <td>{o.chance}%</td>
+                  <td>{o.accepted ? "Accepted" : o.type === "stadium" ? "Not retained" : "Testing free agency"} · contract consumed</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
