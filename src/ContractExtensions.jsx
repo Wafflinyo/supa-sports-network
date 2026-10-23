@@ -104,8 +104,7 @@ export default function ContractExtensions({ league: l }) {
         <h2>ONE-SEASON EXTENSION CONTRACTS</h2>
         <p>
           Each team receives three extension contracts shared between players and Stadiums when the season’s extension window
-          opens. The maximum is three total. Unused contracts expire at the cutoff;
-          contracts cannot be traded.
+          opens. The maximum is three total. If a Stadium accepts an extension, that Stadium stays with the franchise next season and the franchise loses its next Stadium Pick. Without a retained Stadium, the franchise receives its normal Stadium Pick. Unused contracts expire at the cutoff; contracts cannot be traded.
         </p>
         <details>
           <summary>ACCEPTANCE RULES</summary>
