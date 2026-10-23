@@ -1,4 +1,5 @@
-import {PlayerDataDetails} from './PlayerData.jsx'
+import {PlayerDataDetails,PitcherPriorityBadge} from './PlayerData.jsx'
+import gameData from './player-data.json'
 import React, {useEffect, useRef} from 'react'
 import {X} from 'lucide-react'
 import archive from './player-careers.json'
@@ -24,7 +25,7 @@ export default function PlayerProfile({player, PlayerAvatar, onClose,careerSeaso
     <div className="career-profile-toolbar"><button className="close" onClick={onClose} aria-label="Close player profile" autoFocus><X size={20}/> CLOSE</button></div>
     <div className="career-profile-content">
     <div className="player-modal-heading"><PlayerAvatar player={player} size={76}/><div><span className="eyebrow dark">SSL PLAYER PROFILE · #{player.rosterOrder || player.id}</span><h2 id="career-player-name">{player.name}</h2></div></div>
-    <div className="career-bio"><span>{player.class}</span><span>{player.team || 'Free agent'}</span></div>
+    <div className="career-bio"><span>{player.class}</span><PitcherPriorityBadge player={player} record={gameData.players[player.id]}/><span>{player.team || 'Free agent'}</span></div>
     <dl className="career-summary">{[['SEASONS AS A SLUGGER',career.seasons],['CAREER GAMES PLAYED',career.games],['CAREER MVPs',career.mvps]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value ?? '—'}</dd></div>)}</dl>
     <details className="profile-game-data"><summary>GAME STATS & CHEMISTRY</summary><PlayerDataDetails player={player}/></details>
     <h3 className="career-title">CAREER AVERAGES</h3>

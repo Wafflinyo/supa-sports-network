@@ -20,6 +20,7 @@ import { ConferenceMark } from './ConferenceMark.jsx';
 import { PlayerPortrait } from "./PlayerPortrait.jsx";
 import playerData from "./player-data.json";
 import { pitcherPriorityText } from "./player-roles.js";
+import { PitcherPriorityBadge } from './PlayerData.jsx';
 import {
   rosterOf,
   validLineup,
@@ -50,6 +51,7 @@ function Player({ id }) {
     <span className="portrait-label">
       <PlayerPortrait player={p} />
       {p?.name || "Unknown player"}
+      {p && <PitcherPriorityBadge player={p} record={playerData.players[p.id]}/>} 
     </span>
   );
 }
@@ -380,7 +382,7 @@ export function SeasonWorkspace({ league, registeredTeams }) {
                   </>
                 ) : (
                   <p>
-                    {s.teams.length} teams · {s.baseDraftRounds || 11}-round
+                    {s.teams.length} teams · {s.baseDraftRounds || 12}-round
                     snake draft
                   </p>
                 )}
@@ -732,7 +734,7 @@ function Draft({ league: l }) {
       >
         <p>
           Draft begins {time(s.draftAt)} · lottery {time(s.lotteryAt)} ·{" "}
-          {s.baseDraftRounds || 11} rounds · snake order. Supplemental rounds
+          {s.baseDraftRounds || 12} rounds · snake order (11 tradable player turns + one nontradeable stage turn per franchise). Supplemental rounds
           fill teams below 11, skipping full teams.
         </p>
         {s.number>1 && <p>Returning-season lottery: 12th seed 55% · 11th 25% · 10th 15% · 9th 5% for first pick. Winners are removed before the next weighted draw. Seeds 8 through 1 receive picks 5 through 12, then the order snakes.</p>}
@@ -780,7 +782,7 @@ function Draft({ league: l }) {
               Round {s.nextPick?.round} · Pick {next + 1}
               {s.nextPick?.supplemental
                 ? " · ROSTER FILL"
-                : ` / ${12 * (s.baseDraftRounds || 11)} main-round picks`}
+                : ` / ${12 * (s.baseDraftRounds || 12)} main-round picks${s.nextPick?.mustStage ? ' · STAGE PICK REQUIRED' : ''}`}
             </p>
             {!mine && <p>Waiting for {t?.name} to pick. Browse the player pool below.</p>}
             {l.access.role === "commissioner" && (
@@ -1633,7 +1635,7 @@ function Trades({ league: l, messages = false }) {
               <>
                 <p>
                   All involved teams must accept the same offer, followed by
-                  commissioner approval. Keep at least nine next-season picks.
+                  commissioner approval. Keep at least nine tradable next-season player picks plus the untradeable stage pick (10 minimum total). Stage picks can never be traded.
                   Rosters below 11 must be filled immediately after the trade.
                 </p>
                 <details className="trade-participants"><summary>PARTICIPATING TEAMS ({participants.length})</summary><div className="season-team-checks">
@@ -2337,7 +2339,7 @@ export function SeasonHome({ league: l, go }) {
       <Box title={`${s.name} · ${s.status.toUpperCase()}`}>
         <p>
           {s.teams.length} teams · {s.picks.length} draft picks ·{" "}
-          {s.baseDraftRounds || 11} main rounds
+          {s.baseDraftRounds || 12} main rounds
         </p>
         <button
           className="outline-btn"

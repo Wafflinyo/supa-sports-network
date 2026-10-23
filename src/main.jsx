@@ -2,7 +2,9 @@ import PwaInstall from './PwaInstall.jsx'
 import {fantasySeasonReady} from './fantasy-scoring.js'
 import {useSeasonLeague,SeasonWorkspace,SeasonPage,SeasonPrompts,SeasonTeamTools,SeasonHome,SeasonSelector,seasonPages} from './SeasonLeague.jsx'
 import {aggregate,fantasyGames} from './season-data.js'
-import PlayerData from './PlayerData.jsx'
+import PlayerData, {PitcherPriorityBadge} from './PlayerData.jsx'
+import gameData from './player-data.json'
+import {pitcherPriorityFor} from './player-roles.js'
 import React, { useEffect, useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createClient } from '@supabase/supabase-js'
@@ -201,8 +203,8 @@ function App() {
   const categorySort = statTab === 'Pitching Stats' ? {key:'era7',direction:'asc'} : statTab === 'Defensive Stats' ? {key:'putouts',direction:'desc'} : {key:'battingAverage',direction:'desc'}
   const activeSort = sort.key === 'default' ? (hasOfficialStats ? categorySort : {key:'id',direction:'asc'}) : sort
   const filtered = useMemo(() => players.filter(p => `${p.name} ${p.class}`.toLowerCase().includes(query.toLowerCase())).sort((a,b) => {
-    const av = statGroups[statTab].some(([key]) => key === activeSort.key) ? statValue(a, activeSort.key, statView) : a[activeSort.key === 'id' ? 'rosterOrder' : activeSort.key]
-    const bv = statGroups[statTab].some(([key]) => key === activeSort.key) ? statValue(b, activeSort.key, statView) : b[activeSort.key === 'id' ? 'rosterOrder' : activeSort.key]
+    const av = activeSort.key === 'pitcherPriority' ? (pitcherPriorityFor(a,gameData.players[a.id])?.order || 3) : statGroups[statTab].some(([key]) => key === activeSort.key) ? statValue(a, activeSort.key, statView) : a[activeSort.key === 'id' ? 'rosterOrder' : activeSort.key]
+    const bv = activeSort.key === 'pitcherPriority' ? (pitcherPriorityFor(b,gameData.players[b.id])?.order || 3) : statGroups[statTab].some(([key]) => key === activeSort.key) ? statValue(b, activeSort.key, statView) : b[activeSort.key === 'id' ? 'rosterOrder' : activeSort.key]
     if (av == null && bv != null) return 1
     if (bv == null && av != null) return -1
     const comparison = typeof av === 'number' && typeof bv === 'number' ? av - bv : String(av ?? '').localeCompare(String(bv ?? ''))
@@ -244,7 +246,7 @@ function App() {
         <div className="panel data-panel">
           <div className="stat-view-switch" role="group" aria-label="Stat display">{['Totals', 'Averages per Game'].map(view => <button key={view} type="button" aria-pressed={statView === view} className={statView === view ? 'active' : ''} onClick={() => setStatView(view)}>{view}</button>)}</div>
           <div className="table-tools"><div className="search"><Search size={19}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search players" aria-label="Search players"/></div><span>{filtered.length} PLAYERS</span></div>
-          <div className="table-scroll" role="tabpanel" aria-label={`${statTab} — ${statView}`}><table className="ssl-stat-table regular-player-stats" style={{width: `${414+statGroups[statTab].length*112}px`}}><caption>{statTab} · {statView}</caption><colgroup><col style={{width:64}}/><col style={{width:230}}/><col style={{width:120}}/>{statGroups[statTab].map(([key])=><col key={key} style={{width:112}}/>)}</colgroup><thead><tr>{[['id','#'],['name','PLAYER'],['class','CLASS'],...statGroups[statTab]].map(([key,label]) => <th key={key} className={key==='name'?'sticky-player':!['id','class'].includes(key)?'numeric-column':undefined}><button onClick={() => sortBy(key)} aria-label={`Sort by ${label}`}>{label}{activeSort.key === key ? (activeSort.direction === 'asc' ? <ArrowUp size={13}/> : <ArrowDown size={13}/>) : null}</button></th>)}</tr></thead><tbody>{filtered.map(p => <tr key={p.id} onClick={() => setSelectedPlayer(p)} tabIndex={0} onKeyDown={e => e.key === 'Enter' && setSelectedPlayer(p)}><td className="roster-number">{p.rosterOrder}</td><td className="player-cell"><PlayerAvatar player={p}/><strong>{p.name}</strong></td><td>{p.class}</td>{statGroups[statTab].map(([key]) => <td key={key} className="numeric-column">{displayStat(statValue(p, key, statView), statView, key)}</td>)}</tr>)}</tbody></table></div>
+          <div className="table-scroll" role="tabpanel" aria-label={`${statTab} — ${statView}`}><table className="ssl-stat-table regular-player-stats" style={{width: `${488+statGroups[statTab].length*112}px`}}><caption>{statTab} · {statView}</caption><colgroup><col style={{width:64}}/><col style={{width:230}}/><col style={{width:120}}/><col style={{width:74}}/>{statGroups[statTab].map(([key])=><col key={key} style={{width:112}}/>)}</colgroup><thead><tr>{[['id','#'],['name','PLAYER'],['class','CLASS'],['pitcherPriority','P1P/P2P'],...statGroups[statTab]].map(([key,label]) => <th key={key} className={key==='name'?'sticky-player':!['id','class'].includes(key)?'numeric-column':undefined}><button onClick={() => sortBy(key)} aria-label={`Sort by ${label}`}>{label}{activeSort.key === key ? (activeSort.direction === 'asc' ? <ArrowUp size={13}/> : <ArrowDown size={13}/>) : null}</button></th>)}</tr></thead><tbody>{filtered.map(p => <tr key={p.id} onClick={() => setSelectedPlayer(p)} tabIndex={0} onKeyDown={e => e.key === 'Enter' && setSelectedPlayer(p)}><td className="roster-number">{p.rosterOrder}</td><td className="player-cell"><PlayerAvatar player={p}/><strong>{p.name}</strong></td><td>{p.class}</td><td><PitcherPriorityBadge player={p} record={gameData.players[p.id]}/></td>{statGroups[statTab].map(([key]) => <td key={key} className="numeric-column">{displayStat(statValue(p, key, statView), statView, key)}</td>)}</tr>)}</tbody></table></div>
           <p className="table-footnote">{statView === 'Totals' ? 'Season totals and season rates.' : 'Games Played remains a total. Other counting stats are divided by games played; rates and innings use their per-game values.'} Tap a heading to sort. A dash means no verified game stat is available yet. Scroll sideways to see more columns.</p>
         </div>
       </>}
