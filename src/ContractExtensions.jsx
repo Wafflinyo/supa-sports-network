@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import pool from "./players.json";
 import { PlayerPortrait } from "./PlayerPortrait.jsx";
 import { SeasonCalendar } from "./SeasonCalendar.jsx";
-const name = (id) => pool.find((p) => p.id === Number(id))?.name || "Player";
+import {taggedName} from "./PlayerPriority.jsx";
+const name = (id) => taggedName(pool.find((p) => p.id === Number(id)));
 const ordinal = (n) =>
   `${n}${n % 100 >= 11 && n % 100 <= 13 ? "th" : { 1: "st", 2: "nd", 3: "rd" }[n % 10] || "th"}`;
 export default function ContractExtensions({ league: l }) {

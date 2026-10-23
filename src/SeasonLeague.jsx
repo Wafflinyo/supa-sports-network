@@ -21,6 +21,7 @@ import { PlayerPortrait } from "./PlayerPortrait.jsx";
 import playerData from "./player-data.json";
 import { pitcherPriorityText } from "./player-roles.js";
 import { PitcherPriorityBadge } from './PlayerData.jsx';
+import {taggedName} from './PlayerPriority.jsx';
 import {
   rosterOf,
   validLineup,
@@ -44,7 +45,7 @@ const time = (v) =>
       }).format(new Date(v)) + " ET"
     : "Not set";
 const iso = (v) => new Date(v).toISOString();
-const name = (id) => byPlayer.get(Number(id))?.name || "Unknown player";
+const name = (id) => byPlayer.has(Number(id)) ? taggedName(byPlayer.get(Number(id))) : "Unknown player";
 function Player({ id }) {
   const p = byPlayer.get(Number(id));
   return (
@@ -926,7 +927,7 @@ function LineupEditor({ league: l, team, game, onDone }) {
             <option value="">Choose player</option>
             {roster.map((p) => (
               <option key={p} value={p}>
-                {name(p)}{pitcherTag(p) !== "—" ? " · " + pitcherTag(p) : ""}{game?.id && s.starCoins?.games?.[game.id]?.[team]?.recharging?.includes(p) ? " ↻ Recharge · 6 coins" : ""}
+                {name(p)}{game?.id && s.starCoins?.games?.[game.id]?.[team]?.recharging?.includes(p) ? " ↻ Recharge · 6 coins" : ""}
               </option>
             ))}
           </select>
@@ -950,7 +951,7 @@ function LineupEditor({ league: l, team, game, onDone }) {
       {game ? <StarSelections season={s} team={team} game={game} selected={stars} onChange={setStars} disabled={l.busy}/> : <><StarBalance season={s} team={team}/><p>Star selections are made separately for each game; default lineups do not automatically spend coins.</p></>}
       <h4>BENCH</h4>
       <p>
-        {lineup.bench.map(id => name(id) + (pitcherTag(id) !== "—" ? " (" + pitcherTag(id) + ")" : "")).join(" · ") ||
+        {lineup.bench.map(id => name(id)).join(" · ") ||
           "Choose all nine starters first."}
       </p>
       <button className="red-btn" disabled={l.busy || !valid}>
@@ -2221,7 +2222,7 @@ function History({ league: l }) {
               {s.picks.map((p) => (
                 <p key={p.number}>
                   #{p.number} · {s.teams.find((t) => t.id === p.team)?.name} ·{" "}
-                  {name(p.player)}
+                  {p.kind === "stage" ? `STAGE · ${p.stage}` : name(p.player)}
                 </p>
               ))}
             </details>

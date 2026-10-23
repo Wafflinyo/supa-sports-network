@@ -1,4 +1,5 @@
 import { PlayerPortrait } from "./PlayerPortrait.jsx";
+import {taggedName,PlayerPriority} from "./PlayerPriority.jsx";
 import React, { useEffect, useMemo, useState } from "react";
 import { CalendarDays, LockKeyhole, Search, Trophy } from "lucide-react";
 import {
@@ -500,7 +501,7 @@ export function FantasyLeague({
                         <div className="portrait-label">
                           <PlayerPortrait player={player} />
                           <div>
-                            <strong>{player.name}</strong>
+                            <strong>{player.name} <PlayerPriority player={player}/></strong>
                             <small>
                               {player.class} · #{player.id}
                             </small>
@@ -531,7 +532,7 @@ export function FantasyLeague({
                   <h4>Your roster ({myRoster.length}/10)</h4>
                   {myRoster.map((pick, i) => (
                     <p key={pick.pick_number}>
-                      {i + 1}. {byId.get(pick.player_id)?.name}
+                      {i + 1}. {taggedName(byId.get(pick.player_id))}
                     </p>
                   ))}
                   <h4>All picks</h4>
@@ -539,7 +540,7 @@ export function FantasyLeague({
                     {[...picks].reverse().map((p) => (
                       <p key={p.pick_number}>
                         #{p.pick_number} {teamName(p.user_id)} ·{" "}
-                        {byId.get(p.player_id)?.name}
+                        {taggedName(byId.get(p.player_id))}
                       </p>
                     ))}
                   </div>
@@ -633,7 +634,7 @@ export function FantasyLeague({
                         >
                           <span>
                             <PlayerPortrait player={byId.get(row.player_id)} />
-                            {byId.get(row.player_id)?.name}
+                            {taggedName(byId.get(row.player_id))}
                             <small>
                               {locked(row.player_id) ? (
                                 <>
@@ -772,7 +773,7 @@ export function FantasyLeague({
                 <div key={p.id}>
                   <span className="portrait-label">
                     <PlayerPortrait player={p} />
-                    {p.name}
+                    {taggedName(p)}
                   </span>
                   <strong>
                     {formatScore(sumScores(scoringGames, p.id, currentWeek))}
@@ -798,7 +799,7 @@ export function FantasyLeague({
                 <div key={p.id}>
                   <span className="portrait-label">
                     <PlayerPortrait player={p} />
-                    {p.name}
+                    {taggedName(p)}
                   </span>
                   <small>{p.class}</small>
                 </div>

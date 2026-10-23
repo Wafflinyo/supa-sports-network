@@ -1,4 +1,5 @@
 import PlayerData from './PlayerData.jsx'
+import {taggedName} from './PlayerPriority.jsx'
 import playerPool from './players.json'
 import React, { useState, useRef, useEffect } from 'react'
 import test from './temporary-league.json'
@@ -18,7 +19,7 @@ const leagueTeam = id => test.teams.find(t => t.id === id)
 const fantasyTeam = id => test.fantasyTeams.find(t => t.id === id)
 const owner = pid => test.teams.find(t => t.players.includes(pid))
 const date = value => new Intl.DateTimeFormat('en-US', {timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(new Date(value))
-const names = ids => ids.map(id => profiles[id].name).join(' + ')
+const names = ids => ids.map(id => taggedName(profiles[id])).join(' + ')
 const completed = id => results.games.find(game=>game.id===id)
 const reportedTeam = team => {
   const lineup = results.lineups?.[team.id]
@@ -89,7 +90,7 @@ function PopulatedTestingLeague({ PlayerAvatar }) {
   })
   const sortBy = key => setSort(previous=>({key,direction:previous.key===key && previous.direction==='desc'?'asc':'desc'}))
   const roster = fantasyTeam(selected)
-  const player = (id,detail) => <div className="test-player" key={id}><PlayerAvatar player={profiles[id]} size={30}/><div><strong>{profiles[id].name}</strong><small>{detail || profiles[id].ability}</small></div></div>
+  const player = (id,detail) => <div className="test-player" key={id}><PlayerAvatar player={profiles[id]} size={30}/><div><strong>{taggedName(profiles[id])}</strong><small>{detail || profiles[id].ability}</small></div></div>
   return <>
     <div className="page-heading"><span className="eyebrow dark">TEMPORARY EXHIBITION SETUP</span><h1>LEAGUE TESTING</h1><p>{week.label} · Eastern Time. {weeklyResults.games.length} of 5 game reports received. Putouts earn 1 point; assists earn 0.75. Results and fantasy points come from uploaded Project Rio reports.</p></div>
     <div className="test-summary panel testing-summary"><div><strong>10</strong><span>league teams</span></div><div><strong>90</strong><span>rostered players</span></div><div><strong>5</strong><span>scheduled games</span></div><div><strong>8</strong><span>fantasy teams</span></div></div>
@@ -104,11 +105,11 @@ function PopulatedTestingLeague({ PlayerAvatar }) {
     {tab==='League teams' && <>
       <p className="test-note">Nine rounds in snake order after captain anchors. Lineups emphasize contact at the top, power in the middle, pitching options, and chemistry in the outfield. Named Miis use Mii stats and color chemistry.</p>
       <div className="test-grid test-roster-columns">{[0,1].map(column=><div className="test-roster-column" key={column}>{test.teams.filter((_,index)=>index%2===column).map(reportedTeam).map(team => <details className="panel test-team test-team-disclosure" key={team.id} style={{order:test.teams.findIndex(t=>t.id===team.id)}}>
-        <summary className="section-title"><div><small>{team.players.length} PLAYERS · ANCHOR {profiles[team.anchor].name}</small><h2>{team.name}</h2></div><span className="disclosure-label">Lineup <span aria-hidden="true">⌄</span></span></summary>
+        <summary className="section-title"><div><small>{team.players.length} PLAYERS · ANCHOR {taggedName(profiles[team.anchor])}</small><h2>{team.name}</h2></div><span className="disclosure-label">Lineup <span aria-hidden="true">⌄</span></span></summary>
         <div className="test-team-body"><p>{team.reported?'Actual report lineup · leftmost position is the starting position':team.identity}</p>
           <div className="test-lineup-head"><span>BAT</span><span>PLAYER / ABILITY</span><span>POS</span></div>
           {team.battingOrder.map((id,i) => <div className="test-lineup-row" key={id}><b>{i+1}</b>{player(id)}<b>{Object.entries(team.defense).find(([,pid])=>pid===id)?.[0]}</b></div>)}
-          <dl className="test-details"><div><dt>Opening pitcher</dt><dd>{profiles[team.defense.P].name}</dd></div><div><dt>Pitching options</dt><dd>{team.pitchingDepth.map(id=>profiles[id].name).join(', ')}</dd></div><div><dt>Outfield buddy pairs</dt><dd>{team.buddyPairs.map(pair=>names(pair)).join('; ') || 'No positive pair'}</dd></div><div><dt>Positive chemistry</dt><dd>{team.goodChemistryPairs.length} pairs</dd></div>
+          <dl className="test-details"><div><dt>Opening pitcher</dt><dd>{taggedName(profiles[team.defense.P])}</dd></div><div><dt>Pitching options</dt><dd>{team.pitchingDepth.map(id=>taggedName(profiles[id])).join(', ')}</dd></div><div><dt>Outfield buddy pairs</dt><dd>{team.buddyPairs.map(pair=>names(pair)).join('; ') || 'No positive pair'}</dd></div><div><dt>Positive chemistry</dt><dd>{team.goodChemistryPairs.length} pairs</dd></div>
             {!!team.badChemistryPairs.length && <div><dt>Watch chemistry</dt><dd>{team.badChemistryPairs.map(pair=>names(pair)).join('; ')}. Keep these pairs apart in fielding and batting order.</dd></div>}
           </dl>
           {team.players.filter(id=>!team.battingOrder.includes(id)).length>0 && <section className="test-league-bench"><h3>Bench</h3>{team.players.filter(id=>!team.battingOrder.includes(id)).map(id=>player(id))}</section>}
@@ -139,7 +140,7 @@ function PopulatedTestingLeague({ PlayerAvatar }) {
       {fantasyTab==='Teams' && <div className="test-fantasy-layout"><aside className="panel test-fantasy-list">{test.fantasyTeams.map(team=><button className={team.id===selected?'selected':''} key={team.id} onClick={()=>setSelected(team.id)}>{team.name}<small>7 starters · 3 bench</small></button>)}</aside>
         <section className="panel test-team"><div className="section-title"><div><small>TEMPORARY FANTASY ROSTER</small><h2>{roster.name}</h2></div></div><div className="test-team-body">
           <div className="test-fantasy-roster">{[['Starters',roster.starters],['Bench',roster.bench]].map(([title,ids])=><section key={title}><h3>{title} ({ids.length})</h3>{ids.map(id=>player(id,`${owner(id).name} · ${points(id)} pts${title==='Bench'?' · excluded from matchup':''}`))}</section>)}</div>
-          {week.lineupReview && <p className="test-note"><strong>Week 2 changes:</strong> {week.lineupReview.changes.find(change=>change.teamId===roster.id)?.promoted.map(id=>profiles[id].name).join(', ')} into the starting seven; {week.lineupReview.changes.find(change=>change.teamId===roster.id)?.benched.map(id=>profiles[id].name).join(', ')} to the bench.</p>}
+          {week.lineupReview && <p className="test-note"><strong>Week 2 changes:</strong> {week.lineupReview.changes.find(change=>change.teamId===roster.id)?.promoted.map(id=>taggedName(profiles[id])).join(', ')} into the starting seven; {week.lineupReview.changes.find(change=>change.teamId===roster.id)?.benched.map(id=>profiles[id].name).join(', ')} to the bench.</p>}
           <p className="test-note">{week.lineupReview?'Week 2 starters were selected after reviewing Week 1 batting, fielding, and pitching points. Ties retain the previous starter.':'Saved lineup for this completed week.'} Only starters contribute to the weekly matchup.</p>
         </div></section></div>}
       <details className="panel test-undrafted"><summary>10 league-rostered players not drafted in fantasy</summary><p>{names(test.eligibleUndrafted)}</p><p>They remain unavailable for pickups during this test.</p></details>
