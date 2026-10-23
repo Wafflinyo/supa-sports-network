@@ -1,21 +1,7 @@
 {
-  "label": "Current SSL league setup",
+  "label": "SSL Oct 22 2026 Balance Patch 2",
   "rules": {
-    "minimumTrajectory": "Medium",
-    "koopaTroopaTrajectory": "Medium"
+    "trajectorySource": "Exact current main.dol (Medium, High and Low are all valid)"
   },
-  "players": {
-    "174": {
-      "slap contact size": 60,
-      "charge contact size": 40,
-      "slap hit power": 45,
-      "charge hit power": 58
-    },
-    "141": {
-      "hit trajectory": "High"
-    },
-    "143": {
-      "hit trajectory": "High"
-    }
-  }
+  "players": {}
 }

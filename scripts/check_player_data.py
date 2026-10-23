@@ -26,18 +26,21 @@ for p in players:
     assert all(group<=ids and p['id'] not in group for group in groups)
     assert not any(groups[i]&groups[j] for i in range(3) for j in range(i+1,3))
     if p.get('portrait'): assert (ROOT/'public'/p['portrait']).is_file()
-assert {k:data['174']['stats'][k] for k in ['slap hit power','charge hit power','slap contact size','charge contact size']}=={'slap hit power':45,'charge hit power':58,'slap contact size':60,'charge contact size':40}
+assert {k:data['174']['stats'][k] for k in ['slap hit power','charge hit power','slap contact size','charge contact size']}=={'slap hit power':40,'charge hit power':55,'slap contact size':55,'charge contact size':40}
 print('181 players verified: stable IDs, family order, Rio aliases, portraits, all 21 attributes, chemistry references, and Bone Goomba reductions.')
 # These approved changes must not regress to the older DOL defaults.
 by_name={p['name']:p for p in players}
 assert data[str(by_name['Green Shy Guy']['id'])]['stats']['player class']=='Power'
-assert data[str(by_name['White Toad']['id'])]['stats']['hit trajectory']=='High'
+assert data[str(by_name['White Toad']['id'])]['stats']['hit trajectory']=='Medium'
 assert data[str(by_name['Purple Kritter']['id'])]['stats']['hit trajectory']=='High'
 assert data[str(by_name['Mario']['id'])]['stats']['player class']=='Power'
 assert data[str(by_name['Wario']['id'])]['stats']['hit trajectory']=='High'
-assert all(r['stats']['hit trajectory'] in ['Medium','High'] for r in data.values())
+assert sum(p['kind']=='character' and data[str(p['id'])]['stats']['hit trajectory']=='Low' for p in players)==29
 assert all(data[str(p['id'])]['stats']['hit trajectory']=='Medium' for p in players if p.get('gameCharacterId') in [12,42,76])
-print('Edited league classes, White Toad trajectory, Koopa trajectories, and no-low-trajectory rule verified.')
+assert all(data[str(by_name[n]['id'])]['stats']['hit trajectory']=='Low' for n in ['Baby Mario','Baby Luigi','Baby Peach','Blue Yoshi'])
+assert by_name['Iggy']['class']=='Speed'
+assert data[str(by_name['Mario']['id'])]['stats']['slap contact size']==50
+print('29 Low trajectory characters, Patch 2 contact values, classes and Koopa values verified.')
 
 miis=[p for p in players if p['kind']=='mii']
 assert all('mii' not in p['name'].lower() for p in miis)
