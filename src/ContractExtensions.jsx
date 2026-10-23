@@ -155,6 +155,7 @@ export default function ContractExtensions({ league: l }) {
                     onChange={(e) => {
                       setContract(e.target.value);
                       setPlayer("");
+                      setStadium("");
                       setQuote(null);
                       setResult(null);
                     }}
