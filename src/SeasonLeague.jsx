@@ -533,8 +533,8 @@ export function SeasonWorkspace({ league, registeredTeams }) {
                 <Box title="FINISH CHAMPIONSHIP SERIES">
                   <p>
                     Confirm only after the final championship game. This opens
-                    the two-week extension countdown. Contracts have been
-                    available since the trade deadline.
+                    the one-month extension window for player and Stadium
+                    contracts. Each team shares three contracts across both.
                   </p>
                   <form
                     className="season-form"
