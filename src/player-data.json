@@ -1,7 +1,7 @@
 {
   "source": {
-    "label": "Current SSL league setup",
-    "baselineSha256": "540e885949d4c7b271be917dc16f39028b6419f997e3b99c7669bed59f816043",
+    "label": "SSL October 22, 2026 Balance Patch 2",
+    "baselineSha256": "f1c5850f34151bf29e5127a698db80e7f28d66b786d310dc7416be07680a8bae",
     "leagueWorkbook": {
       "name": "Untitled spreadsheet-3.xlsx",
       "sha256": "85c05eeacdfd591d5f8c377440d96c6a6f44b1c8f7338ef5795a020ff41442be",
@@ -135,10 +135,10 @@
       ]
     },
     "adjustments": {
-      "label": "Current SSL league setup",
+      "label": "Superseded by current main.dol character records",
       "rules": {
-        "minimumTrajectory": "Medium",
-        "koopaTroopaTrajectory": "Medium"
+        "minimumTrajectory": null,
+        "koopaTroopaTrajectory": null
       },
       "players": {
         "141": {
@@ -158,17 +158,18 @@
     "miiNote": "Mii names, colors, genders and portraits follow the current Wii database. Same-color Mii chemistry applies to opposite genders.",
     "miiDatabase": {
       "count": 70
-    }
+    },
+    "gameBuild": "SSL October 22 Balance Patch 2; 111 non-Mii character records synchronized directly with audited executable; Miis unchanged"
   },
   "players": {
     "1": {
       "stats": {
         "player class": "Power",
-        "pitching stamina": 50,
+        "pitching stamina": 70,
         "weight": 2,
         "fielding ability": 0,
         "baserunning ability": 7,
-        "slap contact size": 68,
+        "slap contact size": 50,
         "charge contact size": 55,
         "slap hit power": 55,
         "charge hit power": 70,
@@ -237,17 +238,17 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "2": {
       "stats": {
         "player class": "Speed",
-        "pitching stamina": 50,
+        "pitching stamina": 78,
         "weight": 2,
         "fielding ability": 2,
         "baserunning ability": 0,
-        "slap contact size": 70,
-        "charge contact size": 50,
+        "slap contact size": 62,
+        "charge contact size": 40,
         "slap hit power": 40,
         "charge hit power": 60,
         "hit trajectory": "Medium",
@@ -315,12 +316,12 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "3": {
       "stats": {
         "player class": "Power",
-        "pitching stamina": 75,
+        "pitching stamina": 85,
         "weight": 4,
         "fielding ability": 11,
         "baserunning ability": 0,
@@ -330,7 +331,7 @@
         "charge hit power": 90,
         "hit trajectory": "High",
         "bunting": 10,
-        "speed": 20,
+        "speed": 30,
         "outfield throwing speed": 85,
         "fielding": 30,
         "displayed pitching": 6,
@@ -365,23 +366,23 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "4": {
       "stats": {
         "player class": "Technique",
-        "pitching stamina": 30,
+        "pitching stamina": 74,
         "weight": 1,
         "fielding ability": 2,
         "baserunning ability": 0,
-        "slap contact size": 65,
+        "slap contact size": 60,
         "charge contact size": 45,
         "slap hit power": 20,
         "charge hit power": 40,
         "hit trajectory": "Medium",
         "bunting": 40,
         "speed": 75,
-        "outfield throwing speed": 40,
+        "outfield throwing speed": 58,
         "fielding": 84,
         "displayed pitching": 5,
         "displayed batting": 4,
@@ -412,12 +413,12 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "5": {
       "stats": {
         "player class": "Balanced",
-        "pitching stamina": 20,
+        "pitching stamina": 80,
         "weight": 2,
         "fielding ability": 12,
         "baserunning ability": 0,
@@ -482,19 +483,19 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "6": {
       "stats": {
         "player class": "Balanced",
-        "pitching stamina": 30,
+        "pitching stamina": 76,
         "weight": 2,
         "fielding ability": 1,
         "baserunning ability": 0,
         "slap contact size": 70,
         "charge contact size": 50,
         "slap hit power": 40,
-        "charge hit power": 60,
+        "charge hit power": 58,
         "hit trajectory": "Medium",
         "bunting": 40,
         "speed": 50,
@@ -543,12 +544,12 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "7": {
       "stats": {
         "player class": "Speed",
-        "pitching stamina": 60,
+        "pitching stamina": 77,
         "weight": 2,
         "fielding ability": 3,
         "baserunning ability": 0,
@@ -559,7 +560,7 @@
         "hit trajectory": "Medium",
         "bunting": 40,
         "speed": 90,
-        "outfield throwing speed": 40,
+        "outfield throwing speed": 55,
         "fielding": 65,
         "displayed pitching": 4,
         "displayed batting": 4,
@@ -617,7 +618,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "8": {
       "stats": {
@@ -630,10 +631,10 @@
         "charge contact size": 40,
         "slap hit power": 20,
         "charge hit power": 30,
-        "hit trajectory": "Medium",
+        "hit trajectory": "Low",
         "bunting": 40,
-        "speed": 80,
-        "outfield throwing speed": 30,
+        "speed": 88,
+        "outfield throwing speed": 40,
         "fielding": 40,
         "displayed pitching": 5,
         "displayed batting": 3,
@@ -689,7 +690,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "9": {
       "stats": {
@@ -700,12 +701,12 @@
         "baserunning ability": 0,
         "slap contact size": 55,
         "charge contact size": 35,
-        "slap hit power": 10,
+        "slap hit power": 25,
         "charge hit power": 20,
-        "hit trajectory": "Medium",
+        "hit trajectory": "Low",
         "bunting": 40,
-        "speed": 80,
-        "outfield throwing speed": 20,
+        "speed": 92,
+        "outfield throwing speed": 35,
         "fielding": 50,
         "displayed pitching": 5,
         "displayed batting": 2,
@@ -759,7 +760,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "10": {
       "stats": {
@@ -857,7 +858,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "11": {
       "stats": {
@@ -866,9 +867,9 @@
         "weight": 3,
         "fielding ability": 11,
         "baserunning ability": 0,
-        "slap contact size": 60,
+        "slap contact size": 58,
         "charge contact size": 40,
-        "slap hit power": 55,
+        "slap hit power": 50,
         "charge hit power": 78,
         "hit trajectory": "High",
         "bunting": 10,
@@ -917,7 +918,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "12": {
       "stats": {
@@ -974,7 +975,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "13": {
       "stats": {
@@ -983,8 +984,8 @@
         "weight": 1,
         "fielding ability": 0,
         "baserunning ability": 5,
-        "slap contact size": 70,
-        "charge contact size": 50,
+        "slap contact size": 60,
+        "charge contact size": 45,
         "slap hit power": 35,
         "charge hit power": 50,
         "hit trajectory": "Medium",
@@ -1034,7 +1035,7 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "14": {
       "stats": {
@@ -1047,9 +1048,9 @@
         "charge contact size": 35,
         "slap hit power": 45,
         "charge hit power": 55,
-        "hit trajectory": "High",
+        "hit trajectory": "Medium",
         "bunting": 30,
-        "speed": 74,
+        "speed": 76,
         "outfield throwing speed": 55,
         "fielding": 45,
         "displayed pitching": 5,
@@ -1094,17 +1095,17 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "15": {
       "stats": {
         "player class": "Speed",
-        "pitching stamina": 55,
+        "pitching stamina": 70,
         "weight": 1,
         "fielding ability": 0,
         "baserunning ability": 4,
-        "slap contact size": 75,
-        "charge contact size": 55,
+        "slap contact size": 65,
+        "charge contact size": 50,
         "slap hit power": 20,
         "charge hit power": 30,
         "hit trajectory": "Medium",
@@ -1178,7 +1179,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "16": {
       "stats": {
@@ -1187,11 +1188,11 @@
         "weight": 0,
         "fielding ability": 0,
         "baserunning ability": 7,
-        "slap contact size": 70,
-        "charge contact size": 50,
-        "slap hit power": 20,
-        "charge hit power": 30,
-        "hit trajectory": "Medium",
+        "slap contact size": 65,
+        "charge contact size": 35,
+        "slap hit power": 30,
+        "charge hit power": 42,
+        "hit trajectory": "Low",
         "bunting": 30,
         "speed": 80,
         "outfield throwing speed": 30,
@@ -1246,7 +1247,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "17": {
       "stats": {
@@ -1255,11 +1256,11 @@
         "weight": 1,
         "fielding ability": 1,
         "baserunning ability": 0,
-        "slap contact size": 60,
+        "slap contact size": 55,
         "charge contact size": 40,
         "slap hit power": 35,
         "charge hit power": 55,
-        "hit trajectory": "Medium",
+        "hit trajectory": "Low",
         "bunting": 44,
         "speed": 45,
         "outfield throwing speed": 55,
@@ -1320,12 +1321,12 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "18": {
       "stats": {
         "player class": "Power",
-        "pitching stamina": 50,
+        "pitching stamina": 80,
         "weight": 3,
         "fielding ability": 4,
         "baserunning ability": 0,
@@ -1335,7 +1336,7 @@
         "charge hit power": 78,
         "hit trajectory": "Medium",
         "bunting": 20,
-        "speed": 50,
+        "speed": 55,
         "outfield throwing speed": 80,
         "fielding": 70,
         "displayed pitching": 4,
@@ -1387,7 +1388,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "19": {
       "stats": {
@@ -1397,9 +1398,9 @@
         "fielding ability": 0,
         "baserunning ability": 6,
         "slap contact size": 65,
-        "charge contact size": 45,
+        "charge contact size": 40,
         "slap hit power": 30,
-        "charge hit power": 50,
+        "charge hit power": 45,
         "hit trajectory": "Medium",
         "bunting": 60,
         "speed": 78,
@@ -1449,12 +1450,12 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "20": {
       "stats": {
         "player class": "Technique",
-        "pitching stamina": 50,
+        "pitching stamina": 70,
         "weight": 2,
         "fielding ability": 0,
         "baserunning ability": 5,
@@ -1532,7 +1533,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "21": {
       "stats": {
@@ -1541,8 +1542,8 @@
         "weight": 1,
         "fielding ability": 2,
         "baserunning ability": 0,
-        "slap contact size": 65,
-        "charge contact size": 35,
+        "slap contact size": 55,
+        "charge contact size": 30,
         "slap hit power": 40,
         "charge hit power": 45,
         "hit trajectory": "Medium",
@@ -1592,7 +1593,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "22": {
       "stats": {
@@ -1601,14 +1602,14 @@
         "weight": 4,
         "fielding ability": 11,
         "baserunning ability": 0,
-        "slap contact size": 55,
+        "slap contact size": 45,
         "charge contact size": 35,
-        "slap hit power": 52,
-        "charge hit power": 82,
+        "slap hit power": 50,
+        "charge hit power": 83,
         "hit trajectory": "High",
         "bunting": 20,
-        "speed": 20,
-        "outfield throwing speed": 80,
+        "speed": 30,
+        "outfield throwing speed": 82,
         "fielding": 35,
         "displayed pitching": 5,
         "displayed batting": 8,
@@ -1651,7 +1652,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "23": {
       "stats": {
@@ -1660,13 +1661,13 @@
         "weight": 4,
         "fielding ability": 11,
         "baserunning ability": 0,
-        "slap contact size": 55,
+        "slap contact size": 40,
         "charge contact size": 35,
-        "slap hit power": 52,
-        "charge hit power": 82,
+        "slap hit power": 55,
+        "charge hit power": 86,
         "hit trajectory": "High",
         "bunting": 20,
-        "speed": 20,
+        "speed": 25,
         "outfield throwing speed": 80,
         "fielding": 41,
         "displayed pitching": 4,
@@ -1710,7 +1711,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "24": {
       "stats": {
@@ -1721,12 +1722,12 @@
         "baserunning ability": 0,
         "slap contact size": 55,
         "charge contact size": 35,
-        "slap hit power": 52,
-        "charge hit power": 82,
+        "slap hit power": 48,
+        "charge hit power": 80,
         "hit trajectory": "High",
         "bunting": 20,
-        "speed": 25,
-        "outfield throwing speed": 80,
+        "speed": 40,
+        "outfield throwing speed": 85,
         "fielding": 35,
         "displayed pitching": 4,
         "displayed batting": 8,
@@ -1769,7 +1770,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "25": {
       "stats": {
@@ -1780,9 +1781,9 @@
         "baserunning ability": 0,
         "slap contact size": 60,
         "charge contact size": 40,
-        "slap hit power": 20,
-        "charge hit power": 40,
-        "hit trajectory": "Medium",
+        "slap hit power": 25,
+        "charge hit power": 35,
+        "hit trajectory": "Low",
         "bunting": 40,
         "speed": 99,
         "outfield throwing speed": 40,
@@ -1824,7 +1825,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "26": {
       "stats": {
@@ -1835,9 +1836,9 @@
         "baserunning ability": 0,
         "slap contact size": 60,
         "charge contact size": 40,
-        "slap hit power": 20,
+        "slap hit power": 28,
         "charge hit power": 40,
-        "hit trajectory": "Medium",
+        "hit trajectory": "Low",
         "bunting": 40,
         "speed": 99,
         "outfield throwing speed": 40,
@@ -1879,7 +1880,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "27": {
       "stats": {
@@ -1890,9 +1891,9 @@
         "baserunning ability": 0,
         "slap contact size": 65,
         "charge contact size": 45,
-        "slap hit power": 25,
-        "charge hit power": 45,
-        "hit trajectory": "Medium",
+        "slap hit power": 24,
+        "charge hit power": 37,
+        "hit trajectory": "Low",
         "bunting": 45,
         "speed": 99,
         "outfield throwing speed": 45,
@@ -1934,7 +1935,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "28": {
       "stats": {
@@ -1943,7 +1944,7 @@
         "weight": 3,
         "fielding ability": 7,
         "baserunning ability": 0,
-        "slap contact size": 60,
+        "slap contact size": 55,
         "charge contact size": 25,
         "slap hit power": 10,
         "charge hit power": 88,
@@ -2000,20 +2001,20 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "29": {
       "stats": {
         "player class": "Technique",
-        "pitching stamina": 55,
+        "pitching stamina": 65,
         "weight": 0,
         "fielding ability": 0,
         "baserunning ability": 7,
-        "slap contact size": 65,
-        "charge contact size": 45,
-        "slap hit power": 20,
-        "charge hit power": 30,
-        "hit trajectory": "Medium",
+        "slap contact size": 45,
+        "charge contact size": 30,
+        "slap hit power": 25,
+        "charge hit power": 35,
+        "hit trajectory": "Low",
         "bunting": 50,
         "speed": 35,
         "outfield throwing speed": 60,
@@ -2064,7 +2065,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "30": {
       "stats": {
@@ -2077,9 +2078,9 @@
         "charge contact size": 40,
         "slap hit power": 50,
         "charge hit power": 60,
-        "hit trajectory": "High",
+        "hit trajectory": "Medium",
         "bunting": 30,
-        "speed": 70,
+        "speed": 72,
         "outfield throwing speed": 55,
         "fielding": 40,
         "displayed pitching": 4,
@@ -2124,7 +2125,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "31": {
       "stats": {
@@ -2137,9 +2138,9 @@
         "charge contact size": 40,
         "slap hit power": 40,
         "charge hit power": 60,
-        "hit trajectory": "High",
+        "hit trajectory": "Medium",
         "bunting": 30,
-        "speed": 78,
+        "speed": 80,
         "outfield throwing speed": 45,
         "fielding": 50,
         "displayed pitching": 3,
@@ -2184,7 +2185,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "32": {
       "stats": {
@@ -2197,9 +2198,9 @@
         "charge contact size": 35,
         "slap hit power": 50,
         "charge hit power": 55,
-        "hit trajectory": "High",
+        "hit trajectory": "Medium",
         "bunting": 30,
-        "speed": 76,
+        "speed": 78,
         "outfield throwing speed": 50,
         "fielding": 45,
         "displayed pitching": 4,
@@ -2244,7 +2245,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "33": {
       "stats": {
@@ -2257,9 +2258,9 @@
         "charge contact size": 40,
         "slap hit power": 50,
         "charge hit power": 65,
-        "hit trajectory": "High",
+        "hit trajectory": "Medium",
         "bunting": 30,
-        "speed": 75,
+        "speed": 77,
         "outfield throwing speed": 60,
         "fielding": 30,
         "displayed pitching": 5,
@@ -2303,20 +2304,20 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "34": {
       "stats": {
         "player class": "Balanced",
-        "pitching stamina": 70,
+        "pitching stamina": 75,
         "weight": 2,
         "fielding ability": 5,
         "baserunning ability": 0,
-        "slap contact size": 40,
+        "slap contact size": 35,
         "charge contact size": 30,
         "slap hit power": 20,
         "charge hit power": 20,
-        "hit trajectory": "Medium",
+        "hit trajectory": "Low",
         "bunting": 30,
         "speed": 20,
         "outfield throwing speed": 55,
@@ -2375,16 +2376,16 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "35": {
       "stats": {
         "player class": "Balanced",
-        "pitching stamina": 55,
+        "pitching stamina": 62,
         "weight": 2,
         "fielding ability": 5,
         "baserunning ability": 0,
-        "slap contact size": 55,
+        "slap contact size": 50,
         "charge contact size": 45,
         "slap hit power": 30,
         "charge hit power": 35,
@@ -2447,7 +2448,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "36": {
       "stats": {
@@ -2456,7 +2457,7 @@
         "weight": 2,
         "fielding ability": 5,
         "baserunning ability": 0,
-        "slap contact size": 50,
+        "slap contact size": 45,
         "charge contact size": 35,
         "slap hit power": 25,
         "charge hit power": 35,
@@ -2519,20 +2520,20 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "37": {
       "stats": {
         "player class": "Balanced",
-        "pitching stamina": 50,
+        "pitching stamina": 70,
         "weight": 2,
         "fielding ability": 5,
         "baserunning ability": 0,
-        "slap contact size": 45,
+        "slap contact size": 40,
         "charge contact size": 30,
         "slap hit power": 25,
         "charge hit power": 30,
-        "hit trajectory": "Medium",
+        "hit trajectory": "Low",
         "bunting": 30,
         "speed": 20,
         "outfield throwing speed": 40,
@@ -2591,16 +2592,16 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "38": {
       "stats": {
         "player class": "Power",
-        "pitching stamina": 60,
+        "pitching stamina": 78,
         "weight": 3,
         "fielding ability": 0,
         "baserunning ability": 4,
-        "slap contact size": 65,
+        "slap contact size": 60,
         "charge contact size": 45,
         "slap hit power": 50,
         "charge hit power": 75,
@@ -2671,7 +2672,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "39": {
       "stats": {
@@ -2686,7 +2687,7 @@
         "charge hit power": 92,
         "hit trajectory": "High",
         "bunting": 10,
-        "speed": 20,
+        "speed": 30,
         "outfield throwing speed": 90,
         "fielding": 48,
         "displayed pitching": 4,
@@ -2747,7 +2748,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "40": {
       "stats": {
@@ -2756,14 +2757,14 @@
         "weight": 1,
         "fielding ability": 12,
         "baserunning ability": 0,
-        "slap contact size": 60,
+        "slap contact size": 55,
         "charge contact size": 40,
         "slap hit power": 20,
         "charge hit power": 35,
         "hit trajectory": "Medium",
         "bunting": 30,
         "speed": 72,
-        "outfield throwing speed": 40,
+        "outfield throwing speed": 45,
         "fielding": 80,
         "displayed pitching": 3,
         "displayed batting": 3,
@@ -2805,7 +2806,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "41": {
       "stats": {
@@ -2814,13 +2815,13 @@
         "weight": 0,
         "fielding ability": 10,
         "baserunning ability": 0,
-        "slap contact size": 55,
+        "slap contact size": 45,
         "charge contact size": 40,
         "slap hit power": 25,
-        "charge hit power": 40,
-        "hit trajectory": "Medium",
+        "charge hit power": 35,
+        "hit trajectory": "Low",
         "bunting": 90,
-        "speed": 50,
+        "speed": 65,
         "outfield throwing speed": 50,
         "fielding": 60,
         "displayed pitching": 6,
@@ -2878,7 +2879,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "42": {
       "stats": {
@@ -2887,13 +2888,13 @@
         "weight": 0,
         "fielding ability": 2,
         "baserunning ability": 0,
-        "slap contact size": 60,
-        "charge contact size": 40,
+        "slap contact size": 45,
+        "charge contact size": 30,
         "slap hit power": 20,
         "charge hit power": 40,
-        "hit trajectory": "Medium",
+        "hit trajectory": "Low",
         "bunting": 50,
-        "speed": 50,
+        "speed": 65,
         "outfield throwing speed": 50,
         "fielding": 65,
         "displayed pitching": 6,
@@ -2941,7 +2942,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "43": {
       "stats": {
@@ -2950,8 +2951,8 @@
         "weight": 1,
         "fielding ability": 0,
         "baserunning ability": 5,
-        "slap contact size": 65,
-        "charge contact size": 55,
+        "slap contact size": 55,
+        "charge contact size": 50,
         "slap hit power": 30,
         "charge hit power": 60,
         "hit trajectory": "Medium",
@@ -3001,7 +3002,7 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "44": {
       "stats": {
@@ -3010,8 +3011,8 @@
         "weight": 1,
         "fielding ability": 2,
         "baserunning ability": 0,
-        "slap contact size": 60,
-        "charge contact size": 40,
+        "slap contact size": 50,
+        "charge contact size": 35,
         "slap hit power": 35,
         "charge hit power": 55,
         "hit trajectory": "Medium",
@@ -3061,7 +3062,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "45": {
       "stats": {
@@ -3070,13 +3071,13 @@
         "weight": 1,
         "fielding ability": 1,
         "baserunning ability": 0,
-        "slap contact size": 55,
+        "slap contact size": 50,
         "charge contact size": 35,
         "slap hit power": 45,
         "charge hit power": 50,
-        "hit trajectory": "Medium",
+        "hit trajectory": "Low",
         "bunting": 44,
-        "speed": 50,
+        "speed": 55,
         "outfield throwing speed": 55,
         "fielding": 70,
         "displayed pitching": 5,
@@ -3135,7 +3136,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "46": {
       "stats": {
@@ -3144,13 +3145,13 @@
         "weight": 1,
         "fielding ability": 1,
         "baserunning ability": 0,
-        "slap contact size": 50,
+        "slap contact size": 45,
         "charge contact size": 35,
         "slap hit power": 40,
         "charge hit power": 45,
-        "hit trajectory": "Medium",
+        "hit trajectory": "Low",
         "bunting": 44,
-        "speed": 55,
+        "speed": 60,
         "outfield throwing speed": 55,
         "fielding": 75,
         "displayed pitching": 4,
@@ -3209,7 +3210,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "47": {
       "stats": {
@@ -3218,10 +3219,10 @@
         "weight": 1,
         "fielding ability": 1,
         "baserunning ability": 0,
-        "slap contact size": 60,
-        "charge contact size": 40,
+        "slap contact size": 55,
+        "charge contact size": 35,
         "slap hit power": 35,
-        "charge hit power": 55,
+        "charge hit power": 60,
         "hit trajectory": "Medium",
         "bunting": 44,
         "speed": 55,
@@ -3283,7 +3284,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "48": {
       "stats": {
@@ -3292,14 +3293,14 @@
         "weight": 1,
         "fielding ability": 1,
         "baserunning ability": 0,
-        "slap contact size": 55,
+        "slap contact size": 45,
         "charge contact size": 35,
         "slap hit power": 35,
         "charge hit power": 50,
-        "hit trajectory": "Medium",
+        "hit trajectory": "Low",
         "bunting": 44,
-        "speed": 58,
-        "outfield throwing speed": 65,
+        "speed": 65,
+        "outfield throwing speed": 70,
         "fielding": 78,
         "displayed pitching": 4,
         "displayed batting": 4,
@@ -3357,7 +3358,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "49": {
       "stats": {
@@ -3366,7 +3367,7 @@
         "weight": 1,
         "fielding ability": 0,
         "baserunning ability": 1,
-        "slap contact size": 65,
+        "slap contact size": 60,
         "charge contact size": 50,
         "slap hit power": 55,
         "charge hit power": 75,
@@ -3424,7 +3425,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "50": {
       "stats": {
@@ -3433,8 +3434,8 @@
         "weight": 1,
         "fielding ability": 0,
         "baserunning ability": 1,
-        "slap contact size": 60,
-        "charge contact size": 45,
+        "slap contact size": 55,
+        "charge contact size": 40,
         "slap hit power": 50,
         "charge hit power": 72,
         "hit trajectory": "High",
@@ -3491,7 +3492,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "51": {
       "stats": {
@@ -3500,7 +3501,7 @@
         "weight": 1,
         "fielding ability": 0,
         "baserunning ability": 1,
-        "slap contact size": 55,
+        "slap contact size": 50,
         "charge contact size": 40,
         "slap hit power": 50,
         "charge hit power": 80,
@@ -3558,7 +3559,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "52": {
       "stats": {
@@ -3567,7 +3568,7 @@
         "weight": 1,
         "fielding ability": 0,
         "baserunning ability": 1,
-        "slap contact size": 62,
+        "slap contact size": 57,
         "charge contact size": 50,
         "slap hit power": 60,
         "charge hit power": 74,
@@ -3625,7 +3626,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "53": {
       "stats": {
@@ -3634,7 +3635,7 @@
         "weight": 3,
         "fielding ability": 7,
         "baserunning ability": 0,
-        "slap contact size": 58,
+        "slap contact size": 50,
         "charge contact size": 20,
         "slap hit power": 10,
         "charge hit power": 85,
@@ -3690,7 +3691,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "54": {
       "stats": {
@@ -3755,7 +3756,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "55": {
       "stats": {
@@ -3768,7 +3769,7 @@
         "charge contact size": 35,
         "slap hit power": 50,
         "charge hit power": 70,
-        "hit trajectory": "High",
+        "hit trajectory": "Medium",
         "bunting": 20,
         "speed": 80,
         "outfield throwing speed": 65,
@@ -3815,7 +3816,7 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "56": {
       "stats": {
@@ -3824,8 +3825,8 @@
         "weight": 2,
         "fielding ability": 0,
         "baserunning ability": 2,
-        "slap contact size": 70,
-        "charge contact size": 50,
+        "slap contact size": 60,
+        "charge contact size": 45,
         "slap hit power": 35,
         "charge hit power": 50,
         "hit trajectory": "Medium",
@@ -3872,7 +3873,7 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "57": {
       "stats": {
@@ -3881,13 +3882,13 @@
         "weight": 4,
         "fielding ability": 11,
         "baserunning ability": 0,
-        "slap contact size": 60,
+        "slap contact size": 45,
         "charge contact size": 35,
         "slap hit power": 55,
         "charge hit power": 80,
         "hit trajectory": "High",
         "bunting": 10,
-        "speed": 30,
+        "speed": 35,
         "outfield throwing speed": 80,
         "fielding": 60,
         "displayed pitching": 4,
@@ -3924,23 +3925,23 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "58": {
       "stats": {
         "player class": "Balanced",
-        "pitching stamina": 40,
+        "pitching stamina": 76,
         "weight": 2,
-        "fielding ability": 1,
+        "fielding ability": 12,
         "baserunning ability": 0,
-        "slap contact size": 68,
+        "slap contact size": 56,
         "charge contact size": 50,
         "slap hit power": 30,
         "charge hit power": 50,
         "hit trajectory": "Medium",
         "bunting": 50,
         "speed": 55,
-        "outfield throwing speed": 40,
+        "outfield throwing speed": 55,
         "fielding": 75,
         "displayed pitching": 7,
         "displayed batting": 5,
@@ -3975,7 +3976,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "59": {
       "stats": {
@@ -3984,7 +3985,7 @@
         "weight": 3,
         "fielding ability": 8,
         "baserunning ability": 0,
-        "slap contact size": 60,
+        "slap contact size": 55,
         "charge contact size": 40,
         "slap hit power": 50,
         "charge hit power": 75,
@@ -4029,7 +4030,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "60": {
       "stats": {
@@ -4038,9 +4039,9 @@
         "weight": 3,
         "fielding ability": 8,
         "baserunning ability": 0,
-        "slap contact size": 55,
+        "slap contact size": 52,
         "charge contact size": 35,
-        "slap hit power": 55,
+        "slap hit power": 50,
         "charge hit power": 70,
         "hit trajectory": "High",
         "bunting": 20,
@@ -4083,7 +4084,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "61": {
       "stats": {
@@ -4094,7 +4095,7 @@
         "baserunning ability": 0,
         "slap contact size": 50,
         "charge contact size": 40,
-        "slap hit power": 55,
+        "slap hit power": 50,
         "charge hit power": 80,
         "hit trajectory": "High",
         "bunting": 20,
@@ -4137,7 +4138,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "62": {
       "stats": {
@@ -4146,9 +4147,9 @@
         "weight": 3,
         "fielding ability": 8,
         "baserunning ability": 0,
-        "slap contact size": 60,
+        "slap contact size": 55,
         "charge contact size": 38,
-        "slap hit power": 50,
+        "slap hit power": 45,
         "charge hit power": 73,
         "hit trajectory": "High",
         "bunting": 20,
@@ -4191,7 +4192,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "63": {
       "stats": {
@@ -4206,7 +4207,7 @@
         "charge hit power": 94,
         "hit trajectory": "High",
         "bunting": 10,
-        "speed": 10,
+        "speed": 15,
         "outfield throwing speed": 90,
         "fielding": 20,
         "displayed pitching": 6,
@@ -4252,20 +4253,20 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "64": {
       "stats": {
         "player class": "Technique",
-        "pitching stamina": 20,
+        "pitching stamina": 60,
         "weight": 0,
         "fielding ability": 12,
         "baserunning ability": 0,
         "slap contact size": 70,
         "charge contact size": 55,
-        "slap hit power": 15,
+        "slap hit power": 20,
         "charge hit power": 25,
-        "hit trajectory": "Medium",
+        "hit trajectory": "Low",
         "bunting": 50,
         "speed": 60,
         "outfield throwing speed": 30,
@@ -4328,7 +4329,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "65": {
       "stats": {
@@ -4391,7 +4392,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "66": {
       "stats": {
@@ -4400,10 +4401,10 @@
         "weight": 0,
         "fielding ability": 11,
         "baserunning ability": 0,
-        "slap contact size": 55,
-        "charge contact size": 40,
+        "slap contact size": 50,
+        "charge contact size": 35,
         "slap hit power": 50,
-        "charge hit power": 65,
+        "charge hit power": 60,
         "hit trajectory": "Medium",
         "bunting": 55,
         "speed": 40,
@@ -4461,7 +4462,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "67": {
       "stats": {
@@ -4477,7 +4478,7 @@
         "hit trajectory": "Medium",
         "bunting": 35,
         "speed": 80,
-        "outfield throwing speed": 40,
+        "outfield throwing speed": 58,
         "fielding": 55,
         "displayed pitching": 3,
         "displayed batting": 4,
@@ -4536,7 +4537,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "68": {
       "stats": {
@@ -4549,10 +4550,10 @@
         "charge contact size": 40,
         "slap hit power": 30,
         "charge hit power": 30,
-        "hit trajectory": "Medium",
+        "hit trajectory": "Low",
         "bunting": 35,
         "speed": 80,
-        "outfield throwing speed": 35,
+        "outfield throwing speed": 45,
         "fielding": 50,
         "displayed pitching": 4,
         "displayed batting": 2,
@@ -4611,7 +4612,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "69": {
       "stats": {
@@ -4624,10 +4625,10 @@
         "charge contact size": 35,
         "slap hit power": 30,
         "charge hit power": 40,
-        "hit trajectory": "Medium",
+        "hit trajectory": "Low",
         "bunting": 40,
-        "speed": 75,
-        "outfield throwing speed": 35,
+        "speed": 85,
+        "outfield throwing speed": 40,
         "fielding": 60,
         "displayed pitching": 3,
         "displayed batting": 4,
@@ -4686,7 +4687,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "70": {
       "stats": {
@@ -4702,7 +4703,7 @@
         "hit trajectory": "Medium",
         "bunting": 35,
         "speed": 80,
-        "outfield throwing speed": 35,
+        "outfield throwing speed": 50,
         "fielding": 65,
         "displayed pitching": 3,
         "displayed batting": 3,
@@ -4761,7 +4762,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "71": {
       "stats": {
@@ -4774,10 +4775,10 @@
         "charge contact size": 45,
         "slap hit power": 40,
         "charge hit power": 40,
-        "hit trajectory": "Medium",
+        "hit trajectory": "Low",
         "bunting": 35,
         "speed": 85,
-        "outfield throwing speed": 35,
+        "outfield throwing speed": 40,
         "fielding": 55,
         "displayed pitching": 2,
         "displayed batting": 3,
@@ -4836,7 +4837,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "74": {
       "stats": {
@@ -7335,8 +7336,8 @@
         "charge hit power": 55,
         "hit trajectory": "Medium",
         "bunting": 40,
-        "speed": 92,
-        "outfield throwing speed": 45,
+        "speed": 88,
+        "outfield throwing speed": 50,
         "fielding": 50,
         "displayed pitching": 3,
         "displayed batting": 6,
@@ -7389,12 +7390,12 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "140": {
       "stats": {
         "player class": "Technique",
-        "pitching stamina": 70,
+        "pitching stamina": 78,
         "weight": 2,
         "fielding ability": 3,
         "baserunning ability": 0,
@@ -7402,7 +7403,7 @@
         "charge contact size": 30,
         "slap hit power": 35,
         "charge hit power": 40,
-        "hit trajectory": "Medium",
+        "hit trajectory": "Low",
         "bunting": 40,
         "speed": 85,
         "outfield throwing speed": 55,
@@ -7458,12 +7459,12 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "141": {
       "stats": {
         "player class": "Speed",
-        "pitching stamina": 50,
+        "pitching stamina": 70,
         "weight": 0,
         "fielding ability": 0,
         "baserunning ability": 7,
@@ -7471,9 +7472,9 @@
         "charge contact size": 25,
         "slap hit power": 40,
         "charge hit power": 60,
-        "hit trajectory": "High",
+        "hit trajectory": "Medium",
         "bunting": 30,
-        "speed": 70,
+        "speed": 72,
         "outfield throwing speed": 50,
         "fielding": 40,
         "displayed pitching": 7,
@@ -7518,7 +7519,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "142": {
       "stats": {
@@ -7527,13 +7528,13 @@
         "weight": 4,
         "fielding ability": 11,
         "baserunning ability": 0,
-        "slap contact size": 55,
+        "slap contact size": 50,
         "charge contact size": 40,
         "slap hit power": 55,
-        "charge hit power": 80,
+        "charge hit power": 84,
         "hit trajectory": "High",
         "bunting": 20,
-        "speed": 30,
+        "speed": 35,
         "outfield throwing speed": 80,
         "fielding": 40,
         "displayed pitching": 5,
@@ -7577,7 +7578,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "143": {
       "stats": {
@@ -7586,9 +7587,9 @@
         "weight": 3,
         "fielding ability": 8,
         "baserunning ability": 0,
-        "slap contact size": 65,
+        "slap contact size": 60,
         "charge contact size": 35,
-        "slap hit power": 60,
+        "slap hit power": 55,
         "charge hit power": 70,
         "hit trajectory": "High",
         "bunting": 20,
@@ -7632,7 +7633,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "144": {
       "stats": {
@@ -7641,8 +7642,8 @@
         "weight": 1,
         "fielding ability": 0,
         "baserunning ability": 5,
-        "slap contact size": 68,
-        "charge contact size": 52,
+        "slap contact size": 58,
+        "charge contact size": 47,
         "slap hit power": 40,
         "charge hit power": 55,
         "hit trajectory": "Medium",
@@ -7692,7 +7693,7 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "145": {
       "stats": {
@@ -7703,7 +7704,7 @@
         "baserunning ability": 0,
         "slap contact size": 50,
         "charge contact size": 30,
-        "slap hit power": 25,
+        "slap hit power": 20,
         "charge hit power": 80,
         "hit trajectory": "High",
         "bunting": 10,
@@ -7764,7 +7765,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "146": {
       "stats": {
@@ -7773,8 +7774,8 @@
         "weight": 1,
         "fielding ability": 0,
         "baserunning ability": 1,
-        "slap contact size": 60,
-        "charge contact size": 55,
+        "slap contact size": 55,
+        "charge contact size": 45,
         "slap hit power": 60,
         "charge hit power": 80,
         "hit trajectory": "High",
@@ -7836,7 +7837,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "147": {
       "stats": {
@@ -7845,7 +7846,7 @@
         "weight": 1,
         "fielding ability": 0,
         "baserunning ability": 1,
-        "slap contact size": 68,
+        "slap contact size": 63,
         "charge contact size": 40,
         "slap hit power": 65,
         "charge hit power": 70,
@@ -7909,7 +7910,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "148": {
       "stats": {
@@ -7921,8 +7922,8 @@
         "slap contact size": 60,
         "charge contact size": 40,
         "slap hit power": 20,
-        "charge hit power": 40,
-        "hit trajectory": "Medium",
+        "charge hit power": 30,
+        "hit trajectory": "Low",
         "bunting": 40,
         "speed": 99,
         "outfield throwing speed": 40,
@@ -7970,7 +7971,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "149": {
       "stats": {
@@ -7981,9 +7982,9 @@
         "baserunning ability": 0,
         "slap contact size": 60,
         "charge contact size": 40,
-        "slap hit power": 20,
-        "charge hit power": 40,
-        "hit trajectory": "Medium",
+        "slap hit power": 22,
+        "charge hit power": 30,
+        "hit trajectory": "Low",
         "bunting": 40,
         "speed": 99,
         "outfield throwing speed": 40,
@@ -8031,7 +8032,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "150": {
       "stats": {
@@ -8040,8 +8041,8 @@
         "weight": 1,
         "fielding ability": 2,
         "baserunning ability": 0,
-        "slap contact size": 55,
-        "charge contact size": 45,
+        "slap contact size": 45,
+        "charge contact size": 40,
         "slap hit power": 40,
         "charge hit power": 60,
         "hit trajectory": "Medium",
@@ -8091,7 +8092,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "151": {
       "stats": {
@@ -8100,13 +8101,13 @@
         "weight": 1,
         "fielding ability": 1,
         "baserunning ability": 0,
-        "slap contact size": 60,
+        "slap contact size": 50,
         "charge contact size": 35,
-        "slap hit power": 50,
+        "slap hit power": 40,
         "charge hit power": 40,
-        "hit trajectory": "Medium",
+        "hit trajectory": "Low",
         "bunting": 44,
-        "speed": 60,
+        "speed": 70,
         "outfield throwing speed": 60,
         "fielding": 80,
         "displayed pitching": 3,
@@ -8171,7 +8172,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "152": {
       "stats": {
@@ -8180,10 +8181,10 @@
         "weight": 1,
         "fielding ability": 1,
         "baserunning ability": 0,
-        "slap contact size": 65,
-        "charge contact size": 45,
-        "slap hit power": 40,
-        "charge hit power": 60,
+        "slap contact size": 45,
+        "charge contact size": 40,
+        "slap hit power": 45,
+        "charge hit power": 55,
         "hit trajectory": "Medium",
         "bunting": 44,
         "speed": 50,
@@ -8251,7 +8252,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "153": {
       "stats": {
@@ -8260,7 +8261,7 @@
         "weight": 2,
         "fielding ability": 5,
         "baserunning ability": 0,
-        "slap contact size": 55,
+        "slap contact size": 50,
         "charge contact size": 40,
         "slap hit power": 30,
         "charge hit power": 40,
@@ -8329,20 +8330,20 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "154": {
       "stats": {
         "player class": "Technique",
-        "pitching stamina": 60,
+        "pitching stamina": 84,
         "weight": 2,
         "fielding ability": 5,
         "baserunning ability": 0,
-        "slap contact size": 40,
+        "slap contact size": 30,
         "charge contact size": 25,
         "slap hit power": 20,
         "charge hit power": 30,
-        "hit trajectory": "Medium",
+        "hit trajectory": "Low",
         "bunting": 30,
         "speed": 25,
         "outfield throwing speed": 55,
@@ -8407,7 +8408,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "155": {
       "stats": {
@@ -8419,7 +8420,7 @@
         "slap contact size": 68,
         "charge contact size": 45,
         "slap hit power": 38,
-        "charge hit power": 65,
+        "charge hit power": 62,
         "hit trajectory": "Medium",
         "bunting": 40,
         "speed": 60,
@@ -8460,7 +8461,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "156": {
       "stats": {
@@ -8473,7 +8474,7 @@
         "charge contact size": 40,
         "slap hit power": 35,
         "charge hit power": 30,
-        "hit trajectory": "Medium",
+        "hit trajectory": "Low",
         "bunting": 40,
         "speed": 40,
         "outfield throwing speed": 40,
@@ -8517,7 +8518,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "157": {
       "stats": {
@@ -8526,11 +8527,11 @@
         "weight": 1,
         "fielding ability": 0,
         "baserunning ability": 4,
-        "slap contact size": 65,
+        "slap contact size": 60,
         "charge contact size": 45,
-        "slap hit power": 30,
+        "slap hit power": 25,
         "charge hit power": 35,
-        "hit trajectory": "Medium",
+        "hit trajectory": "Low",
         "bunting": 40,
         "speed": 42,
         "outfield throwing speed": 45,
@@ -8574,7 +8575,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "158": {
       "stats": {
@@ -8583,11 +8584,11 @@
         "weight": 1,
         "fielding ability": 0,
         "baserunning ability": 4,
-        "slap contact size": 75,
+        "slap contact size": 65,
         "charge contact size": 50,
-        "slap hit power": 30,
-        "charge hit power": 40,
-        "hit trajectory": "Medium",
+        "slap hit power": 20,
+        "charge hit power": 38,
+        "hit trajectory": "Low",
         "bunting": 40,
         "speed": 50,
         "outfield throwing speed": 30,
@@ -8631,7 +8632,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "159": {
       "stats": {
@@ -8640,9 +8641,9 @@
         "weight": 1,
         "fielding ability": 0,
         "baserunning ability": 4,
-        "slap contact size": 70,
+        "slap contact size": 60,
         "charge contact size": 55,
-        "slap hit power": 35,
+        "slap hit power": 30,
         "charge hit power": 45,
         "hit trajectory": "Medium",
         "bunting": 40,
@@ -8688,7 +8689,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "160": {
       "stats": {
@@ -8697,7 +8698,7 @@
         "weight": 1,
         "fielding ability": 0,
         "baserunning ability": 4,
-        "slap contact size": 80,
+        "slap contact size": 70,
         "charge contact size": 45,
         "slap hit power": 38,
         "charge hit power": 40,
@@ -8743,7 +8744,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "161": {
       "stats": {
@@ -8754,8 +8755,8 @@
         "baserunning ability": 0,
         "slap contact size": 73,
         "charge contact size": 55,
-        "slap hit power": 50,
-        "charge hit power": 72,
+        "slap hit power": 42,
+        "charge hit power": 67,
         "hit trajectory": "Medium",
         "bunting": 40,
         "speed": 65,
@@ -8792,7 +8793,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "162": {
       "stats": {
@@ -8801,9 +8802,9 @@
         "weight": 3,
         "fielding ability": 11,
         "baserunning ability": 0,
-        "slap contact size": 65,
+        "slap contact size": 60,
         "charge contact size": 40,
-        "slap hit power": 60,
+        "slap hit power": 50,
         "charge hit power": 82,
         "hit trajectory": "High",
         "bunting": 10,
@@ -8854,22 +8855,22 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "163": {
       "stats": {
         "player class": "Balanced",
-        "pitching stamina": 68,
+        "pitching stamina": 74,
         "weight": 3,
-        "fielding ability": 1,
+        "fielding ability": 12,
         "baserunning ability": 0,
-        "slap contact size": 65,
+        "slap contact size": 55,
         "charge contact size": 35,
-        "slap hit power": 55,
+        "slap hit power": 45,
         "charge hit power": 60,
         "hit trajectory": "Medium",
         "bunting": 10,
-        "speed": 45,
+        "speed": 50,
         "outfield throwing speed": 80,
         "fielding": 70,
         "displayed pitching": 7,
@@ -8911,7 +8912,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "164": {
       "stats": {
@@ -8920,10 +8921,10 @@
         "weight": 4,
         "fielding ability": 0,
         "baserunning ability": 5,
-        "slap contact size": 45,
-        "charge contact size": 40,
-        "slap hit power": 70,
-        "charge hit power": 85,
+        "slap contact size": 40,
+        "charge contact size": 20,
+        "slap hit power": 58,
+        "charge hit power": 86,
         "hit trajectory": "High",
         "bunting": 10,
         "speed": 40,
@@ -8972,7 +8973,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "165": {
       "stats": {
@@ -8981,7 +8982,7 @@
         "weight": 2,
         "fielding ability": 0,
         "baserunning ability": 5,
-        "slap contact size": 80,
+        "slap contact size": 68,
         "charge contact size": 55,
         "slap hit power": 50,
         "charge hit power": 55,
@@ -9029,7 +9030,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "166": {
       "stats": {
@@ -9038,14 +9039,14 @@
         "weight": 1,
         "fielding ability": 12,
         "baserunning ability": 0,
-        "slap contact size": 70,
-        "charge contact size": 50,
+        "slap contact size": 65,
+        "charge contact size": 45,
         "slap hit power": 40,
         "charge hit power": 35,
         "hit trajectory": "Medium",
         "bunting": 40,
         "speed": 80,
-        "outfield throwing speed": 50,
+        "outfield throwing speed": 60,
         "fielding": 84,
         "displayed pitching": 5,
         "displayed batting": 4,
@@ -9078,7 +9079,7 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "167": {
       "stats": {
@@ -9087,10 +9088,10 @@
         "weight": 2,
         "fielding ability": 0,
         "baserunning ability": 5,
-        "slap contact size": 80,
+        "slap contact size": 68,
         "charge contact size": 50,
-        "slap hit power": 55,
-        "charge hit power": 60,
+        "slap hit power": 50,
+        "charge hit power": 58,
         "hit trajectory": "Medium",
         "bunting": 20,
         "speed": 80,
@@ -9145,19 +9146,19 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "168": {
       "stats": {
-        "player class": "Technique",
-        "pitching stamina": 60,
+        "player class": "Speed",
+        "pitching stamina": 75,
         "weight": 2,
         "fielding ability": 0,
         "baserunning ability": 5,
-        "slap contact size": 70,
+        "slap contact size": 56,
         "charge contact size": 40,
-        "slap hit power": 48,
-        "charge hit power": 55,
+        "slap hit power": 42,
+        "charge hit power": 52,
         "hit trajectory": "Medium",
         "bunting": 20,
         "speed": 70,
@@ -9209,7 +9210,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "169": {
       "stats": {
@@ -9218,10 +9219,10 @@
         "weight": 2,
         "fielding ability": 0,
         "baserunning ability": 5,
-        "slap contact size": 70,
+        "slap contact size": 60,
         "charge contact size": 45,
-        "slap hit power": 60,
-        "charge hit power": 50,
+        "slap hit power": 58,
+        "charge hit power": 45,
         "hit trajectory": "Medium",
         "bunting": 25,
         "speed": 88,
@@ -9270,19 +9271,19 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "170": {
       "stats": {
-        "player class": "Technique",
-        "pitching stamina": 70,
+        "player class": "Balanced",
+        "pitching stamina": 82,
         "weight": 2,
         "fielding ability": 0,
         "baserunning ability": 5,
-        "slap contact size": 75,
+        "slap contact size": 65,
         "charge contact size": 50,
-        "slap hit power": 55,
-        "charge hit power": 70,
+        "slap hit power": 50,
+        "charge hit power": 65,
         "hit trajectory": "Medium",
         "bunting": 20,
         "speed": 75,
@@ -9323,7 +9324,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "171": {
       "stats": {
@@ -9332,10 +9333,10 @@
         "weight": 2,
         "fielding ability": 0,
         "baserunning ability": 5,
-        "slap contact size": 70,
+        "slap contact size": 60,
         "charge contact size": 50,
-        "slap hit power": 60,
-        "charge hit power": 78,
+        "slap hit power": 53,
+        "charge hit power": 75,
         "hit trajectory": "Medium",
         "bunting": 20,
         "speed": 70,
@@ -9385,7 +9386,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "172": {
       "stats": {
@@ -9394,10 +9395,10 @@
         "weight": 2,
         "fielding ability": 0,
         "baserunning ability": 5,
-        "slap contact size": 75,
+        "slap contact size": 64,
         "charge contact size": 45,
         "slap hit power": 55,
-        "charge hit power": 74,
+        "charge hit power": 70,
         "hit trajectory": "Medium",
         "bunting": 20,
         "speed": 75,
@@ -9439,18 +9440,18 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "173": {
       "stats": {
-        "player class": "Technique",
-        "pitching stamina": 65,
+        "player class": "Speed",
+        "pitching stamina": 72,
         "weight": 2,
         "fielding ability": 0,
         "baserunning ability": 5,
-        "slap contact size": 80,
-        "charge contact size": 55,
-        "slap hit power": 50,
+        "slap contact size": 72,
+        "charge contact size": 48,
+        "slap hit power": 48,
         "charge hit power": 60,
         "hit trajectory": "Medium",
         "bunting": 20,
@@ -9487,7 +9488,7 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "174": {
       "stats": {
@@ -9496,13 +9497,13 @@
         "weight": 0,
         "fielding ability": 10,
         "baserunning ability": 0,
-        "slap contact size": 60,
-        "charge contact size": 45,
+        "slap contact size": 55,
+        "charge contact size": 40,
         "slap hit power": 40,
-        "charge hit power": 60,
+        "charge hit power": 55,
         "hit trajectory": "Medium",
         "bunting": 65,
-        "speed": 40,
+        "speed": 55,
         "outfield throwing speed": 55,
         "fielding": 60,
         "displayed pitching": 3,
@@ -9560,12 +9561,12 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "175": {
       "stats": {
         "player class": "Technique",
-        "pitching stamina": 80,
+        "pitching stamina": 85,
         "weight": 4,
         "fielding ability": 0,
         "baserunning ability": 3,
@@ -9628,7 +9629,7 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "176": {
       "stats": {
@@ -9637,13 +9638,13 @@
         "weight": 0,
         "fielding ability": 2,
         "baserunning ability": 0,
-        "slap contact size": 50,
+        "slap contact size": 40,
         "charge contact size": 35,
         "slap hit power": 30,
         "charge hit power": 25,
-        "hit trajectory": "Medium",
+        "hit trajectory": "Low",
         "bunting": 55,
-        "speed": 60,
+        "speed": 70,
         "outfield throwing speed": 60,
         "fielding": 75,
         "displayed pitching": 6,
@@ -9692,20 +9693,20 @@
       ],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "177": {
       "stats": {
         "player class": "Technique",
-        "pitching stamina": 34,
+        "pitching stamina": 77,
         "weight": 2,
         "fielding ability": 0,
         "baserunning ability": 2,
-        "slap contact size": 75,
-        "charge contact size": 45,
+        "slap contact size": 65,
+        "charge contact size": 40,
         "slap hit power": 30,
         "charge hit power": 40,
-        "hit trajectory": "Medium",
+        "hit trajectory": "Low",
         "bunting": 65,
         "speed": 40,
         "outfield throwing speed": 55,
@@ -9754,7 +9755,7 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "178": {
       "stats": {
@@ -9815,7 +9816,7 @@
       "badChemistryIds": [],
       "conditionalGoodChemistryIds": [],
       "miiColorProfile": false,
-      "statsSource": "Oct 21 2026 Updated Stats.ods (patched main.dol)"
+      "statsSource": "SSL October 22, 2026 Balance Patch 2 main.dol"
     },
     "179": {
       "stats": {

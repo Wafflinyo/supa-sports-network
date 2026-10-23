@@ -182,7 +182,7 @@
   {
     "id": 168,
     "name": "Iggy",
-    "class": "Technique",
+    "class": "Speed",
     "color": "Green",
     "source": "Mario",
     "gameCharacterId": 130,
@@ -206,7 +206,7 @@
   {
     "id": 170,
     "name": "Ludwig",
-    "class": "Technique",
+    "class": "Balanced",
     "color": "Blue",
     "source": "Mario",
     "gameCharacterId": 132,
@@ -242,7 +242,7 @@
   {
     "id": 173,
     "name": "Wendy",
-    "class": "Technique",
+    "class": "Speed",
     "color": "Pink",
     "source": "Mario",
     "gameCharacterId": 135,
