@@ -735,7 +735,7 @@ function Draft({ league: l }) {
       >
         <p>
           Draft begins {time(s.draftAt)} · lottery {time(s.lotteryAt)} ·{" "}
-          {s.baseDraftRounds || 12} rounds · snake order (11 tradable player turns + one nontradeable stage turn per franchise). Supplemental rounds
+          {s.baseDraftRounds || 12} rounds · snake order (11 tradable player turns + one nontradeable Stadium Pick per franchise). Supplemental rounds
           fill teams below 11, skipping full teams.
         </p>
         {s.number>1 && <p>Returning-season lottery: 12th seed 55% · 11th 25% · 10th 15% · 9th 5% for first pick. Winners are removed before the next weighted draw. Seeds 8 through 1 receive picks 5 through 12, then the order snakes.</p>}
@@ -783,7 +783,7 @@ function Draft({ league: l }) {
               Round {s.nextPick?.round} · Pick {next + 1}
               {s.nextPick?.supplemental
                 ? " · ROSTER FILL"
-                : ` / ${12 * (s.baseDraftRounds || 12)} main-round picks${s.nextPick?.mustStage ? ' · STAGE PICK REQUIRED' : ''}`}
+                : ` / ${12 * (s.baseDraftRounds || 12)} main-round picks${s.nextPick?.mustStage ? ' · STADIUM PICK REQUIRED' : ''}`}
             </p>
             {!mine && <p>Waiting for {t?.name} to pick. Browse the player pool below.</p>}
             {l.access.role === "commissioner" && (
@@ -987,6 +987,15 @@ function MyTeam({ league: l }) {
       {l.access.role === "commissioner" && (
         <TeamChooser s={l.season} value={team} onChange={setTeam} />
       )}
+      {l.season && team && <Box title="TEAM STADIUMS">
+        <p>Stadiums owned this season:</p>
+        {(() => {
+          const stadiums = [...new Set([...(l.season.retainedStadiums?.[team] || []),
+            ...(l.season.picks || []).filter(p => p.team === team && p.kind === "stage").map(p => p.stage)])];
+          return stadiums.length ? <ul>{stadiums.map(stadium => <li key={stadium}>{stadium}</li>)}</ul> : <p>No Stadium selected yet.</p>;
+        })()}
+        <p>Accepted Stadium extensions retain Stadiums for next season. Every team also receives a new nontradable Stadium Pick each season.</p>
+      </Box>}
       <Box title="ROSTER & DEFAULT LINEUP">
         {!l.season || !team ? (
           <p>Select your season team to manage its roster.</p>
@@ -1636,7 +1645,7 @@ function Trades({ league: l, messages = false }) {
               <>
                 <p>
                   All involved teams must accept the same offer, followed by
-                  commissioner approval. Keep at least nine tradable next-season player picks plus the untradeable stage pick (10 minimum total). Stage picks can never be traded.
+                  commissioner approval. Keep at least nine tradable next-season player picks plus the untradeable Stadium Pick (10 minimum total). Stadium Picks can never be traded.
                   Rosters below 11 must be filled immediately after the trade.
                 </p>
                 <details className="trade-participants"><summary>PARTICIPATING TEAMS ({participants.length})</summary><div className="season-team-checks">
@@ -2222,7 +2231,7 @@ function History({ league: l }) {
               {s.picks.map((p) => (
                 <p key={p.number}>
                   #{p.number} · {s.teams.find((t) => t.id === p.team)?.name} ·{" "}
-                  {p.kind === "stage" ? `STAGE · ${p.stage}` : name(p.player)}
+                  {p.kind === "stage" ? `STADIUM · ${p.stage}` : name(p.player)}
                 </p>
               ))}
             </details>
