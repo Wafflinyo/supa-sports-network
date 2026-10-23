@@ -26,5 +26,14 @@ const extensionUi = readFileSync(new URL('../src/ContractExtensions.jsx', import
 assert(draftUi.includes('STADIUM PICK'), 'Draft picker should be labeled Stadium Pick');
 assert(extensionUi.includes('ssl_stadium_extension_preview'), 'Stadium preview must be available');
 assert(extensionUi.includes('extension_stadium'), 'Stadium retention action must be wired');
+assert(draftUi.includes('<th>Player / Stadium</th>'), 'Draft results must identify Stadium selections, not just players');
+
+const rulesUi = readFileSync(new URL('../src/LeagueRules.jsx', import.meta.url), 'utf8');
+assert(rulesUi.includes('one nontradable Stadium Pick'), 'Rules must call the protected pick a Stadium Pick');
+assert(rulesUi.includes('an owned Stadium using the same repeat-offer percentages'), 'Rules must extend the player acceptance odds to Stadiums');
+const retainedStadiumMigration = readFileSync(new URL('../supabase/migrations/20261023050000_ssl_retained_stadium_skips_draft_pick.sql', import.meta.url), 'utf8');
+assert(retainedStadiumMigration.includes("if r=12 and jsonb_array_length"), 'Retained Stadiums must remove the next nontradable Stadium Pick');
+const stadiumLabelMigration = readFileSync(new URL('../supabase/migrations/20261023054917_ssl_stadium_selection_label.sql', import.meta.url), 'utf8');
+assert(stadiumLabelMigration.includes('Choose a Stadium from the official Stadium list'), 'Backend messages must use Stadium terminology');
 
 console.log('SSL Stadium catalog, names, and shared-extension contract invariants validated.');
