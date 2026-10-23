@@ -11,9 +11,11 @@ const expected = [
 assert.deepEqual(DRAFT_STAGES, expected, 'The official stadium list must match the published SSL catalog');
 assert.equal(new Set(DRAFT_STAGES).size, 13, 'Stadium names must be unique');
 
+const originalDraftMigration = readFileSync(new URL('../supabase/migrations/20261022232000_ssl_stage_draft_12_rounds.sql', import.meta.url), 'utf8');
 const migration = readFileSync(new URL('../supabase/migrations/20261023042557_ssl_stadium_catalog_and_shared_contract_extensions.sql', import.meta.url), 'utf8');
+const catalogMigrations = originalDraftMigration + migration;
 for (const stadium of expected) {
-  assert(migration.includes(stadium), 'Stadium not recognized by database migration: ' + stadium);
+  assert(catalogMigrations.includes(stadium), 'Stadium not recognized by database migration: ' + stadium);
 }
 assert(migration.includes('league_private.ssl_extension_quote'), 'Stadium offers must use the same probability formula as players');
 assert(migration.includes('tokens=tokens-1'), 'Stadium offers must consume existing shared contract tokens');
