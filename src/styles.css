@@ -180,3 +180,6 @@
 .player-data-name,.portrait-label,.player-cell{gap:10px;align-items:center}
 .player-data-name .pitcher-priority-badge,.player-cell>.pitcher-priority-badge{flex-shrink:0}
 .regular-player-stats td.player-cell{white-space:normal}
+
+/* Keep the profile dialog accessible name equal to the player name only. */
+.profile-name-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
