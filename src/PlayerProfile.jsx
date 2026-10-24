@@ -24,8 +24,8 @@ export default function PlayerProfile({player, PlayerAvatar, onClose,careerSeaso
   return <dialog ref={dialog} className="modal player-modal career-profile" aria-labelledby="career-player-name" onCancel={e=>{e.preventDefault();onClose()}} onClick={e=>{if(e.target===e.currentTarget){const r=e.currentTarget.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)onClose()}}}>
     <div className="career-profile-toolbar"><button className="close" onClick={onClose} aria-label="Close player profile" autoFocus><X size={20}/> CLOSE</button></div>
     <div className="career-profile-content">
-    <div className="player-modal-heading"><PlayerAvatar player={player} size={76}/><div><span className="eyebrow dark">SSL PLAYER PROFILE · #{player.rosterOrder || player.id}</span><h2 id="career-player-name">{player.name}</h2></div></div>
-    <div className="career-bio"><span>{player.class}</span><PitcherPriorityBadge player={player} record={gameData.players[player.id]}/><span>{player.team || 'Free agent'}</span></div>
+    <div className="player-modal-heading"><PlayerAvatar player={player} size={76}/><div><span className="eyebrow dark">SSL PLAYER PROFILE · #{player.rosterOrder || player.id}</span><h2 id="career-player-name">{player.name} <PitcherPriorityBadge player={player} record={gameData.players[player.id]}/></h2></div></div>
+    <div className="career-bio"><span>{player.class}</span><span>{player.team || 'Free agent'}</span></div>
     <dl className="career-summary">{[['SEASONS AS A SLUGGER',career.seasons],['CAREER GAMES PLAYED',career.games],['CAREER MVPs',career.mvps]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value ?? '—'}</dd></div>)}</dl>
     <details className="profile-game-data"><summary>GAME STATS & CHEMISTRY</summary><PlayerDataDetails player={player}/></details>
     <h3 className="career-title">CAREER AVERAGES</h3>

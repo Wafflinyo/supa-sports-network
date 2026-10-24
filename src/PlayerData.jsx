@@ -36,7 +36,7 @@ export function PlayerDataDetails({player}) {
   if(!record) return null
   const priority=pitcherPriorityFor(player,record)
   return <div className="player-data-details">
-    <div className="player-data-bio"><PlayerPortrait player={player} size={68}/><div><h3>{player.name} <PitcherPriorityBadge player={player} record={record}/></h3><p>{record.stats['player class']} · {player.color}{record.miiColorProfile?' · Mii color profile':''}</p><div className="priority-profile-row"><PitcherPriorityBadge player={player} record={record}/>{priority?<span>{priority.label} · pitcher-substitution priority</span>:<span>Standard pitcher fallback</span>}</div></div></div>
+    <div className="player-data-bio"><PlayerPortrait player={player} size={68}/><div><h3>{player.name} <PitcherPriorityBadge player={player} record={record}/></h3><p>{record.stats['player class']} · {player.color}{record.miiColorProfile?' · Mii color profile':''}</p><div className="priority-profile-row">{priority?<span>{priority.label} · pitcher-substitution priority</span>:<span>Standard pitcher fallback</span>}</div></div></div>
     <div className="player-data-groups">{Object.entries(categories).filter(([name])=>name!=='Chemistry').map(([name,fields])=><section key={name}><h4>{name}</h4><dl>{fields.map(key=><div key={key}><dt>{label(key)}</dt><dd>{key==='pitcher priority'?<PitcherPriorityBadge player={player} record={record}/>:formatStatValue(key,record.stats[key])}</dd></div>)}</dl></section>)}</div>
     <section className="chem-section"><h4>Good chemistry</h4><Names ids={record.goodChemistryIds}/></section>
     <section className="chem-section"><h4>Bad chemistry</h4><Names ids={record.badChemistryIds}/></section>
