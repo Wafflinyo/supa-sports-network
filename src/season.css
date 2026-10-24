@@ -477,3 +477,7 @@ details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
 .star-player-grid .needs-recharge {border-color:#b0761b; background:#fff7e5;}
 .star-selections {margin:20px 0; padding:16px; border:1px solid #dce1eb;}
 .recharge-badge {display:inline-block; color:#8a5700; font-size:13px; font-weight:700;}
+
+.star-player-description{min-width:0;flex:1}
+.star-player-description strong{font-size:14px}
+.star-player-grid .tier-portrait-wrap{margin-right:5px}

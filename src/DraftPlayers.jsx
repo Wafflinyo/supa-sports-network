@@ -40,7 +40,7 @@ export function DraftPlayers({league:l}) {
     <p className="draft-pool-count">{pool.length-ownership.size} available · {filtered.length} shown · {ownership.size} on rosters</p>
     <div className="draft-player-grid" tabIndex={0} aria-label="Scrollable draft players">
       {filtered.map(p=><button type="button" key={p.id} className={`draft-player-card${ownership.has(p.id)?' is-drafted':''}`} aria-label={`View ${p.name}${ownership.has(p.id)?' · drafted by '+ownership.get(p.id):' · available'}`} onClick={e=>{opener.current=e.currentTarget;setSelected(p);}}>
-        <PlayerPortrait player={p} size={56}/><strong>{p.name}</strong><span>{p.class}</span>{pitcherPriorityFor(p,data.players[p.id]) && <span className="draft-priority-tag" title={pitcherPriorityFor(p,data.players[p.id]).label}>{pitcherPriorityFor(p,data.players[p.id]).code} · {pitcherPriorityFor(p,data.players[p.id]).label}</span>}<small>{ownership.has(p.id)?'DRAFTED · '+ownership.get(p.id):'AVAILABLE'}</small>
+        <PlayerPortrait player={p} size={56}/><span className="draft-player-identity"><strong>{p.name}</strong>{pitcherPriorityFor(p,data.players[p.id])&&<span className="draft-priority-tag" title={pitcherPriorityFor(p,data.players[p.id]).label}>{pitcherPriorityFor(p,data.players[p.id]).code}</span>}</span><span>{p.class}</span><small>{ownership.has(p.id)?'DRAFTED · '+ownership.get(p.id):'AVAILABLE'}</small>
       </button>)}
       {!filtered.length&&<p>No players match these filters.</p>}
     </div>

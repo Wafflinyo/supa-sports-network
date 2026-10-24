@@ -927,7 +927,7 @@ function LineupEditor({ league: l, team, game, onDone }) {
             <option value="">Choose player</option>
             {roster.map((p) => (
               <option key={p} value={p}>
-                {name(p)}{game?.id && s.starCoins?.games?.[game.id]?.[team]?.recharging?.includes(p) ? " ↻ Recharge · 6 coins" : ""}
+                {name(p)}{game?.id && Number(s.starCoins?.games?.[game.id]?.[team]?.remainingByPlayer?.[p]||0)>0 ? ` ↻ ${s.starCoins?.games?.[game.id]?.[team]?.priceByPlayer?.[p]} coins incl. bypass` : ""}
               </option>
             ))}
           </select>

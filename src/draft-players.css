@@ -2,3 +2,6 @@
 
 .draft-stage-picker{display:flex;flex-wrap:wrap;align-items:end;gap:12px;padding:16px;border:1px solid var(--line,#dadada);border-radius:12px;margin:12px 0;background:var(--panel,#fafafa)}
 .draft-stage-picker h3,.draft-stage-picker p{flex-basis:100%;margin:0}.draft-stage-picker label{display:flex;flex-direction:column;gap:6px;min-width:220px}.draft-stage-picker select{padding:9px}
+
+.draft-player-identity{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px;min-width:0}
+.draft-player-identity .draft-priority-tag{display:inline-block;border-radius:4px;padding:2px 4px;background:#192440;color:white;font-size:10px}
