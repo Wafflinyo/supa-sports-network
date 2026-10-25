@@ -4,6 +4,7 @@ import players from './players.json'
 import data from './player-data.json'
 import {PlayerPortrait} from './PlayerPortrait.jsx'
 import {abilityLabel, pitcherPriorityFor, pitcherPriorityText} from './player-roles.js'
+import {chemistryDisplayName, chemistryDisplayNames} from './chemistry-names.js'
 
 const byId = new Map(players.map(p=>[p.id,p]))
 const categories = {
@@ -29,7 +30,8 @@ export function PitcherPriorityBadge({player,record}) {
   return priority ? <span className={`pitcher-priority-badge ${priority.code.toLowerCase()}`} title={priority.label} aria-label={priority.label}>{priority.code}</span> : null
 }
 function Names({ids}) {
-  return ids.length ? <span className="chem-names">{ids.map(id=><span key={id}>{byId.get(id).name}</span>)}</span> : <span className="muted">None</span>
+  const groupedNames = chemistryDisplayNames(ids, byId)
+  return groupedNames.length ? <span className="chem-names">{groupedNames.map(label=><span key={label}>{label}</span>)}</span> : <span className="muted">None</span>
 }
 export function PlayerDataDetails({player}) {
   const record=data.players[player.id]
@@ -52,7 +54,8 @@ export default function PlayerData() {
   const [selected,setSelected]=useState(null)
   const filtered=useMemo(()=>players.filter(p=>{
     const record=data.players[p.id]
-    const searchNames=category==='Chemistry'?[p.name,...record.goodChemistryIds.map(id=>byId.get(id).name),...record.badChemistryIds.map(id=>byId.get(id).name),...record.conditionalGoodChemistryIds.map(id=>byId.get(id).name)]:[p.name]
+    const chemistryIds=[...record.goodChemistryIds,...record.badChemistryIds,...record.conditionalGoodChemistryIds]
+    const searchNames=category==='Chemistry'?[p.name,...chemistryIds.flatMap(id=>{const chemPlayer=byId.get(id);return chemPlayer?[chemPlayer.name,chemistryDisplayName(chemPlayer)]:[]})]:[p.name]
     return (classFilter==='All classes'||p.class===classFilter)&&(priorityFilter==='All pitcher priorities'||pitcherPriorityText(p,record)===priorityFilter)&&searchNames.some(name=>name.toLowerCase().includes(query.toLowerCase().trim()))
   }).sort((a,b)=>{
     const av=sortStatValue(a,sort.key), bv=sortStatValue(b,sort.key)
