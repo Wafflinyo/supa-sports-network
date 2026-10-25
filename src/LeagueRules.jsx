@@ -31,6 +31,12 @@ const sections = [
     'Pitcher substitution priority guide: P1P (Priority 1 Pitcher) identifies the 12 captains; captains have first replacement priority when a pitcher tires. P2P (Priority 2 Pitcher) identifies non-captains with a displayed pitching rating of 7 or higher; they come next. When neither group is available, the replacement is random. These roster labels help GMs plan lineups; the website does not operate or alter Dolphin substitutions.',
     'A lineup locks when the commissioner uploads that game’s results, even if those results remain hidden ahead of a premiere. After results are published, the team prepares for its next scheduled game. Player transactions prompt a review of the default lineup; picks-only trades do not.'
   ]],
+  ['Schedule, matchup labels and team records', [
+    'After the draft the commissioner generates 132 home-and-away matchups across Weeks 1–22, with six games per week. The generator assigns opponents, home teams and week numbers, but DOES NOT choose game dates.',
+    'The commissioner enters the actual date and time for each individual game in Schedule & Results. No matchup can be published until all 132 dates are entered and each game is placed within its assigned numbered week. Week 1 begins on a Sunday in Eastern Time.',
+    'The Schedule labels games In Conference Matchup when both teams belong to the same conference and Out of Conference Matchup when their conferences differ.',
+    'Team Stats displays regular-season Home Record (wins–losses) and Away Record (wins–losses). Home and away records are cumulative team statistics, not per-game averages.',
+  ]],
   ['Heating Up and hot streaks', [
     'After every official game, the commissioner adds each player’s Project Rio in-game Game Score to the Stats worksheet. A score of 90 or higher automatically makes that player starred for their next team game. Fantasy points do not count as Game Score.',
     'Heating Up is automatic, with no manager selection, coin balance, player tier, recharge period, cost, or limit on the number of qualifying players.',

@@ -93,11 +93,15 @@ export function aggregate(season) {
   }
   return stats;
 }
+export function matchupType(season,game){
+  const a=season?.teams?.find(t=>t.id===game?.away),b=season?.teams?.find(t=>t.id===game?.home);
+  if(!a?.conference||!b?.conference)return 'Conference Pending';
+  return a.conference===b.conference?'In Conference Matchup':'Out of Conference Matchup';
+}
 export function standings(season) {
   return (season?.teams || [])
     .map((t) => {
-      let wins = 0,
-        losses = 0,
+      let wins=0,losses=0,homeWins=0,homeLosses=0,awayWins=0,awayLosses=0,
         runsFor = 0,
         runsAgainst = 0;
       for (const g of season.games) {
@@ -111,12 +115,14 @@ export function standings(season) {
           b = g.result.scores[g.away === t.id ? g.home : g.away];
         runsFor += a;
         runsAgainst += b;
-        a > b ? wins++ : losses++;
+        if(a>b){wins++;if(g.home===t.id)homeWins++;else awayWins++;}
+        else if(a<b){losses++;if(g.home===t.id)homeLosses++;else awayLosses++;}
       }
       return {
         ...t,
         wins,
         losses,
+        homeWins,homeLosses,awayWins,awayLosses,
         runsFor,
         runsAgainst,
         pct: wins + losses ? wins / (wins + losses) : 0,

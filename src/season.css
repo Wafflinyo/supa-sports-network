@@ -493,3 +493,38 @@ details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
 .roster-fixture details{margin:12px 0;padding:9px 12px;border:1px solid #e1e6ed}
 .roster-lock-status{color:#67758b;font-size:13px}
 @media(max-width:620px){.roster-fixture-heading{align-items:stretch;flex-direction:column}.roster-fixture-heading button{width:100%}.roster-manager-players{grid-template-columns:1fr}}
+
+/* Matchup-first, commissioner-scheduled 22 week slate */
+.schedule-week-heading{display:flex;justify-content:space-between;gap:12px;align-items:baseline;background:#182b4c;color:white;margin:24px 0 8px;padding:12px 18px;border-left:5px solid #edbf4b;font:900 25px 'Barlow Condensed',Impact,sans-serif;letter-spacing:.055em}
+.schedule-week-heading small{color:#d2dcf1;font-size:12px;letter-spacing:.08em}
+.game-date-editor{margin:14px 0}
+.game-date-editor>button{max-width:100%}
+.game-date-editor form{margin:12px 0;max-width:500px;padding:15px;background:#f2f5fa;border-radius:6px;border:1px solid #d9dfeb}
+.matchup-conference{display:flex;align-items:center;gap:7px;text-transform:uppercase;color:#2a3f66;font-size:12px;font-weight:850;letter-spacing:.035em}
+.schedule-anchor-settings{margin-top:16px;padding:12px 14px;border:1px solid #dbe2ec;border-radius:6px}
+.schedule-anchor-settings>summary{font-weight:850;cursor:pointer;color:#132e55}
+
+/* Draft lottery: real franchise logos printed on modeled bingo balls. Server chooses order. */
+.lottery-reveal-bingo{display:grid;grid-template-columns:minmax(180px,250px) minmax(0,1fr);gap:24px;padding:16px 24px;align-items:center}
+.bingo-machine{height:240px;position:relative;display:grid;place-items:center;isolation:isolate}
+.bingo-drum{position:relative;width:194px;height:194px;border:9px solid #efbd51;border-radius:50%;background:radial-gradient(circle at 25% 20%,#ffffff18,#081a38aa 72%),repeating-linear-gradient(0deg,transparent 0 19px,#ffffff36 20px 22px);box-shadow:inset 0 0 0 3px #9c651f,0 9px 17px #0008;transform-origin:center}
+.bingo-drum:before,.bingo-drum:after{content:"";position:absolute;z-index:0;left:50%;top:50%;width:140px;height:7px;border-radius:3px;background:#f2cc72;transform:translate(-50%,-50%) rotate(45deg);opacity:.7}
+.bingo-drum:after{transform:translate(-50%,-50%) rotate(-45deg)}
+.bingo-drum-spinning{animation:bingo-rotate 3.2s linear infinite}
+.bingo-cage-ball{position:absolute;display:grid;place-items:center;left:calc(50% - 18px);top:calc(50% - 18px);width:36px;height:36px;border-radius:50%;border:2px solid #fff0b2;background:radial-gradient(circle at 28% 22%,#fffbe4,#ffca37 63%,#b87514);box-shadow:inset -2px -4px 4px #9257136b,0 2px 5px #0008;transform:rotate(var(--ball-angle)) translateY(-66px) rotate(calc(-1 * var(--ball-angle)));z-index:1;overflow:hidden}
+.bingo-cage-ball img{width:29px;height:29px;object-fit:contain;filter:drop-shadow(0 1px 1px #3333)}
+.bingo-crank{position:absolute;right:2px;top:95px;width:26px;height:9px;background:#dfaa48;box-shadow:7px 0 0 #fff1ba}
+.bingo-machine-base{position:absolute;bottom:0;width:140px;height:13px;background:linear-gradient(#f6ca67,#88551f);border-radius:5px;box-shadow:0 3px 3px #0008}
+.bingo-announcement{min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px}
+.bingo-announcement-heading{font-size:13px;font-weight:950;letter-spacing:.15em;color:#ffd86e}
+.bingo-announcement .lottery-ball{width:100px;height:100px;animation:none;display:grid;place-items:center;font-size:35px;overflow:hidden}
+.bingo-announcement .lottery-ball img{width:76px;height:76px;object-fit:contain;filter:drop-shadow(0 2px 1px #0005)}
+.bingo-announcement strong{overflow-wrap:anywhere;font:900 23px 'Barlow Condensed',Impact,sans-serif}
+.bingo-announcement small{font-size:12px;color:#e1d7bd}
+.bingo-ball-drawn{animation:bingo-draw-pop .65s cubic-bezier(.2,1.8,.5,1) both!important}
+.lottery-result-team{display:flex;align-items:center;gap:7px}
+.lottery-result-team img{width:29px;height:29px;object-fit:contain}
+@keyframes bingo-rotate{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes bingo-draw-pop{from{transform:translateY(-25px) scale(.55);opacity:.25}to{transform:translateY(0) scale(1);opacity:1}}
+@media(max-width:600px){.lottery-reveal-bingo{grid-template-columns:1fr;padding:15px}.bingo-machine{height:206px}.bingo-drum{width:166px;height:166px}.bingo-cage-ball{transform:rotate(var(--ball-angle)) translateY(-57px) rotate(calc(-1 * var(--ball-angle))) }}
+@media(prefers-reduced-motion:reduce){.bingo-drum-spinning,.bingo-ball-drawn{animation:none!important}}
