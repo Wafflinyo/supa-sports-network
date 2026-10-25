@@ -293,7 +293,7 @@ export function BroadcastControls({ league: l, game: g }) {
           SAVE BROADCAST
         </button>
       </form>
-      {["scheduled","live","recorded"].includes(g.stage) && <button type="button" className="outline-btn" disabled={l.busy} onClick={()=>{if(confirm("Cancel this game and release or refund its Star Coins?")) l.act("cancel_game",{game:g.id});}}>CANCEL GAME & REFUND STARS</button>}
+      {["scheduled","live","recorded"].includes(g.stage) && <button type="button" className="outline-btn" disabled={l.busy} onClick={()=>{if(confirm("Cancel this unreleased game?")) l.act("cancel_game",{game:g.id});}}>CANCEL GAME</button>}
       {g.stage === "recorded" && (
         <button
           className="red-btn"

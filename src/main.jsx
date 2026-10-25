@@ -2,6 +2,9 @@ import PwaInstall from './PwaInstall.jsx'
 import {fantasySeasonReady} from './fantasy-scoring.js'
 import {useSeasonLeague,SeasonWorkspace,SeasonPage,SeasonPrompts,SeasonTeamTools,SeasonHome,SeasonSelector,seasonPages} from './SeasonLeague.jsx'
 import {aggregate,fantasyGames} from './season-data.js'
+import {heatingUpForSeason} from './heating-up.js'
+import {HeatingUpProvider,HeatFlame} from './HeatingUpBadge.jsx'
+import {leagueNews} from './league-news.js'
 import PlayerData from './PlayerData.jsx'
 import {PlayerPriority} from './PlayerPriority.jsx'
 import {PlayerPortrait} from './PlayerPortrait.jsx'
@@ -53,6 +56,7 @@ const statGroups = {
     ['buddyJumpAttempts', 'Buddy Jump Attempts'], ['doublePlays', 'Double Plays'],
     ['triplePlays', 'Triple Plays'], ['bobbles', 'Bobbles'],
   ],
+  'Heating Up': [['heatingUpCount','Times Heated Up'],['hotStreaks','Hot Streaks (2+)'],['longestHotStreak','Longest Hot Streak'],['currentHotStreak','Current Streak']],
   'Pitching Stats': [
     ['positionsPlayed', 'Position(s) Played'], ['gamesPlayed', 'Games Played'], ['mvps', 'MVPs'], ['battersFaced', 'Batters Faced'], ['inningsPitched', 'Innings Pitched'],
     ['pitches', 'Pitches'], ['strikes', 'Strikes'], ['balls', 'Balls'],
@@ -74,7 +78,7 @@ const perGameOnly = new Set(['battingAverage', 'onBase', 'slug', 'onBasePlusSlug
 
 function statValue(player, key, view) {
   const total = player.stats?.[key] ?? player[key]
-  if (key === 'gamesPlayed') return total ?? null
+  if (key === 'gamesPlayed' || ['heatingUpCount','hotStreaks','longestHotStreak','currentHotStreak'].includes(key)) return total ?? null
   if (view === 'Totals') return total ?? null
   const perGame = player.perGame?.[key]
   if (perGame != null) return perGame
@@ -86,7 +90,7 @@ function statValue(player, key, view) {
 
 function displayStat(value, view, key) {
   if (value == null) return '—'
-  if (key === 'gamesPlayed') return value
+  if (key === 'gamesPlayed' || ['heatingUpCount','hotStreaks','longestHotStreak','currentHotStreak'].includes(key)) return value
   if(key==='positionsPlayed')return Array.isArray(value)?value.join(', '):value
   if(view==='Totals'&&perGameOnly.has(key)&&typeof value==='number')return value.toFixed(key==='inningsPitched'?2:3)
   return view === 'Averages per Game' && typeof value === 'number'
@@ -133,7 +137,11 @@ function App() {
   useEffect(()=>{loadOfficialTeams();const timer=setInterval(loadOfficialTeams,15000);return()=>clearInterval(timer)},[])
   const seasonLeague=useSeasonLeague(supabase,{...access,signedIn:!!session})
   const seasonStats=useMemo(()=>aggregate(seasonLeague.season),[seasonLeague.season])
-  const players=useMemo(()=>basePlayers.map(p=>{const stats=seasonStats[p.id];return {...p,...stats,stats,team:seasonLeague.season?.teams.find(t=>seasonLeague.season.rosters[t.id]?.includes(p.id))?.name,perGame:stats?Object.fromEntries(Object.entries(stats).filter(([,v])=>typeof v==='number').map(([k,v])=>[k,perGameOnly.has(k)&&k!=='inningsPitched'?v:v/stats.gamesPlayed])):null}}),[seasonStats,seasonLeague.season])
+  const seasonHeating=useMemo(()=>heatingUpForSeason(seasonLeague.season),[seasonLeague.season])
+  const hotIds=useMemo(()=>new Set(Object.entries(seasonHeating.players).filter(([,r])=>r.currentHotStreak>0).map(([id])=>Number(id))),[seasonHeating])
+  const newsItems=useMemo(()=>leagueNews(seasonLeague.seasons,playerPool),[seasonLeague.seasons])
+  const [showAllNews,setShowAllNews]=useState(false)
+  const players=useMemo(()=>basePlayers.map(p=>{const base=seasonStats[p.id],heat=seasonHeating.players[p.id];const stats=base?{...base,...(heat||{})}:heat;return {...p,...stats,stats,team:seasonLeague.season?.teams.find(t=>seasonLeague.season.rosters[t.id]?.includes(p.id))?.name,perGame:base?Object.fromEntries(Object.entries(base).filter(([,v])=>typeof v==='number').map(([k,v])=>[k,perGameOnly.has(k)&&k!=='inningsPitched'?v:v/base.gamesPlayed])):null}}),[seasonStats,seasonLeague.season,seasonHeating])
   const careerSeasons=useMemo(()=>seasonLeague.seasons.map(s=>({id:s.id,playerStats:aggregate(s)})),[seasonLeague.seasons])
   const liveGames=useMemo(()=>fantasyGames(seasonLeague.seasons),[seasonLeague.seasons])
   const fantasyEligible=new Set(Object.values(seasonLeague.seasons.find(s=>s.status!=='archived')?.rosters||{}).flat())
@@ -201,7 +209,7 @@ function App() {
     setJoinCode(''); setMessage('You joined the league.'); await loadLeagues()
   }
   const hasOfficialStats = players.some(player => (player.gamesPlayed ?? 0) > 0)
-  const categorySort = statTab === 'Pitching Stats' ? {key:'era7',direction:'asc'} : statTab === 'Defensive Stats' ? {key:'putouts',direction:'desc'} : {key:'battingAverage',direction:'desc'}
+  const categorySort = statTab === 'Heating Up' ? {key:'heatingUpCount',direction:'desc'} : statTab === 'Pitching Stats' ? {key:'era7',direction:'asc'} : statTab === 'Defensive Stats' ? {key:'putouts',direction:'desc'} : {key:'battingAverage',direction:'desc'}
   const activeSort = sort.key === 'default' ? (hasOfficialStats ? categorySort : {key:'id',direction:'asc'}) : sort
   const filtered = useMemo(() => players.filter(p => `${p.name} ${p.class}`.toLowerCase().includes(query.toLowerCase())).sort((a,b) => {
     const av = activeSort.key === 'pitcherPriority' ? (pitcherPriorityFor(a,gameData.players[a.id])?.order || 3) : statGroups[statTab].some(([key]) => key === activeSort.key) ? statValue(a, activeSort.key, statView) : a[activeSort.key === 'id' ? 'rosterOrder' : activeSort.key]
@@ -214,7 +222,7 @@ function App() {
   function sortBy(key) { setSort(s => ({ key, direction: s.key === key && s.direction === 'desc' ? 'asc' : 'desc' })) }
   function go(next) { if (!canViewLeaguePage(next, !!session, access.role)) return; window.history.replaceState(null, '', window.location.pathname); setPage(next); setMenu(false); setMessage(''); window.scrollTo({top: 0, behavior: 'smooth'}) }
   const logo = `${import.meta.env.BASE_URL}sluggers-supa-league-logo.svg`
-  return <>
+  return <HeatingUpProvider ids={hotIds}>
     <div className="topline"><div className="container topline-inner"><span><i className="live-dot"/> SLUGGERS SUPA LEAGUE</span><span>THE LEAGUE STARTS HERE <b>★</b></span><button onClick={() => setAuthOpen(true)}>{session ? session.user.email?.split('@')[0] : 'SIGN IN / JOIN'}</button></div></div>
     <header className="masthead"><div className="container masthead-inner"><button className="brand" onClick={() => go('Home')}><img src={logo} alt="Sluggers Supa League logo"/><span><strong>SLUGGERS <em>SUPA</em> LEAGUE</strong><small>THE OFFICIAL LEAGUE HUB</small></span></button><button className="mobile-menu" aria-label={menu ? "Close menu" : "Open menu"} aria-expanded={menu} aria-controls="league-main-navigation" onClick={() => setMenu(!menu)}>{menu ? <X/> : <Menu/>}<span>MENU</span></button><div className="masthead-right"><span className="league-tag">MARIO SUPER SLUGGERS</span><span className="badge-star">★</span></div></div></header>
     <nav id="league-main-navigation" className={`nav ${menu ? 'open' : ''}`} aria-label="Main navigation"><div className="container nav-inner">{visibleNav.map(n => <button key={n} className={page === n ? 'active' : ''} aria-current={page === n ? 'page' : undefined} onClick={() => go(n)}>{n}</button>)}</div></nav>
@@ -237,7 +245,16 @@ function App() {
       {page === 'Home' && <><SeasonHome league={seasonLeague} go={go}/>
         <div className="home-grid"><div className="hero"><div className="hero-content"><span className="eyebrow">WELCOME TO THE LEAGUE</span><h1>THE GAME<br/><span>STARTS HERE.</span></h1><p>Follow every game, explore the player pool, and manage your fantasy league in one place.</p><button className="yellow-btn" onClick={() => go('Player Stats')}>EXPLORE PLAYERS <span>›</span></button></div><div className="hero-number">01</div></div>
           <div className="side-stack"><div className="panel compact"><SectionTitle kicker="ON DECK" right={<CalendarDays size={19}/>}>UPCOMING MATCHES</SectionTitle>{seasonLeague.season?<p className="season-box">{seasonLeague.season.games.filter(g=>g.stage!=='final').length} upcoming games · <button className="text-link" onClick={()=>go('Schedule')}>VIEW SCHEDULE ›</button></p>:<Empty title="Schedule coming soon">Matchups will appear when the season schedule is set.</Empty>}</div><div className="panel compact"><SectionTitle kicker="FINAL SCORES" right={<Trophy size={19}/>}>RECENT RESULTS</SectionTitle>{seasonLeague.season?<p className="season-box">{seasonLeague.season.games.filter(g=>g.stage==='final').length} completed games · <button className="text-link" onClick={()=>go('Schedule')}>VIEW RESULTS ›</button></p>:<Empty icon={Trophy} title="No games yet">Results will appear after the first game is uploaded.</Empty>}</div></div></div>
-        <div className="home-bottom"><div className="panel news-panel"><SectionTitle kicker="FROM AROUND THE LEAGUE">LATEST NEWS</SectionTitle><div className="news-item"><span className="news-mark">★</span><div><small>LEAGUE UPDATE</small><h3>The player pool is ready</h3><p>Browse all {players.length} players before teams and the season schedule are announced.</p></div><button aria-label="Browse players" onClick={() => go('Player Stats')}>›</button></div></div><div className="panel standings-panel"><SectionTitle kicker="THE RACE" right={<button className="text-link" onClick={() => go('Standings')}>FULL STANDINGS ›</button>}>STANDINGS</SectionTitle>{seasonLeague.season?<p className="season-box">{seasonLeague.season.teams.length} season teams · <button className="text-link" onClick={()=>go('Standings')}>VIEW TABLE ›</button></p>:<Empty icon={Shield} title="Teams coming soon">Standings begin when teams and results are added.</Empty>}</div></div>
+        <div className="home-bottom"><div className="panel news-panel"><SectionTitle kicker="FROM AROUND THE LEAGUE">LEAGUE NEWS FEED</SectionTitle>
+          {newsItems.length ? <><div className="league-news-scroll" aria-label="Official league news">
+            {(showAllNews?newsItems:newsItems.slice(0,8)).map(item=><article key={item.id} className={`news-item news-item-live news-${item.category}`}>
+              <span className="news-mark" aria-hidden="true">{item.category==='heating'?<HeatFlame/>:item.category==='trade'?<Shield size={27}/>:item.category==='pitching'?<Trophy size={27}/>:<Trophy size={27}/>}</span>
+              <div className="news-copy"><small>{item.label}{item.at?' · '+new Date(item.at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):''}</small><h3>{item.title}</h3><p>{item.summary}</p></div>
+              <button aria-label={item.playerId?'View player profile':'View trades'} title={item.playerId?'Player profile':'Transactions'} onClick={()=>{if(item.playerId){const p=players.find(x=>x.id===item.playerId);if(p)setSelectedPlayer(p)}else go('Transactions')}}>›</button>
+            </article>)}
+            </div>{newsItems.length>8&&<button className="outline-btn news-more" onClick={()=>setShowAllNews(v=>!v)}>{showAllNews?'SHOW RECENT NEWS':`VIEW ALL ${newsItems.length} HEADLINES`}</button>}</>
+          : <div className="news-item"><span className="news-mark"><Trophy size={26}/></span><div><small>LEAGUE UPDATE</small><h3>The player pool is ready</h3><p>Game highlights, Heating Up alerts and completed trades will appear here when official results are released.</p></div><button aria-label="Browse players" onClick={()=>go('Player Stats')}>›</button></div>}
+          </div><div className="panel standings-panel"><SectionTitle kicker="THE RACE" right={<button className="text-link" onClick={() => go('Standings')}>FULL STANDINGS ›</button>}>STANDINGS</SectionTitle>{seasonLeague.season?<p className="season-box">{seasonLeague.season.teams.length} season teams · <button className="text-link" onClick={()=>go('Standings')}>VIEW TABLE ›</button></p>:<Empty icon={Shield} title="Teams coming soon">Standings begin when teams and results are added.</Empty>}</div></div>
       </>}
       {page === 'League Rules' && <LeagueRules/>}
       {page === 'Player Data' && <><button className="outline-btn" onClick={()=>go('Player Stats')}>BACK TO PLAYER STATS</button><PlayerData/></>}
@@ -261,9 +278,9 @@ function App() {
     </main>
     <PwaInstall/>
     <footer><div className="container footer-inner"><span>SLUGGERS <b>SUPA</b> LEAGUE</span><small>LEAGUE DATA AND FANTASY HUB</small></div></footer>
-    {selectedPlayer && <PlayerProfile careerSeasons={careerSeasons} player={players.find(p=>p.id===selectedPlayer.id)||selectedPlayer} PlayerAvatar={PlayerAvatar} onClose={() => setSelectedPlayer(null)}/>}
+    {selectedPlayer && <PlayerProfile careerSeasons={careerSeasons} fullSeasons={seasonLeague.seasons} player={players.find(p=>p.id===selectedPlayer.id)||selectedPlayer} PlayerAvatar={PlayerAvatar} onClose={() => setSelectedPlayer(null)}/>}
     {authOpen && <AccountDialog supabase={supabase} session={session} onClose={() => setAuthOpen(false)} onAccess={next=>{setAccess(next);if(next.role==='gm')setTeamWelcomeSeen(false)}}/>}
-  </>
+  </HeatingUpProvider>
 }
 function BasicPage({ kicker, title, icon, empty, detail }) { return <><div className="page-heading"><span className="eyebrow dark">{kicker}</span><h1>{title}</h1></div><div className="panel basic-panel"><Empty icon={icon} title={empty}>{detail}</Empty></div></> }
 

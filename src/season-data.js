@@ -210,7 +210,10 @@ export async function readRio(file, season, game, players) {
     });
     return out;
   }
-  const bat = rows("Stats").filter(
+  const rawBat = rows("Stats");
+  if (!rawBat.some(r => r.gamescore != null || r.ingamescore != null))
+    throw Error('Add a "Game Score" column to the Project Rio Stats worksheet with each player\'s in-game score (not fantasy points).');
+  const bat = rawBat.filter(
       (r) =>
         r.player &&
         r.position &&
@@ -299,6 +302,10 @@ export function buildReport(preview, awayLabel, season, game, players, mvp) {
       if (counts.has(key) && key !== "mvps")
         stats[key] = numeric(r, key, "batting");
     stats.mvps = player === Number(mvp) ? 1 : 0;
+    const rawGameScore = r.gamescore ?? r.ingamescore;
+    const gameScore = Number(rawGameScore);
+    if (rawGameScore == null || String(rawGameScore).trim() === '' || !Number.isFinite(gameScore) || gameScore < 0 || gameScore > 999.99)
+      throw Error(`${r.player}: enter a valid Game Score (0–999.99) on the Stats worksheet.`);
     stats.starBases = Number(r.starbaseshelper || 0);
     stats.totalBases =
       stats.singles +
@@ -324,6 +331,7 @@ export function buildReport(preview, awayLabel, season, game, players, mvp) {
     result.push({
       player,
       team,
+      gameScore,
       positions: String(r.position)
         .split(/[\/,;→\-]+/)
         .map((x) => x.trim())
