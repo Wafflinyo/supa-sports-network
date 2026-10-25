@@ -137,9 +137,9 @@ function App() {
   useEffect(()=>{loadOfficialTeams();const timer=setInterval(loadOfficialTeams,15000);return()=>clearInterval(timer)},[])
   const seasonLeague=useSeasonLeague(supabase,{...access,signedIn:!!session})
   const seasonStats=useMemo(()=>aggregate(seasonLeague.season),[seasonLeague.season])
-  const seasonHeating=useMemo(()=>heatingUpForSeason(seasonLeague.season),[seasonLeague.season])
+  const seasonHeating=useMemo(()=>heatingUpForSeason(seasonLeague.season,{includeRecorded:access.role==='commissioner'}),[seasonLeague.season,access.role])
   const hotIds=useMemo(()=>new Set(Object.entries(seasonHeating.players).filter(([,r])=>r.currentHotStreak>0).map(([id])=>Number(id))),[seasonHeating])
-  const newsItems=useMemo(()=>leagueNews(seasonLeague.seasons,playerPool),[seasonLeague.seasons])
+  const newsItems=useMemo(()=>leagueNews(seasonLeague.seasons,playerPool,{includeRecorded:access.role==='commissioner'}),[seasonLeague.seasons,access.role])
   const [showAllNews,setShowAllNews]=useState(false)
   const players=useMemo(()=>basePlayers.map(p=>{const base=seasonStats[p.id],heat=seasonHeating.players[p.id];const stats=base?{...base,...(heat||{})}:heat;return {...p,...stats,stats,team:seasonLeague.season?.teams.find(t=>seasonLeague.season.rosters[t.id]?.includes(p.id))?.name,perGame:base?Object.fromEntries(Object.entries(base).filter(([,v])=>typeof v==='number').map(([k,v])=>[k,perGameOnly.has(k)&&k!=='inningsPitched'?v:v/base.gamesPlayed])):null}}),[seasonStats,seasonLeague.season,seasonHeating])
   const careerSeasons=useMemo(()=>seasonLeague.seasons.map(s=>({id:s.id,playerStats:aggregate(s)})),[seasonLeague.seasons])
@@ -249,7 +249,7 @@ function App() {
           {newsItems.length ? <><div className="league-news-scroll" aria-label="Official league news">
             {(showAllNews?newsItems:newsItems.slice(0,8)).map(item=><article key={item.id} className={`news-item news-item-live news-${item.category}`}>
               <span className="news-mark" aria-hidden="true">{item.category==='heating'?<HeatFlame/>:item.category==='trade'?<Shield size={27}/>:item.category==='pitching'?<Trophy size={27}/>:<Trophy size={27}/>}</span>
-              <div className="news-copy"><small>{item.label}{item.at?' · '+new Date(item.at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):''}</small><h3>{item.title}</h3><p>{item.summary}</p></div>
+              <div className="news-copy"><small>{item.label}{item.private?' · PRIVATE PREVIEW':''}{item.at?' · '+new Date(item.at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):''}</small><h3>{item.title}</h3><p>{item.summary}</p></div>
               <button aria-label={item.playerId?'View player profile':'View trades'} title={item.playerId?'Player profile':'Transactions'} onClick={()=>{if(item.playerId){const p=players.find(x=>x.id===item.playerId);if(p)setSelectedPlayer(p)}else go('Transactions')}}>›</button>
             </article>)}
             </div>{newsItems.length>8&&<button className="outline-btn news-more" onClick={()=>setShowAllNews(v=>!v)}>{showAllNews?'SHOW RECENT NEWS':`VIEW ALL ${newsItems.length} HEADLINES`}</button>}</>
@@ -278,7 +278,7 @@ function App() {
     </main>
     <PwaInstall/>
     <footer><div className="container footer-inner"><span>SLUGGERS <b>SUPA</b> LEAGUE</span><small>LEAGUE DATA AND FANTASY HUB</small></div></footer>
-    {selectedPlayer && <PlayerProfile careerSeasons={careerSeasons} fullSeasons={seasonLeague.seasons} player={players.find(p=>p.id===selectedPlayer.id)||selectedPlayer} PlayerAvatar={PlayerAvatar} onClose={() => setSelectedPlayer(null)}/>}
+    {selectedPlayer && <PlayerProfile careerSeasons={careerSeasons} fullSeasons={seasonLeague.seasons} includeRecorded={access.role==='commissioner'} player={players.find(p=>p.id===selectedPlayer.id)||selectedPlayer} PlayerAvatar={PlayerAvatar} onClose={() => setSelectedPlayer(null)}/>}
     {authOpen && <AccountDialog supabase={supabase} session={session} onClose={() => setAuthOpen(false)} onAccess={next=>{setAccess(next);if(next.role==='gm')setTeamWelcomeSeen(false)}}/>}
   </HeatingUpProvider>
 }

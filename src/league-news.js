@@ -1,12 +1,12 @@
 // Derived newsroom: no stored duplicate headlines when a report is corrected.
 // Only released final games are visible; private recorded games remain embargoed.
-export function leagueNews(seasons, players) {
+export function leagueNews(seasons, players,{includeRecorded=false}={}) {
   const pool=new Map(players.map(p=>[Number(p.id),p.name]));
   const items=[];
   for(const season of seasons||[]) {
     const teamName=id=>season.teams?.find(t=>t.id===id)?.name||'the opposing team';
     for(const game of season.games||[]) {
-      if(game.stage!=='final'||!Array.isArray(game.result?.players))continue;
+      if(!(game.stage==='final'||(includeRecorded&&game.stage==='recorded'))||!Array.isArray(game.result?.players))continue;
       const at=game.releasedAt||game.result.postedAt||game.startsAt;
       for(const row of game.result.players) {
         const playerId=Number(row.player),player=pool.get(playerId)||'A player',stats=row.stats||{};
@@ -15,7 +15,7 @@ export function leagueNews(seasons, players) {
         const key=`game:${game.id}:${playerId}`;
         const add=(category,label,title,summary)=>items.push({
           id:`${key}:${category}`,category,label,title,summary,at,season:season.name,
-          gameId:game.id,playerId,teamId:row.team,
+          gameId:game.id,playerId,teamId:row.team,private:game.stage==='recorded',
         });
         if(row.gameScore!=null&&Number.isFinite(score)&&score>=90)
           add('heating','HEATING UP',`${player} is heating up!`,

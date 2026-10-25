@@ -1,12 +1,12 @@
 // Official Project Rio in-game Game Score, not fantasy points. All values
 // derive from posted reports so corrections automatically recalculate history.
 export const HEATING_UP_THRESHOLD = 90;
-export function heatingUpForSeason(season) {
+export function heatingUpForSeason(season,{includeRecorded=false}={}) {
   const players={},byGame={},ready={},lastEarned={};
   const ordered=[...(season?.games||[])].filter(g=>g.stage!=='cancelled')
     .sort((a,b)=>Date.parse(a.startsAt||0)-Date.parse(b.startsAt||0)||String(a.id).localeCompare(String(b.id)));
   for(const g of ordered){
-    const finalized=g.stage==='final'&&Array.isArray(g.result?.players);
+    const finalized=(g.stage==='final'||(includeRecorded&&g.stage==='recorded'))&&Array.isArray(g.result?.players);
     const appearances=new Map((finalized?g.result.players:[]).map(p=>[Number(p.player),p]));
     byGame[g.id]={};
     for(const team of [g.away,g.home]){
@@ -38,11 +38,11 @@ export function heatingUpForSeason(season) {
   return {players,byGame,events:Object.values(players).flatMap(r=>r.events)
     .sort((a,b)=>Date.parse(b.at||0)-Date.parse(a.at||0))};
 }
-export function heatingUpCareer(id,seasons){
+export function heatingUpCareer(id,seasons,options={}){
   let heatingUpCount=0,hotStreaks=0,longestHotStreak=0,currentHotStreak=0;
   const events=[];
   for(const s of [...seasons].sort((a,b)=>(a.number||0)-(b.number||0))){
-    const r=heatingUpForSeason(s).players[id];if(!r)continue;
+    const r=heatingUpForSeason(s,options).players[id];if(!r)continue;
     heatingUpCount+=r.heatingUpCount;hotStreaks+=r.hotStreaks;
     longestHotStreak=Math.max(longestHotStreak,r.longestHotStreak);
     currentHotStreak=r.currentHotStreak;

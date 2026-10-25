@@ -866,14 +866,14 @@ function Draft({ league: l }) {
   );
 }
 
-function HeatingStatus({season,game,team}) {
-  const ids=heatingUpForSeason(season).byGame[game.id]?.[team]||[];
+function HeatingStatus({season,game,team,includeRecorded=false}) {
+  const ids=heatingUpForSeason(season,{includeRecorded}).byGame[game.id]?.[team]||[];
   return <p className="heating-up-status"><strong>★ HEATING UP · Next-game stars:</strong> {ids.length?ids.map(name).join(' · '):'None earned yet'} <small>Automatic from previous game scores of 90+.</small></p>;
 }
 function HeatingUpPage({league:l}) {
   const season=l.season;
   if(!season)return <Box title="HEATING UP"><p>No season available yet.</p></Box>;
-  const heat=heatingUpForSeason(season);
+  const heat=heatingUpForSeason(season,{includeRecorded:l.access.role==='commissioner'});
   const entries=Object.entries(heat.players).filter(([,v])=>v.heatingUpCount>0)
     .sort((a,b)=>b[1].heatingUpCount-a[1].heatingUpCount||b[1].longestHotStreak-a[1].longestHotStreak);
   const gameNames=new Map((season.games||[]).map(g=>[g.id,`${season.teams?.find(t=>t.id===g.away)?.name||'Away'} at ${season.teams?.find(t=>t.id===g.home)?.name||'Home'}`]));
@@ -969,7 +969,7 @@ function LineupEditor({ league: l, team, game, onDone }) {
           </select>
         </div>
       ))}
-      {game ? <HeatingStatus season={s} game={game} team={team}/> : <p className="heating-up-help">Players become starred automatically for their next team game after earning a Project Rio Game Score of 90 or higher. No coins, tiers, or manual star selection.</p>}
+      {game ? <HeatingStatus season={s} game={game} team={team} includeRecorded={l.access.role==='commissioner'}/> : <p className="heating-up-help">Players become starred automatically for their next team game after earning a Project Rio Game Score of 90 or higher. No coins, tiers, or manual star selection.</p>}
       <h4>BENCH</h4>
       <p>
         {lineup.bench.map(id => name(id)).join(" · ") ||
@@ -1339,7 +1339,7 @@ function Schedule({ league: l, commissioner = false }) {
                   {[g.away, g.home].map((id) => (
                     <div key={id}>
                       <h4>{s.teams.find((t) => t.id === id)?.name}</h4>
-                      <HeatingStatus season={s} game={g} team={id}/>
+                      <HeatingStatus season={s} game={g} team={id} includeRecorded={l.access.role==='commissioner'}/>
                       {(g.lineups[id] || s.defaults[id])?.starters.map(
                         (p, i) => (
                           <p key={i}>

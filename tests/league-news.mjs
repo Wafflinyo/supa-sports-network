@@ -28,4 +28,7 @@ assert.equal(edited.filter(e=>e.category==='heating').length,0);
 assert.equal(edited.filter(e=>e.category==='home-run').length,1);
 assert.equal(edited.filter(e=>e.category==='trade').length,1);
 assert.equal(leagueNews([season],names).length,6,'correcting a report must not mutate previous inputs');
+const privateFeed=leagueNews([season],names,{includeRecorded:true});
+assert.equal(privateFeed.filter(e=>e.private).length,5,'Commissioner preview includes recorded events');
+assert.equal(leagueNews([season],names).filter(e=>e.private).length,0,'Public must never see recorded events');
 console.log('PASS: news feed thresholds, team names, embargo, trades, corrections and deduplication');
