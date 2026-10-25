@@ -29,12 +29,8 @@ export default function PlayerProfile({player, PlayerAvatar, onClose,careerSeaso
     <div className="career-profile-content">
     <div className="player-modal-heading"><PlayerAvatar player={player} size={76}/><div><span className="eyebrow dark">SSL PLAYER PROFILE · #{player.rosterOrder || player.id}</span><div className="profile-name-row"><h2 id="career-player-name">{player.name}</h2><HeatMark playerId={player.id} inline/><PitcherPriorityBadge player={player} record={gameData.players[player.id]}/></div></div></div>
     <div className="career-bio"><span>{player.class}</span><span>{player.team || 'Free agent'}</span></div>
-    <dl className="career-summary">{[['SEASONS AS A SLUGGER',career.seasons],['CAREER GAMES PLAYED',career.games],['CAREER MVPs',career.mvps],['TIMES HEATED UP',heat.heatingUpCount],['HOT STREAKS (2+)',heat.hotStreaks],['LONGEST HOT STREAK',heat.longestHotStreak]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value ?? '—'}</dd></div>)}</dl>
+    <dl className="career-summary">{[['SEASONS AS A SLUGGER',career.seasons],['CAREER GAMES PLAYED',career.games],['CAREER MVPs',career.mvps],['TIMES HEATED UP',heat.heatingUpCount]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value ?? '—'}</dd></div>)}</dl>
     <details className="profile-game-data"><summary>GAME STATS & CHEMISTRY</summary><PlayerDataDetails player={player}/></details>
-    <h3 className="career-title">HEATING UP HISTORY</h3>
-     <p className="career-note">A Project Rio Game Score of 90+ earns a star for the next team game. Hot streaks begin at two consecutive 90+ scores.</p>
-     <p><strong>Current hot streak:</strong> {heat.currentHotStreak}</p>
-     {heat.events.length ? <div className="heat-history">{heat.events.map((event,i)=><p key={event.gameId+'-'+i}><strong>{event.season}</strong> · {event.at?new Date(event.at).toLocaleDateString('en-US'):'Date unavailable'} · Game Score {event.gameScore} · {event.streak>=2?'HOT STREAK ×'+event.streak:'Heating Up'}{event.starredGame?' · Next game starred':''}</p>)}</div> : <p>No qualifying Game Scores recorded yet.</p>}
      <h3 className="career-title">CAREER AVERAGES</h3>
     {groups.map(([title,stats])=><section className="career-category" key={title}><h4>{title}</h4><dl className="career-average-grid">{stats.map(([key,label,precision])=><div key={key}><dt>{label}</dt><dd>{career.averages[key]?.toFixed(precision) ?? '—'}</dd></div>)}</dl></section>)}
     <p className="career-note">{career.games ? 'Official SSL seasons only. Career rates use combined totals; per-game averages use career games played.' : 'No official SSL career stats yet. Seasons, games, and averages will appear once official season data is recorded. Temporary test games do not count.'}</p>
