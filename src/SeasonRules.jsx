@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {CheckCircle2, Clock3, Star, Trophy, Vote} from 'lucide-react';
 import {PlayerPortrait} from './PlayerPortrait.jsx';
+import {CommissionerVoteTracker} from './VoteParticipation.jsx';
 import {ConferenceMark} from './ConferenceMark.jsx';
 import pool from "./players.json";
 const names = new Map(pool.map((p) => [p.id, p.name]));
@@ -165,6 +166,13 @@ function Ballot({ league: l, kind, w }) {
       <div className="ssl-ballot-body">
         <div className="ssl-ballot-meta"><span><Clock3 size={17}/> Closes {time(w.closesAt)}</span><span><Vote size={17}/> {w.ballots || 0} ballots submitted</span>
           {w.myChoices?.length>0&&<span className="ssl-ballot-saved"><CheckCircle2 size={17}/> Saved ballot on file</span>}</div>
+        {l.access.role === "commissioner" && <CommissionerVoteTracker
+          type="ballot"
+          teams={s?.teams || []}
+          voters={l.ballotVoters ? (l.ballotVoters[kind] || []) : null}
+          error={l.ballotVotersError}
+          votedIds={(l.ballotVoters?.[kind] || []).map(v => v.teamId).filter(Boolean)}
+        />}
         <div className="ssl-ballot-progress"><div><strong>{chosen.length} / {required}</strong><span>players selected</span></div>
           <div className="ssl-ballot-track" aria-label={`${chosen.length} of ${required} choices selected`}><span style={{width:`${Math.min(100,100*chosen.length/required)}%`}}/></div></div>
         {(isAllStar ? ['supa','galaxy'] : ['all']).map((c) => {
