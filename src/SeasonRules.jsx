@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from "react";
+import {CheckCircle2, Clock3, Star, Trophy, Vote} from 'lucide-react';
+import {PlayerPortrait} from './PlayerPortrait.jsx';
+import {ConferenceMark} from './ConferenceMark.jsx';
 import pool from "./players.json";
 const names = new Map(pool.map((p) => [p.id, p.name]));
 export const conferences = {
@@ -140,72 +143,61 @@ export function SeasonRuleControls({ league: l }) {
 function Ballot({ league: l, kind, w }) {
   const [chosen, setChosen] = useState(w.myChoices || []),
     s = l.season,
+    isAllStar = kind === "allstar",
+    required = isAllStar ? 18 : 1,
     open = w.open && l.now < new Date(w.closesAt).getTime(),
-    signed = !!l.access.signedIn;
+    signed = !!l.access.signedIn,
+    candidates = w.candidates || [];
   useEffect(() => setChosen(w.myChoices || []), [JSON.stringify(w.myChoices)]);
-  const toggle = (id) =>
-    setChosen((v) => (v.includes(id) ? v.filter((x) => x !== id) : [...v, id]));
+  const countFor = (conference) => chosen.filter(id=>candidates.some(p=>p.player===id && p.conference===conference)).length;
+  const toggle = id => setChosen(v=>isAllStar ? (v.includes(id)?v.filter(x=>x!==id):[...v,id]) : (v.includes(id)?[]:[id]));
   return (
-    <Box title={w.label}>
-      <p>
-        {open ? "OPEN" : "CLOSED"} · Deadline {time(w.closesAt)} ·{" "}
-        {w.ballots || 0} account ballots
-      </p>
-      <p>
-        {kind === "allstar"
-          ? "Choose nine different players from each conference. Your saved ballot can be edited until voting closes."
-          : "Choose one player. Your saved vote can be edited until voting closes."}
-      </p>
-      {(kind === "allstar" ? ["supa", "galaxy"] : ["all"]).map((c) => (
-        <details open={c === "all"} key={c}>
-          <summary>
-            {c === "all" ? "CANDIDATES" : conferences[c]}{" "}
-            {kind === "allstar" &&
-              `${chosen.filter((id) => w.candidates.some((p) => p.player === id && p.conference === c)).length}/9`}
-          </summary>
-          <div className="season-player-list">
-            {w.candidates
-              .filter((p) => c === "all" || p.conference === c)
-              .map((p) => (
-                <label key={p.player}>
-                  <input
-                    type="checkbox"
-                    disabled={
-                      !open ||
-                      !signed ||
-                      (!chosen.includes(p.player) &&
-                        (kind !== "allstar"
-                          ? chosen.length >= 1
-                          : chosen.filter((id) =>
-                              w.candidates.some(
-                                (x) => x.player === id && x.conference === c,
-                              ),
-                            ).length >= 9))
-                    }
-                    checked={chosen.includes(p.player)}
-                    onChange={() => toggle(p.player)}
-                  />
-                  {names.get(p.player)} ·{" "}
-                  {s.teams.find((t) => t.id === p.team)?.name}{" "}
-                  <small>{w.totals?.[p.player] || 0} votes</small>
-                </label>
-              ))}
-          </div>
-        </details>
-      ))}
-      {open &&
-        (signed ? (
-          <button
-            className="red-btn"
-            disabled={l.busy || chosen.length !== (kind === "allstar" ? 18 : 1)}
-            onClick={() => l.act("ballot", { kind, choices: chosen })}
-          >
-            SAVE {kind === "allstar" ? "18-VOTE BALLOT" : "VOTE"}
-          </button>
-        ) : (
-          <p>Sign in with any account to vote.</p>
-        ))}
-    </Box>
+    <section className="panel ssl-ballot-panel" aria-label={w.label}>
+      <div className="ssl-ballot-banner">
+        <div className="ssl-ballot-symbol">{isAllStar ? <Star size={34}/> : <Trophy size={34}/>}</div>
+        <div className="ssl-ballot-title">
+          <span className="ssl-ballot-overline">SLUGGERS SUPA LEAGUE · OFFICIAL BALLOT</span>
+          <h2>{w.label}</h2>
+          <p>{isAllStar ? 'The best of both conferences. Select your nine All-Stars from each side.' : 'One vote. One winner. Make your choice count.'}</p>
+        </div>
+        <span className={`ssl-poll-state ${open?'is-open':'is-closed'}`}><Clock3 size={15}/>{open?'VOTING OPEN':'BALLOT CLOSED'}</span>
+      </div>
+      <div className="ssl-ballot-body">
+        <div className="ssl-ballot-meta"><span><Clock3 size={17}/> Closes {time(w.closesAt)}</span><span><Vote size={17}/> {w.ballots || 0} ballots submitted</span>
+          {w.myChoices?.length>0&&<span className="ssl-ballot-saved"><CheckCircle2 size={17}/> Saved ballot on file</span>}</div>
+        <div className="ssl-ballot-progress"><div><strong>{chosen.length} / {required}</strong><span>players selected</span></div>
+          <div className="ssl-ballot-track" aria-label={`${chosen.length} of ${required} choices selected`}><span style={{width:`${Math.min(100,100*chosen.length/required)}%`}}/></div></div>
+        {(isAllStar ? ['supa','galaxy'] : ['all']).map((c) => {
+          const conferencePlayers = candidates.filter(p => c === 'all' || p.conference===c);
+          const conferenceCount = c==='all' ? chosen.length : countFor(c);
+          return <details className="ssl-ballot-conference" key={c} open={c==='all' || c==='supa'}>
+            <summary>
+              <span className="ssl-ballot-conference-name">{c==='all'?<Trophy size={23}/>:<ConferenceMark id={c} size={38}/>}<strong>{c==='all'?'OFFICIAL CANDIDATES':conferences[c]}</strong></span>
+              <span className="ssl-ballot-count">{conferenceCount} / {isAllStar?9:1} PICKED</span>
+            </summary>
+            <div className="ssl-ballot-candidates">
+              {conferencePlayers.map(p => {
+                const selected=chosen.includes(p.player);
+                const maxed=isAllStar ? countFor(c)>=9 : chosen.length>=1;
+                const disabled=!open||!signed||(!selected&&maxed);
+                const player=pool.find(x=>x.id===Number(p.player));
+                return <label key={p.player} className={`ssl-ballot-candidate ${selected?'is-selected':''} ${disabled?'is-disabled':''}`}>
+                  <input type="checkbox" disabled={disabled} checked={selected} onChange={()=>toggle(p.player)}/>
+                  <span className="ssl-ballot-player"><PlayerPortrait player={player} size={43}/><span><strong>{names.get(p.player) || player?.name || 'Player'}</strong><small>{s.teams.find(t=>t.id===p.team)?.name || 'SSL Team'}</small></span></span>
+                  <span className="ssl-ballot-candidate-foot"><span>{w.totals?.[p.player]||0} votes</span>{selected&&<CheckCircle2 size={20}/>}</span>
+                </label>;
+              })}
+            </div>
+          </details>;
+        })}
+        <div className="ssl-ballot-action">
+          <div><strong>{chosen.length === required?'YOUR PICKS ARE READY':'BUILD YOUR BALLOT'}</strong><p>{open ? 'You can change and resubmit your vote until the deadline.' : 'This ballot is closed to new votes.'}</p></div>
+          {open && (signed ?
+            <button className="red-btn" disabled={l.busy||chosen.length!==required} onClick={()=>l.act('ballot',{kind,choices:chosen})}>{w.myChoices?.length?'UPDATE':'SUBMIT'} {isAllStar?'ALL-STAR BALLOT':'VOTE'}</button>
+            : <p className="ssl-ballot-signin">Sign in to cast your vote.</p>)}
+        </div>
+      </div>
+    </section>
   );
 }
 export function PublicBallots({ league: l }) {
