@@ -20,6 +20,7 @@ jobs:
       - run: npm ci
       - run: npm install --no-save playwright@1.56.1
       - run: npx playwright install --with-deps chromium
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
       - run: node scripts/render-lottery-preview.mjs
       - uses: actions/upload-artifact@v4
         with:
