@@ -22,6 +22,7 @@ jobs:
       - run: node tests/stadiums.mjs
       - run: node tests/heating-up.mjs
       - run: node tests/league-news.mjs
+      - run: node tests/roster-lineups.mjs
       - run: npm run build
         env:
           GITHUB_PAGES_BASE: /supa-sports-network/
