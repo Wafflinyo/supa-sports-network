@@ -1,0 +1,29 @@
+name: S1 Lottery Video Preview
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/render-lottery-preview.mjs'
+      - '.github/workflows/lottery-preview-video.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preview:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm install --no-save playwright@1.56.1
+      - run: npx playwright install --with-deps chromium
+      - run: node scripts/render-lottery-preview.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: s1-draft-lottery-video
+          path: dist/ssl-season1-bingo-lottery-preview.mp4
+          if-no-files-found: error
+          retention-days: 30

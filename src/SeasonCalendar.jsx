@@ -102,13 +102,13 @@ export function ScheduleGenerator({ league: l }) {
   const dated=regular.filter(g=>g.startsAt).length;
   return <Box title="GENERATE SEASON 1 MATCHUPS · DATES LATER">
     <p>Generate all <strong>132 matchups across 22 weeks</strong>, six games per week. Each team faces every opponent twice — once at home and once away — for exactly 11 home and 11 away games per franchise.</p>
-    <p><strong>Matchups first, dates second.</strong> Generate the weekly pairing list now, then enter each game's actual date and time in Schedule &amp; Results. The schedule cannot be published until all 132 games are dated and every assigned Week matches its date.</p>
+    <p><strong>Matchups first, dates second.</strong> Generate the weekly pairing list now, then enter each game's actual date and time in Schedule &amp; Results. You can publish the matchups immediately with Date TBD and add real dates afterward.</p>
     <button type="button" className="red-btn" disabled={l.busy} onClick={()=>{
       if(!regular.length||confirm('Replace the unplayed matchups? Any dates entered on the old matchup list will be lost.'))l.act('generate_schedule',{});
     }}>{regular.length?'REGENERATE 22-WEEK MATCHUPS':'GENERATE 22-WEEK MATCHUPS'}</button>
-    {regular.length>0&&<p role="status"><strong>{dated} / 132 games dated.</strong> {dated===132?'Dates complete. Review Week 1 before publishing.':'Open Schedule & Results below and set each game date.'}</p>}
+    {regular.length>0&&<p role="status"><strong>{dated} / 132 games dated.</strong> {dated===132?'Dates complete. Review Week 1 before publishing.':'Undated matchups remain visible publicly as Date TBD once you publish.'}</p>}
     <details className="schedule-anchor-settings"><summary>OPTIONAL · SET WEEK 1 SUNDAY / TRADE DEADLINE</summary>
-      <p>The site can derive the Week 1 Sunday from your first week's dates when the schedule is published, or you can set the Week 1 starting Sunday now.</p>
+      <p>The site can derive Week 1 Sunday when you date the first Week 1 game, or you can set it here. It is not required to publish the matchup list.</p>
       <form className="season-form" onSubmit={e=>{e.preventDefault();const weekOne=new FormData(e.currentTarget).get('weekOne');l.act('season_calendar',{weekOne});}}>
         <label>Week 1 Sunday (Eastern Time)<input required type="date" name="weekOne" defaultValue={s.weekOne||''}/></label>
         <button className="outline-btn" disabled={l.busy}>SAVE WEEK 1 SUNDAY</button>

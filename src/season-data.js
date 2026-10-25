@@ -28,7 +28,7 @@ export const clock = (n) =>
 export function fantasyGames(seasons) {
   return seasons.flatMap((s) =>
     s.schedulePublished
-      ? s.games.map((g) => ({
+      ? s.games.filter(g=>g.startsAt).map((g) => ({
           id: "ssl:" + g.id,
           seasonId: s.id,
           phase: g.phase,
