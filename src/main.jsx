@@ -56,7 +56,6 @@ const statGroups = {
     ['buddyJumpAttempts', 'Buddy Jump Attempts'], ['doublePlays', 'Double Plays'],
     ['triplePlays', 'Triple Plays'], ['bobbles', 'Bobbles'],
   ],
-  'Heating Up': [['heatingUpCount','Times Heated Up'],['hotStreaks','Hot Streaks (2+)'],['longestHotStreak','Longest Hot Streak'],['currentHotStreak','Current Streak']],
   'Pitching Stats': [
     ['positionsPlayed', 'Position(s) Played'], ['gamesPlayed', 'Games Played'], ['mvps', 'MVPs'], ['battersFaced', 'Batters Faced'], ['inningsPitched', 'Innings Pitched'],
     ['pitches', 'Pitches'], ['strikes', 'Strikes'], ['balls', 'Balls'],
@@ -211,7 +210,7 @@ function App() {
     setJoinCode(''); setMessage('You joined the league.'); await loadLeagues()
   }
   const hasOfficialStats = players.some(player => (player.gamesPlayed ?? 0) > 0)
-  const categorySort = statTab === 'Heating Up' ? {key:'heatingUpCount',direction:'desc'} : statTab === 'Pitching Stats' ? {key:'era7',direction:'asc'} : statTab === 'Defensive Stats' ? {key:'putouts',direction:'desc'} : {key:'battingAverage',direction:'desc'}
+  const categorySort = statTab === 'Pitching Stats' ? {key:'era7',direction:'asc'} : statTab === 'Defensive Stats' ? {key:'putouts',direction:'desc'} : {key:'battingAverage',direction:'desc'}
   const activeSort = sort.key === 'default' ? (hasOfficialStats ? categorySort : {key:'id',direction:'asc'}) : sort
   const filtered = useMemo(() => players.filter(p => `${p.name} ${p.class}`.toLowerCase().includes(query.toLowerCase())).sort((a,b) => {
     const av = activeSort.key === 'pitcherPriority' ? (pitcherPriorityFor(a,gameData.players[a.id])?.order || 3) : statGroups[statTab].some(([key]) => key === activeSort.key) ? statValue(a, activeSort.key, statView) : a[activeSort.key === 'id' ? 'rosterOrder' : activeSort.key]
