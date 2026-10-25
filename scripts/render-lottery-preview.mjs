@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import {createRequire} from 'node:module';
 import {spawn} from 'node:child_process';
+import {lotteryProgress, LOTTERY_INTRO_MS, LOTTERY_DRAW_INTERVAL_MS} from '../src/lottery-timing.js';
 const {chromium}=createRequire(import.meta.url)('playwright');
 const root=process.cwd(),output=path.join(root,'dist','ssl-season1-bingo-lottery-preview.mp4');
 const names=[
@@ -58,47 +59,61 @@ const html='<!doctype html><html><head><meta charset="utf-8"><style>'+css+'\n'+a
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
 const page=await browser.newPage({viewport:{width:1280,height:720},deviceScaleFactor:1});
 await page.setContent(html,{waitUntil:'load'});
+const order=[7,3,1,10,6,12,4,2,8,11,5,9]; // Example only, NOT the official draw.
 await page.evaluate(({teams,order})=>{
  const bySlot=new Map(teams.map(t=>[t.slot,t]));
- const cage=document.getElementById('cage'),drawn=document.getElementById('drawn');
- let n=0;
- function draw(){
-   cage.replaceChildren();
-   const remaining=teams.filter(t=>!order.slice(0,n).includes(t.slot));
-   remaining.forEach((t,i)=>{
-     const shell=document.createElement('span');shell.className='bingo-cage-ball';
-     shell.style.setProperty('--ball-angle',(i*360/Math.max(1,remaining.length))+'deg');
-     shell.title=t.name;
-     const im=document.createElement('img');im.src=t.logo;im.alt='';
-     shell.append(im);cage.append(shell);
-   });
-   if(n){
-     const winner=bySlot.get(order[n-1]);drawn.replaceChildren();
+ const cage=document.getElementById('cage'), drawn=document.getElementById('drawn');
+ const results=document.getElementById('results');
+ cage.classList.remove('bingo-drum-spinning');
+ let currentReveal=-1;
+ window.renderLotteryStage=({revealed,phase,secondsToNext,elapsedMs})=>{
+   // Capture the drum at each frame's timeline position: video speed doesn't
+   // depend on machine performance or real-time JavaScript intervals.
+   cage.style.transform='rotate('+(elapsedMs*.095)+'deg)';
+   if(revealed!==currentReveal){
+     currentReveal=revealed;
+     cage.replaceChildren();
+     const remaining=teams.filter(t=>!order.slice(0,revealed).includes(t.slot));
+     remaining.forEach((t,i)=>{
+       const shell=document.createElement('span');shell.className='bingo-cage-ball';
+       shell.style.setProperty('--ball-angle',(i*360/Math.max(1,remaining.length))+'deg');
+       shell.title=t.name;
+       const im=document.createElement('img');im.src=t.logo;im.alt='';
+       shell.append(im);cage.append(shell);
+     });
+     results.replaceChildren();
+     order.slice(0,revealed).forEach((slot,i)=>{
+       const t=bySlot.get(slot),line=document.createElement('span');line.className='lottery-result-team';
+       const im=document.createElement('img');im.src=t.logo;im.alt='';
+       line.append(im,document.createTextNode((i+1)+'. '+t.name));results.append(line);
+     });
+   }
+   const announcement=(phase==='announce'||phase==='complete')&&revealed>0;
+   drawn.replaceChildren();
+   if(announcement){
+     const winner=bySlot.get(order[revealed-1]);
      const im=document.createElement('img');im.src=winner.logo;im.alt=winner.name;
      drawn.append(im);
-     document.getElementById('status').textContent='BALL DRAWN';
-     document.getElementById('team-name').textContent=n+'. '+winner.name;
-     drawn.classList.remove('bingo-ball-drawn');void drawn.offsetHeight;drawn.classList.add('bingo-ball-drawn');
+     drawn.className='lottery-ball bingo-drawn-ball';
+   }else {
+     drawn.textContent='?';
+     drawn.className='lottery-ball bingo-ball-pending';
    }
-   document.getElementById('remaining').textContent=n===order.length?'LOTTERY COMPLETE':(order.length-n)+' balls remaining';
-   const results=document.getElementById('results');results.replaceChildren();
-   order.slice(0,n).forEach((slot,i)=>{
-     const t=bySlot.get(slot),line=document.createElement('span');line.className='lottery-result-team';
-     const im=document.createElement('img');im.src=t.logo;im.alt='';
-     line.append(im,document.createTextNode((i+1)+'. '+t.name));results.append(line);
-   });
-   if(n===order.length){cage.classList.remove('bingo-drum-spinning');cage.classList.add('bingo-drum-stopped');}
- }
- draw();setInterval(()=>{n=Math.min(n+1,order.length);draw()},1600);
-},{teams,order:[7,3,1,10,6,12,4,2,8,11,5,9]});
-await page.waitForTimeout(300);
-const fps=8,frames=fps*21;
-const ff=spawn('ffmpeg',['-hide_banner','-loglevel','error','-y','-f','image2pipe','-framerate',String(fps),'-vcodec','png','-i','pipe:0','-c:v','libx264','-preset','ultrafast','-crf','24','-pix_fmt','yuv420p','-movflags','+faststart',output],{stdio:['pipe','inherit','inherit']});
+   document.getElementById('status').textContent=phase==='complete'?'THE OFFICIAL ORDER IS IN':announcement?'BALL DRAWN · PICK ANNOUNCED':phase==='intro'?'MIXING ALL 12 FRANCHISES':'MIXING FOR THE NEXT PICK';
+   document.getElementById('team-name').textContent=announcement?'#'+revealed+' · '+bySlot.get(order[revealed-1]).name:phase==='intro'?'THE CAGE IS MIXING…':'WHO WILL BE CALLED NEXT?';
+   document.getElementById('remaining').textContent=phase==='complete'?'DRAFT LOTTERY COMPLETE':(order.length-revealed)+' balls remaining · next reveal in '+secondsToNext+'s';
+ };
+},{teams,order});
+const fps=6, durationMs=LOTTERY_INTRO_MS+(order.length-1)*LOTTERY_DRAW_INTERVAL_MS+6500;
+const frames=Math.ceil(fps*durationMs/1000);
+const ff=spawn('ffmpeg',['-hide_banner','-loglevel','error','-y','-f','image2pipe','-framerate',String(fps),'-vcodec','png','-i','pipe:0','-c:v','libx264','-preset','ultrafast','-crf','25','-pix_fmt','yuv420p','-movflags','+faststart',output],{stdio:['pipe','inherit','inherit']});
 const done=new Promise((resolve,reject)=>ff.on('exit',code=>code===0?resolve():reject(Error('ffmpeg exited '+code))));
 for(let i=0;i<frames;i++){
- const png=await page.screenshot({type:'png',animations:'allow'});
+ const elapsedMs=Math.floor(i*1000/fps);
+ const stage=lotteryProgress(order.length,'1970-01-01T00:00:00.000Z',elapsedMs);
+ await page.evaluate(data=>window.renderLotteryStage(data),{...stage,elapsedMs});
+ const png=await page.screenshot({type:'png',animations:'disabled'});
  if(!ff.stdin.write(png))await new Promise(res=>ff.stdin.once('drain',res));
- await page.waitForTimeout(110);
 }
 ff.stdin.end();await done;await browser.close();
 console.log('Video exported: '+output);
