@@ -179,7 +179,7 @@ function Ballot({ league: l, kind, w }) {
               {conferencePlayers.map(p => {
                 const selected=chosen.includes(p.player);
                 const maxed=isAllStar ? countFor(c)>=9 : chosen.length>=1;
-                const disabled=!open||!signed||(!selected&&maxed);
+                const disabled=!open||!signed||(!selected&&isAllStar&&maxed);
                 const player=pool.find(x=>x.id===Number(p.player));
                 return <label key={p.player} className={`ssl-ballot-candidate ${selected?'is-selected':''} ${disabled?'is-disabled':''}`}>
                   <input type="checkbox" disabled={disabled} checked={selected} onChange={()=>toggle(p.player)}/>
