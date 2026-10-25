@@ -43,7 +43,9 @@
 .career-profile .player-modal-heading h2{font-size:40px}
 .career-bio{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
 .career-bio span{padding:5px 9px;background:#eef2f8;font-size:12px;font-weight:700}
-.career-profile .career-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;border:0;margin:0 0 22px}
+.career-profile .career-summary{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;border:0;margin:0 0 22px}
+.career-profile .career-summary>div{grid-column:span 2;min-width:0}
+.career-profile .career-summary>div:nth-child(4),.career-profile .career-summary>div:nth-child(5){grid-column:span 3}
 .career-profile .career-summary div{display:block;padding:14px 10px;background:#10244b;color:white;border:0}
 .career-profile .career-summary dt{font-size:11px;line-height:1.4;color:#c8d3e4}
 .career-profile .career-summary dd{font-family:'Barlow Condensed';font-size:32px;color:#fbd13b;margin-top:4px}
@@ -199,3 +201,6 @@
 .news-item-live button{align-self:center;font-size:25px}
 .news-more{width:calc(100% - 30px);margin:12px 15px}
 @media(max-width:680px){.news-item.news-item-live{padding:12px;gap:9px}.news-item-live .news-mark{width:41px;min-width:41px;height:43px}.news-item-live h3{font-size:19px}}
+
+/* Five career totals: three on the first row, two evenly sized on the second. */
+@media(max-width:520px){.career-profile .career-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.career-profile .career-summary>div{grid-column:span 1}.career-profile .career-summary>div:nth-child(4){grid-column:span 1}.career-profile .career-summary>div:nth-child(5){grid-column:span 2}}
