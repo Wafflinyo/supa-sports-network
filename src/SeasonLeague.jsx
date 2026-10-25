@@ -1,5 +1,5 @@
 import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
-import {StarBalance,StarSelections} from './StarCoins.jsx';
+import {heatingUpForSeason} from './heating-up.js';
 import {
   SeasonRuleControls,
   PublicBallots,
@@ -865,11 +865,34 @@ function Draft({ league: l }) {
     </>
   );
 }
+
+function HeatingStatus({season,game,team,includeRecorded=false}) {
+  const ids=heatingUpForSeason(season,{includeRecorded}).byGame[game.id]?.[team]||[];
+  return <p className="heating-up-status"><strong>★ HEATING UP · Next-game stars:</strong> {ids.length?ids.map(name).join(' · '):'None earned yet'} <small>Automatic from previous game scores of 90+.</small></p>;
+}
+function HeatingUpPage({league:l}) {
+  const season=l.season;
+  if(!season)return <Box title="HEATING UP"><p>No season available yet.</p></Box>;
+  const heat=heatingUpForSeason(season,{includeRecorded:l.access.role==='commissioner'});
+  const entries=Object.entries(heat.players).filter(([,v])=>v.heatingUpCount>0)
+    .sort((a,b)=>b[1].heatingUpCount-a[1].heatingUpCount||b[1].longestHotStreak-a[1].longestHotStreak);
+  const gameNames=new Map((season.games||[]).map(g=>[g.id,`${season.teams?.find(t=>t.id===g.away)?.name||'Away'} at ${season.teams?.find(t=>t.id===g.home)?.name||'Home'}`]));
+  return <>
+    <Box title="HEATING UP · SEASON RECORDS">
+      <p>A Project Rio Game Score of 90 or higher automatically stars the player for their next team game. Two or more consecutive qualifying games create a hot streak. These are cumulative totals, not per-game averages.</p>
+      {entries.length?<div className="season-table"><table><thead><tr><th>Player</th><th>Times Heated Up</th><th>Hot Streaks (2+)</th><th>Longest Streak</th><th>Current Streak</th></tr></thead><tbody>
+        {entries.map(([id,r])=><tr key={id}><td><Player id={Number(id)}/></td><td>{r.heatingUpCount}</td><td>{r.hotStreaks}</td><td>{r.longestHotStreak}</td><td>{r.currentHotStreak}</td></tr>)}
+      </tbody></table></div>:<p>No official 90+ Game Scores recorded yet.</p>}
+    </Box>
+    <Box title="HEATING UP · GAME HISTORY">
+      {heat.events.length?heat.events.map((e,i)=><p key={e.gameId+'-'+i}><strong>{name(e.playerId)}</strong> · {e.at?new Date(e.at).toLocaleDateString('en-US'):'Date unavailable'} · {gameNames.get(e.gameId)} · Score {e.gameScore} · {e.streak>=2?'HOT STREAK ×'+e.streak:'Heating Up'}{e.starredGame?' · Star next game':''}</p>):<p>Game-by-game Heating Up history appears after official reports are released.</p>}
+    </Box>
+  </>;
+}
 function LineupEditor({ league: l, team, game, onDone }) {
   const s = l.season,
     initial = game?.lineups?.[team] || s.defaults?.[team],
     roster = rosterOf(s, team),
-    [stars,setStars] = useState(game?.starRequests?.[team]||[]),
     [slots, setSlots] = useState(
       positions.map(
         (pos, i) => initial?.starters?.[i] || { player: "", position: pos },
@@ -884,7 +907,6 @@ function LineupEditor({ league: l, team, game, onDone }) {
       ),
     [team, game?.id],
   );
-  useEffect(()=>setStars(game?.starRequests?.[team]||[]),[team,game?.id]);
   const lineup = {
       starters: slots.map((x) => ({ ...x, player: Number(x.player) })),
       bench: roster.filter((p) => !slots.some((x) => Number(x.player) === p)),
@@ -899,7 +921,6 @@ function LineupEditor({ league: l, team, game, onDone }) {
           await l.act(game ? "game_lineup" : "default_lineup", {
             team,
             game: game?.id,
-            stars,
             lineup,
           })
         )
@@ -927,7 +948,7 @@ function LineupEditor({ league: l, team, game, onDone }) {
             <option value="">Choose player</option>
             {roster.map((p) => (
               <option key={p} value={p}>
-                {name(p)}{game?.id && Number(s.starCoins?.games?.[game.id]?.[team]?.remainingByPlayer?.[p]||0)>0 ? ` ↻ ${s.starCoins?.games?.[game.id]?.[team]?.priceByPlayer?.[p]} coins incl. bypass` : ""}
+                {name(p)}
               </option>
             ))}
           </select>
@@ -948,7 +969,7 @@ function LineupEditor({ league: l, team, game, onDone }) {
           </select>
         </div>
       ))}
-      {game ? <StarSelections season={s} team={team} game={game} selected={stars} onChange={setStars} disabled={l.busy}/> : <><StarBalance season={s} team={team}/><p>Star selections are made separately for each game; default lineups do not automatically spend coins.</p></>}
+      {game ? <HeatingStatus season={s} game={game} team={team} includeRecorded={l.access.role==='commissioner'}/> : <p className="heating-up-help">Players become starred automatically for their next team game after earning a Project Rio Game Score of 90 or higher. No coins, tiers, or manual star selection.</p>}
       <h4>BENCH</h4>
       <p>
         {lineup.bench.map(id => name(id)).join(" · ") ||
@@ -968,7 +989,6 @@ function LineupEditor({ league: l, team, game, onDone }) {
                 team,
                 game: game.id,
                 useDefault: true,
-                stars,
               })
             )
               onDone?.();
@@ -1319,7 +1339,7 @@ function Schedule({ league: l, commissioner = false }) {
                   {[g.away, g.home].map((id) => (
                     <div key={id}>
                       <h4>{s.teams.find((t) => t.id === id)?.name}</h4>
-                      <p><strong>★ Stars:</strong> {(g.starRequests?.[id]||[]).map(name).join(" · ")||"None"} · {s.starCoins?.games?.[g.id]?.[id]?.cost||0} coins {s.starCoins?.games?.[g.id]?.[id]?.status||"reserved"}</p>
+                      <HeatingStatus season={s} game={g} team={id} includeRecorded={l.access.role==='commissioner'}/>
                       {(g.lineups[id] || s.defaults[id])?.starters.map(
                         (p, i) => (
                           <p key={i}>
@@ -1370,9 +1390,10 @@ function ReportImport({ league: l, game, onDone }) {
     <div className="report-import">
       <h3>PROJECT RIO RESULT REVIEW</h3>
       <p>
-        Map report team labels and any ambiguous Mii/name rows. Review before
-        posting. Replacing a report recalculates totals instead of adding a
-        second game.
+        Map report team labels and any ambiguous Mii/name rows. Include a
+        Game Score column in the Project Rio Stats worksheet (0–999.99).
+        A score of 90+ automatically grants a star next game. Replacing a
+        report recalculates Heating Up records and streaks instead of adding a second game.
       </p>
       <input
         type="file"
@@ -1420,6 +1441,7 @@ function ReportImport({ league: l, game, onDone }) {
                 <tr>
                   <th>Rio player</th>
                   <th>Report team</th>
+                  <th>Game Score</th>
                   <th>SSL player</th>
                 </tr>
               </thead>
@@ -1430,6 +1452,7 @@ function ReportImport({ league: l, game, onDone }) {
                     <tr key={i}>
                       <td>{r.player}</td>
                       <td>{r.label}</td>
+                      <td><strong>{r.gamescore ?? r.ingamescore ?? '—'}</strong>{Number(r.gamescore ?? r.ingamescore ?? 0)>=90?' ★':''}</td>
                       <td>
                         <select
                           aria-label={`Map ${r.player} row ${r.row}`}
@@ -1611,7 +1634,7 @@ function Trades({ league: l, messages = false }) {
       m.kind === "player"
         ? name(m.id)
         : m.kind === "coin"
-          ? `${m.quantity} Star Coin(s)`
+          ? 'Legacy coin transfer (retired)'
           : (() => {
               const a = s.pickAssets.find((p) => p.id === m.id);
               return `S${s.tradePickSeason || s.number + 1} · Round ${a?.round || "?"} · ${teamName(a?.originalTeam)}`;
@@ -1715,26 +1738,9 @@ function Trades({ league: l, messages = false }) {
                     >
                       <option value="player">Player</option>
                       <option value="pick">Next-season draft pick</option>
-                      <option value="coin">Star Coins</option>
                     </select>
                   </label>
-                  {move.kind === "coin" ? (
-                    <label>
-                      Star Coins
-                      <input
-                        type="number"
-                        min="1"
-                        max={
-                          s.starCoins?.balances?.[move.from]?.available || 0
-                        }
-                        value={move.quantity}
-                        onChange={(e) =>
-                          setMove({ ...move, quantity: Number(e.target.value) })
-                        }
-                      />
-                    </label>
-                  ) : (
-                    <label>
+                  <label>
                       {move.kind === "player" ? "Player" : "Pick"}
                       <select
                         aria-label={move.kind === "player" ? "Player" : "Pick"}
@@ -1759,14 +1765,13 @@ function Trades({ league: l, messages = false }) {
                               ))}
                       </select>
                     </label>
-                  )}
                   <button
                     className="outline-btn"
                     disabled={
                       !move.from ||
                       !move.to ||
                       move.from === move.to ||
-                      (move.kind !== "coin" && !move.id)
+                      !move.id
                     }
                     onClick={() => {
                       setMoves((a) => [
@@ -2268,6 +2273,7 @@ export const seasonPages = [
   "Standings",
   "Teams",
   "Team Stats",
+  "Heating Up",
   "Transactions",
   "Playoff Bracket",
   "Voting",
@@ -2290,6 +2296,8 @@ export function SeasonPage({ page, league: l }) {
         <Teams league={l} />
       ) : page === "Team Stats" ? (
         <TeamStats league={l} />
+      ) : page === "Heating Up" ? (
+        <HeatingUpPage league={l} />
       ) : page === "Voting" ? (
         <>
           <PublicBallots league={l} />

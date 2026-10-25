@@ -470,14 +470,10 @@ details.fantasy-schedule-row { display: block; }
 details.fantasy-schedule-row > summary { cursor: pointer; font-weight: 800; color: #162b4e; }
 details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
 
-.star-balance {display:flex; flex-wrap:wrap; gap:8px 18px; padding:14px; background:#fff6d1; color:#172342; border:1px solid #ead36c; margin:12px 0;}
-.star-player-grid {display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:8px;}
-.star-player-grid label {display:flex; align-items:center; gap:10px; padding:10px; border:1px solid #dce1eb; margin:0; cursor:pointer;}
-.star-player-grid small {display:block; color:#657087;}
-.star-player-grid .needs-recharge {border-color:#b0761b; background:#fff7e5;}
-.star-selections {margin:20px 0; padding:16px; border:1px solid #dce1eb;}
-.recharge-badge {display:inline-block; color:#8a5700; font-size:13px; font-weight:700;}
 
-.star-player-description{min-width:0;flex:1}
-.star-player-description strong{font-size:14px}
-.star-player-grid .tier-portrait-wrap{margin-right:5px}
+/* No Star Coins, tier pricing or recharge controls. */
+.heating-up-status,.heating-up-help{margin:12px 0;padding:12px 14px;border-left:4px solid #f27d22;background:#fff7ec;color:#2b354b}
+.heating-up-status strong{color:#8f2d15}
+.heating-up-status small{display:block;color:#5b6270;margin-top:3px}
+.heat-history{max-height:260px;overflow:auto}
+.heat-history p{padding:7px 0;border-bottom:1px solid #dce3ee}

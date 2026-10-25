@@ -29,16 +29,14 @@ const sections = [
     'Rosters must contain 11–14 players, except for the temporary post-trade shortfall described in Free Agency. Each lineup has nine starters, one at each defensive position, a complete batting order, and the remaining roster on the bench.',
     'Every team submits a default lineup after drafting. For each upcoming game, the GM may submit a new lineup or choose the default. The default is the fallback if no game-specific lineup is submitted.',
     'Pitcher substitution priority guide: P1P (Priority 1 Pitcher) identifies the 12 captains; captains have first replacement priority when a pitcher tires. P2P (Priority 2 Pitcher) identifies non-captains with a displayed pitching rating of 7 or higher; they come next. When neither group is available, the replacement is random. These roster labels help GMs plan lineups; the website does not operate or alter Dolphin substitutions.',
-    'A lineup locks when the commissioner uploads that game’s results, even if those results remain hidden ahead of a premiere. After results are published, the team prepares for its next scheduled game. Player transactions prompt a review of the default lineup; picks-only or coins-only trades do not.'
+    'A lineup locks when the commissioner uploads that game’s results, even if those results remain hidden ahead of a premiere. After results are published, the team prepares for its next scheduled game. Player transactions prompt a review of the default lineup; picks-only trades do not.'
   ]],
-  ['Star Coins and recharge', [
-    'Every franchise receives 60 Star Coins at the start of each season, covering the regular season and playoffs. Up to three players may be starred per game, and each player’s Star Tier determines the cost. A team may star fewer than three players or none.',
-    'Tier 1: all players not listed in higher tiers. Star cost: 1 coin, with no recharge games; these players may be starred in consecutive games without a surcharge. Tier 2: Mario, Morton, Roy, all Piantas, all Dry Bones, and Flower Fields Monty. Star cost: 2 coins; after starring they need one team game unstarred to recharge. Tier 3: Bowser, Donkey Kong, Petey Piranha, King K Rool, every Kritter, every Bro (Hammer, Fire, Boomerang, Ice, and variants), King Boo, Funky Kong, Boom Boom, King Bob-omb, and Wario. Star cost: 3 coins; after starring they need two team games unstarred to recharge.',
-    'Recharge bypass: a manager may skip any remaining recharge games for 2 extra Star Coins per skipped game, in addition to that player’s standard tier fee. Starring a player starts their full recharge countdown again. Example: Bowser (Tier 3) costs 3 coins in Game 1. Re-starring him in Game 2 costs 3 + 4 = 7 coins to skip both games. If he is unstarred in Game 2, starring him in Game 3 costs 3 + 2 = 5 coins to skip the one remaining game. After two unstarred team games, he costs 3 again.',
-    'Recharge counts team games, not calendar days. Each game a player is on the roster but not starred reduces remaining recharge by one, even if they are benched. Trades never reset the countdown, and receiving-team games before the player joins do not count. Skipping recharge uses the surcharge for every remaining game.',
-    'Submitted star selections reserve their cost. Reserved coins cannot be traded or spent on another game. Editing before the lineup locks releases the old reservation and reserves the revised cost. Uploading results locks the selections and spends the reservation once. A replacement or corrected report does not charge again.',
-    'A postponed game keeps its reservation unless selections change or the game is cancelled. Cancellation releases the reservation or refunds the charge.',
-    'Available coins may be traded during open trading periods under normal trade approval rules. Use whole coins only; available balances cannot go negative. Remaining coins expire league-wide after the championship series ends. Every franchise receives a fresh 60 next season, with no rollover.'
+  ['Heating Up and hot streaks', [
+    'After every official game, the commissioner adds each player’s Project Rio in-game Game Score to the Stats worksheet. A score of 90 or higher automatically makes that player starred for their next team game. Fantasy points do not count as Game Score.',
+    'Heating Up is automatic, with no manager selection, coin balance, player tier, recharge period, cost, or limit on the number of qualifying players.',
+    'The site records each qualifying score and game, each player’s total Heating Up occurrences, the number of hot streaks, current streak length, and longest hot streak. A hot streak is two or more consecutive team games with a Game Score of 90+ for that player.',
+    'A score below 90 or a team game without a qualifying player score ends that streak. Starred status applies only to the next team game. Trades do not grant a free star; eligibility is based on the player’s preceding game result.',
+    'Heating Up is a cumulative record, never a per-game average. Correcting an official Project Rio report automatically recalculates affected totals and streaks, so duplicate records are not created.',
   ]],
   ['Free agency', [
     'Free agency is first come, first served: the first team to complete a valid signing gets the available player. There are no waiver bids or waiting periods.',
@@ -46,8 +44,8 @@ const sections = [
     'A trade may temporarily leave a team below 11. It must immediately sign enough free agents or choose Random Fill to reach 11, then review its default lineup. Transactions must respect locked games and season restrictions. Offseason free-agent signings do not replace the next season’s draft.'
   ]],
   ['Trades and deadlines', [
-    'Trades may include players, eligible next-season draft picks and available Star Coins. Extension contracts cannot be traded. Two or more teams may participate.',
-    'Every involved GM must accept before the commissioner gives final approval. Approval checks asset ownership, roster and pick restrictions, coin availability, and locked-game conflicts. Player trades require default-lineup review.',
+    'Trades may include players and eligible next-season draft picks. Heating Up stars are earned automatically and cannot be traded; extension contracts cannot be traded. Two or more teams may participate.',
+    'Every involved GM must accept before the commissioner gives final approval. Approval checks asset ownership, roster and pick restrictions, and locked-game conflicts. Player trades require default-lineup review.',
     'A franchise receives eleven tradable player picks and one nontradable Stadium Pick, unless a Stadium was successfully retained for that season. Trades must leave at least nine player picks; that means ten minimum total turns without a retained Stadium (nine players plus Stadium) or nine player turns when the Stadium is already retained. Stadium Picks and supplemental picks cannot be traded.',
     'Trading opens after the draft and establishment of rosters and default lineups. The regular-season deadline is Saturday of Week 12 at 11:59:59 p.m. Eastern. Trading stays closed for the rest of the regular season, playoffs and extension window. Offseason trading opens when extensions close and continues until the next draft starts.'
   ]],
@@ -62,7 +60,7 @@ const sections = [
   ['Playoff bracket', [
     'Opening matchups are 1 vs 8, 4 vs 5, 2 vs 7, and 3 vs 6. Reseed after every round: the highest remaining seed plays the lowest remaining seed.',
     'Quarterfinals and semifinals are best of three (two wins). The championship is best of five (three wins). The higher seed hosts Game 1; home field alternates every game. The higher seed therefore hosts Games 1 and 3, and Game 5 if needed.',
-    'A series ends as soon as a team reaches the required wins. Unnecessary games are not played. Star Coin costs and recharge continue through the playoffs, without an additional playoff coin grant.'
+    'A series ends as soon as a team reaches the required wins. Unnecessary games are not played. Heating Up remains active in the playoffs; qualifying Game Scores of 90+ award a star in the next team game.'
   ]],
   ['Contract extensions', [
     'Each franchise receives three shared one-season extension contracts per season. A contract may be offered to a player or an owned Stadium using the same repeat-offer percentages and postseason modifiers. An accepted offer retains that player or Stadium for the following season. A Stadium that accepts replaces the franchise’s next-season Stadium Pick; the franchise keeps the Stadium but cannot draft an additional one that season. A franchise without an accepted Stadium extension receives its normal Stadium Pick. Every applied offer consumes one contract, whether accepted or rejected. Contracts cannot be traded or rolled over.',
@@ -80,7 +78,7 @@ const sections = [
   ]],
   ['Offseason and next season', [
     'After the championship, GMs use or void extension contracts. The window closes when all teams finish, or at the one-month deadline. Unretained players and Stadiums leave. Retaining a Stadium means losing the next Stadium Pick; teams without a retained Stadium can draft one. Offseason trades open.',
-    'The commissioner then uses Set Up Next Season to prepare the new draft and archive the completed season in SSL History. Records, awards and extension history remain attached to the franchise. Accepted retains and eligible assets carry into the next season; Star Coins reset to 60.'
+    'The commissioner then uses Set Up Next Season to prepare the new draft and archive the completed season in SSL History. Records, awards and extension history remain attached to the franchise. Accepted retains and eligible assets carry into the next season; Heating Up career totals and longest hot streaks remain recorded.'
   ]],
   ['Sluggers Fantasy', [
     'Fantasy leagues can be created or started only after the SSL draft is fully complete and all 12 rosters have at least 11 players. League sizes are six, eight or ten managers. Each fantasy team drafts ten players: seven open starter slots and three bench slots, without position restrictions.',
@@ -92,7 +90,7 @@ const sections = [
 
 export default function LeagueRules() {
   return <>
-    <div className="page-heading"><span className="eyebrow dark">THE LEAGUE HANDBOOK</span><h1>LEAGUE RULES</h1><p>Season setup, team management, Star Coins, playoffs and retaining your players. All times are Eastern.</p></div>
+    <div className="page-heading"><span className="eyebrow dark">THE LEAGUE HANDBOOK</span><h1>LEAGUE RULES</h1><p>Season setup, team management, Heating Up, playoffs and retaining your players. All times are Eastern.</p></div>
     <div className="league-rules-sections">{sections.map(([title,paragraphs],i)=><details className="panel league-rule-section" key={title} open={i===0?true:undefined}><summary><span className="league-rule-number">{String(i+1).padStart(2,'0')}</span><h2>{title}</h2></summary><div className="league-rule-body">{paragraphs.map(p=><p key={p}>{p}</p>)}</div></details>)}</div>
   </>
 }

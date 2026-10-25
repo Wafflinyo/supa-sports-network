@@ -170,16 +170,32 @@
 .season-lineup .priority-lineup-help{margin:8px 0 14px;padding:10px 12px;background:#edf3ff;border-left:3px solid #2d527d;color:#20334d;line-height:1.55}
 .season-lineup .priority-lineup-help strong{font-weight:900}
 
-/* Star Tier and pitching priority are attached to the shared player portrait/name, never separate table columns. */
+/* Shared vector Heating Up badge, rendered directly on the portrait for every
+   roster, player table, draft card, lineup and player profile. */
 .tier-portrait-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;flex-shrink:0;overflow:visible}
 .tier-portrait-wrap>.player-avatar{overflow:hidden;flex-shrink:0}
-.player-tier-badge{position:absolute;right:-7px;bottom:-5px;display:inline-flex;align-items:center;justify-content:center;padding:1px 3px;min-width:19px;min-height:15px;border-radius:4px;font-size:9px!important;font-weight:900;line-height:1.05;letter-spacing:0;z-index:1;border:1px solid #17243f;box-shadow:0 1px 2px #0007}
-.player-tier-badge.tier-1{background:#dfeaf8;color:#172c54}
-.player-tier-badge.tier-2{background:#ffc94a;color:#17243f}
-.player-tier-badge.tier-3{background:#c72340;color:white}
+.heat-mark{position:absolute;top:-8px;right:-11px;display:inline-grid;place-items:center;z-index:2;width:25px;height:28px;filter:drop-shadow(0 1px 2px #38100899)}
+.heat-mark svg{display:block;width:100%;height:100%}
+.heat-mark-inline{position:relative;top:auto;right:auto;width:21px;height:24px;vertical-align:middle;margin-left:4px}
+@media(prefers-reduced-motion:reduce){.heat-mark{animation:none}}
 .player-data-name,.portrait-label,.player-cell{gap:10px;align-items:center}
 .player-data-name .pitcher-priority-badge,.player-cell>.pitcher-priority-badge{flex-shrink:0}
 .regular-player-stats td.player-cell{white-space:normal}
 
 /* Keep the profile dialog accessible name equal to the player name only. */
 .profile-name-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+
+/* Official SSL newsroom */
+.news-panel{min-width:0}
+.league-news-scroll{max-height:860px;overflow:auto;overscroll-behavior:contain}
+.news-item.news-item-live{padding:16px 19px;gap:14px;border-top:1px solid #e6eaf0;align-items:flex-start}
+.news-item-live .news-mark{width:54px;height:55px;min-width:54px;color:#ffc951;border-radius:6px}
+.news-item-live .news-mark svg{width:28px;height:34px}
+.news-item-live.news-heating .news-mark{background:#2c2141}
+.news-item-live.news-trade .news-mark{background:#153755}
+.news-item-live .news-copy{flex:1;min-width:0}
+.news-item-live h3{font-size:21px;line-height:1.09;overflow-wrap:anywhere}
+.news-item-live p{font-size:13px;line-height:1.45}
+.news-item-live button{align-self:center;font-size:25px}
+.news-more{width:calc(100% - 30px);margin:12px 15px}
+@media(max-width:680px){.news-item.news-item-live{padding:12px;gap:9px}.news-item-live .news-mark{width:41px;min-width:41px;height:43px}.news-item-live h3{font-size:19px}}
