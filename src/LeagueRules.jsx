@@ -33,7 +33,7 @@ const sections = [
   ]],
   ['Schedule, matchup labels and team records', [
     'After the draft the commissioner generates 132 home-and-away matchups across Weeks 1–22, with six games per week. The generator assigns opponents, home teams and week numbers, but DOES NOT choose game dates.',
-    'The commissioner enters the actual date and time for each individual game in Schedule & Results. No matchup can be published until all 132 dates are entered and each game is placed within its assigned numbered week. Week 1 begins on a Sunday in Eastern Time.',
+    'The commissioner enters the actual date and time for each individual game in Schedule & Results. All 132 matchups can be made public immediately with dates marked TBD. The commissioner can enter or change game dates later; they update on the public site automatically. Week 1 begins on a Sunday in Eastern Time.',
     'The Schedule labels games In Conference Matchup when both teams belong to the same conference and Out of Conference Matchup when their conferences differ.',
     'Team Stats displays regular-season Home Record (wins–losses) and Away Record (wins–losses). Home and away records are cumulative team statistics, not per-game averages.',
   ]],

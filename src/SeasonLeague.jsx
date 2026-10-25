@@ -1132,7 +1132,7 @@ function GameDateEditor({league:l,game:g}){
   const s=l.season;
   const [date,setDate]=useState('');
   const [open,setOpen]=useState(false);
-  const canSet=['postdraft','regular'].includes(s.status)&&!s.schedulePublished&&g.phase==='regular'&&g.stage==='scheduled';
+  const canSet=['postdraft','regular'].includes(s.status)&&g.phase==='regular'&&g.stage==='scheduled'&&!g.lockedAt;
   if(!canSet)return null;
   return <div className="game-date-editor">
     <button type="button" className={g.startsAt?'outline-btn':'red-btn'} onClick={()=>setOpen(v=>!v)} aria-expanded={open}>{open?'CLOSE DATE EDITOR':g.startsAt?'CHANGE GAME DATE & TIME':'SET GAME DATE & TIME'}</button>
@@ -1273,16 +1273,16 @@ function Schedule({ league: l, commissioner = false }) {
             <button
               type="button"
               className="outline-btn"
-              disabled={l.busy || !s.games.length || s.games.filter(g=>g.phase==="regular").some(g=>!g.startsAt)}
+              disabled={l.busy || !s.games.length || s.schedulePublished}
               onClick={() => l.act("publish_schedule")}
             >
-              PUBLISH SCHEDULE
+              {s.schedulePublished?'SCHEDULE PUBLISHED':'PUBLISH MATCHUPS PUBLICLY'}
             </button>
           </form>
           <p>
             {s.schedulePublished
-              ? "Schedule is public."
-              : "Schedule is a commissioner-only draft until published."}
+              ? "The schedule is public, including Date TBD matchups. Date edits appear automatically."
+              : "Publish generated matchups publicly now, even if every date is TBD."}
           </p>
         </Box>
       )}
