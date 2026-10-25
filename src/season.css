@@ -629,3 +629,8 @@ details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
 .ssl-ballot-signin{color:#f6c94d!important}
 @media(max-width:700px){.ssl-ballot-banner{padding:21px 16px;gap:12px;flex-wrap:wrap}.ssl-ballot-symbol{width:51px;height:51px;flex-basis:51px}.ssl-ballot-body{padding:16px}.ssl-ballot-candidates{padding:10px;grid-template-columns:1fr}.ssl-ballot-action{padding:15px}.ssl-ballot-action button{width:100%}}
 @media(prefers-reduced-motion:reduce){.ssl-ballot-track span,.ssl-ballot-candidate{transition:none}}
+
+/* Team Stats mirrors Player Stats' totals / per-game average switch. */
+.season-box .team-stats-caption{caption-side:top;text-align:left;background:#edf1f7;color:#526179;padding:11px 16px;font-size:12px;font-weight:800;letter-spacing:.03em;border-block:1px solid #dfe4ea}
+.season-table .team-stats-number{font-variant-numeric:tabular-nums}
+.season-box .team-stats-explainer{font-size:13px;color:#526179;margin:14px 0 0;line-height:1.6}
