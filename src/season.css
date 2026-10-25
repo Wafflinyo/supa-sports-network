@@ -582,3 +582,50 @@ details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
 .ssl-poll-footnote{font-size:12px;color:#627087;margin:18px 0 0;line-height:1.55}
 @media(max-width:700px){.ssl-poll-hero{padding:22px 19px;gap:14px;flex-wrap:wrap}.ssl-poll-hero-icon{width:54px;height:54px;flex-basis:54px}.ssl-poll-state{align-self:center}.ssl-poll-content{padding:20px 16px}.ssl-poll-option{padding:18px}.ssl-poll-date{min-height:0}}
 @media(prefers-reduced-motion:reduce){.ssl-poll-meter span,.ssl-poll-option{transition:none}}
+
+/* All-Star and awards vote overlays: structured ballots with live selection progress. */
+.ssl-ballot-panel{overflow:hidden;margin:24px 0}
+.ssl-ballot-banner{display:flex;gap:20px;align-items:center;padding:26px 29px;background:linear-gradient(110deg,#0e2147,#193966 70%,#294777);color:#fff;border-bottom:5px solid #e8be46}
+.ssl-ballot-symbol{display:grid;place-items:center;width:70px;height:70px;flex:0 0 70px;color:#fbd555;border:3px solid #f4c94d;border-radius:13px;background:#ffffff12}
+.ssl-ballot-title{flex:1;min-width:0}
+.ssl-ballot-overline{color:#f4c94d;font-size:11px;font-weight:900;letter-spacing:.16em}
+.ssl-ballot-title h2{margin:5px 0!important;font:900 clamp(28px,4vw,42px)/1.12 'Barlow Condensed',Impact,sans-serif;color:#fff}
+.ssl-ballot-title p{color:#c8d8ec;font-size:14px;line-height:1.4;margin:6px 0}
+.ssl-ballot-body{padding:24px 28px 27px}
+.ssl-ballot-meta{display:flex;align-items:center;flex-wrap:wrap;gap:11px 21px;font-weight:800;font-size:12px;color:#52657f;margin-bottom:22px}
+.ssl-ballot-meta>span{display:inline-flex;align-items:center;gap:6px}
+.ssl-ballot-meta svg{color:#bd353c}
+.ssl-ballot-meta .ssl-ballot-saved{color:#1c7b49}
+.ssl-ballot-meta .ssl-ballot-saved svg{color:#1c7b49}
+.ssl-ballot-progress{display:flex;align-items:center;gap:19px;padding:16px 20px;background:#eef3fa;border-radius:7px;border-left:4px solid #e0b542;margin-bottom:24px}
+.ssl-ballot-progress>div:first-child{display:flex;flex-direction:column;flex-shrink:0;gap:2px}
+.ssl-ballot-progress strong{font:900 27px/1 'Barlow Condensed',Impact,sans-serif;color:#10244b;font-variant-numeric:tabular-nums}
+.ssl-ballot-progress span{font-size:11px;font-weight:800;color:#607189}
+.ssl-ballot-track{height:12px;flex:1;border-radius:99px;background:#d1dce9;overflow:hidden}
+.ssl-ballot-track span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#be2935,#f3bf47);transition:width .25s}
+.ssl-ballot-conference{margin:15px 0;border:1px solid #d7dfea;background:white;border-radius:8px;overflow:hidden}
+.ssl-ballot-conference>summary{display:flex;justify-content:space-between;gap:16px;align-items:center;cursor:pointer;list-style:none;padding:15px 18px;background:#f7f9fd}
+.ssl-ballot-conference>summary::-webkit-details-marker{display:none}
+.ssl-ballot-conference[open]>summary{border-bottom:1px solid #dce4ef;background:#eef3fb}
+.ssl-ballot-conference-name{display:flex;align-items:center;gap:10px;min-width:0}
+.ssl-ballot-conference-name strong{font:900 clamp(16px,2vw,21px) 'Barlow Condensed',Impact,sans-serif;color:#132b51;overflow-wrap:anywhere}
+.ssl-ballot-count{color:#9b3540;background:#ffe9e7;padding:7px 10px;font-size:11px;letter-spacing:.04em;font-weight:900;white-space:nowrap;border-radius:5px}
+.ssl-ballot-candidates{padding:17px;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,275px),1fr));gap:11px}
+.ssl-ballot-candidate{cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px 13px;min-height:88px;border-radius:8px;border:2px solid #dbe2eb;background:#fff;transition:background .15s,border-color .15s,box-shadow .15s}
+.ssl-ballot-candidate:hover:not(.is-disabled){border-color:#c6a13a;background:#fffdf4}
+.ssl-ballot-candidate.is-selected{border-color:#d5a631;background:#fff9e6;box-shadow:0 3px 11px #d2ae3d28}
+.ssl-ballot-candidate.is-disabled:not(.is-selected){background:#f5f6f9;opacity:.73;cursor:default}
+.ssl-ballot-candidate input{flex:0 0 18px;width:18px;height:18px;accent-color:#c02f39;cursor:inherit}
+.ssl-ballot-player{display:flex;align-items:center;gap:11px;min-width:0;flex:1}
+.ssl-ballot-player>span{display:flex;flex-direction:column;min-width:0;gap:4px}
+.ssl-ballot-player strong{font-size:13px;color:#192c4e;overflow-wrap:anywhere;line-height:1.25}
+.ssl-ballot-player small{font-size:11px;color:#627189;line-height:1.2;overflow-wrap:anywhere}
+.ssl-ballot-candidate-foot{display:flex;flex-direction:column;gap:7px;align-items:center;min-width:45px;white-space:nowrap;color:#597088;font-size:10px;font-weight:700}
+.ssl-ballot-candidate-foot svg{color:#2a8b55}
+.ssl-ballot-action{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;padding:23px;margin-top:22px;border-top:3px solid #ebc356;background:#132b51;color:#fff}
+.ssl-ballot-action strong{font:900 22px 'Barlow Condensed',Impact,sans-serif}
+.ssl-ballot-action p{color:#c5d3e8;font-size:12px;margin:5px 0 0}
+.ssl-ballot-action button{min-width:245px;min-height:48px}
+.ssl-ballot-signin{color:#f6c94d!important}
+@media(max-width:700px){.ssl-ballot-banner{padding:21px 16px;gap:12px;flex-wrap:wrap}.ssl-ballot-symbol{width:51px;height:51px;flex-basis:51px}.ssl-ballot-body{padding:16px}.ssl-ballot-candidates{padding:10px;grid-template-columns:1fr}.ssl-ballot-action{padding:15px}.ssl-ballot-action button{width:100%}}
+@media(prefers-reduced-motion:reduce){.ssl-ballot-track span,.ssl-ballot-candidate{transition:none}}
