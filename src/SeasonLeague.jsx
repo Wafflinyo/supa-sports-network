@@ -1,4 +1,6 @@
 import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
+import {lotteryProgress} from './lottery-timing.js';
+import {CalendarDays, CheckCircle2, Clock3, Vote} from 'lucide-react';
 import {heatingUpForSeason} from './heating-up.js';
 import {effectiveGameLineup,gameLineupIsEditable,teamGameLineups,savedLineupLabel} from './roster-lineups.js';
 import {
@@ -630,59 +632,68 @@ function Voting({ league: l }) {
     [team, setTeam] = useActingTeam(l);
   if (!s?.poll)
     return (
-      <Box title="VOTING CLOSED">
-        <p>
-          The commissioner will open a draft-date poll after selecting 12 teams.
-        </p>
-      </Box>
+      <section className="panel ssl-voting-panel">
+        <div className="ssl-poll-hero">
+          <div className="ssl-poll-hero-icon"><Vote size={32}/></div>
+          <div><span className="ssl-poll-kicker">LEAGUE DECISION CENTER</span><h2>DRAFT-DATE VOTING</h2>
+          <p>Voting is not open yet. The commissioner will publish a poll after the 12 franchises are selected.</p></div>
+          <span className="ssl-poll-state">NOT OPEN</span>
+        </div>
+      </section>
     );
-  const open = s.status === "poll" && l.now < new Date(s.poll.closesAt);
+  const open = s.status === "poll" && l.now < new Date(s.poll.closesAt).getTime();
+  const options = s.poll.options || [];
+  const counts = Object.values(s.poll.votes || {});
+  const activeVote = team && s.poll.votes?.[team];
   return (
-    <Box title={open ? "DRAFT-DATE VOTE" : "DRAFT-DATE VOTE CLOSED"}>
-      <p>Deadline: {time(s.poll.closesAt)} · one vote per team.</p>
-      {l.access.role === "commissioner" && (
-        <TeamChooser s={s} value={team} onChange={setTeam} />
-      )}
-      <div className="season-options">
-        {s.poll.options.map((o) => (
-          <div key={o.id}>
-            <strong>{time(o.date)}</strong>
-            <span>
-              {
-                Object.values(s.poll.votes || {}).filter((v) => v === o.id)
-                  .length
-              }{" "}
-              votes
-            </span>
-            {team && open && (
-              <button
-                className="outline-btn"
-                disabled={l.busy}
-                onClick={() => l.act("vote", { team, option: o.id })}
-              >
-                {s.poll.votes[team] === o.id
-                  ? "YOUR VOTE"
-                  : "VOTE FOR THIS DATE"}
-              </button>
-            )}
-          </div>
-        ))}
+    <section className="panel ssl-voting-panel" aria-labelledby="draft-date-poll-title">
+      <div className="ssl-poll-hero">
+        <div className="ssl-poll-hero-icon"><Vote size={34}/></div>
+        <div className="ssl-poll-headline">
+          <span className="ssl-poll-kicker">SEASON {s.number || 1} · OFFICIAL FRANCHISE VOTE</span>
+          <h2 id="draft-date-poll-title">CHOOSE DRAFT NIGHT</h2>
+          <p>Help decide when the Sluggers Supa League takes the stage. Each franchise gets one vote.</p>
+        </div>
+        <span className={`ssl-poll-state ${open ? 'is-open' : 'is-closed'}`}><Clock3 size={15}/>{open ? 'VOTING OPEN' : 'VOTING CLOSED'}</span>
       </div>
-    </Box>
+      <div className="ssl-poll-content">
+        <div className="ssl-poll-meta">
+          <span><CalendarDays size={18}/> Closes {time(s.poll.closesAt)}</span>
+          <span><Vote size={18}/> {counts.length} of {s.teams.length} franchise votes cast</span>
+          {activeVote && <span className="ssl-vote-saved"><CheckCircle2 size={18}/> Your vote is recorded</span>}
+        </div>
+        {l.access.role === "commissioner" && <div className="ssl-voting-team-choice"><TeamChooser s={s} value={team} onChange={setTeam} label="Voting on behalf of franchise"/></div>}
+        <div className="ssl-poll-options">
+          {options.map((o,i) => {
+            const votes = counts.filter(v=>v===o.id).length;
+            const selected = !!team && activeVote===o.id;
+            const share = counts.length ? votes / counts.length * 100 : 0;
+            return <article key={o.id} className={`ssl-poll-option ${selected?'is-selected':''}`}>
+              <div className="ssl-poll-option-heading"><span className="ssl-poll-option-number">OPTION {String(i+1).padStart(2,'0')}</span>
+                {selected && <span className="ssl-poll-chosen"><CheckCircle2 size={17}/> YOUR PICK</span>}
+              </div>
+              <time dateTime={o.date} className="ssl-poll-date">{time(o.date)}</time>
+              <div className="ssl-poll-vote-data"><strong>{votes} {votes===1?'vote':'votes'}</strong><span>{Math.round(share)}% of votes cast</span></div>
+              <div className="ssl-poll-meter" role="meter" aria-label={`Vote share for option ${i+1}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(share)}><span style={{width:`${share}%`}}/></div>
+              {team && open && <button className={selected?'ssl-poll-vote-button selected':'ssl-poll-vote-button'} type="button" aria-pressed={selected} disabled={l.busy || selected} onClick={()=>l.act('vote',{team,option:o.id})}>
+                {selected ? <><CheckCircle2 size={18}/> VOTE RECORDED</> : <>VOTE FOR THIS DATE <Vote size={17}/></>}
+              </button>}
+            </article>;
+          })}
+        </div>
+        <p className="ssl-poll-footnote">{open ? team ? 'You can change your vote before the deadline. The last saved choice is counted.' : 'Choose your franchise to cast its vote.' : 'Voting has ended. The commissioner will confirm the official draft date.'}</p>
+      </div>
+    </section>
   );
 }
 function Draft({ league: l }) {
-  const s = l.season,
-    [reveal, setReveal] = useState(0);
-  useEffect(() => {
-    if (!s?.order?.length) return;
-    setReveal(0);
-    const t = setInterval(
-      () => setReveal((x) => Math.min(s.order.length, x + 1)),
-      1600,
-    );
-    return () => clearInterval(t);
-  }, [s?.id, s?.order?.length]);
+  const s = l.season;
+  // Based on the scheduled lottery time, not a per-visitor interval:
+  // reloading or joining late never restarts (or races ahead of) the reveal.
+  const lottery = lotteryProgress(s?.order?.length || 0, s?.lotteryAt, l.now);
+  const reveal = lottery.revealed;
+  const mixing = ['intro','mixing'].includes(lottery.phase);
+  const announcement = ['announce','complete'].includes(lottery.phase);
   if (!s)
     return (
       <>
@@ -748,7 +759,7 @@ function Draft({ league: l }) {
           <>
             <div className="lottery-reveal lottery-reveal-bingo">
               <div className="bingo-machine" role="img" aria-label="Rotating draft lottery bingo cage with every franchise's logo on a ball">
-                <div className={`bingo-drum ${reveal<s.order.length?'bingo-drum-spinning':'bingo-drum-stopped'}`}>
+                <div className={`bingo-drum ${mixing?'bingo-drum-spinning':'bingo-drum-stopped'}`}>
                   {s.teams.filter(t=>!s.order.slice(0,reveal).includes(t.id)).map((team,i,remaining)=>(
                     <span key={team.id} className="bingo-cage-ball" style={{'--ball-angle':`${i*360/Math.max(remaining.length,1)}deg`}} title={team.name}>
                       {team.logoPath&&<img alt="" src={teamLogo(l.supabase,team.logoPath)}/>}
@@ -759,15 +770,15 @@ function Draft({ league: l }) {
                 <div className="bingo-machine-base" aria-hidden="true"/>
               </div>
               <div className="bingo-announcement" aria-live="polite">
-                <span className="bingo-announcement-heading">{reveal?'BALL DRAWN':'ROTATING THE BINGO CAGE'}</span>
-                <span className={`lottery-ball bingo-drawn-ball ${reveal?'bingo-ball-drawn':'bingo-ball-pending'}`}>
-                  {reveal>0?(()=>{
+                <span className="bingo-announcement-heading">{lottery.phase==='complete'?'THE OFFICIAL ORDER IS IN':announcement?'BALL DRAWN · PICK ANNOUNCED':lottery.phase==='intro'?'MIXING ALL 12 FRANCHISES':'MIXING FOR THE NEXT PICK'}</span>
+                <span key={announcement?reveal:'pending'} className={`lottery-ball bingo-drawn-ball ${announcement?'bingo-ball-drawn':'bingo-ball-pending'}`}>
+                  {announcement&&reveal>0?(()=>{
                     const team=s.teams.find(t=>t.id===s.order[reveal-1]);
                     return team?.logoPath?<img alt={`${team.name} logo on drawn bingo ball`} src={teamLogo(l.supabase,team.logoPath)}/>:reveal;
                   })():'?'}
                 </span>
-                <strong>{reveal?`${reveal}. ${s.teams.find(t=>t.id===s.order[reveal-1])?.name}`:'MIXING ALL 12 TEAM LOGO BALLS…'}</strong>
-                <small>{reveal>=s.order.length?'DRAFT LOTTERY COMPLETE':`${s.order.length-reveal} balls remaining`}</small>
+                <strong>{announcement&&reveal?`#${reveal} · ${s.teams.find(t=>t.id===s.order[reveal-1])?.name}`:lottery.phase==='intro'?'THE CAGE IS MIXING…':'WHO WILL BE CALLED NEXT?'}</strong>
+                <small>{lottery.phase==='complete'?'DRAFT LOTTERY COMPLETE':`${s.order.length-reveal} team${s.order.length-reveal===1?'':'s'} still waiting · next reveal in ${lottery.secondsToNext}s`}</small>
               </div>
             </div>
             <div className="season-draft-order">
@@ -1060,6 +1071,7 @@ function MyTeam({league:l}){
 
 function Teams({ league: l }) {
   const s = l.season;
+  const records = new Map(standings(s).map(t=>[t.id,t]));
   return (
     <div className="season-team-columns">
       {[0, 1].map((col) => (
@@ -1079,6 +1091,7 @@ function Teams({ league: l }) {
                     />
                   )}{" "}
                   {t.name}
+                  <span className="season-team-record" title="Overall regular-season wins and losses">RECORD · {records.get(t.id)?.wins ?? 0}–{records.get(t.id)?.losses ?? 0}</span>
                   <small>
                     <ConferenceMark id={t.conference} size={29}/>{conferences[t.conference] || "Conference pending"} ·{" "}
                     {rosterOf(s, t.id).length} players
@@ -2192,7 +2205,7 @@ function TeamStats({ league: l }) {
             <tr>
               <th>Team</th>
               <th>GP</th>
-              <th>Home Record (W–L)</th><th>Away Record (W–L)</th>
+              <th>Record (W–L)</th><th>Home Record (W–L)</th><th>Away Record (W–L)</th>
               {keys.map((k) => (
                 <th key={k}>{k.replace(/([A-Z])/g, " $1")}</th>
               ))}
@@ -2210,6 +2223,7 @@ function TeamStats({ league: l }) {
                 <tr key={t.id}>
                   <td>{t.name}</td>
                   <td>{games.length}</td>
+                  <td><strong>{records.get(t.id)?.wins??0}–{records.get(t.id)?.losses??0}</strong></td>
                   <td>{records.get(t.id)?.homeWins??0}–{records.get(t.id)?.homeLosses??0}</td>
                   <td>{records.get(t.id)?.awayWins??0}–{records.get(t.id)?.awayLosses??0}</td>
                   {keys.map((k) => (
@@ -2223,7 +2237,7 @@ function TeamStats({ league: l }) {
           </tbody>
         </table>
       </div>
-      <p>Home and Away Records count released regular-season games only.</p>
+      <p>Overall, Home and Away Records count released regular-season games only.</p>
     </Box>
   );
 }
