@@ -2183,52 +2183,73 @@ function Standings({ league: l }) {
   );
 }
 function TeamStats({ league: l }) {
+  const [view, setView] = useState("Totals");
+  const isAverage = view === "Averages per Game";
   const keys = [
-      "atBats",
-      "hits",
-      "runs",
-      "homeRuns",
-      "rbi",
-      "putouts",
-      "assists",
-      "bobbles",
-      "pitchStrikeouts",
-      "earnedRuns",
-    ],
-    s = l.season,
-    records = new Map(standings(s).map(t=>[t.id,t]));
+    "atBats",
+    "hits",
+    "runs",
+    "homeRuns",
+    "rbi",
+    "putouts",
+    "assists",
+    "bobbles",
+    "pitchStrikeouts",
+    "earnedRuns",
+  ];
+  const s = l.season;
+  const records = new Map(standings(s).map(t => [t.id, t]));
+  const statLabel = k => k.replace(/([A-Z])/g, " $1");
   return (
-    <Box title="TEAM STAT TOTALS">
-      <div className="season-table">
+    <Box title={isAverage ? "TEAM STAT AVERAGES" : "TEAM STAT TOTALS"}>
+      <div className="stat-view-switch" role="group" aria-label="Team stat display">
+        {["Totals", "Averages per Game"].map(option => (
+          <button
+            key={option}
+            type="button"
+            className={view === option ? "active" : ""}
+            aria-pressed={view === option}
+            onClick={() => setView(option)}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
+      <div className="season-table" role="region" aria-label={isAverage ? "Team averages per game" : "Team stat totals"} tabIndex={0}>
         <table>
+          <caption className="team-stats-caption">{isAverage ? "Team averages per completed game" : "Team season totals"}</caption>
           <thead>
             <tr>
               <th>Team</th>
               <th>GP</th>
               <th>Record (W–L)</th><th>Home Record (W–L)</th><th>Away Record (W–L)</th>
-              {keys.map((k) => (
-                <th key={k}>{k.replace(/([A-Z])/g, " $1")}</th>
-              ))}
+              {keys.map(k => <th key={k}>{statLabel(k)}{isAverage ? " / G" : ""}</th>)}
             </tr>
           </thead>
           <tbody>
-            {s?.teams.map((t) => {
-              const games = s.games.filter(
-                  (g) => g.stage === "final" && [g.away, g.home].includes(t.id),
-                ),
-                all = games.flatMap((g) =>
-                  g.result.players.filter((p) => p.team === t.id),
-                );
+            {s?.teams.map(t => {
+              const games = s.games.filter(g =>
+                g.stage === "final" && [g.away, g.home].includes(t.id)
+              );
+              const all = games.flatMap(g =>
+                (g.result?.players || []).filter(p => p.team === t.id)
+              );
+              const totals = Object.fromEntries(
+                keys.map(k => [k, all.reduce((sum, p) => sum + (Number(p.stats?.[k]) || 0), 0)])
+              );
+              const record = records.get(t.id);
               return (
                 <tr key={t.id}>
                   <td>{t.name}</td>
                   <td>{games.length}</td>
-                  <td><strong>{records.get(t.id)?.wins??0}–{records.get(t.id)?.losses??0}</strong></td>
-                  <td>{records.get(t.id)?.homeWins??0}–{records.get(t.id)?.homeLosses??0}</td>
-                  <td>{records.get(t.id)?.awayWins??0}–{records.get(t.id)?.awayLosses??0}</td>
-                  {keys.map((k) => (
-                    <td key={k}>
-                      {all.reduce((n, p) => n + (p.stats[k] || 0), 0)}
+                  <td><strong>{record?.wins ?? 0}–{record?.losses ?? 0}</strong></td>
+                  <td>{record?.homeWins ?? 0}–{record?.homeLosses ?? 0}</td>
+                  <td>{record?.awayWins ?? 0}–{record?.awayLosses ?? 0}</td>
+                  {keys.map(k => (
+                    <td key={k} className="team-stats-number">
+                      {isAverage
+                        ? games.length ? (totals[k] / games.length).toFixed(2) : "—"
+                        : totals[k]}
                     </td>
                   ))}
                 </tr>
@@ -2237,7 +2258,12 @@ function TeamStats({ league: l }) {
           </tbody>
         </table>
       </div>
-      <p>Overall, Home and Away Records count released regular-season games only.</p>
+      <p className="team-stats-explainer">
+        {isAverage
+          ? "Team averages are the sum of all players' stats divided by the team's completed games. GP and all W–L records remain totals; teams without completed games show a dash."
+          : "Team totals combine every player's stats from completed games."}
+        {" "}Overall, Home and Away Records count released regular-season games only.
+      </p>
     </Box>
   );
 }
