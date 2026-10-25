@@ -1,5 +1,6 @@
 import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
 import {heatingUpForSeason} from './heating-up.js';
+import {effectiveGameLineup,gameLineupIsEditable,teamGameLineups,savedLineupLabel} from './roster-lineups.js';
 import {
   SeasonRuleControls,
   PublicBallots,
@@ -242,7 +243,7 @@ export function SeasonPrompts({ league, go }) {
       ) : needs ? (
         <>
           <p>Update your default lineup after the draft or roster change.</p>
-          <button className="red-btn" onClick={() => go("Team Tools")}>
+          <button className="red-btn" onClick={() => go(l.access.role === "commissioner" ? "Commissioner Tools" : "GM Tools", "Roster")}>
             SET DEFAULT LINEUP
           </button>
         </>
@@ -252,7 +253,7 @@ export function SeasonPrompts({ league, go }) {
             Submit a lineup for your upcoming game on {time(upcoming.startsAt)},
             or choose your default.
           </p>
-          <button className="red-btn" onClick={() => go("Schedule")}>
+          <button className="red-btn" onClick={() => go(l.access.role === "commissioner" ? "Schedule" : "GM Tools", "Roster")}>
             GAME LINEUP
           </button>
         </>
@@ -284,7 +285,7 @@ export function SeasonWorkspace({ league, registeredTeams }) {
     "Season Setup",
     "Draft",
     "Schedule & Results",
-    "Lineups",
+    "Team Rosters",
     "Trades",
     "Extensions",
   ];
@@ -593,7 +594,7 @@ export function SeasonWorkspace({ league, registeredTeams }) {
       )}
       {tab === "Draft" && <Draft league={l} />}
       {tab === "Schedule & Results" && <Schedule league={l} commissioner />}
-      {tab === "Lineups" && <MyTeam league={l} />}
+      {tab === "Team Rosters" && <RosterManager league={l} />}
       {tab === "Trades" && <Trades league={l} />}
       {tab === "Extensions" && <Extensions league={l} />}
     </>
@@ -905,7 +906,7 @@ function LineupEditor({ league: l, team, game, onDone }) {
           (pos, i) => initial?.starters?.[i] || { player: "", position: pos },
         ),
       ),
-    [team, game?.id],
+    [team, game?.id, JSON.stringify(initial)],
   );
   const lineup = {
       starters: slots.map((x) => ({ ...x, player: Number(x.player) })),
@@ -1000,49 +1001,74 @@ function LineupEditor({ league: l, team, game, onDone }) {
     </form>
   );
 }
-function MyTeam({ league: l }) {
-  const [team, setTeam] = useActingTeam(l);
-  return (
-    <>
-      {l.access.role === "commissioner" && (
-        <TeamChooser s={l.season} value={team} onChange={setTeam} />
-      )}
-      {l.season && team && <Box title="TEAM STADIUMS">
-        <p>Stadiums owned this season:</p>
-        {(() => {
-          const stadiums = [...new Set([...(l.season.retainedStadiums?.[team] || []),
-            ...(l.season.picks || []).filter(p => p.team === team && p.kind === "stage").map(p => p.stage)])];
-          return stadiums.length ? <ul>{stadiums.map(stadium => <li key={stadium}>{stadium}</li>)}</ul> : <p>No Stadium selected yet.</p>;
-        })()}
-        <p>Accepted Stadium extensions retain Stadiums for next season and replace the team's next Stadium Pick. Teams without a retained Stadium receive one nontradable Stadium Pick.</p>
-      </Box>}
-      <Box title="ROSTER & DEFAULT LINEUP">
-        {!l.season || !team ? (
-          <p>Select your season team to manage its roster.</p>
-        ) : l.season.status === "offseason" || l.season.offseasonTrading ? (
-          <>
-            <p>
-              Only extended players remain. The next draft fills the roster; no
-              default lineup is needed yet.
-            </p>
-            {rosterOf(l.season, team).map((id) => (
-              <p key={id}>
-                <Player id={id} />
-              </p>
-            ))}
-          </>
-        ) : rosterOf(l.season, team).length < 11 ? (
-          <p>
-            Your team needs {11 - rosterOf(l.season, team).length} more players.
-            Visit Free Agency or use Random Fill.
-          </p>
-        ) : (
-          <LineupEditor key={team} league={l} team={team} />
-        )}
+export function RosterManager({ league: l }) {
+  const s=l.season;
+  const [team,setTeam]=useActingTeam(l);
+  const [editDefault,setEditDefault]=useState(false);
+  const [editingGame,setEditingGame]=useState(null);
+  useEffect(()=>{setEditDefault(false);setEditingGame(null)},[s?.id,team]);
+  if(!s)return <Box title="ROSTER"><p>No season has been created yet. Team rosters will appear after the draft starts.</p></Box>;
+  const chosen=s.teams.find(t=>t.id===team);
+  const roster=team?rosterOf(s,team):[];
+  const playable=['postdraft','regular','postseason','retention'].includes(s.status)&&!s.offseasonTrading;
+  const canEditDefault=playable && roster.length>=11;
+  const hasDefault=team&&validLineup(s,team,s.defaults?.[team]);
+  const fixtures=team?teamGameLineups(s,team):[];
+  const ready=fixtures.filter(g=>gameLineupIsEditable(s,team,g));
+  const defaultLineup=s.defaults?.[team];
+  return <>
+    {l.access.role==='commissioner'&&<Box title="COMMISSIONER · ALL TEAM LINEUPS">
+      <p>Select any franchise to edit its default lineup or one of its upcoming game lineups. Your changes use the same Schedule records as GM submissions.</p>
+      <TeamChooser s={s} value={team} onChange={setTeam} label="Manage franchise roster"/>
+    </Box>}
+    {!chosen?<Box title="ROSTER"><p>{l.access.role==='commissioner'?'Choose a team above to manage its roster.':'Your franchise will appear once the commissioner adds it to Season 1.'}</p></Box>:<>
+      <Box title={`${chosen.name.toUpperCase()} · ROSTER`}>
+        <p><strong>{roster.length} players</strong> · {hasDefault?'Default lineup saved':'Default lineup not saved yet'} · {s.status.toUpperCase()}</p>
+        {roster.length===0?<p>Players will appear as they are drafted.</p>:<div className="roster-manager-players">{roster.map(id=><div key={id} className="roster-manager-player"><Player id={id}/></div>)}</div>}
       </Box>
-    </>
-  );
+      <Box title="DEFAULT LINEUP">
+        <p>This lineup is the fallback for every game until you submit a specific game lineup. Changes here do not overwrite a game lineup already submitted.</p>
+        {roster.length<11?<p><strong>Draft or acquire at least 11 players before saving a default lineup.</strong></p>:<>
+          {hasDefault&&!editDefault&&<div className="roster-lineup-summary">
+            <h3>CURRENT DEFAULT BATTING ORDER</h3>
+            {defaultLineup.starters.map((p,i)=><p key={p.player}><strong>{i+1}.</strong> <Player id={p.player}/> · {p.position}</p>)}
+            <p><strong>Bench:</strong> {defaultLineup.bench.map(name).join(' · ')||'None'}</p>
+          </div>}
+          {!canEditDefault?<p>Default-lineup editing opens after the draft and closes during the offseason.</p>:<>
+            <button type="button" className="outline-btn" onClick={()=>setEditDefault(v=>!v)} aria-expanded={editDefault}>{editDefault?'CANCEL DEFAULT LINEUP EDIT':l.access.role==='commissioner'?'EDIT TEAM DEFAULT LINEUP':'EDIT MY DEFAULT LINEUP'}</button>
+            {!hasDefault&&!editDefault&&<p>Click the button above to create the required default lineup.</p>}
+            {editDefault&&<LineupEditor key={s.id+':'+team+':default'} league={l} team={team} onDone={()=>setEditDefault(false)}/>}
+          </>}
+        </>}
+      </Box>
+      <Box title="UPCOMING GAME LINEUPS">
+        <p>Select a scheduled game, then submit the nine starters, batting order, defensive positions and bench. Your saved lineup appears automatically in Schedule and replaces the default for that matchup only. You may edit it again until the game is locked by its result upload.</p>
+        {!s.schedulePublished?<p><strong>The commissioner must publish the schedule before game-specific lineups can be submitted.</strong></p>:!fixtures.length?<p>No scheduled games for this franchise yet.</p>:<>
+          {fixtures.filter(g=>g.stage!=='cancelled').map(g=>{
+            const editable=gameLineupIsEditable(s,team,g);
+            const opponent=s.teams.find(t=>t.id===(g.away===team?g.home:g.away));
+            const existing=effectiveGameLineup(s,team,g);
+            const active=editingGame===g.id;
+            return <section className="roster-fixture" key={g.id}>
+              <div className="roster-fixture-heading">
+                <div><h3>{g.away===team?'VS':'AT'} {opponent?.name||'Opponent'}</h3>
+                <p>{time(g.startsAt)} · {g.stage.toUpperCase()} · <strong>{savedLineupLabel(s,team,g)}</strong></p></div>
+                {editable&&<button type="button" className="outline-btn" aria-expanded={active} onClick={()=>setEditingGame(active?null:g.id)}>{active?'CLOSE EDITOR':g.lineups?.[team]?'EDIT GAME LINEUP':'SUBMIT GAME LINEUP'}</button>}
+              </div>
+              {!active&&existing?.starters?.length>0&&<details><summary>VIEW LINEUP ON SCHEDULE</summary>{existing.starters.map((p,i)=><p key={i}>{i+1}. {name(p.player)} · {p.position}</p>)}<p><strong>Bench:</strong> {existing.bench?.map(name).join(' · ')||'None'}</p></details>}
+              {active&&editable&&<LineupEditor key={s.id+':'+team+':'+g.id} league={l} team={team} game={g} onDone={()=>setEditingGame(null)}/>}
+              {!editable&&<p className="roster-lock-status">{g.stage==='recorded'||g.stage==='final'||g.lockedAt?'Lineup locked after result upload.':'Lineup edits are unavailable for this game.'}</p>}
+            </section>;
+          })}
+        </>}
+      </Box>
+    </>}
+  </>;
 }
+function MyTeam({league:l}){
+  return <RosterManager league={l}/>;
+}
+
 function Teams({ league: l }) {
   const s = l.season;
   return (
@@ -2337,15 +2363,13 @@ export function SeasonPage({ page, league: l }) {
     </>
   );
 }
-export function SeasonTeamTools({ league }) {
-  return (
-    <>
-      <SeasonSelector league={league} />
-      <SeasonFeedback league={league} />
-      <MyTeam league={league} />
-      <Extensions league={league} />
-    </>
-  );
+export function SeasonTeamTools({ league, section='Roster' }) {
+  return <>
+    <SeasonSelector league={league}/>
+    <SeasonFeedback league={league}/>
+    {section==='Roster'&&<RosterManager league={league}/>}
+    {section==='Extensions'&&<Extensions league={league}/>}
+  </>;
 }
 export function SeasonHome({ league: l, go }) {
   const s = l.season;

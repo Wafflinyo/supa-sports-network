@@ -477,3 +477,19 @@ details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
 .heating-up-status small{display:block;color:#5b6270;margin-top:3px}
 .heat-history{max-height:260px;overflow:auto}
 .heat-history p{padding:7px 0;border-bottom:1px solid #dce3ee}
+
+/* Season 1 roster management: one shared editor for GMs and commissioners. */
+.roster-manager-players{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:7px;margin:15px 0}
+.roster-manager-player{min-width:0;border:1px solid #e1e6ef;border-radius:6px;background:#f8faff;padding:9px 12px}
+.roster-lineup-summary{padding:14px 16px;margin:13px 0;background:#f4f6fa;border:1px solid #dce2ec;border-radius:5px}
+.roster-lineup-summary h3{margin:0 0 10px;color:#11284b;font-size:18px}
+.roster-lineup-summary p{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
+.roster-fixture{padding:16px 0;border-top:1px solid #dce1eb}
+.roster-fixture-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.roster-fixture-heading h3{font-size:20px;color:#152b53;margin:0 0 5px}
+.roster-fixture-heading p{margin:0;color:#606f84;font-size:13px}
+.roster-fixture-heading>div{min-width:0}
+.roster-fixture .season-lineup{margin:14px 0}
+.roster-fixture details{margin:12px 0;padding:9px 12px;border:1px solid #e1e6ed}
+.roster-lock-status{color:#67758b;font-size:13px}
+@media(max-width:620px){.roster-fixture-heading{align-items:stretch;flex-direction:column}.roster-fixture-heading button{width:100%}.roster-manager-players{grid-template-columns:1fr}}
