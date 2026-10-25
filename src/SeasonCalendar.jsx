@@ -96,59 +96,23 @@ export function NextSeason({ league: l }) {
   );
 }
 export function ScheduleGenerator({ league: l }) {
-  const s = l.season;
-  if (!s || s.status !== "postdraft" || l.access.role !== "commissioner")
-    return null;
-  return (
-    <Box title="22-WEEK HOME & AWAY SCHEDULE">
-      <p>
-        Generate six games per week for 22 weeks. Each team gets 11 home games
-        and 11 away games. Adjust individual times afterward.
-      </p>
-      <form
-        className="season-form"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const f = new FormData(e.currentTarget);
-          if (!s.games.length || confirm("Replace the unplayed schedule?"))
-            l.act("generate_schedule", {
-              weekOne: f.get("weekOne"),
-              time: f.get("time"),
-            });
-        }}
-      >
-        <label>
-          Week 1 Sunday (Eastern Time)
-          <input
-            required
-            type="date"
-            name="weekOne"
-            defaultValue={s.weekOne || ""}
-          />
-        </label>
-        <label>
-          Default Sunday game time (Eastern Time)
-          <input required type="time" name="time" defaultValue="19:00" />
-        </label>
-        <button className="red-btn" disabled={l.busy}>
-          GENERATE 22-WEEK SCHEDULE
-        </button>
-        <button
-          type="button"
-          className="outline-btn"
-          disabled={l.busy}
-          onClick={(e) => {
-            const f = new FormData(e.currentTarget.form);
-            l.act("season_calendar", { weekOne: f.get("weekOne") });
-          }}
-        >
-          SAVE CALENDAR ONLY
-        </button>
+  const s=l.season;
+  if(!s||s.status!=='postdraft'||l.access.role!=='commissioner')return null;
+  const regular=(s.games||[]).filter(g=>g.phase==='regular');
+  const dated=regular.filter(g=>g.startsAt).length;
+  return <Box title="GENERATE SEASON 1 MATCHUPS · DATES LATER">
+    <p>Generate all <strong>132 matchups across 22 weeks</strong>, six games per week. Each team faces every opponent twice — once at home and once away — for exactly 11 home and 11 away games per franchise.</p>
+    <p><strong>Matchups first, dates second.</strong> Generate the weekly pairing list now, then enter each game's actual date and time in Schedule &amp; Results. The schedule cannot be published until all 132 games are dated and every assigned Week matches its date.</p>
+    <button type="button" className="red-btn" disabled={l.busy} onClick={()=>{
+      if(!regular.length||confirm('Replace the unplayed matchups? Any dates entered on the old matchup list will be lost.'))l.act('generate_schedule',{});
+    }}>{regular.length?'REGENERATE 22-WEEK MATCHUPS':'GENERATE 22-WEEK MATCHUPS'}</button>
+    {regular.length>0&&<p role="status"><strong>{dated} / 132 games dated.</strong> {dated===132?'Dates complete. Review Week 1 before publishing.':'Open Schedule & Results below and set each game date.'}</p>}
+    <details className="schedule-anchor-settings"><summary>OPTIONAL · SET WEEK 1 SUNDAY / TRADE DEADLINE</summary>
+      <p>The site can derive the Week 1 Sunday from your first week's dates when the schedule is published, or you can set the Week 1 starting Sunday now.</p>
+      <form className="season-form" onSubmit={e=>{e.preventDefault();const weekOne=new FormData(e.currentTarget).get('weekOne');l.act('season_calendar',{weekOne});}}>
+        <label>Week 1 Sunday (Eastern Time)<input required type="date" name="weekOne" defaultValue={s.weekOne||''}/></label>
+        <button className="outline-btn" disabled={l.busy}>SAVE WEEK 1 SUNDAY</button>
       </form>
-      <p>
-        Manually entered schedules must also contain all 132 home/away pairings,
-        with one game per team per week.
-      </p>
-    </Box>
-  );
+    </details>
+  </Box>;
 }

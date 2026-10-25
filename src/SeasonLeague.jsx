@@ -30,6 +30,7 @@ import {
   elapsed,
   clock,
   standings,
+  matchupType,
   aggregate,
   readRio,
   buildReport,
@@ -745,31 +746,38 @@ function Draft({ league: l }) {
           <p>Waiting for the scheduled lottery time.</p>
         ) : (
           <>
-            <div className="lottery-reveal">
-              <span className="lottery-ball">{reveal < 12 ? "★" : 12}</span>
-              {reveal > 0 &&
-                s.teams.find((t) => t.id === s.order[reveal - 1])?.logoPath && (
-                  <img
-                    alt=""
-                    src={teamLogo(
-                      l.supabase,
-                      s.teams.find((t) => t.id === s.order[reveal - 1])
-                        .logoPath,
-                    )}
-                  />
-                )}
-              <strong>
-                {reveal
-                  ? `${reveal}. ${s.teams.find((t) => t.id === s.order[reveal - 1])?.name}`
-                  : "MIXING THE BINGO BALLS…"}
-              </strong>
+            <div className="lottery-reveal lottery-reveal-bingo">
+              <div className="bingo-machine" role="img" aria-label="Rotating draft lottery bingo cage with every franchise's logo on a ball">
+                <div className={`bingo-drum ${reveal<s.order.length?'bingo-drum-spinning':'bingo-drum-stopped'}`}>
+                  {s.teams.filter(t=>!s.order.slice(0,reveal).includes(t.id)).map((team,i,remaining)=>(
+                    <span key={team.id} className="bingo-cage-ball" style={{'--ball-angle':`${i*360/Math.max(remaining.length,1)}deg`}} title={team.name}>
+                      {team.logoPath&&<img alt="" src={teamLogo(l.supabase,team.logoPath)}/>}
+                    </span>
+                  ))}
+                </div>
+                <div className="bingo-crank" aria-hidden="true"/>
+                <div className="bingo-machine-base" aria-hidden="true"/>
+              </div>
+              <div className="bingo-announcement" aria-live="polite">
+                <span className="bingo-announcement-heading">{reveal?'BALL DRAWN':'ROTATING THE BINGO CAGE'}</span>
+                <span className={`lottery-ball bingo-drawn-ball ${reveal?'bingo-ball-drawn':'bingo-ball-pending'}`}>
+                  {reveal>0?(()=>{
+                    const team=s.teams.find(t=>t.id===s.order[reveal-1]);
+                    return team?.logoPath?<img alt={`${team.name} logo on drawn bingo ball`} src={teamLogo(l.supabase,team.logoPath)}/>:reveal;
+                  })():'?'}
+                </span>
+                <strong>{reveal?`${reveal}. ${s.teams.find(t=>t.id===s.order[reveal-1])?.name}`:'MIXING ALL 12 TEAM LOGO BALLS…'}</strong>
+                <small>{reveal>=s.order.length?'DRAFT LOTTERY COMPLETE':`${s.order.length-reveal} balls remaining`}</small>
+              </div>
             </div>
             <div className="season-draft-order">
-              {s.order.slice(0, reveal).map((id, i) => (
-                <span key={id}>
-                  {i + 1}. {s.teams.find((t) => t.id === id)?.name}
-                </span>
-              ))}
+              {s.order.slice(0,reveal).map((id,i)=>{
+                const team=s.teams.find(t=>t.id===id);
+                return <span key={id} className="lottery-result-team">
+                  {team?.logoPath&&<img alt="" src={teamLogo(l.supabase,team.logoPath)}/>}
+                  {i+1}. {team?.name}
+                </span>;
+              })}
             </div>
           </>
         )}
@@ -1120,6 +1128,21 @@ function Teams({ league: l }) {
     </div>
   );
 }
+function GameDateEditor({league:l,game:g}){
+  const s=l.season;
+  const [date,setDate]=useState('');
+  const [open,setOpen]=useState(false);
+  const canSet=['postdraft','regular'].includes(s.status)&&!s.schedulePublished&&g.phase==='regular'&&g.stage==='scheduled';
+  if(!canSet)return null;
+  return <div className="game-date-editor">
+    <button type="button" className={g.startsAt?'outline-btn':'red-btn'} onClick={()=>setOpen(v=>!v)} aria-expanded={open}>{open?'CLOSE DATE EDITOR':g.startsAt?'CHANGE GAME DATE & TIME':'SET GAME DATE & TIME'}</button>
+    {open&&<form className="season-form" onSubmit={async e=>{e.preventDefault();if(!date)return;const start=new Date(date);if(!Number.isFinite(start.getTime()))return;const ok=await l.act('set_matchup_time',{game:g.id,startsAt:start.toISOString()});if(ok){setOpen(false);setDate('')}}}>
+      <p><strong>Week {g.week}</strong> · Enter the actual matchup date and time in your device's timezone. It will display in Eastern Time.</p>
+      <label>Matchup date and time<input type="datetime-local" required value={date} onChange={e=>setDate(e.target.value)}/></label>
+      <button className="red-btn" disabled={!date||l.busy}>SAVE MATCHUP DATE</button>
+    </form>}
+  </div>;
+}
 function Schedule({ league: l, commissioner = false }) {
   const s = l.season,
     [form, setForm] = useState({ away: "", home: "", startsAt: "", label: "" }),
@@ -1133,8 +1156,11 @@ function Schedule({ league: l, commissioner = false }) {
       </Box>
     );
   const admin = commissioner && l.access.role === "commissioner",
-    games = [...s.games].sort(
-      (a, b) => new Date(a.startsAt) - new Date(b.startsAt),
+    games = [...s.games].sort((a,b)=>
+      (a.phase==='regular'?0:1)-(b.phase==='regular'?0:1)||
+      Number(a.week||999)-Number(b.week||999)||
+      (a.startsAt?new Date(a.startsAt).getTime():0)-(b.startsAt?new Date(b.startsAt).getTime():0)||
+      String(a.id).localeCompare(String(b.id))
     );
   return (
     <>
@@ -1247,7 +1273,7 @@ function Schedule({ league: l, commissioner = false }) {
             <button
               type="button"
               className="outline-btn"
-              disabled={l.busy || !s.games.length}
+              disabled={l.busy || !s.games.length || s.games.filter(g=>g.phase==="regular").some(g=>!g.startsAt)}
               onClick={() => l.act("publish_schedule")}
             >
               PUBLISH SCHEDULE
@@ -1273,17 +1299,20 @@ function Schedule({ league: l, commissioner = false }) {
           <p>The commissioner is preparing the schedule.</p>
         </Box>
       ) : (
-        games.map((g) => (
-          <section className="panel season-game" key={g.id}>
+        games.map((g,i) => (
+          <React.Fragment key={g.id}>
+          {g.week && (i===0 || games[i-1].week!==g.week) && <h2 className="schedule-week-heading">WEEK {g.week} <small>· SIX MATCHUPS</small></h2>}
+          <section className="panel season-game">
             <div>
               <small>
                 {g.postponed ? "POSTPONED · " : ""}
-                {g.label || g.phase} · {time(g.startsAt)}
+                {g.label || g.phase} · {g.startsAt?time(g.startsAt):"DATE & TIME TBD"}
               </small>
               <h3>
                 {s.teams.find((t) => t.id === g.away)?.name} <b>AT</b>{" "}
                 {s.teams.find((t) => t.id === g.home)?.name}
               </h3>
+              <p className="matchup-conference"><ConferenceMark id={s.teams.find(t=>t.id===g.home)?.conference} size={19}/> {matchupType(s,g)}</p>
               {g.announcement && <p>{g.announcement}</p>}
               {g.youtubeUrl && (
                 <a href={g.youtubeUrl} target="_blank" rel="noreferrer">
@@ -1309,6 +1338,7 @@ function Schedule({ league: l, commissioner = false }) {
                   {g.lineups[team] ? "EDIT SUBMITTED" : "SUBMIT"} LINEUP
                 </button>
               )}
+            {admin && <GameDateEditor league={l} game={g}/>}
             {admin && (
               <div className="season-inline">
                 <button
@@ -1401,6 +1431,7 @@ function Schedule({ league: l, commissioner = false }) {
               />
             )}
           </section>
+          </React.Fragment>
         ))
       )}
     </>
@@ -2170,7 +2201,8 @@ function TeamStats({ league: l }) {
       "pitchStrikeouts",
       "earnedRuns",
     ],
-    s = l.season;
+    s = l.season,
+    records = new Map(standings(s).map(t=>[t.id,t]));
   return (
     <Box title="TEAM STAT TOTALS">
       <div className="season-table">
@@ -2179,6 +2211,7 @@ function TeamStats({ league: l }) {
             <tr>
               <th>Team</th>
               <th>GP</th>
+              <th>Home Record (W–L)</th><th>Away Record (W–L)</th>
               {keys.map((k) => (
                 <th key={k}>{k.replace(/([A-Z])/g, " $1")}</th>
               ))}
@@ -2196,6 +2229,8 @@ function TeamStats({ league: l }) {
                 <tr key={t.id}>
                   <td>{t.name}</td>
                   <td>{games.length}</td>
+                  <td>{records.get(t.id)?.homeWins??0}–{records.get(t.id)?.homeLosses??0}</td>
+                  <td>{records.get(t.id)?.awayWins??0}–{records.get(t.id)?.awayLosses??0}</td>
                   {keys.map((k) => (
                     <td key={k}>
                       {all.reduce((n, p) => n + (p.stats[k] || 0), 0)}
@@ -2207,6 +2242,7 @@ function TeamStats({ league: l }) {
           </tbody>
         </table>
       </div>
+      <p>Home and Away Records count released regular-season games only.</p>
     </Box>
   );
 }
