@@ -1,5 +1,6 @@
 import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
 import {lotteryProgress} from './lottery-timing.js';
+import {CommissionerVoteTracker} from './VoteParticipation.jsx';
 import {CalendarDays, CheckCircle2, Clock3, Vote} from 'lucide-react';
 import {heatingUpForSeason} from './heating-up.js';
 import {effectiveGameLineup,gameLineupIsEditable,teamGameLineups,savedLineupLabel} from './roster-lineups.js';
@@ -84,6 +85,8 @@ export function useSeasonLeague(supabase, access) {
     [error, setError] = useState(""),
     [notice, setNotice] = useState(""),
     [busy, setBusy] = useState(false),
+    [ballotVoters, setBallotVoters] = useState(null),
+    [ballotVotersError, setBallotVotersError] = useState(""),
     [now, setNow] = useState(Date.now());
   const season = seasons.find((s) => s.id === selected) || seasons[0] || null;
   async function refresh() {
@@ -95,6 +98,22 @@ export function useSeasonLeague(supabase, access) {
     }
     setSeasons(r.data || []);
     setError("");
+    // Secure, commissioner-only roster. No account identities enter the public
+    // season response; the server verifies current commissioner access.
+    const targetSeason = selected || (r.data || [])[0]?.id;
+    if (access.role === "commissioner" && targetSeason) {
+      const v = await supabase.rpc("ssl_commissioner_ballot_voters", {target_season: targetSeason});
+      if (v.error) {
+        setBallotVoters(null);
+        setBallotVotersError(v.error.message);
+      } else {
+        setBallotVoters(v.data || {});
+        setBallotVotersError("");
+      }
+    } else {
+      setBallotVoters(null);
+      setBallotVotersError("");
+    }
     if (
       ["gm", "commissioner"].includes(access.role) &&
       (selected || (r.data || [])[0]?.id)
@@ -154,6 +173,8 @@ export function useSeasonLeague(supabase, access) {
     error,
     notice,
     busy,
+    ballotVoters,
+    ballotVotersError,
     now,
     act,
     refresh,
@@ -662,7 +683,10 @@ function Voting({ league: l }) {
           <span><Vote size={18}/> {counts.length} of {s.teams.length} franchise votes cast</span>
           {activeVote && <span className="ssl-vote-saved"><CheckCircle2 size={18}/> Your vote is recorded</span>}
         </div>
-        {l.access.role === "commissioner" && <div className="ssl-voting-team-choice"><TeamChooser s={s} value={team} onChange={setTeam} label="Voting on behalf of franchise"/></div>}
+        {l.access.role === "commissioner" && <>
+          <CommissionerVoteTracker teams={s.teams || []} votedIds={Object.keys(s.poll.votes || {})}/>
+          <div className="ssl-voting-team-choice"><TeamChooser s={s} value={team} onChange={setTeam} label="Voting on behalf of franchise"/></div>
+        </>}
         <div className="ssl-poll-options">
           {options.map((o,i) => {
             const votes = counts.filter(v=>v===o.id).length;
