@@ -879,25 +879,6 @@ function HeatingStatus({season,game,team,includeRecorded=false}) {
   const ids=heatingUpForSeason(season,{includeRecorded}).byGame[game.id]?.[team]||[];
   return <p className="heating-up-status"><strong>★ HEATING UP · Next-game stars:</strong> {ids.length?ids.map(name).join(' · '):'None earned yet'} <small>Automatic from previous game scores of 90+.</small></p>;
 }
-function HeatingUpPage({league:l}) {
-  const season=l.season;
-  if(!season)return <Box title="HEATING UP"><p>No season available yet.</p></Box>;
-  const heat=heatingUpForSeason(season,{includeRecorded:l.access.role==='commissioner'});
-  const entries=Object.entries(heat.players).filter(([,v])=>v.heatingUpCount>0)
-    .sort((a,b)=>b[1].heatingUpCount-a[1].heatingUpCount||b[1].longestHotStreak-a[1].longestHotStreak);
-  const gameNames=new Map((season.games||[]).map(g=>[g.id,`${season.teams?.find(t=>t.id===g.away)?.name||'Away'} at ${season.teams?.find(t=>t.id===g.home)?.name||'Home'}`]));
-  return <>
-    <Box title="HEATING UP · SEASON RECORDS">
-      <p>A Project Rio Game Score of 90 or higher automatically stars the player for their next team game. Two or more consecutive qualifying games create a hot streak. These are cumulative totals, not per-game averages.</p>
-      {entries.length?<div className="season-table"><table><thead><tr><th>Player</th><th>Times Heated Up</th><th>Hot Streaks (2+)</th><th>Longest Streak</th><th>Current Streak</th></tr></thead><tbody>
-        {entries.map(([id,r])=><tr key={id}><td><Player id={Number(id)}/></td><td>{r.heatingUpCount}</td><td>{r.hotStreaks}</td><td>{r.longestHotStreak}</td><td>{r.currentHotStreak}</td></tr>)}
-      </tbody></table></div>:<p>No official 90+ Game Scores recorded yet.</p>}
-    </Box>
-    <Box title="HEATING UP · GAME HISTORY">
-      {heat.events.length?heat.events.map((e,i)=><p key={e.gameId+'-'+i}><strong>{name(e.playerId)}</strong> · {e.at?new Date(e.at).toLocaleDateString('en-US'):'Date unavailable'} · {gameNames.get(e.gameId)} · Score {e.gameScore} · {e.streak>=2?'HOT STREAK ×'+e.streak:'Heating Up'}{e.starredGame?' · Star next game':''}</p>):<p>Game-by-game Heating Up history appears after official reports are released.</p>}
-    </Box>
-  </>;
-}
 function LineupEditor({ league: l, team, game, onDone }) {
   const s = l.season,
     initial = game?.lineups?.[team] || s.defaults?.[team],
@@ -2335,7 +2316,6 @@ export const seasonPages = [
   "Standings",
   "Teams",
   "Team Stats",
-  "Heating Up",
   "Transactions",
   "Playoff Bracket",
   "Voting",
@@ -2358,8 +2338,6 @@ export function SeasonPage({ page, league: l }) {
         <Teams league={l} />
       ) : page === "Team Stats" ? (
         <TeamStats league={l} />
-      ) : page === "Heating Up" ? (
-        <HeatingUpPage league={l} />
       ) : page === "Voting" ? (
         <>
           <PublicBallots league={l} />
