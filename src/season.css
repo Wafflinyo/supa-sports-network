@@ -634,3 +634,40 @@ details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
 .season-box .team-stats-caption{caption-side:top;text-align:left;background:#edf1f7;color:#526179;padding:11px 16px;font-size:12px;font-weight:800;letter-spacing:.03em;border-block:1px solid #dfe4ea}
 .season-table .team-stats-number{font-variant-numeric:tabular-nums}
 .season-box .team-stats-explainer{font-size:13px;color:#526179;margin:14px 0 0;line-height:1.6}
+
+/* Commissioner-only participation panel for draft, All-Star and award votes. */
+.ssl-voter-tracker{margin:3px 0 25px;padding:21px 23px 23px;border:1px solid #cfd9e8;border-top:5px solid #d6ac3b;background:linear-gradient(160deg,#f4f7fc 0%,#fff 56%);border-radius:9px}
+.ssl-voter-heading{display:flex;justify-content:space-between;align-items:center;gap:22px;flex-wrap:wrap}
+.ssl-voter-heading-title{flex:1;min-width:210px}
+.ssl-voter-eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:10px;font-weight:900;letter-spacing:.12em;color:#9a343e}
+.ssl-voter-heading h3{font:900 27px/1.1 'Barlow Condensed',Impact,sans-serif;margin:6px 0;color:#10244b}
+.ssl-voter-heading p{font-size:12px!important;color:#65738b!important;line-height:1.45!important;margin:6px 0!important}
+.ssl-voter-tally{text-align:right;display:flex;flex-direction:column;gap:3px}
+.ssl-voter-tally strong{font:900 36px/1 'Barlow Condensed',Impact,sans-serif;color:#172c52;font-variant-numeric:tabular-nums}
+.ssl-voter-tally span{font-size:10px;letter-spacing:.07em;font-weight:900;color:#718096}
+.ssl-voter-progress{margin:16px 0 18px;height:11px;border-radius:99px;background:#dce4ef;overflow:hidden}
+.ssl-voter-progress>span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#1c8f60,#38c18d);transition:width .25s}
+.ssl-voter-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.ssl-voter-group{background:#fff;border:1px solid #dce3ef;border-radius:6px;min-width:0;overflow:hidden}
+.ssl-voter-group h4,.ssl-voter-accounts h4{font-size:12px;display:flex;align-items:center;gap:8px;letter-spacing:.045em;margin:0;padding:11px 14px;background:#eef4f9;color:#163352}
+.ssl-voter-group h4>span,.ssl-voter-accounts h4>span{margin-left:auto;background:#fff;border:1px solid #c9d8e7;border-radius:30px;padding:3px 8px;font-size:11px;color:#263e59;font-variant-numeric:tabular-nums}
+.ssl-voter-group:first-child h4 svg{color:#268954}
+.ssl-voter-group:last-child h4 svg{color:#af6f24}
+.ssl-voter-list,.ssl-voter-account-list{list-style:none;margin:0;padding:6px 10px}
+.ssl-voter-list li{display:flex;align-items:center;gap:9px;padding:10px 4px;border-bottom:1px solid #eef0f4;font-size:12px}
+.ssl-voter-list li:last-child{border-bottom:none}
+.ssl-voter-list li span{flex:1;min-width:0;overflow-wrap:anywhere;font-weight:800;color:#24354c}
+.ssl-voter-list li strong{font-size:9px;letter-spacing:.03em;white-space:nowrap;border-radius:4px;padding:4px 6px}
+.ssl-voter-list .is-complete svg{color:#218656;flex-shrink:0}
+.ssl-voter-list .is-complete strong{background:#dff5e9;color:#116a42}
+.ssl-voter-list .is-missing svg{color:#af762b;flex-shrink:0}
+.ssl-voter-list .is-missing strong{background:#fff0dc;color:#965b15}
+.ssl-voter-empty,.ssl-voter-loading{padding:12px 14px!important;color:#5b6c83!important;font-size:12px!important;margin:0!important;line-height:1.5!important}
+.ssl-voter-accounts{margin-top:17px;background:#fff;border:1px solid #dae3ec;border-radius:6px;overflow:hidden}
+.ssl-voter-account-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 19px;padding:8px 14px}
+.ssl-voter-account-list li{display:flex;justify-content:space-between;flex-wrap:wrap;gap:3px 12px;padding:10px 0;border-bottom:1px solid #edf0f4}
+.ssl-voter-account-list li strong{color:#182d51;font-size:12px;overflow-wrap:anywhere}
+.ssl-voter-account-list li span{color:#64748b;font-size:11px;overflow-wrap:anywhere}
+.ssl-voter-disclaimer{padding:0 14px 12px;margin:0!important;color:#64738b!important;font-size:11px!important;line-height:1.5!important}
+@media(max-width:680px){.ssl-voter-tracker{padding:16px 14px}.ssl-voter-columns,.ssl-voter-account-list{grid-template-columns:1fr}.ssl-voter-tally{text-align:left}.ssl-voter-heading{align-items:flex-start}}
+@media(prefers-reduced-motion:reduce){.ssl-voter-progress>span{transition:none}}
