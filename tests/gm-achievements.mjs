@@ -1,12 +1,13 @@
 import assert from 'node:assert/strict';
 import {GM_ACHIEVEMENTS,earnedAchievements,achievementProgress} from '../src/gm-achievements.js';
 const badges=GM_ACHIEVEMENTS;
-assert.equal(badges.length,73);
-assert.equal(new Set(badges.map(b=>b.id)).size,73);
+assert.equal(badges.length,79);
+assert.equal(new Set(badges.map(b=>b.id)).size,79);
 assert.equal(badges.filter(b=>b.category==='Wins').length,7);
 assert.equal(badges.filter(b=>b.category==='Offense').length,25);
 assert.equal(badges.filter(b=>b.category==='Defense').length,34);
 assert.equal(badges.filter(b=>b.category==='Pitching').length,7);
+assert.equal(badges.filter(b=>b.category==='Playoffs').length,6);
 assert.deepEqual(badges.filter(b=>b.group==='player-putouts').map(b=>b.threshold),[5,8,10,12,15,18,20]);
 assert.deepEqual(badges.filter(b=>b.group==='player-assists').map(b=>b.threshold),[5,8,10,12,15,18,20]);
 
@@ -56,7 +57,7 @@ const split=add('game-2',[row(7,'knights',{putouts:6,assists:6}),
 assert(!earnedAchievements([{...season,games:[split]}],1).find(x=>x.id==='player-putouts-10').earned);
 assert(!earnedAchievements([{...season,games:[split]}],1).find(x=>x.id==='player-assists-10').earned);
 // Commissioner can read per-team awards, without GM account identities.
-assert.equal(earnedAchievements([season],2).filter(b=>b.earned).length,0);
+assert(!earnedAchievements([season],2).find(b=>b.id==='winning-1').earned);
 // Embargo protects unreleased games.
 const recorded=structuredClone(first);
 recorded.stage='recorded';
@@ -94,4 +95,41 @@ assert(earnedAchievements([perfect],1).find(x=>x.id==='winning-perfect').earned)
 perfect.games[12].result.scores.knights=0;
 perfect.games[12].result.scores.dedennes=1;
 assert(!earnedAchievements([perfect],1).find(x=>x.id==='winning-perfect').earned);
-console.log('PASS: 73 achievements, individual thresholds, team milestones, seasons, 22-0, report corrections, embargo and verified relief');
+// Playoff series uses official bracket membership, not regular-season standings guesses.
+const bracket=structuredClone(season);
+bracket.status='postseason';
+bracket.playoffTeams=['knights','dedennes'];
+bracket.playoffSeries=[
+  {id:'q1',round:'quarterfinal',high:'knights',low:'dedennes',winner:'knights'},
+  {id:'s1',round:'semifinal',high:'knights',low:'dedennes',winner:'knights'},
+  {id:'f1',round:'final',high:'knights',low:'dedennes',winner:'knights'},
+];
+bracket.games=[
+ {id:'playoff-one',stage:'final',phase:'playoffs',seriesId:'q1',
+  home:'knights',away:'dedennes',startsAt:'2026-12-01T17:00:00Z',
+  result:{scores:{knights:4,dedennes:2},players:[row(7,'knights',{pitchStrikeouts:2})]}},
+ {id:'playoff-two',stage:'final',phase:'playoffs',seriesId:'s1',
+  home:'knights',away:'dedennes',startsAt:'2026-12-05T17:00:00Z',
+  result:{scores:{knights:2,dedennes:1},players:[row(7,'knights',{pitchStrikeouts:1})]}},
+ {id:'playoff-three',stage:'final',phase:'playoffs',seriesId:'f1',
+  home:'knights',away:'dedennes',startsAt:'2026-12-10T17:00:00Z',
+  result:{scores:{knights:2,dedennes:1},players:[row(7,'knights',{pitchStrikeouts:1})]}},
+];
+const playoffBadges=earnedAchievements([bracket],1);
+for(const id of ['playoffs-qualified','playoffs-first-win','playoffs-series',
+  'playoffs-semifinals','playoffs-finals','playoffs-champion'])
+  assert(playoffBadges.find(b=>b.id===id).earned, id+' must unlock');
+assert.equal(playoffBadges.find(b=>b.id==='playoffs-series').count,3);
+assert(earnedAchievements([bracket],2).find(b=>b.id==='playoffs-qualified').earned);
+assert(!earnedAchievements([bracket],2).find(b=>b.id==='playoffs-champion').earned);
+const incomplete=structuredClone(bracket);
+incomplete.playoffSeries[2].winner=null;
+assert(!earnedAchievements([incomplete],1).find(b=>b.id==='playoffs-champion').earned);
+const noPostseason=structuredClone(bracket);
+noPostseason.status='regular';
+noPostseason.playoffSeries=[];
+noPostseason.playoffTeams=[];
+assert(!earnedAchievements([noPostseason],1).find(b=>b.id==='playoffs-qualified').earned);
+assert(!earnedAchievements([{...bracket,games:bracket.games.map(g=>({...g,stage:'recorded'}))}],1)
+  .find(b=>b.id==='playoffs-first-win').earned);
+console.log('PASS: 79 GM achievements, single-player thresholds, season history, 22-0, playoff advancement and championship, embargo and corrections');
