@@ -41,6 +41,23 @@ jobs:
           GITHUB_PAGES_BASE: /${{ github.event.repository.name }}/
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  mobile-qa:
+    # Mobile screenshot QA remains automatic, but never blocks the public
+    # website deployment if Playwright's OS package installation is slow.
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
       - name: Install browser for mobile checks
         run: |
           npm install --prefix "$RUNNER_TEMP/ssn-browser" --no-save playwright@1.56.1
@@ -55,8 +72,3 @@ jobs:
           name: ssl-draft-trade-screenshots
           path: dist/ui-screenshots/
           retention-days: 30
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-      - id: deployment
-        uses: actions/deploy-pages@v4
