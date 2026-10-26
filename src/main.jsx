@@ -6,6 +6,7 @@ import {heatingUpForSeason} from './heating-up.js'
 import {HeatingUpProvider,HeatFlame} from './HeatingUpBadge.jsx'
 import {leagueNews} from './league-news.js'
 import GmAchievements from './GmAchievements.jsx'
+import GmAchievementNotifications from './GmAchievementNotifications.jsx'
 import PlayerData from './PlayerData.jsx'
 import {PlayerPriority} from './PlayerPriority.jsx'
 import {PlayerPortrait} from './PlayerPortrait.jsx'
@@ -284,6 +285,14 @@ function App() {
     <footer><div className="container footer-inner"><span>SLUGGERS <b>SUPA</b> LEAGUE</span><small>LEAGUE DATA AND FANTASY HUB</small></div></footer>
     {selectedPlayer && <PlayerProfile careerSeasons={careerSeasons} fullSeasons={seasonLeague.seasons} includeRecorded={access.role==='commissioner'} player={players.find(p=>p.id===selectedPlayer.id)||selectedPlayer} PlayerAvatar={PlayerAvatar} onClose={() => setSelectedPlayer(null)}/>}
     {authOpen && <AccountDialog supabase={supabase} session={session} onClose={() => setAuthOpen(false)} onAccess={next=>{setAccess(next);if(next.role==='gm')setTeamWelcomeSeen(false)}}/>}
+    {isGM&&Number.isFinite(Number(access.slot))&&
+      <GmAchievementNotifications
+        key={session.user.id+':'+access.slot}
+        supabase={supabase} userId={session.user.id}
+        slot={access.slot} seasons={seasonLeague.seasons}
+        refreshLeague={seasonLeague.refresh}
+        onViewAchievements={()=>go('GM Tools','Achievements')}/>
+    }
   </HeatingUpProvider>
 }
 function BasicPage({ kicker, title, icon, empty, detail }) { return <><div className="page-heading"><span className="eyebrow dark">{kicker}</span><h1>{title}</h1></div><div className="panel basic-panel"><Empty icon={icon} title={empty}>{detail}</Empty></div></> }
