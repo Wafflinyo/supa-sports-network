@@ -3,11 +3,10 @@ import {CheckCircle2, Clock3, UserRoundCheck, UsersRound} from "lucide-react";
 
 /**
  * Team-by-team participation view, visible to commissioners only.
- * Draft votes are explicitly franchise-linked. All-Star / award ballots are
- * account ballots; the franchise association comes from the account's most
- * recent GM-code login that preceded its ballot submission.
+ * Tracks All-Star and award ballots. The franchise association comes
+ * from the account's latest GM-code login before ballot submission.
  */
-export function CommissionerVoteTracker({teams=[],votedIds=[],voters=null,error="",type="draft"}) {
+export function CommissionerVoteTracker({teams=[],votedIds=[],voters=null,error="",type="ballot"}) {
   const isBallot=type==="ballot";
   const knownVotes=new Set(votedIds.map(String));
   const submitted=teams.filter(t=>knownVotes.has(String(t.id)));
@@ -29,9 +28,9 @@ export function CommissionerVoteTracker({teams=[],votedIds=[],voters=null,error=
       <div className="ssl-voter-heading-title">
         <span className="ssl-voter-eyebrow"><UsersRound size={15}/> COMMISSIONER ONLY</span>
         <h3>WHO HAS VOTED?</h3>
-        <p>{isBallot?"Franchises with a recognized GM account ballot and teams still awaiting one.":"Track the 12 franchises' draft-date poll responses."}</p>
+        <p>{"Franchises with a recognized GM account ballot and teams still awaiting one."}</p>
       </div>
-      <div className="ssl-voter-tally"><strong>{submitted.length} / {teams.length}</strong><span>{isBallot?"GM TEAMS REPRESENTED":"FRANCHISES VOTED"}</span></div>
+      <div className="ssl-voter-tally"><strong>{submitted.length} / {teams.length}</strong><span>{"GM TEAMS REPRESENTED"}</span></div>
     </div>
     <div className="ssl-voter-progress" role="progressbar" aria-label="Franchises with a recorded vote" aria-valuenow={submitted.length} aria-valuemin={0} aria-valuemax={teams.length}>
       <span style={{width:percent+"%"}}/>
