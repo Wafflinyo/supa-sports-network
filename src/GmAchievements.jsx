@@ -6,11 +6,13 @@ const palettes={
   Wins:['#f6bd54','#b65c17','#fff1b4'],Offense:['#f08067','#a02e4d','#ffe0a3'],
   Defense:['#66c7ec','#174a9a','#b6eeff'],Pitching:['#b99af6','#6540a7','#f1deff'],
   Playoffs:['#f9d36e','#9a5a17','#fff7bc'],
+  'Front Office':['#54cfbd','#21766f','#c8fcf2'],
+  'Season Honors':['#f4dc73','#735a2c','#fff3c3'],
 };
 
 function Motif({type}) {
   // Original vector illustrations are shared by achievement families. Each of
-  // the 73 finished insignias combines a different number, rank, track and seal.
+  // the original vector insignias combines a different number, rank, track and seal.
   const shared={stroke:'currentColor',strokeWidth:5,strokeLinecap:'round',strokeLinejoin:'round',fill:'none'};
   if(type==='flag')return <g {...shared}><path d="M-18 24V-27M-18-27Q-4-37 11-25T25-24V-1Q9-12-18-1"/><path d="M-26 24H0"/></g>;
   if(type==='crown')return <g {...shared}><path d="M-28-12L-16 16H19L29-12L8 2 0-24-10 2Z"/><path d="M-18 24H20"/></g>;
@@ -26,6 +28,9 @@ function Motif({type}) {
   if(type==='shield')return <g {...shared}><path d="M0-31L27-20V2Q25 20 0 32Q-25 20-27 2V-20Z"/><path d="M-14 1L-3 12 17-12"/></g>;
   if(type==='wings')return <g {...shared}><path d="M0-6Q-24-28-34-19Q-34 3-3 25M0-6Q24-28 34-19Q34 3 3 25M-29-8L-8 9M29-8L8 9"/><circle cy="-11" r="8"/></g>;
   if(type==='crack')return <g {...shared}><path d="M0-29Q-26-22-28 1Q-23 27 0 30Q25 26 28 0Q22-25 0-29Z"/><path d="M8-27L-5-6 9 1-9 27"/></g>;
+  if(type==='exchange')return <g {...shared}><path d="M-30-10H22L12-21M22-10L12 2M30 14H-22L-12 3M-22 14L-12 25"/></g>;
+  if(type==='contract')return <g {...shared}><path d="M-20-29H14L25-17V28H-20Z"/><path d="M14-29V-17H25M-11-6H13M-11 5H13M-11 17H8"/></g>;
+  if(type==='stadium')return <g {...shared}><path d="M-29 22V-3L0-24 29-3V22Z"/><path d="M-18 22V-3H18V22M-29-3H29M-10 22V7H10V22"/></g>;
   if(type==='strike')return <g><text x="0" y="21" fill="currentColor" textAnchor="middle" fontWeight="1000" fontSize="64" fontFamily="Arial Black, sans-serif">K</text></g>;
   if(type==='arm')return <g {...shared}><path d="M-25 16Q-13-8 0-6Q9-4 10 5L18-2Q28-8 31 2Q30 15 15 25H-10Z"/><path d="M-25 16Q-30 0-20-13L-13-22Q-5-29 1-19L-4-8"/></g>;
   return <g {...shared}><path d="M-30 21H4Q25 21 25-1V-21"/><path d="M10-9L25-24L39-9"/><circle cx="-13" cy="-1" r="9"/></g>;
@@ -97,12 +102,12 @@ export default function GmAchievements({seasons=[],slot,teams=[],commissioner=fa
     <div className="achievement-hero">
       <div><span className="achievement-kicker">SLUGGERS SUPA LEAGUE • TROPHY CASE</span>
         <h2>GM ACHIEVEMENTS</h2>
-        <p>79 original collectible badges. Complete official game challenges across the seasons to bring your trophy case to life.</p>
+        <p>92 original collectible badges. Complete official game challenges across the seasons to bring your trophy case to life.</p>
         {activeTeam&&<div className="achievement-owner">TEAM • <strong>{activeTeam.name}</strong></div>}
       </div>
-      <div className="achievement-progress" aria-label={earned+' of 79 badges unlocked'}>
-        <strong>{earned}<span> / 79</span></strong><small>BADGES UNLOCKED</small>
-        <div className="achievement-track"><i style={{width:(earned/79*100)+'%'}}/></div>
+      <div className="achievement-progress" aria-label={earned+' of 92 badges unlocked'}>
+        <strong>{earned}<span> / 92</span></strong><small>BADGES UNLOCKED</small>
+        <div className="achievement-track"><i style={{width:(earned/92*100)+'%'}}/></div>
       </div>
     </div>
     {commissioner&&<div className="achievement-team-panel">
@@ -111,7 +116,7 @@ export default function GmAchievements({seasons=[],slot,teams=[],commissioner=fa
       {knownTeams.length?<div className="achievement-team-picker">
         {knownTeams.map(t=><button type="button" key={t.slot} className={t.slot===activeSlot?'active':''}
           onClick={()=>setChosenSlot(t.slot)} aria-pressed={t.slot===activeSlot}>
-          <span>{t.name}</span><strong>{teamsEarned[t.slot]||0}/79</strong></button>)}
+          <span>{t.name}</span><strong>{teamsEarned[t.slot]||0}/92</strong></button>)}
       </div>:<p>No registered teams yet. Team achievements will appear once franchises are created.</p>}
     </div>}
     <div className="achievement-toolbar">
@@ -139,7 +144,7 @@ export default function GmAchievements({seasons=[],slot,teams=[],commissioner=fa
           <h3>{b.name}</h3><p>{b.description}</p>
           <span className={'achievement-status'+(b.earned?' won':'')}>{b.earned?'✓ UNLOCKED':'◉ LOCKED'}</span>
           {b.earned&&<small className="achievement-earned-line">
-            {b.count>1?`${b.count} times · `:''}{b.lastEarned?.seasonName}
+            {b.lastEarned?.seasonName}
             {b.lastEarned?.playerName?' · '+b.lastEarned.playerName:''}
             {niceDate(b.lastEarned?.earnedAt)?' · '+niceDate(b.lastEarned.earnedAt):''}
           </small>}
@@ -147,6 +152,6 @@ export default function GmAchievements({seasons=[],slot,teams=[],commissioner=fa
       </article>)}
     </div>
     {!visible.length&&<p className="achievement-empty">No badges match these filters.</p>}
-    <p className="achievement-footnote">Badges unlock only from released official match results. Season wins and season home runs are counted within each regular season. Putouts and assists require one individual player to reach the threshold; other match totals are team-wide. Historic awards remain visible in All Seasons. The Superstar Reliever badge requires verified substitution timing data.</p>
+    <p className="achievement-footnote">Badges unlock only from released official match results. Season wins and season home runs are counted within each regular season. Putouts and assists require one individual player to reach the threshold; other match totals are team-wide. Badges are unlocked once for the entire GM career, not once per season. The Superstar Reliever badge requires verified substitution timing data.</p>
   </section>;
 }
