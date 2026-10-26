@@ -5,19 +5,28 @@ import {PlayerDataDetails} from './PlayerData.jsx';
 import data from './player-data.json';
 import {pitcherPriorityFor} from './player-roles.js';
 import './draft-players.css';
-import {DRAFT_STAGES} from './draft-stages.js';
+import {Building2,CheckCircle2,Landmark,LockKeyhole} from 'lucide-react';
+import {stadiumDraftState} from './draft-stadium-state.js';
 
 export function DraftPlayers({league:l}) {
-  const s=l.season, [query,setQuery]=useState(''), [category,setCategory]=useState('All classes'), [selected,setSelected]=useState(null), [stageChoice,setStageChoice]=useState('Mario Stadium');
+  const s=l.season, [query,setQuery]=useState(''), [category,setCategory]=useState('All classes'), [selected,setSelected]=useState(null);
+  const [tab,setTab]=useState('players'), [selectedStadium,setSelectedStadium]=useState(null);
   const dialog=useRef(null), opener=useRef(null);
   const ownership=new Map();
   for(const t of s.teams) for(const id of s.rosters?.[t.id]||[]) ownership.set(Number(id),t.name);
   for(const pick of s.picks) if(pick.player != null && !ownership.has(Number(pick.player))) ownership.set(Number(pick.player),s.teams.find(t=>t.id===pick.team)?.name||'Drafted');
   const owner=s.nextPick?.team, team=s.teams.find(t=>t.id===owner);
   const canPick=s.status==='drafting'&&!s.paused&&(l.access.role==='commissioner'||(l.access.role==='gm'&&l.myTeam?.id===owner));
-  const stageAvailable = s.status==='drafting' && !s.nextPick?.supplemental && !s.nextPick?.stageAlreadyChosen;
-  const mustStage = Boolean(s.nextPick?.mustStage);
+  // A GM always sees their own chosen Stadium—even while another team is on
+  // the clock. Commissioner draft controls target the current picking team.
+  const stadiumTeamId=l.access.role==='commissioner'?owner:l.myTeam?.id;
+  const stadiumTeam=s.teams.find(t=>String(t.id)===String(stadiumTeamId));
+  const stadiumState=stadiumDraftState(s,stadiumTeamId,canPick);
+  const {owned:myStadium,eligible:canDraftStadium,mandatory:mustStage,available:availableStadiums}=stadiumState;
   const filtered=pool.filter(p=>(category==='All classes'||p.class===category)&&p.name.toLowerCase().includes(query.trim().toLowerCase()));
+  useEffect(()=>{
+    if(selectedStadium&&!availableStadiums.includes(selectedStadium))setSelectedStadium(null);
+  },[selectedStadium,availableStadiums.join('|')]);
   useEffect(()=>{
     if(selected&&!dialog.current.open) dialog.current.showModal();
     if(!selected&&dialog.current.open) dialog.current.close();
@@ -29,10 +38,59 @@ export function DraftPlayers({league:l}) {
     return()=>{document.body.style.overflow=previous;};
   },[selected]);
   function close(){setSelected(null);opener.current?.focus();}
-  return <section className="draft-player-browser" aria-label="Draft player pool">
-    <h2>PLAYER POOL</h2>
-    <p>Tap a player for ratings, named abilities, and chemistry. P1P captains have first pitcher-change priority; P2P (7+ pitching) are next. Gray cards are already on a roster.</p>
-    <div className="draft-stage-picker" aria-label="Stadium pick selection"><h3>STADIUM PICK · ONE PER TEAM</h3><p>Stadium Picks cannot be traded. Successfully retained Stadiums replace next season’s Stadium Pick. Otherwise, choose your Stadium on any main-draft turn; if you leave it until the final turn, the Stadium Pick becomes mandatory.</p><label>Choose your Stadium <select value={stageChoice} onChange={e=>setStageChoice(e.target.value)}>{DRAFT_STAGES.map(stage=><option key={stage} value={stage}>{stage}</option>)}</select></label><button type="button" className="red-btn" disabled={!canPick||l.busy||!stageAvailable} onClick={()=>l.act('pick_stage',{stage:stageChoice})}>{mustStage?'PICK STADIUM NOW — REQUIRED':'USE CURRENT TURN FOR STADIUM'}</button>{s.nextPick?.stadiumRetained ? <p>Stadium retained from last season — no Stadium Pick this season.</p> : s.nextPick?.stageAlreadyChosen ? <p>Stadium already selected for the team on the clock.</p> : null}{mustStage&&<p role="alert">This team must select its Stadium before the draft can advance.</p>}</div>
+  return <section className="draft-player-browser" aria-label="Draft room player and Stadium selections">
+    <div className="draft-pool-header">
+      <div><h2>DRAFT SELECTIONS</h2><p>Switch between Players and Stadiums on any draft turn. Every team gets one exclusive Stadium Pick.</p></div>
+      <div className="draft-pool-tabs" role="tablist" aria-label="Draft selection type">
+        <button type="button" role="tab" id="draft-tab-players" aria-controls="draft-panel-players" aria-selected={tab==='players'} className={tab==='players'?'active':''} onClick={()=>setTab('players')}>PLAYERS</button>
+        <button type="button" role="tab" id="draft-tab-stadiums" aria-controls="draft-panel-stadiums" aria-selected={tab==='stadiums'} className={tab==='stadiums'?'active':''} onClick={()=>setTab('stadiums')}>STADIUMS <small>{myStadium?'✓ OWNED':availableStadiums.length+' LEFT'}</small></button>
+      </div>
+    </div>
+    <div id="draft-panel-stadiums" role="tabpanel" aria-labelledby="draft-tab-stadiums" hidden={tab!=='stadiums'} className="draft-stadium-panel">
+      <div className="draft-stadium-heading"><h3>{myStadium?'YOUR STADIUM':'AVAILABLE STADIUMS'}</h3><p>{myStadium
+        ? 'This Stadium belongs to your franchise this season. Your Stadium Pick is complete.'
+        : 'A Stadium disappears from every other GM’s available list as soon as a team drafts or retains it. Stadium Picks cannot be traded.'}</p></div>
+      {myStadium?<>
+        <div className="draft-stadium-owned" data-testid="draft-stadium-owned">
+          <span className="draft-stadium-tile-icon"><Landmark aria-hidden="true" size={38}/></span>
+          <div><small>YOUR HOME STADIUM</small><h4>{myStadium.name}</h4><p>{myStadium.source==='retained'?'RETAINED THROUGH CONTRACT EXTENSION':'DRAFTED · YOUR STADIUM PICK IS USED'}</p></div>
+          <span className="draft-stadium-lock"><CheckCircle2 size={25}/> OWNED</span>
+        </div>
+        <p className="draft-stadium-note"><LockKeyhole size={16}/> You cannot draft another Stadium. Other GMs cannot select this one.</p>
+      </>:<>
+        <p className="draft-stadium-status" role="status">{availableStadiums.length} of 13 Stadiums are still unclaimed.{stadiumTeam?.name?' Viewing for '+stadiumTeam.name+'.':''}</p>
+        {mustStage&&<p className="draft-stadium-required" role="alert">This is your team's final available main-draft turn. You must select a Stadium to continue.</p>}
+        <div className="draft-stadium-grid" aria-label="Undrafted Stadiums">
+          {availableStadiums.map(stage=><button type="button" key={stage}
+            className={'draft-stadium-card'+(selectedStadium===stage?' selected':'')}
+            onClick={()=>setSelectedStadium(stage)} aria-pressed={selectedStadium===stage}>
+              <span className="draft-stadium-tile-icon"><Building2 size={30} aria-hidden="true"/></span>
+              <strong>{stage}</strong>
+              <small>AVAILABLE</small>
+            </button>)}
+        </div>
+        {!availableStadiums.length&&<p>Every Stadium is currently owned. Ask the commissioner to review the draft status.</p>}
+        <div className="draft-stadium-confirm">
+          <p>{selectedStadium?<>Selected: <strong>{selectedStadium}</strong></>:
+            'Select one of the available Stadiums above.'}</p>
+          <button type="button" className="red-btn" disabled={!canDraftStadium||!selectedStadium||l.busy}
+            onClick={async()=>{if(!selectedStadium||!availableStadiums.includes(selectedStadium))return;
+              if(!window.confirm('Draft '+selectedStadium+' as your exclusive Stadium? This uses your current pick.'))return;
+              const success=await l.act('pick_stage',{stage:selectedStadium});
+              if(success)setSelectedStadium(null);
+            }}>{l.busy?'SUBMITTING…':mustStage?'PICK STADIUM — REQUIRED':'DRAFT SELECTED STADIUM'}</button>
+        </div>
+        {!canDraftStadium&&<p className="draft-stadium-note">
+          {s.status!=='drafting'?'Draft picks become available when the official draft begins.':
+            s.paused?'The commissioner has paused the draft.':
+            stadiumState.isTurn?'Stadium selection is unavailable on this turn.':
+              'You can browse Stadiums now. Draft one when your team is on the clock.'}
+        </p>}
+      </>}
+    </div>
+    <div id="draft-panel-players" role="tabpanel" aria-labelledby="draft-tab-players" hidden={tab!=='players'} className="draft-players-panel">
+      <h3>PLAYER POOL</h3>
+      <p>Tap a player for ratings, named abilities, and chemistry. P1P captains have first pitcher-change priority; P2P (7+ pitching) are next. Gray cards are already on a roster.</p>
     <div className="draft-pool-filters">
       <label>Search players<input aria-label="Search draft players" placeholder="Search players" value={query} onChange={e=>setQuery(e.target.value)}/></label>
       <label>Class<select aria-label="Filter draft class" value={category} onChange={e=>setCategory(e.target.value)}>{['All classes','Balanced','Power','Speed','Technique'].map(c=><option key={c}>{c}</option>)}</select></label>
@@ -43,6 +101,7 @@ export function DraftPlayers({league:l}) {
         <PlayerPortrait player={p} size={56}/><span className="draft-player-identity"><strong>{p.name}</strong>{pitcherPriorityFor(p,data.players[p.id])&&<span className="draft-priority-tag" title={pitcherPriorityFor(p,data.players[p.id]).label}>{pitcherPriorityFor(p,data.players[p.id]).code}</span>}</span><span>{p.class}</span><small>{ownership.has(p.id)?'DRAFTED · '+ownership.get(p.id):'AVAILABLE'}</small>
       </button>)}
       {!filtered.length&&<p>No players match these filters.</p>}
+    </div>
     </div>
     <dialog className="draft-player-dialog" ref={dialog} aria-label={selected?`${selected.name} draft profile`:'Draft player profile'} onCancel={e=>{e.preventDefault();close();}} onClick={e=>{if(e.target===dialog.current)close();}}>
       {selected&&<div className="draft-dialog-content">
