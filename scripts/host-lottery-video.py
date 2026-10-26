@@ -170,8 +170,16 @@ with tempfile.TemporaryDirectory() as temp:
   for off in [-70,-5,62]:d.line((CX+off,CY-92,CX+off,CY+92),fill=(186,161,112,80),width=2)
   d.ellipse((CX-RING,CY-RING,CX+RING,CY+RING),outline=(247,213,133),width=3)
   d.ellipse((CX-5,CY-5,CX+5,CY+5),fill=(255,226,151))
-  d.rounded_rectangle((CX+RING-3,CY+74,CX+RING+38,CY+84),radius=3,fill=(212,152,66))
-  d.rounded_rectangle((504,318,861,329),radius=5,fill=(198,132,46),outline=(250,213,133),width=2)
+  d.rounded_rectangle((CX+RING-3,CY+35,CX+RING+34,CY+46),radius=3,fill=(212,152,66),outline=(255,225,143))
+  # Long sloping track physically connects the exit to the raised display.
+  d.polygon([(340,315),(645,303),(645,316),(340,328)],fill=(127,78,30),outline=(252,210,123))
+  d.line((343,309,645,297),fill=(255,226,158),width=4)
+  d.line((342,330,645,318),fill=(161,109,47),width=3)
+  # The selection podium: gold top, dark brass riser, engraved SSL base.
+  d.rounded_rectangle((637,308,781,323),radius=7,fill=(214,157,61),outline=(255,226,150),width=3)
+  d.rounded_rectangle((671,321,747,335),radius=3,fill=(124,81,29),outline=(237,198,113),width=2)
+  d.text((709,322),'SSL',anchor='mt',font=f11,fill=(255,232,155))
+  d.rounded_rectangle((649,333,770,344),radius=5,fill=(174,117,44),outline=(255,218,136),width=2)
   selected=ORDER[revealed-1] if revealed else None
   if state=='intro':label='OPENING CAGE MIX';title='LET THE BALLS MIX…';minor='FIRST BALL ROLLS OUT IN  '+str(math.ceil(remaining))+'s';style='waiting'
   elif state=='mixing':label='MIXING FOR THE NEXT PICK';title='NEXT FRANCHISE UP…';minor='NEXT BALL ROLLS OUT IN  '+str(math.ceil(remaining))+'s';style='waiting'
@@ -182,17 +190,20 @@ with tempfile.TemporaryDirectory() as temp:
   d.text((710,152),label,anchor='mt',font=f15,fill=gold)
   if style=='rolling':
    u=min(1,elapsed/ROLL);ease=1-(1-u)**2.6
-   px=495+(710-495)*ease;py=258-32*(1-ease)+8*math.sin(math.pi*u)
-   ball_logo(pic,px,py,63,selected,True,rotation=-1000*(1-ease))
-  elif style in ('announce','complete'):ball_logo(pic,710,258,63,selected,True)
+   px=355+(710-355)*ease
+   py=251-6*ease+7*math.sin(math.pi*u)
+   # PIL-positive angle is counter-clockwise. Decreasing a positive angle
+   # moves clockwise, matching a physical ball rolling to the right.
+   ball_logo(pic,px,py,63,selected,True,rotation=1080*(1-ease))
+  elif style in ('announce','complete'):ball_logo(pic,710,245,63,selected,True)
   else:
-   ball_logo(pic,710,258,53,1)
-   d=ImageDraw.Draw(pic);d.ellipse((681,231,740,289),fill=(245,210,91),outline=(255,244,190),width=2)
-   d.text((710,234),'?',font=f40,anchor='mt',fill=(37,46,68))
+   d=ImageDraw.Draw(pic)
+   d.text((709,250),'NEXT',font=f21,anchor='mt',fill=(220,185,115))
+   d.text((709,273),'BALL',font=f21,anchor='mt',fill=(220,185,115))
   d=ImageDraw.Draw(pic)
   chosenfont=f21 if d.textbbox((0,0),title,font=f25)[2]>412 else f25
-  d.text((710,343),title,anchor='mt',font=chosenfont,fill=white)
-  d.text((710,375),minor,anchor='mt',font=f12,fill=gold if style=='waiting' else blue)
+  d.text((710,351),title,anchor='mt',font=chosenfont,fill=white)
+  d.text((710,379),minor,anchor='mt',font=f12,fill=gold if style=='waiting' else blue)
   shown=revealed-1 if state=='rolling' else revealed
   for ix in range(shown):
    teamid=ORDER[ix];col=ix%4;row=ix//4;left=23+col*234;top=425+row*34
@@ -204,15 +215,15 @@ with tempfile.TemporaryDirectory() as temp:
   d.text((900,403),str(shown)+' OF 12',anchor='rt',font=f13,fill=blue)
   return pic.convert('RGB')
  def sound(wavpath):
-  # Original, bouncy 124-BPM instrumental gameshow cue and physically modeled
-  # glass-marble clinks + marble-on-wood roll, each rendered to its own bus.
+  # A faster punchy 138 BPM brass-led game-show groove with short
+  # lower-pitched billiard ball impacts and a roll over wood and felt.
   # The real site exposes individual mute/volume controls for these two buses.
   hz=24000
   n=math.ceil(DURATION*hz)
   music=np.zeros(n,np.float32)
   effects=np.zeros(n,np.float32)
   rng=np.random.default_rng(20261025)
-  beat=60/124
+  beat=60/138
   half=beat/2
   roots=[48,43,45,41]   # C, G, A minor, F
   chords=[[60,64,67],[55,59,62],[57,60,64],[53,57,60]]
@@ -236,8 +247,10 @@ with tempfile.TemporaryDirectory() as temp:
     env=(1-np.exp(-t*110))*np.exp(-t/max(.09,dur*.78))
     wave=np.sin(2*np.pi*freq*t)+.23*np.sin(2*np.pi*2*freq*t)
    elif kind=='chord':
-    env=(1-np.exp(-t*150))*np.exp(-t/max(.09,dur*.70))
-    wave=.8*np.sin(2*np.pi*freq*t)+.17*np.sin(2*np.pi*2*freq*t)
+    env=(1-np.exp(-t*160))*np.exp(-t/max(.09,dur*.57))
+    # Band-limited brassy reed stab with more midrange oomph.
+    wave=(np.sin(2*np.pi*freq*t)+.37*np.sin(2*np.pi*2*freq*t)
+          +.19*np.sin(2*np.pi*3*freq*t)+.10*np.sin(2*np.pi*4*freq*t))
    else:
     env=(1-np.exp(-t*380))*np.exp(-t/max(.055,dur*.72))
     wave=np.sin(2*np.pi*freq*t)+.28*np.sin(2*np.pi*2.02*freq*t)*np.exp(-t*19)
@@ -247,7 +260,7 @@ with tempfile.TemporaryDirectory() as temp:
    frequency=55+110*np.exp(-t*29)
    phase=2*np.pi*(55*t+(110/29)*(1-np.exp(-t*29)))
    env=(1-np.exp(-t*600))*np.exp(-t*25)
-   add(music,at,np.sin(phase)*env*.21)
+   add(music,at,np.sin(phase)*env*.35)
   def snare(at):
    t=np.arange(int(.145*hz),dtype=np.float32)/hz
    white=rng.standard_normal(len(t)).astype(np.float32)
@@ -255,7 +268,7 @@ with tempfile.TemporaryDirectory() as temp:
    high[0]=0
    high[1:]=white[1:]-.83*white[:-1]
    env=np.exp(-t*26)
-   add(music,at,high*env*.065+.045*np.sin(2*np.pi*188*t)*np.exp(-t*35))
+   add(music,at,high*env*.095+.082*np.sin(2*np.pi*188*t)*np.exp(-t*35))
   def hat(at,accent=False):
    t=np.arange(int(.073*hz),dtype=np.float32)/hz
    white=rng.standard_normal(len(t)).astype(np.float32)
@@ -269,27 +282,28 @@ with tempfile.TemporaryDirectory() as temp:
    if count%2==0:
     if count in (0,4):kick(t)
     if count in (2,6):snare(t)
-    note(t,roots[bar],.27,.112,'bass')
+    note(t,roots[bar],.27,.19,'bass')
+    note(t,roots[bar]-12,.26,.095,'bass')
     hat(t,False)
-   else:hat(t,True)
+   else:
+    hat(t,True)
+    if count in (3,7):kick(t)
    if count in (0,2,3,4,6,7):
     note(t,melodies[bar][count],.22,.090 if count in (0,4) else .072)
-   if count in (0,5):
-    for tone in chords[bar]:note(t,tone,.30,.019,'chord')
+   if count in (0,3,6):
+    for tone in chords[bar]:note(t,tone,.22,.061,'chord')
   def marble_clink(at,vol=.36):
-   # Glass has short inharmonic bell modes, but no long electronic ringing.
-   # Damped transient and slight wooden contact create small hard marbles.
-   fundamental=rng.uniform(1450,2280)
-   modes=[(1,.060,.32),(1.73,.040,.17),(2.67,.025,.105)]
-   length=int(.09*hz);t=np.arange(length,dtype=np.float32)/hz
+   # A billiard ball's dry, sharp low-mid crack, with no glass-like high
+   # ringing. Short phenolic resonances and felt-covered table knock.
+   fundamental=rng.uniform(380,610)
+   modes=[(1,.039,.56),(1.47,.022,.18),(2.18,.012,.038)]
+   length=int(.080*hz);t=np.arange(length,dtype=np.float32)/hz
    tone=np.zeros(length,np.float32)
    for ratio,decay,amp in modes:
-    tone+=amp*np.sin(2*np.pi*fundamental*ratio*t+rng.uniform(0,1))*np.exp(-t/decay)
-   fine=rng.standard_normal(length).astype(np.float32)
-   trans=(fine-np.roll(fine,1))*np.exp(-t*210)*.05
-   wood=.085*np.sin(2*np.pi*420*t)*np.exp(-t*70)
-   env=1-np.exp(-t*1200)
-   add(effects,at,(tone*env+trans+wood)*vol)
+    tone+=amp*np.sin(2*np.pi*fundamental*ratio*t+rng.uniform(0,.5))*np.exp(-t/decay)
+   low=.33*np.sin(2*np.pi*220*t)*np.exp(-t*47)
+   attack=1-np.exp(-t*1300)
+   add(effects,at,(tone+low)*attack*vol)
   def wood_tick(at,strength=.12):
    t=np.arange(int(.055*hz),dtype=np.float32)/hz
    freq=rng.uniform(260,530)
@@ -300,8 +314,7 @@ with tempfile.TemporaryDirectory() as temp:
    if size<=0:return
    t=np.arange(size,dtype=np.float32)/hz
    noise=rng.standard_normal(size).astype(np.float32)
-   # Low-frequency band-limited friction with irregular grain; softened to
-   # evoke a glass marble spinning and slowing across a wood tabletop.
+   # Low-frequency dry rolling friction over a wooden/felt-topped chute.
    kernel=np.ones(57,dtype=np.float32)/57
    grain=np.convolve(noise,kernel,mode='same')
    fine=np.convolve(noise,np.ones(7,dtype=np.float32)/7,mode='same')
@@ -312,7 +325,7 @@ with tempfile.TemporaryDirectory() as temp:
    while tick_at<ROLL-.23:
     wood_tick(at+tick_at,.025+rng.uniform(0,.022))
     tick_at+=rng.uniform(.19,.33)
-   marble_clink(at+ROLL-.08,.52)
+   marble_clink(at+ROLL-.08,.72)
    wood_tick(at+ROLL-.025,.11)
   def announcement_sting(at):
    # Compact rising "winning draw" two-note xylophone fanfare.
@@ -332,7 +345,7 @@ with tempfile.TemporaryDirectory() as temp:
    announcement_sting(pos)
    pos+=ANN
   # User-facing default mix: gameshow music behind, marbles clear and up front.
-  combined=music*.72+effects*.85
+  combined=music*.90+effects*.79
   combined=np.tanh(combined*1.16)*.87
   with wave.open(str(wavpath),'wb') as w:
    w.setnchannels(1);w.setsampwidth(2);w.setframerate(hz)
