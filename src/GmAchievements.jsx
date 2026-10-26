@@ -90,10 +90,10 @@ export default function GmAchievements({seasons=[],slot,teams=[],commissioner=fa
   const activeTeam=knownTeams.find(t=>t.slot===activeSlot);
   const [category,setCategory]=useState('All');
   const [status,setStatus]=useState('All badges');
-  const [seasonId,setSeasonId]=useState('all');
+  const seasonId='all';
   const badges=useMemo(()=>earnedAchievements(seasons,activeSlot,{seasonId}),[seasons,activeSlot,seasonId]);
   const earned=badges.filter(b=>b.earned).length;
-  const seasonChoices=[...seasons].filter(s=>s.teams?.some(t=>Number(t.slot)===activeSlot));
+
   const visible=badges.filter(b=>(category==='All'||b.category===category) &&
     (status==='All badges'||(status==='Earned'?b.earned:!b.earned)));
   const teamsEarned=useMemo(()=>Object.fromEntries(knownTeams.map(t=>[t.slot,
@@ -102,7 +102,7 @@ export default function GmAchievements({seasons=[],slot,teams=[],commissioner=fa
     <div className="achievement-hero">
       <div><span className="achievement-kicker">SLUGGERS SUPA LEAGUE • TROPHY CASE</span>
         <h2>GM ACHIEVEMENTS</h2>
-        <p>92 original collectible badges. Complete official game challenges across the seasons to bring your trophy case to life.</p>
+        <p>92 original collectible badges. Earn each badge just once across your entire GM career. Unlocked badges stay with your collection.</p>
         {activeTeam&&<div className="achievement-owner">TEAM • <strong>{activeTeam.name}</strong></div>}
       </div>
       <div className="achievement-progress" aria-label={earned+' of 92 badges unlocked'}>
@@ -125,11 +125,7 @@ export default function GmAchievements({seasons=[],slot,teams=[],commissioner=fa
           aria-pressed={category===c} className={category===c?'active':''}>{c}</button>)}
       </div>
       <div className="achievement-selectors">
-        <label>Season <select value={seasonChoices.some(s=>String(s.id)===String(seasonId))?seasonId:'all'}
-          onChange={e=>setSeasonId(e.target.value)}>
-          <option value="all">All Seasons</option>
-          {seasonChoices.map(s=><option key={s.id} value={s.id}>{s.name||'Season'}</option>)}
-        </select></label>
+        <span className="achievement-lifetime-label">LIFETIME COLLECTION · UNLOCK ONCE</span>
         <label>Show <select value={status} onChange={e=>setStatus(e.target.value)}>
           {['All badges','Earned','Locked'].map(s=><option key={s}>{s}</option>)}
         </select></label>
