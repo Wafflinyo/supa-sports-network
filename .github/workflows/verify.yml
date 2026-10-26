@@ -23,6 +23,7 @@ jobs:
       - run: node tests/heating-up.mjs
       - run: node tests/league-news.mjs
       - run: node tests/gm-achievements.mjs
+      - run: node tests/badge-art-design.mjs
       - run: node tests/roster-lineups.mjs
       - run: node tests/schedule-matchup-records.mjs
       - run: node tests/public-tbd-schedule.mjs
