@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Produce the public SSL 12-pick sample MP4 for GitHub Pages.
 The draw order is EXAMPLE ONLY; never read or modify the real server lottery.
-Uses the same timings as src/lottery-timing.js (10s mix, 3.2s roll, 8s announce).
+Uses the same timings as src/lottery-timing.js (10s mix, 3.2s roll, 5s announce).
 """
 from PIL import Image, ImageDraw, ImageFont
 from pathlib import Path
@@ -19,7 +19,7 @@ DEST=ROOT/'public'/'videos'/'ssl-draft-lottery-12-picks.mp4'
 DEST.parent.mkdir(parents=True,exist_ok=True)
 FPS=8
 W,H=960,540
-INTRO,MIX,ROLL,ANN=10,10,3.2,8
+INTRO,MIX,ROLL,ANN=10,10,3.2,5
 DURATION=INTRO+11*MIX+12*(ROLL+ANN)+1.2
 LOGOS=[
  ('Delfino Dolphins','1/76fc9d22-ade5-4b0f-89b3-c23bcb055248.png'),
@@ -83,7 +83,7 @@ with tempfile.TemporaryDirectory() as temp:
  draw.text((220,110),'SSL LOTTERY CAGE',anchor='mt',font=f12,fill=gold)
  draw.line((421,135,421,365),fill=(160,134,85,120),width=2)
  draw.text((480,401),'DRAFT ORDER  /  LIVE REVEAL',anchor='mt',font=f13,fill=gold)
- draw.text((W//2,532),'SAMPLE DRAW  /  CINEMATIC COLLISION CAGE  /  ALL TWELVE PICKS',anchor='mb',font=f10,fill=(140,167,200))
+ draw.text((W//2,532),'SAMPLE DRAW  /  GAME-SHOW MUSIC + MARBLE EFFECTS  /  INDEPENDENT VOLUME CONTROLS ON THE LIVE SITE',anchor='mb',font=f10,fill=(140,167,200))
  for n in range(12):
   col=n%4;row=n//4;left=23+col*234;top=425+row*34
   draw.rounded_rectangle((left,top,left+225,top+30),radius=4,fill=(30,48,78,255),outline=(76,97,131,255))
@@ -204,36 +204,139 @@ with tempfile.TemporaryDirectory() as temp:
   d.text((900,403),str(shown)+' OF 12',anchor='rt',font=f13,fill=blue)
   return pic.convert('RGB')
  def sound(wavpath):
-  hz=16000;n=int(DURATION*hz);data=np.zeros(n,np.float32)
-  rng=np.random.default_rng(11)
-  def impact(t,volume=.18):
-   start=int(t*hz);length=int(.095*hz)
-   if start>=n:return
-   size=min(length,n-start);u=np.arange(size)/hz;freq=rng.uniform(720,1250)
-   data[start:start+size]+=volume*np.exp(-u*55)*(np.sin(2*np.pi*freq*u)+.2*np.sin(2*np.pi*freq*2.5*u))
-  def rolling(t):
-   start=int(t*hz);num=min(int(ROLL*hz),n-start)
-   if num<=0:return
-   u=np.arange(num)/hz;white=rng.standard_normal(num)
-   smooth=np.convolve(white,np.ones(21)/21,mode='same')
-   envelope=np.minimum(1,u/.12)*np.minimum(1,(ROLL-u)/.15)
-   data[start:start+num]+=(smooth*.28+.035*(np.sin(2*np.pi*(11+u*1.3)*u)**10))*envelope
-   impact(t+2.75,.19);impact(t+3.1,.23)
-  def announced(t):
-   st=int(t*hz);num=min(int(.7*hz),n-st)
-   if num<=0:return
-   u=np.arange(num)/hz;env=(1-np.exp(-u*55))*np.exp(-4*u)
-   data[st:st+num]+=.14*env*(np.sin(2*np.pi*660*u)+.5*np.sin(2*np.pi*990*u))
+  # Original, bouncy 124-BPM instrumental gameshow cue and physically modeled
+  # glass-marble clinks + marble-on-wood roll, each rendered to its own bus.
+  # The real site exposes individual mute/volume controls for these two buses.
+  hz=24000
+  n=math.ceil(DURATION*hz)
+  music=np.zeros(n,np.float32)
+  effects=np.zeros(n,np.float32)
+  rng=np.random.default_rng(20261025)
+  beat=60/124
+  half=beat/2
+  roots=[48,43,45,41]   # C, G, A minor, F
+  chords=[[60,64,67],[55,59,62],[57,60,64],[53,57,60]]
+  melodies=[
+   [76,79,83,79,76,79,84,79],
+   [74,79,83,79,74,79,86,79],
+   [76,81,84,81,76,81,88,81],
+   [72,77,81,77,72,77,84,77]
+  ]
+  def add(buf,at,signal):
+   st=int(at*hz)
+   if st>=n or st+len(signal)<=0:return
+   lo=max(0,-st);end=min(len(signal),n-st)
+   if end>lo:buf[max(0,st):max(0,st)+end-lo]+=signal[lo:end].astype(np.float32)
+  def note(at,midi,dur=.2,volume=.1,kind='marimba'):
+   if at>=DURATION:return
+   samples=max(10,int((dur+.05)*hz))
+   t=np.arange(samples,dtype=np.float32)/hz
+   freq=440*2**((midi-69)/12)
+   if kind=='bass':
+    env=(1-np.exp(-t*110))*np.exp(-t/max(.09,dur*.78))
+    wave=np.sin(2*np.pi*freq*t)+.23*np.sin(2*np.pi*2*freq*t)
+   elif kind=='chord':
+    env=(1-np.exp(-t*150))*np.exp(-t/max(.09,dur*.70))
+    wave=.8*np.sin(2*np.pi*freq*t)+.17*np.sin(2*np.pi*2*freq*t)
+   else:
+    env=(1-np.exp(-t*380))*np.exp(-t/max(.055,dur*.72))
+    wave=np.sin(2*np.pi*freq*t)+.28*np.sin(2*np.pi*2.02*freq*t)*np.exp(-t*19)
+   add(music,at,wave*env*volume)
+  def kick(at):
+   t=np.arange(int(.17*hz),dtype=np.float32)/hz
+   frequency=55+110*np.exp(-t*29)
+   phase=2*np.pi*(55*t+(110/29)*(1-np.exp(-t*29)))
+   env=(1-np.exp(-t*600))*np.exp(-t*25)
+   add(music,at,np.sin(phase)*env*.21)
+  def snare(at):
+   t=np.arange(int(.145*hz),dtype=np.float32)/hz
+   white=rng.standard_normal(len(t)).astype(np.float32)
+   high=np.empty_like(white)
+   high[0]=0
+   high[1:]=white[1:]-.83*white[:-1]
+   env=np.exp(-t*26)
+   add(music,at,high*env*.065+.045*np.sin(2*np.pi*188*t)*np.exp(-t*35))
+  def hat(at,accent=False):
+   t=np.arange(int(.073*hz),dtype=np.float32)/hz
+   white=rng.standard_normal(len(t)).astype(np.float32)
+   high=np.diff(white,prepend=white[0])
+   add(music,at,high*np.exp(-t*79)*(.036 if accent else .025))
+  for step in range(int(DURATION/half)+2):
+   t=step*half
+   if t>=DURATION:break
+   count=step%8
+   bar=(step//8)%4
+   if count%2==0:
+    if count in (0,4):kick(t)
+    if count in (2,6):snare(t)
+    note(t,roots[bar],.27,.112,'bass')
+    hat(t,False)
+   else:hat(t,True)
+   if count in (0,2,3,4,6,7):
+    note(t,melodies[bar][count],.22,.090 if count in (0,4) else .072)
+   if count in (0,5):
+    for tone in chords[bar]:note(t,tone,.30,.019,'chord')
+  def marble_clink(at,vol=.36):
+   # Glass has short inharmonic bell modes, but no long electronic ringing.
+   # Damped transient and slight wooden contact create small hard marbles.
+   fundamental=rng.uniform(1450,2280)
+   modes=[(1,.060,.32),(1.73,.040,.17),(2.67,.025,.105)]
+   length=int(.09*hz);t=np.arange(length,dtype=np.float32)/hz
+   tone=np.zeros(length,np.float32)
+   for ratio,decay,amp in modes:
+    tone+=amp*np.sin(2*np.pi*fundamental*ratio*t+rng.uniform(0,1))*np.exp(-t/decay)
+   fine=rng.standard_normal(length).astype(np.float32)
+   trans=(fine-np.roll(fine,1))*np.exp(-t*210)*.05
+   wood=.085*np.sin(2*np.pi*420*t)*np.exp(-t*70)
+   env=1-np.exp(-t*1200)
+   add(effects,at,(tone*env+trans+wood)*vol)
+  def wood_tick(at,strength=.12):
+   t=np.arange(int(.055*hz),dtype=np.float32)/hz
+   freq=rng.uniform(260,530)
+   sig=np.sin(2*np.pi*freq*t)*np.exp(-t*90)
+   add(effects,at,sig*strength)
+  def marble_roll(at):
+   size=min(int(ROLL*hz),n-int(at*hz))
+   if size<=0:return
+   t=np.arange(size,dtype=np.float32)/hz
+   noise=rng.standard_normal(size).astype(np.float32)
+   # Low-frequency band-limited friction with irregular grain; softened to
+   # evoke a glass marble spinning and slowing across a wood tabletop.
+   kernel=np.ones(57,dtype=np.float32)/57
+   grain=np.convolve(noise,kernel,mode='same')
+   fine=np.convolve(noise,np.ones(7,dtype=np.float32)/7,mode='same')
+   env=np.minimum(1,t/.14)*np.minimum(1,np.maximum(.0001,ROLL-t)/.28)
+   grain_wave=(grain*.28+fine*.062)*env
+   add(effects,at,grain_wave)
+   tick_at=.16
+   while tick_at<ROLL-.23:
+    wood_tick(at+tick_at,.025+rng.uniform(0,.022))
+    tick_at+=rng.uniform(.19,.33)
+   marble_clink(at+ROLL-.08,.52)
+   wood_tick(at+ROLL-.025,.11)
+  def announcement_sting(at):
+   # Compact rising "winning draw" two-note xylophone fanfare.
+   for offset,pitch in [(0,79),(.13,83),(.27,88)]:
+    note(at+offset,pitch,.32,.125,'marimba')
   pos=0
   for i in range(12):
-   length=INTRO if i==0 else MIX;t=pos+.06
-   while t<pos+length-.18:
-    t+=float(rng.uniform(.16,.42));impact(t,float(rng.uniform(.12,.23)))
-   pos+=length;rolling(pos);pos+=ROLL;announced(pos);pos+=ANN
-  data=np.tanh(data*1.45)*.76
+   length=INTRO if i==0 else MIX
+   t=pos+.04
+   while t<pos+length-.10:
+    t+=float(rng.uniform(.15,.34))
+    marble_clink(t,float(rng.uniform(.27,.58)))
+    if rng.random()<.20:wood_tick(t+.014,.044)
+   pos+=length
+   marble_roll(pos)
+   pos+=ROLL
+   announcement_sting(pos)
+   pos+=ANN
+  # User-facing default mix: gameshow music behind, marbles clear and up front.
+  combined=music*.72+effects*.85
+  combined=np.tanh(combined*1.16)*.87
   with wave.open(str(wavpath),'wb') as w:
    w.setnchannels(1);w.setsampwidth(2);w.setframerate(hz)
-   w.writeframes(np.int16(data*32767).tobytes())
+   w.writeframes(np.int16(combined*32767).tobytes())
  silent=base/'silent.mp4';wav=base/'sound.wav'
  ff=subprocess.Popen(['ffmpeg','-hide_banner','-loglevel','error','-y','-f','rawvideo','-pix_fmt','rgb24','-s',str(W)+'x'+str(H),'-r',str(FPS),'-i','pipe:0','-c:v','libx264','-preset','ultrafast','-crf','24','-pix_fmt','yuv420p','-movflags','+faststart',str(silent)],stdin=subprocess.PIPE)
  nframes=math.ceil(DURATION*FPS)
