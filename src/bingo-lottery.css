@@ -43,17 +43,23 @@
   transform:rotate(-27deg);filter:blur(2px);z-index:2;pointer-events:none
 }
 .ssl-display-ball-rolling{
-  animation:ssl-downhill-ball 3200ms cubic-bezier(.19,.1,.4,1) both;
+  animation:ssl-downhill-ball 3200ms linear both;
+  transform-origin:50% 50%;
   will-change:transform
 }
 /* A ball traveling right rotates clockwise: negative angle at the start,
    steadily INCREASING toward zero. The slope is positive Y (down the page). */
 @keyframes ssl-downhill-ball{
-  0%{transform:translate(-344%, -75%) rotate(-1000deg) scale(.78);opacity:.8}
-  18%{transform:translate(-285%, -60%) rotate(-800deg) scale(.87);opacity:1}
-  52%{transform:translate(-158%, -34%) rotate(-430deg) scale(.95)}
-  83%{transform:translate(-9%, -2%) rotate(-42deg) scale(1.01)}
-  90%{transform:translate(3%, -8%) rotate(-22deg)}
+  0%{transform:translate(-344%, -75%) rotate(-1200deg) scale(.78);opacity:.83}
+  12%{transform:translate(-319%, -69%) rotate(-1113deg) scale(.83);opacity:1}
+  25%{transform:translate(-276%, -60%) rotate(-964deg) scale(.88)}
+  40%{transform:translate(-218%, -46%) rotate(-762deg) scale(.93)}
+  55%{transform:translate(-153%, -33%) rotate(-535deg) scale(.97)}
+  70%{transform:translate(-89%, -19%) rotate(-311deg) scale(1)}
+  82%{transform:translate(-38%, -8%) rotate(-132deg) scale(1.01)}
+  90%{transform:translate(-10%, -2%) rotate(-35deg) scale(1.02)}
+  94%{transform:translate(2%, -9%) rotate(-7deg) scale(1.02)}
+  97%{transform:translate(1%, -4%) rotate(-3deg) scale(1)}
   100%{transform:translate(0,0) rotate(0deg) scale(1)}
 }
 .ssl-machine-counter{
