@@ -18,7 +18,7 @@ import {
   NextSeason,
   ScheduleGenerator,
 } from "./SeasonCalendar.jsx";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import pool from "./players.json";
 import { teamLogo } from "./TeamIdentity.jsx";
 import { ConferenceMark } from './ConferenceMark.jsx';
@@ -89,6 +89,7 @@ export function useSeasonLeague(supabase, access) {
     [ballotVoters, setBallotVoters] = useState(null),
     [ballotVotersError, setBallotVotersError] = useState(""),
     [now, setNow] = useState(Date.now());
+  const serverOffsetMs = useRef(0);
   const season = seasons.find((s) => s.id === selected) || seasons[0] || null;
   async function refresh() {
     if (!supabase) return;
@@ -96,6 +97,12 @@ export function useSeasonLeague(supabase, access) {
     if (r.error) {
       setError(r.error.message);
       return;
+    }
+    // Keep the lottery timeline identical on devices whose local clocks differ.
+    const serverTime = Date.parse((r.data || [])[0]?.serverNow || '');
+    if (Number.isFinite(serverTime)) {
+      serverOffsetMs.current = serverTime - Date.now();
+      setNow(Date.now() + serverOffsetMs.current);
     }
     setSeasons(r.data || []);
     setError("");
@@ -132,7 +139,7 @@ export function useSeasonLeague(supabase, access) {
     return () => clearInterval(t);
   }, [supabase, access.role, access.slot, selected]);
   useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 1000);
+    const t = setInterval(() => setNow(Date.now() + serverOffsetMs.current), 1000);
     return () => clearInterval(t);
   }, []);
   async function act(operation, payload = {}) {
