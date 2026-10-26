@@ -149,7 +149,7 @@ with tempfile.TemporaryDirectory() as temp:
   if abs(rotation)>.01:logo=logo.rotate(rotation,Image.Resampling.BICUBIC,expand=False)
   pic.alpha_composite(logo,(int(px-logo.width/2),int(py-logo.height/2)))
  def render(t):
-  nonlocal balls,prior,prior_state,theta
+  global balls,prior,prior_state,theta
   revealed,state,elapsed,remaining=phase(t)
   if revealed!=prior or state!=prior_state:
    balls=reset(ORDER[revealed:]);prior=revealed;prior_state=state
