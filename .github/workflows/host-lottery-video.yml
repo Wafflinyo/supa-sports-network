@@ -8,17 +8,12 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
-  pages: write
-  id-token: write
 concurrency:
-  group: pages
+  group: ssl-lottery-video-generator
   cancel-in-progress: false
 jobs:
   publish:
     runs-on: ubuntu-24.04
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -53,8 +48,6 @@ jobs:
           GITHUB_PAGES_BASE: /${{ github.event.repository.name }}/
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      # Pushing the generated MP4 to main triggers the site's regular Pages
+      # workflow. Do not deploy Pages from this video job: both runs would
+      # otherwise cancel each other before rendering the video.
