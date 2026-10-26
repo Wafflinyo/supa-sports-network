@@ -1,5 +1,5 @@
 import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
-import {lotteryProgress,lotteryDuration} from './lottery-timing.js';
+import {lotteryProgress,lotteryReplayProgress,lotteryDuration} from './lottery-timing.js';
 import {BingoLottery} from './BingoLottery.jsx';
 import DraftChat from './DraftChat.jsx';
 import {CommissionerVoteTracker} from './VoteParticipation.jsx';
@@ -741,9 +741,8 @@ function Draft({ league: l }) {
     const interval=setInterval(tick,75);
     return()=>clearInterval(interval);
   },[isReplaying,localReplay?.startPerf,replayDuration]);
-  const replayClockStart = '2000-01-01T00:00:00.000Z';
   const lottery = isReplaying
-    ? lotteryProgress(s.order.length,replayClockStart,Date.parse(replayClockStart)+replayElapsed)
+    ? lotteryReplayProgress(s.order.length,replayElapsed)
     : liveLottery;
   const canReplay = s?.order?.length > 0 && liveLottery.phase === 'complete';
   const replayFinished = isReplaying && replayElapsed >= replayDuration;
