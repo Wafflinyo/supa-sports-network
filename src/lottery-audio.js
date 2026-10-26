@@ -1,7 +1,7 @@
 // SSL lottery audio: separate, independently mixed music and physical marble effects.
 // The game-show score is original, synthesized locally with Web Audio;
 // no autoplay, streaming, third-party sounds or licensing dependencies.
-const BPM = 124;
+const BPM = 138;
 const HALF_BEAT = 60 / BPM / 2;
 const MELODY = [
   [76,79,83,79, 76,79,84,79, 76,79,83,79, 74,79,83,79],
@@ -56,17 +56,37 @@ export class LotteryAudio {
     this.tone(freq*2.02,t,.075,vol*.28,'triangle');
     this.tone(freq*.5,t,.16,vol*.19,'triangle');
   }
+  brass(freq,t,duration=.27,peak=.055){
+    // Punchy, band-limited brass stabs: bright attack, warm decay.
+    const ctx=this.ctx;
+    const osc=ctx.createOscillator(),filter=ctx.createBiquadFilter(),gain=ctx.createGain();
+    osc.type='sawtooth';osc.frequency.value=freq;
+    filter.type='lowpass';filter.frequency.setValueAtTime(1200,t);
+    filter.frequency.exponentialRampToValueAtTime(420,t+duration);
+    gain.gain.setValueAtTime(.0001,t);
+    gain.gain.linearRampToValueAtTime(peak,t+.023);
+    gain.gain.exponentialRampToValueAtTime(.0001,t+duration);
+    osc.connect(filter);filter.connect(gain);gain.connect(this.musicBus);
+    osc.start(t);osc.stop(t+duration+.012);
+  }
+  announce(){
+    const t=this.ctx.currentTime+.04;
+    for(const [offset,n] of [[0,72],[.13,76],[.26,79]]) {
+      this.pluck(midi(n),t+offset,.15);
+      this.brass(midi(n-12),t+offset,.3,.055);
+    }
+  }
   kick(t){
     const ctx=this.ctx,o=ctx.createOscillator(),g=ctx.createGain();
     o.type='sine';
     o.frequency.setValueAtTime(112,t);o.frequency.exponentialRampToValueAtTime(51,t+.115);
-    release(g,t,.24,.002,.14);
+    release(g,t,.36,.002,.17);
     o.connect(g);g.connect(this.musicBus);o.start(t);o.stop(t+.17);
   }
   snare(t){
     const ctx=this.ctx,src=ctx.createBufferSource(),filter=ctx.createBiquadFilter(),gain=ctx.createGain();
     src.buffer=this.buffer(.14);filter.type='highpass';filter.frequency.value=950;
-    release(gain,t,.13,.002,.11);
+    release(gain,t,.23,.002,.11);
     src.connect(filter);filter.connect(gain);gain.connect(this.musicBus);
     src.start(t);src.stop(t+.14);
     this.tone(185,t,.075,.055,'triangle');
@@ -79,17 +99,22 @@ export class LotteryAudio {
     src.start(t);src.stop(t+.07);
   }
   playStep(t,step){
-    const beat=step%8,bar=Math.floor(step/8)%4;
-    if(beat%2===0) {
-      if(beat===0||beat===4) this.kick(t);
-      if(beat===2||beat===6) this.snare(t);
-      this.hat(t,.06);
-      this.tone(midi(ROOTS[bar] - (beat===4?0:0)),t,.22,.095,'triangle');
-    } else this.hat(t,.085);
-    const note=MELODY[bar][step%8+(Math.floor(step/16)%2?8:0)];
-    if(beat!==1 || (step%16)>7)this.pluck(midi(note),t,.12);
-    if(beat===0||beat===5) {
-      for(const v of CHORDS[bar]) this.tone(midi(v),t,.30,.024,'sine');
+    const eighth=step%8,bar=Math.floor(step/8)%4;
+    const root=ROOTS[bar];
+    if(eighth%2===0){
+      if(eighth===0||eighth===4)this.kick(t);
+      if(eighth===2||eighth===6)this.snare(t);
+      this.hat(t,.075);
+      this.tone(midi(root),t,.22,.15,'triangle');
+      this.tone(midi(root-12),t,.23,.095,'sine');
+    }else {
+      this.hat(t,.105);
+      if(eighth===3||eighth===7)this.kick(t);
+    }
+    const riff=MELODY[bar][step%8+(Math.floor(step/16)%2?8:0)];
+    if(eighth!==1)this.pluck(midi(riff),t,.11);
+    if([0,3,6].includes(eighth)){
+      CHORDS[bar].forEach((n,i)=>this.brass(midi(n),t,.19,i===0?.055:.037));
     }
   }
   startMusic(){
@@ -111,25 +136,30 @@ export class LotteryAudio {
     this.running=false;clearInterval(this.interval);this.interval=null;
   }
   marbleClink(strength=.4){
+    // Billiard-ball impacts: low-mid "tok/clack", not glass ringing.
+    // Hard resin/phenolic spheres make an abrupt transient, with very
+    // short lower pitched resonances and essentially no shimmering tail.
     const ctx=this.ctx,t=ctx.currentTime;
-    if(t-this.lastCollision<.055)return;
+    if(t-this.lastCollision<.065)return;
     this.lastCollision=t;
-    const v=Math.min(1,Math.max(.1,strength));
-    const freq=1280+Math.random()*950;
-    const resonances=[[1,.092,.075],[1.91,.061,.055],[2.84,.042,.03]];
-    // Multiple short, inharmonic resonances create a glass/marble clink,
-    // followed by a very subtle wooden cage contact.
-    for(const [ratio,decay,amp] of resonances){
+    const v=Math.min(1,Math.max(.18,strength));
+    const base=390+Math.random()*220;
+    for(const [ratio,decay,amp,type] of [
+      [1,.037,.21,'triangle'],[1.46,.021,.073,'sine'],[2.22,.011,.020,'sine']
+    ]){
       const o=ctx.createOscillator(),g=ctx.createGain();
-      o.type='sine';o.frequency.value=freq*ratio;
-      release(g,t,amp*v,.0012,decay);
-      o.connect(g);g.connect(this.effectsBus);o.start(t);o.stop(t+decay+.015);
+      o.type=type;o.frequency.setValueAtTime(base*ratio,t);
+      g.gain.setValueAtTime(Math.max(.0001,amp*v),t+.001);
+      g.gain.exponentialRampToValueAtTime(.0001,t+decay);
+      o.connect(g);g.connect(this.effectsBus);o.start(t);o.stop(t+decay+.018);
     }
-    const wood=ctx.createOscillator(),g=ctx.createGain();
-    wood.type='triangle';wood.frequency.setValueAtTime(390,t);
-    wood.frequency.exponentialRampToValueAtTime(260,t+.048);
-    release(g,t,.02*v,.001,.052);
-    wood.connect(g);g.connect(this.effectsBus);wood.start(t);wood.stop(t+.07);
+    const knock=ctx.createOscillator(),knockGain=ctx.createGain();
+    knock.type='sine';knock.frequency.setValueAtTime(245+Math.random()*55,t);
+    knock.frequency.exponentialRampToValueAtTime(140,t+.027);
+    knockGain.gain.setValueAtTime(Math.max(.0001,.125*v),t);
+    knockGain.gain.exponentialRampToValueAtTime(.0001,t+.038);
+    knock.connect(knockGain);knockGain.connect(this.effectsBus);
+    knock.start(t);knock.stop(t+.042);
   }
   rollingOnWood(phaseElapsed=0,fullMs=3200){
     const ctx=this.ctx,now=ctx.currentTime,duration=Math.max(.15,(fullMs-phaseElapsed)/1000);
