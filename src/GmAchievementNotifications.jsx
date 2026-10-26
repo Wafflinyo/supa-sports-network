@@ -2,23 +2,10 @@ import React,{useCallback,useEffect,useMemo,useRef,useState} from 'react';
 import {X, Trophy, Sparkles, CheckCircle2} from 'lucide-react';
 import {earnedAchievements} from './gm-achievements.js';
 import {AchievementBadgeArt} from './AchievementBadgeArt.jsx';
+import {unseenAchievements,noticesForBadges,isValidGmSlot} from './gm-achievement-notice-utils.js';
 import './gm-achievement-notifications.css';
 
 const TABLE='ssl_gm_achievement_notices';
-const validSlot=slot=>slot!==null&&slot!==undefined&&slot!==''&&Number.isFinite(Number(slot));
-
-/** Acknowledging a notification never awards a badge. The badges themselves
- * are computed from released league results and lifetime GM achievements.
- */
-export function unseenAchievements(achievements, acknowledgedIds) {
-  const seen=new Set(acknowledgedIds);
-  return achievements.filter(b=>b.earned&&!seen.has(b.id));
-}
-export function noticesForBadges(userId, achievements) {
-  if(!userId)return [];
-  return achievements.map(b=>({user_id:userId,badge_id:b.id}));
-}
-
 export default function GmAchievementNotifications({
   supabase,userId,slot,seasons=[],onViewAchievements,refreshLeague
 }) {
@@ -30,15 +17,16 @@ export default function GmAchievementNotifications({
   const alive=useRef(true);
   const firstButton=useRef(null);
   const fetchCounter=useRef(0);
+  const wasHidden=useRef(false);
 
-  const awarded=useMemo(()=>validSlot(slot)?
+  const awarded=useMemo(()=>isValidGmSlot(slot)?
     earnedAchievements(seasons,Number(slot)).filter(x=>x.earned):[],
     [seasons,slot]);
   const pending=useMemo(()=>unseenAchievements(awarded,seen),[awarded,seen]);
   const open=Boolean(loaded&&!snoozed&&pending.length);
 
   const reloadSeen=useCallback(async()=>{
-    if(!supabase||!userId||!validSlot(slot))return;
+    if(!supabase||!userId||!isValidGmSlot(slot))return;
     const request=++fetchCounter.current;
     const {data,error:fetchError}=await supabase.from(TABLE)
       .select('badge_id').eq('user_id',userId);
@@ -67,7 +55,9 @@ export default function GmAchievementNotifications({
   // all catch up immediately. The league's regular 8s polling also continues.
   useEffect(()=>{
     const resume=()=>{
+      if(document.visibilityState==='hidden'){wasHidden.current=true;return;}
       if(document.visibilityState!=='visible')return;
+      if(wasHidden.current){setSnoozed(false);wasHidden.current=false;}
       reloadSeen();
       if(typeof refreshLeague==='function')refreshLeague();
     };
