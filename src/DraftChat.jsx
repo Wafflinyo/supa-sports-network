@@ -13,13 +13,9 @@ export default function DraftChat({supabase,season,access}){
   const [sending,setSending]=useState(false);
   const [error,setError]=useState('');
   const [newActivity,setNewActivity]=useState(false);
-  const viewport=useRef(null),bottom=useRef(null),lastId=useRef(0),busy=useRef(false),mounted=useRef(true);
+  const viewport=useRef(null),lastId=useRef(0),busy=useRef(false);
   const canChat=['gm','commissioner'].includes(access?.role);
   const canRead=canChat && Boolean(supabase&&season?.id);
-  useEffect(()=>{
-    mounted.current=true;
-    return ()=>{mounted.current=false;};
-  },[]);
   useEffect(()=>{
     if(!canRead)return;
     setMessages([]);lastId.current=0;setLoading(true);setError('');
@@ -63,7 +59,7 @@ export default function DraftChat({supabase,season,access}){
       if(!read.error&&Array.isArray(read.data)){
         setMessages(read.data);
         lastId.current=Number(read.data[read.data.length-1]?.id||0);
-        requestAnimationFrame(()=>bottom.current?.scrollIntoView({block:'end',behavior:'smooth'}));
+        requestAnimationFrame(()=>{if(viewport.current)viewport.current.scrollTo({top:viewport.current.scrollHeight,behavior:'smooth'});});
       }
     }
     setSending(false);
@@ -94,7 +90,7 @@ export default function DraftChat({supabase,season,access}){
           <div className="ssl-chat-body">{m.content}</div>
         </div>
       </div>)}
-      <div ref={bottom} />
+
     </div>
     {newActivity&&<button className="ssl-chat-new" type="button" onClick={()=>{setNewActivity(false);if(viewport.current)viewport.current.scrollTo({top:viewport.current.scrollHeight,behavior:'smooth'});}}>
       <RefreshCw size={14}/> New messages · Jump to latest
