@@ -1,6 +1,7 @@
 import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
 import {lotteryProgress} from './lottery-timing.js';
 import {BingoLottery} from './BingoLottery.jsx';
+import DraftChat from './DraftChat.jsx';
 import {CommissionerVoteTracker} from './VoteParticipation.jsx';
 import {CalendarDays, CheckCircle2, Clock3, Vote} from 'lucide-react';
 import {heatingUpForSeason} from './heating-up.js';
@@ -775,6 +776,7 @@ function Draft({ league: l }) {
     <>
       <NextSeason league={l} />
       <SeasonCalendar league={l} />
+      <DraftChat supabase={l.supabase} season={s} access={l.access}/>
       {s.status === 'drafting' && <div className="ssl-draft-rejoin" role="status">
         <div><strong>LIVE DRAFT · LEAVE AND REENTER ANYTIME</strong>
           <p>Your picks and the current turn are saved on the league server. There is no automatic pick timer. Return through Draft Room whenever your next pick comes up; the room reconnects to the latest selection.</p>
