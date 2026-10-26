@@ -14,7 +14,6 @@ import {
 import ContractExtensions from "./ContractExtensions.jsx";
 import {
   SeasonCalendar,
-  NextSeason,
   ScheduleGenerator,
 } from "./SeasonCalendar.jsx";
 import React, { useState, useEffect, useMemo, useRef } from "react";
@@ -319,7 +318,13 @@ export function SeasonWorkspace({ league, registeredTeams }) {
     if(!Number.isFinite(date.getTime()))return;
     const localDate=new Date(date.getTime()-date.getTimezoneOffset()*60000);
     setDraft(localDate.toISOString().slice(0,16));
-  },[s?.id,s?.draftAt]);
+    // Retain the saved lottery lead time when editing an existing date.
+    const lottery=Date.parse(s.lotteryAt);
+    if(Number.isFinite(lottery)){
+      const minutes=Math.round((date.getTime()-lottery)/60000);
+      if(minutes>=15&&minutes<=30)setLotteryMins(minutes);
+    }
+  },[s?.id,s?.draftAt,s?.lotteryAt]);
   const tabs = [
     "Season Setup",
     "Draft",
@@ -581,8 +586,53 @@ function useActingTeam(l) {
   useEffect(() => setT(l.myTeam?.id || ""), [l.season?.id, l.myTeam?.id]);
   return [l.access.role === "commissioner" ? t : l.myTeam?.id, setT];
 }
+function draftCountdown(startsAt,now){
+  const stamp=Date.parse(startsAt);
+  if(!Number.isFinite(stamp))return null;
+  const ms=Math.max(0,stamp-now);
+  const seconds=Math.ceil(ms/1000);
+  const days=Math.floor(seconds/86400);
+  const hours=Math.floor((seconds%86400)/3600);
+  const minutes=Math.floor((seconds%3600)/60);
+  const secs=seconds%60;
+  return {days,hours,minutes,seconds:secs,remaining:ms,
+    display:[days?String(days)+'d':null,String(hours).padStart(2,'0'),String(minutes).padStart(2,'0'),String(secs).padStart(2,'0')].filter(Boolean).join(':')};
+}
+function DraftRoomEntrance({season,now,open,entered,onEnter,onLeave}){
+  const remaining=draftCountdown(season?.draftAt,now);
+  const hasDate=Boolean(season?.draftAt && remaining);
+  const finished=Boolean(season && ['postdraft','regular','postseason','retention','offseason','archived'].includes(season.status));
+  const started=hasDate&&remaining.remaining===0;
+  const status=!hasDate?'DATE NOT SCHEDULED':finished?'DRAFT COMPLETED':started?'DRAFT IN PROGRESS':'COUNTDOWN TO THE DRAFT';
+  return <section className={'ssl-draft-room-gateway'+(entered?' ssl-gateway-inside':'')} aria-label="Official draft date and entry">
+    <div className="ssl-draft-room-header">
+      <span className="ssl-draft-room-kicker">SLUGGERS SUPA LEAGUE · OFFICIAL DRAFT ROOM</span>
+      <h2>{status}</h2>
+      <time className="ssl-draft-date-large" dateTime={season?.draftAt||undefined}>
+        {hasDate?time(season.draftAt):'DATE AND TIME TO BE ANNOUNCED'}
+      </time>
+      {!entered&&<p>{open
+        ? 'The Draft Room is open. Enter to view the live lottery, draft board and commissioner/GM chat.'
+        : hasDate
+          ? 'The room opens one hour before the scheduled draft. The live draft and chat are available after you enter.'
+          : 'The commissioner will set the official draft date and time in Commissioner Tools.'}</p>}
+    </div>
+    <div className="ssl-draft-clock-section">
+      {hasDate&&remaining.remaining>0
+        ? <><span className="ssl-draft-clock-caption">DRAFT BEGINS IN</span><strong className="ssl-draft-clock-count" role="timer">{remaining.display}</strong></>
+        : <strong className="ssl-draft-clock-status">{finished?'DRAFT FINISHED':started?'DRAFT TIME':'AWAITING DATE'}</strong>}
+      {!entered
+        ? <button className="ssl-enter-draft-button" type="button" disabled={!open} onClick={onEnter}>
+            {open?'ENTER DRAFT ROOM':'DRAFT ROOM LOCKED'}
+          </button>
+        : <button className="ssl-leave-draft-button" type="button" onClick={onLeave}>LEAVE DRAFT ROOM</button>}
+    </div>
+  </section>;
+}
 function Draft({ league: l }) {
   const s = l.season;
+  const [enteredRoom,setEnteredRoom] = useState(false);
+  useEffect(()=>{setEnteredRoom(false);},[s?.id]);
   // The official lottery is always derived from the shared server clock.
   // Arriving mid-draw joins the current ball, never starts a new simulation.
   const liveLottery = lotteryProgress(s?.order?.length || 0, s?.lotteryAt, l.now);
@@ -632,43 +682,24 @@ function Draft({ league: l }) {
     };
   },[s?.id]);
   if (!s)
-    return (
-      <>
-        <NextSeason league={l} />
-        <Box title="DRAFT NOT SCHEDULED">
-          <p>The commissioner needs to set up the season first.</p>
-        </Box>
-      </>
-    );
+    return <section className="panel season-box">
+      <h2>DRAFT DATE TO BE ANNOUNCED</h2>
+      <p>The commissioner will set the season and official draft date in Commissioner Tools.</p>
+    </section>;
   const open = ['drafting','postdraft','regular','postseason','retention','offseason','archived'].includes(s.status) ||
     (s.draftAt && l.now >= new Date(s.draftAt).getTime() - 3600000),
     next = s.picks.length,
     owner = s.nextPick?.team,
     t = s.teams.find((t) => t.id === owner),
     mine = l.access.role === "commissioner" || l.myTeam?.id === owner;
-  if (!open)
-    return (
-      <>
-        <NextSeason league={l} />
-        <DraftChat supabase={l.supabase} season={s} access={l.access}/>
-        <Box title="DRAFT ROOM OPENS ONE HOUR EARLY">
-          <p>
-            Draft: {time(s.draftAt)}
-            <br />
-            Room opens:{" "}
-            {s.draftAt
-              ? time(new Date(new Date(s.draftAt).getTime() - 3600000))
-              : "Date to be announced"}
-            <br />
-            Lottery: {time(s.lotteryAt)}
-          </p>
-        </Box>
-      </>
-    );
+  // The tab is only a waiting/entry page. No chat, picks or live lottery
+  // are shown until the user explicitly enters during the open window.
+  if(!open || !enteredRoom)return <DraftRoomEntrance season={s} now={l.now}
+    open={Boolean(open)} entered={false} onEnter={()=>setEnteredRoom(true)}/>;
   return (
     <>
-      <NextSeason league={l} />
-      <SeasonCalendar league={l} />
+      <DraftRoomEntrance season={s} now={l.now} open={Boolean(open)}
+        entered onLeave={()=>{setEnteredRoom(false);stopReplay();}}/>
       <DraftChat supabase={l.supabase} season={s} access={l.access}/>
       {s.status === 'drafting' && <div className="ssl-draft-rejoin" role="status">
         <div><strong>LIVE DRAFT · LEAVE AND REENTER ANYTIME</strong>
