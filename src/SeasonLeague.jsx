@@ -1,6 +1,7 @@
 import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
 import {lotteryProgress,lotteryReplayProgress,lotteryDuration} from './lottery-timing.js';
 import {BingoLottery} from './BingoLottery.jsx';
+import {matchupDisplay} from './matchup-display.js';
 import DraftChat from './DraftChat.jsx';
 import {heatingUpForSeason} from './heating-up.js';
 import {effectiveGameLineup,gameLineupIsEditable,teamGameLineups,savedLineupLabel} from './roster-lineups.js';
@@ -1273,14 +1274,28 @@ function Schedule({ league: l, commissioner = false }) {
           {g.week && (i===0 || games[i-1].week!==g.week) && <h2 className="schedule-week-heading">WEEK {g.week} <small>· SIX MATCHUPS</small></h2>}
           <section className="panel season-game">
             <div>
-              <small>
+              <small className="ssl-matchup-week-label">
                 {g.postponed ? "POSTPONED · " : ""}
-                {g.label || g.phase} · {g.startsAt?time(g.startsAt):"DATE & TIME TBD"}
+                {g.label || g.phase}
               </small>
-              <h3>
-                {s.teams.find((t) => t.id === g.away)?.name} <b>AT</b>{" "}
-                {s.teams.find((t) => t.id === g.home)?.name}
-              </h3>
+              <div className="ssl-matchup-card">
+                <h3 className="ssl-matchup-heading" aria-label={matchupDisplay(s,g).awayName+" at "+matchupDisplay(s,g).homeName}>
+                  <span className="ssl-matchup-side ssl-matchup-away">
+                    <span className="ssl-matchup-team-name">{matchupDisplay(s,g).awayName}</span>
+                    <span className="ssl-matchup-side-label">AWAY</span>
+                  </span>
+                  <span className="ssl-matchup-at" aria-hidden="true">@</span>
+                  <span className="ssl-matchup-side ssl-matchup-home">
+                    <span className="ssl-matchup-team-name">{matchupDisplay(s,g).homeName}</span>
+                    <span className="ssl-matchup-side-label">HOME</span>
+                  </span>
+                </h3>
+                <p className="ssl-matchup-venue-line">
+                  <span className="ssl-matchup-stadium">{matchupDisplay(s,g).stadium || "HOME STADIUM TBD"}</span>
+                  <span className="ssl-matchup-separator" aria-hidden="true">•</span>
+                  <time dateTime={g.startsAt||undefined} className="ssl-matchup-game-time">{g.startsAt?time(g.startsAt):"DATE & TIME TBD"}</time>
+                </p>
+              </div>
               <p className="matchup-conference"><ConferenceMark id={s.teams.find(t=>t.id===g.home)?.conference} size={19}/> {matchupType(s,g)}</p>
               {g.announcement && <p>{g.announcement}</p>}
               {g.youtubeUrl && (
