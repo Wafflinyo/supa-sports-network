@@ -804,6 +804,7 @@ function Draft({ league: l }) {
           {s.baseDraftRounds || 12} rounds · snake order (11 tradable player turns + one nontradable Stadium Pick unless the team retained its Stadium). Supplemental rounds
           fill teams below 11, skipping full teams.
         </p>
+        {s.number===1&&<p className="ssl-lottery-fairness"><strong>Season 1: Equal odds for all 12 franchises.</strong> Every team begins with a 1-in-12 (8.3333%) chance of being drawn first. A drawn ball is removed, so each remaining team then has a 1-in-11 (9.0909%) chance for second. No franchise appears twice. <a href={import.meta.env.BASE_URL+'?lottery-practice=1'} target="_blank" rel="noopener noreferrer">Run a random practice lottery</a> without affecting the real draw.</p>}
         {s.number>1 && <p>Returning-season lottery: 12th seed 55% · 11th 25% · 10th 15% · 9th 5% for first pick. Winners are removed before the next weighted draw. Seeds 8 through 1 receive picks 5 through 12, then the order snakes.</p>}
         <details className="draft-order-details" defaultOpen={['scheduled','drafting'].includes(s.status)}>
           <summary>DRAFT ORDER · {s.order.length || 12} TEAMS</summary>
