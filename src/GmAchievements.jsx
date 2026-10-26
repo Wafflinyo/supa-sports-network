@@ -1,4 +1,5 @@
 import React, {useMemo,useState} from 'react';
+import {signatureMarks,flourishMarks} from './badge-art-design.js';
 import {GM_ACHIEVEMENTS,GM_ACHIEVEMENT_CATEGORIES,earnedAchievements} from './gm-achievements.js';
 import './gm-achievements.css';
 
@@ -36,6 +37,25 @@ function Motif({type}) {
   return <g {...shared}><path d="M-30 21H4Q25 21 25-1V-21"/><path d="M10-9L25-24L39-9"/><circle cx="-13" cy="-1" r="9"/></g>;
 }
 
+// Distinct in-icon insignia for every achievement, including higher levels of
+// the same stat. The central sports motif is paired with a prominent, original
+// etched symbol AND a separate sculpted flourish. 16 x 6 = 96 distinct pairs,
+// more than enough for our current 92 badge designs.
+function UniqueBadgeSymbol({badge}) {
+  const idx=(badge.serial-1)%signatureMarks.length;
+  const flourish=Math.floor((badge.serial-1)/signatureMarks.length);
+  return <g color="#fffdf2" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" fill="none">
+    <path d={flourishMarks[flourish]} strokeWidth="4.8" opacity=".83"/>
+    <g transform="translate(-7 4) scale(.73)" strokeWidth="5.4">
+      <Motif type={badge.icon}/>
+    </g>
+    <g transform="translate(20 -13)">
+      <circle r="18" fill="#182e53" stroke="#fff1c4" strokeWidth="2.5"/>
+      <path d={signatureMarks[idx]} fill="none" strokeWidth="2.7"/>
+    </g>
+  </g>;
+}
+
 export function AchievementBadgeArt({badge,earned=false}) {
   const [light,dark,edge]=palettes[badge.category]||palettes.Wins;
   const variant=(badge.serial*11)%7;
@@ -54,8 +74,8 @@ export function AchievementBadgeArt({badge,earned=false}) {
     <path d={variant%2===0?'M24 37Q60 14 96 37':'M22 88Q60 116 98 88'}
       fill="none" stroke={edge} strokeOpacity=".72" strokeWidth="2"/>
     {Array.from({length:variant+1},(_,i)=><circle key={i} cx={36+i*(48/(variant+1))} cy="23" r="2.15" fill={edge} />)}
-    <g transform="translate(60 70)" color="#fffdf2" style={{filter:'drop-shadow(0 2px 2px rgba(0,0,0,.4))'}}>
-      <Motif type={badge.icon}/>
+    <g transform="translate(60 70)" style={{filter:'drop-shadow(0 2px 2px rgba(0,0,0,.4))'}}>
+      <UniqueBadgeSymbol badge={badge}/>
     </g>
     <path d="M29 102L60 116 91 102" fill="none" stroke={edge} strokeWidth="2.5"/>
     <rect x="30" y="101" width="60" height="25" rx="10" fill="#14233d" stroke={edge} strokeWidth="1.4"/>
