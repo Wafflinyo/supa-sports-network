@@ -1,21 +1,41 @@
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import {GM_ACHIEVEMENTS} from '../src/gm-achievements.js';
-import {signatureMarks,flourishMarks,badgeArtSignature} from '../src/badge-art-design.js';
+import {badgeScenes,badgeSceneIds} from '../src/achievement-badge-scenes.js';
 
-// These are pictograms inside the shield, not simply a changing number or
-// badge color. The SVG signature combines a large icon-family drawing, an
-// illustrated inset emblem, and a distinct full-width flourish.
-assert.equal(GM_ACHIEVEMENTS.length,92);
-assert.equal(signatureMarks.length,16);
-assert.equal(flourishMarks.length,6);
-assert.equal(new Set(signatureMarks).size,16);
-assert.equal(new Set(flourishMarks).size,6);
-const signatures=GM_ACHIEVEMENTS.map(badgeArtSignature);
-assert.equal(new Set(signatures).size,92,'every achievement needs a distinct drawn symbol');
-for (const badge of GM_ACHIEVEMENTS) {
-  const index=(badge.serial-1)%signatureMarks.length;
-  const flourish=Math.floor((badge.serial-1)/signatureMarks.length);
-  assert.match(signatureMarks[index],/^M/,badge.name+' inset emblem');
-  assert.match(flourishMarks[flourish],/^M/,badge.name+' relief flourish');
+const liveIds=GM_ACHIEVEMENTS.map(b=>b.id);
+assert.equal(liveIds.length,92);
+assert.equal(badgeSceneIds.length,92);
+assert.deepEqual([...badgeSceneIds].sort(),[...liveIds].sort(),
+  'every art design must correspond to an existing achievement—no invented awards');
+assert.equal(new Set(badgeSceneIds).size,92);
+assert.equal(new Set(Object.values(badgeScenes).map(s=>
+  [s.hero,s.detail,s.layout,s.engraving].join(':'))).size,92,
+  'each real award needs a unique meaningful baseball illustration');
+assert.equal(new Set(Object.values(badgeScenes).map(s=>
+  [s.hero,s.detail,s.layout].join(':'))).size,92,
+  'unique badge art cannot depend on a different number alone');
+
+const available=readFileSync(new URL('../src/AchievementBadgeArt.jsx',import.meta.url),'utf8');
+const gloveDigitTags=[...available.matchAll(/<path data-glove-digit="([^"]+)"/g)].map(m=>m[1]);
+assert.deepEqual(gloveDigitTags,['thumb','index','middle','ring','pinky'],
+  'baseball glove artwork must have EXACTLY FIVE glove fingers including thumb');
+assert.match(available,/GLOVE_FINGER_COUNT = 5/);
+assert.match(available,/data-finger-count=\{GLOVE_FINGER_COUNT\}/);
+assert.match(available,/data-sport-object="real-baseball-bat"/);
+assert.match(available,/BAT_PROFILE/);
+assert.match(available,/slim wrapped handle/);
+assert.match(available,/rect x="-6" y="25" width="12" height="5"/,
+  'baseball bat must include a proper knob and grip—not a corn-dog shape');
+assert(!available.includes('signatureMarks') && !available.includes('flourishMarks'),
+  'no arbitrary recycled inset symbols');
+for(const b of GM_ACHIEVEMENTS) {
+  const scene=badgeScenes[b.id];
+  assert(scene && scene.hero && scene.detail && scene.layout,b.name);
+  if(b.group==='player-putouts')assert.equal(scene.hero,'glove',
+    'every putout badge uses authentic five-finger glove artwork');
+  if(b.group==='season-homer'||b.group==='game-homer')assert(
+    ['bat','ball','crossed-bats','fire','stadium','crown'].includes(scene.hero),
+    'every home-run scene must convey real baseball imagery');
 }
-console.log('PASS: all 92 badge pictograms are visually unique, with valid engraved inset designs and crest flourishes');
+console.log('PASS: 92 existing awards only; 92 distinct sports scenes; exact five-finger gloves; properly tapered baseball bat');
