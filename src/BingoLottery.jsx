@@ -50,8 +50,9 @@ function useBingoAudio() {
     if(enabled&&!effectsMuted)engine.current?.rollingOnWood(elapsed,LOTTERY_ROLL_MS);
   }
   function stopMusic(){engine.current?.stopMusic();}
+  function announce(){if(enabled)engine.current?.announce();}
   return {
-    enabled,toggle,hit,roll,stopMusic,
+    enabled,toggle,hit,roll,stopMusic,announce,
     musicMuted,setMusicMuted,effectsMuted,setEffectsMuted,
     musicVolume,setMusicVolume,effectsVolume,setEffectsVolume,
   };
@@ -229,6 +230,7 @@ export function BingoLottery({teams=[],order=[],lottery,logoFor}) {
     if(marker===prevPhase.current)return;
     prevPhase.current=marker;
     if(phase==='rolling')soundRef.current.roll(lottery.phaseElapsedMs);
+    if(phase==='announce')soundRef.current.announce();
     if(phase==='complete')soundRef.current.stopMusic();
   },[phase,reveal]);
   return <div className="ssl-lottery-theater">
@@ -274,11 +276,16 @@ export function BingoLottery({teams=[],order=[],lottery,logoFor}) {
         {phase==='complete'?'THE OFFICIAL ORDER IS IN':phase==='rolling'?'THE NEXT BALL IS ROLLING OUT':phase==='announce'?'OFFICIAL PICK ANNOUNCED':phase==='intro'?'OPENING CAGE MIX':'MIXING FOR THE NEXT PICK'}
       </span>
       <div className="ssl-ball-runway">
-        <span className="ssl-ball-runway-rail" aria-hidden="true"/>
-        {phase==='rolling'?<RollingLogoBall key={reveal} team={chosen} number={reveal} logo={chosen?logos[chosen.id]:null} phaseElapsedMs={lottery.phaseElapsedMs}/>
-          :appearing&&chosen?<span className="lottery-ball ssl-feature-ball" key={reveal}>
-            {logos[chosen.id]?<img src={logos[chosen.id]} alt=""/>:reveal}
-          </span>:<span className="lottery-ball ssl-waiting-ball">?</span>}
+        <span className="ssl-ball-chute" aria-hidden="true"/>
+        <div className="ssl-podium-top" aria-hidden="true"/>
+        <div className="ssl-podium-column" aria-hidden="true"><span>SSL</span></div>
+        <div className="ssl-podium-base" aria-hidden="true"/>
+        <div className="ssl-podium-ball-holder">
+          {phase==='rolling'?<RollingLogoBall key={reveal} team={chosen} number={reveal} logo={chosen?logos[chosen.id]:null} phaseElapsedMs={lottery.phaseElapsedMs}/>
+            :appearing&&chosen?<span className="lottery-ball ssl-feature-ball" key={reveal}>
+              {logos[chosen.id]?<img src={logos[chosen.id]} alt=""/>:reveal}
+            </span>:<span className="ssl-podium-waiting">NEXT BALL</span>}
+        </div>
       </div>
       <strong aria-live="polite">{phase==='complete'?'ALL 12 FRANCHISES HAVE BEEN DRAWN':phase==='announce'&&chosen?'#'+reveal+' · '+chosen.name:phase==='rolling'?'THE BALL IS COMING DOWN THE CHUTE…':phase==='intro'?'LET THE BALLS MIX…':'NEXT FRANCHISE UP…'}</strong>
       {mixing?<div className="ssl-mix-countdown"><span>NEXT BALL ROLLS OUT IN</span><b>{lottery.secondsToNext}s</b></div>
