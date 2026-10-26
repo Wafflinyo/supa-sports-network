@@ -692,3 +692,39 @@ details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
 .ssl-lottery-return-button{background:#27496a;border:1px solid #a6c0d9;color:#eff7ff}
 .ssl-lottery-playback-buttons button:focus-visible{outline:3px solid #f7cd7c;outline-offset:2px}
 @media(max-width:600px){.ssl-lottery-playback-controls{align-items:stretch;padding:12px}.ssl-lottery-playback-buttons{width:100%}.ssl-lottery-playback-buttons button{flex:1}}
+
+/* Draft Room entry lobby: date and clock stay visible on the tab, but the
+   official lottery, picks and private GM chat mount only after Enter. */
+.ssl-draft-room-gateway{
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+  flex-wrap:wrap;margin:18px 0 24px;padding:29px 30px;
+  border-radius:13px;border:2px solid #c2a46c;
+  background:linear-gradient(115deg,#132d4e 0%,#0b1d35 62%,#142b47);
+  box-shadow:0 15px 36px #091a2c29,inset 0 0 0 1px #f6d58e32;
+  color:#f9fafc
+}
+.ssl-draft-room-header{flex:1 1 320px;min-width:0}
+.ssl-draft-room-kicker{display:block;font-size:11px;font-weight:900;letter-spacing:.14em;color:#f2d287;margin:0 0 10px}
+.ssl-draft-room-header h2{
+  color:#fff;margin:0 0 10px;font:900 clamp(24px,3.7vw,42px)/1.06 'Barlow Condensed',Impact,Arial,sans-serif;
+  letter-spacing:.02em
+}
+.ssl-draft-date-large{
+  display:block;font:900 clamp(22px,3.4vw,35px)/1.15 'Barlow Condensed',Impact,Arial,sans-serif;
+  color:#ffe0a1;letter-spacing:.015em;overflow-wrap:anywhere
+}
+.ssl-draft-room-header p{font-size:12px;color:#c5d9ea;line-height:1.55;margin:13px 0 0}
+.ssl-draft-clock-section{flex:0 1 255px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;background:#ffffff0c;border:1px solid #bda06e69;border-radius:11px;padding:19px 18px}
+.ssl-draft-clock-caption{font-size:11px;color:#d7e5f4;letter-spacing:.14em;font-weight:900}
+.ssl-draft-clock-count{font:900 clamp(32px,4.3vw,45px)/1 'Barlow Condensed',Impact,Arial,sans-serif;color:#fff3c8;white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:.05em}
+.ssl-draft-clock-status{font:900 25px/1.2 'Barlow Condensed',Impact,Arial,sans-serif;color:#ffe0a1}
+.ssl-enter-draft-button,.ssl-leave-draft-button{width:100%;border-radius:6px;border:1px solid #ffe7af;padding:12px 15px;min-height:44px;cursor:pointer;font-size:12px;font-weight:900;letter-spacing:.04em}
+.ssl-enter-draft-button{background:#f1c86c;color:#162d47}
+.ssl-enter-draft-button:disabled{cursor:not-allowed;background:#7891a6;color:#e3e8ec;border-color:#93a3b3;opacity:.77}
+.ssl-leave-draft-button{background:#21405f;color:#f5faff;border-color:#7393ae}
+.ssl-commissioner-scheduled-date{background:#f1f7fc;padding:13px 16px;border-left:4px solid #ad862e}
+.ssl-commissioner-scheduled-date strong{font-weight:900;color:#112849;font-size:17px}
+@media(max-width:660px){
+  .ssl-draft-room-gateway{padding:20px 17px;gap:15px}
+  .ssl-draft-clock-section{flex:1 1 100%;width:100%;padding:13px}
+}
