@@ -36,6 +36,7 @@ jobs:
       - run: python scripts/check_player_data.py
       - run: npm ci
       - run: node tests/lottery-timing.mjs
+      - run: node tests/matchup-display.mjs
       - run: npm run build
         env:
           GITHUB_PAGES_BASE: /${{ github.event.repository.name }}/
