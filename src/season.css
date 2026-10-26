@@ -500,6 +500,23 @@ details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
 .game-date-editor{margin:14px 0}
 .game-date-editor>button{max-width:100%}
 .game-date-editor form{margin:12px 0;max-width:500px;padding:15px;background:#f2f5fa;border-radius:6px;border:1px solid #d9dfeb}
+
+/* Generated schedule cards: AWAY @ HOME with the hosting franchise's own
+   drafted/retained Stadium and commissioner-editable game date beneath. */
+.ssl-matchup-week-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#51627c;font-weight:850}
+.ssl-matchup-card{max-width:100%;margin:10px 0 12px;padding:17px 18px 13px;border:1px solid #d8dfeb;border-radius:9px;background:linear-gradient(135deg,#f8faff,#eef3fa)}
+.ssl-matchup-heading{display:grid;grid-template-columns:minmax(0,1fr) 46px minmax(0,1fr);align-items:start;gap:8px;margin:0!important;line-height:1.15}
+.ssl-matchup-side{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0;gap:8px}
+.ssl-matchup-team-name{font:900 clamp(18px,2.6vw,26px)/1.12 'Barlow Condensed',Impact,system-ui,sans-serif;color:#152d53;overflow-wrap:anywhere}
+.ssl-matchup-side-label{display:inline-block;font:900 10px/1.2 system-ui,sans-serif;letter-spacing:.16em;border:1px solid #b9c6d9;border-radius:12px;padding:4px 12px;background:#e8eef8;color:#536780}
+.ssl-matchup-home .ssl-matchup-side-label{background:#1f3760;border-color:#1f3760;color:#fff}
+.ssl-matchup-at{font:900 clamp(24px,3vw,34px)/1 'Barlow Condensed',Impact,sans-serif;color:#b17e26;text-align:center;padding-top:2px}
+.season-box p.ssl-matchup-venue-line,.season-game p.ssl-matchup-venue-line{display:flex;justify-content:center;align-items:center;gap:9px;flex-wrap:wrap;text-align:center;font-size:14px;margin:15px 0 0;line-height:1.45;color:#354b67}
+.ssl-matchup-stadium{font-weight:900;color:#173e67}
+.ssl-matchup-separator{font-weight:900;color:#ae7f30}
+.ssl-matchup-game-time{font-weight:750;font-variant-numeric:tabular-nums}
+@media(max-width:620px){.ssl-matchup-card{padding:13px 9px}.ssl-matchup-heading{grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr);gap:4px}.ssl-matchup-team-name{font-size:clamp(17px,4.8vw,24px)}.ssl-matchup-venue-line{font-size:12px!important;gap:5px!important}.ssl-matchup-side-label{font-size:9px;padding:4px 10px}}
+
 .matchup-conference{display:flex;align-items:center;gap:7px;text-transform:uppercase;color:#2a3f66;font-size:12px;font-weight:850;letter-spacing:.035em}
 .schedule-anchor-settings{margin-top:16px;padding:12px 14px;border:1px solid #dbe2ec;border-radius:6px}
 .schedule-anchor-settings>summary{font-weight:850;cursor:pointer;color:#132e55}
