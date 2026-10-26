@@ -117,23 +117,42 @@ function BingoCage({teams,logos,mixing,reducedMotion}){
     const balls=teams.map((t,i)=>{
       const a=TAU*i/Math.max(teams.length,1)+.21,rad=i%2?52:91;
       return {id:t.id,number:i+1,x:CENTER+Math.cos(a)*rad,y:CENTER+Math.sin(a)*rad,
-        vx:Math.sin(a)*115,vy:-Math.cos(a)*115,angle:0,seed:i*1.79};
+        vx:Math.sin(a)*138,vy:-Math.cos(a)*138,angle:0,seed:i*1.79};
     });
     teams.forEach(t=>{
       if(!logos[t.id])return;
       const img=new Image();img.onload=()=>{if(alive&&!mixing)paintCage(ctx,balls,spin,images);};
       img.src=logos[t.id];images.set(t.id,img);
     });
-    function tick(t){
-      const dt=Math.min(.032,Math.max(.006,(t-(last||t-16))/1000));last=t;
+    // Use a fixed physics timestep (120Hz) to keep collisions consistent on
+    // fast monitors, throttled tabs, and 24fps video captures alike.
+    const physicsStep=1/120;
+    function advanceAndPaint(seconds){
       if(mixing&&!reducedMotion){
-        advanceBalls(balls,dt/2);advanceBalls(balls,dt/2);spin+=dt*.78;
+        const dt=Math.min(.075,Math.max(0,seconds));
+        const steps=Math.max(1,Math.ceil(dt/physicsStep));
+        for(let step=0;step<steps;step++)advanceBalls(balls,dt/steps);
+        spin+=dt*.936; // 20% faster than the old 0.78rad/s drum speed.
       }
       paintCage(ctx,balls,spin,images);
+    }
+    function tick(t){
+      const dt=last?Math.max(0,(t-last)/1000):1/60;
+      last=t;
+      advanceAndPaint(dt);
       if(mixing&&!reducedMotion)frameId=requestAnimationFrame(tick);
     }
-    frameId=requestAnimationFrame(tick);
-    return()=>{alive=false;cancelAnimationFrame(frameId);};
+    const preview=window.__sslPreviewMode===true;
+    if(preview){
+      // The renderer advances exactly 1/FPS of simulation per captured frame;
+      // screenshot speed never changes the movement speed in the MP4.
+      window.__sslPreviewAdvance=advanceAndPaint;
+      advanceAndPaint(0);
+    }else frameId=requestAnimationFrame(tick);
+    return()=>{
+      alive=false;cancelAnimationFrame(frameId);
+      if(preview&&window.__sslPreviewAdvance===advanceAndPaint)delete window.__sslPreviewAdvance;
+    };
   },[teamKey,logoKey,mixing,reducedMotion]);
   return <canvas ref={canvas} width={SIZE} height={SIZE} className="ssl-machine-canvas"
     aria-label={mixing?'Bingo balls bouncing inside a metal-and-glass cage':'Bingo cage resting between draws'} />;
