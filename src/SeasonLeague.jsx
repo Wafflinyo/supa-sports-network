@@ -788,6 +788,7 @@ function Draft({ league: l }) {
     return (
       <>
         <NextSeason league={l} />
+        <DraftChat supabase={l.supabase} season={s} access={l.access}/>
         <Box title="DRAFT ROOM OPENS ONE HOUR EARLY">
           <p>
             Draft: {time(s.draftAt)}
