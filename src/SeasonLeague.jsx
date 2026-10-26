@@ -1,5 +1,5 @@
 import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
-import {lotteryProgress} from './lottery-timing.js';
+import {lotteryProgress,lotteryDuration} from './lottery-timing.js';
 import {BingoLottery} from './BingoLottery.jsx';
 import DraftChat from './DraftChat.jsx';
 import {CommissionerVoteTracker} from './VoteParticipation.jsx';
@@ -721,9 +721,40 @@ function Voting({ league: l }) {
 }
 function Draft({ league: l }) {
   const s = l.season;
-  // Based on the scheduled lottery time, not a per-visitor interval:
-  // reloading or joining late never restarts (or races ahead of) the reveal.
-  const lottery = lotteryProgress(s?.order?.length || 0, s?.lotteryAt, l.now);
+  // The official lottery is always derived from the shared server clock.
+  // Arriving mid-draw joins the current ball, never starts a new simulation.
+  const liveLottery = lotteryProgress(s?.order?.length || 0, s?.lotteryAt, l.now);
+  const [localReplay,setLocalReplay] = useState(null);
+  const [replayElapsed,setReplayElapsed] = useState(0);
+  const lotteryDetailsRef = useRef(null);
+  const orderKey = (s?.order || []).join('|');
+  // Replay is LOCAL only; it reads the persisted official order. No write,
+  // draw, RNG, RPC or broadcast occurs when a user presses this button.
+  const isReplaying = Boolean(localReplay && localReplay.seasonId === s?.id &&
+    localReplay.lotteryAt === s?.lotteryAt && localReplay.orderKey === orderKey);
+  const replayDuration = lotteryDuration(s?.order?.length || 0);
+  useEffect(()=>{
+    if(!isReplaying)return;
+    const tick=()=>setReplayElapsed(Math.min(replayDuration,
+      Math.max(0,performance.now()-localReplay.startPerf)));
+    tick();
+    const interval=setInterval(tick,75);
+    return()=>clearInterval(interval);
+  },[isReplaying,localReplay?.startPerf,replayDuration]);
+  const replayClockStart = '2000-01-01T00:00:00.000Z';
+  const lottery = isReplaying
+    ? lotteryProgress(s.order.length,replayClockStart,Date.parse(replayClockStart)+replayElapsed)
+    : liveLottery;
+  const canReplay = s?.order?.length > 0 && liveLottery.phase === 'complete';
+  const replayFinished = isReplaying && replayElapsed >= replayDuration;
+  const beginReplay=()=>{
+    if(!canReplay)return;
+    if(lotteryDetailsRef.current)lotteryDetailsRef.current.open=true;
+    setReplayElapsed(0);
+    setLocalReplay({seasonId:s.id,lotteryAt:s.lotteryAt,orderKey,
+      startPerf:performance.now()});
+  };
+  const stopReplay=()=>{setLocalReplay(null);setReplayElapsed(0);};
   const reveal = lottery.revealed;
   const resultsShown = lottery.phase === 'rolling' ? Math.max(0,reveal-1) : reveal;
   // The pick clock and order are server-owned; this listener only catches a
@@ -804,9 +835,27 @@ function Draft({ league: l }) {
           {s.baseDraftRounds || 12} rounds · snake order (11 tradable player turns + one nontradable Stadium Pick unless the team retained its Stadium). Supplemental rounds
           fill teams below 11, skipping full teams.
         </p>
-        {s.number===1&&<p className="ssl-lottery-fairness"><strong>Season 1: Equal odds for all 12 franchises.</strong> Every team begins with a 1-in-12 (8.3333%) chance of being drawn first. A drawn ball is removed, so each remaining team then has a 1-in-11 (9.0909%) chance for second. No franchise appears twice. <a href={import.meta.env.BASE_URL+'?lottery-practice=1'} target="_blank" rel="noopener noreferrer">Run a random practice lottery</a> without affecting the real draw.</p>}
+        {s.number===1&&<p className="ssl-lottery-fairness"><strong>Season 1: Equal odds for all 12 franchises.</strong> Every team begins with a 1-in-12 (8.3333%) chance of being drawn first. A drawn ball is removed, so each remaining team then has a 1-in-11 (9.0909%) chance for second. No franchise appears twice.</p>}
         {s.number>1 && <p>Returning-season lottery: 12th seed 55% · 11th 25% · 10th 15% · 9th 5% for first pick. Winners are removed before the next weighted draw. Seeds 8 through 1 receive picks 5 through 12, then the order snakes.</p>}
-        <details className="draft-order-details" defaultOpen={['scheduled','drafting'].includes(s.status)}>
+        {s.order.length>0 && <div className="ssl-lottery-playback-controls" aria-label="Official lottery playback">
+          {!canReplay
+            ? <div className="ssl-lottery-live-indicator"><span className="ssl-lottery-live-dot"/> LIVE OFFICIAL LOTTERY · Synchronized to the server clock. Joining now shows the current draw.</div>
+            : <>
+              <div className="ssl-lottery-playback-description">
+                <strong>{isReplaying?'PERSONAL LOTTERY REPLAY':'OFFICIAL LOTTERY COMPLETE'}</strong>
+                <span>{isReplaying
+                  ? 'Watching the original saved draw from the beginning. This replay is visible only to you; everyone else stays on the official live results.'
+                  : 'All 12 balls have been drawn. Replay the exact same result from the beginning on your own screen.'}</span>
+              </div>
+              <div className="ssl-lottery-playback-buttons">
+                <button type="button" className="ssl-lottery-replay-button" onClick={beginReplay}>
+                  {replayFinished?'REPLAY LOTTERY AGAIN':'REPLAY LOTTERY'}
+                </button>
+                {isReplaying&&<button type="button" className="ssl-lottery-return-button" onClick={stopReplay}>RETURN TO OFFICIAL RESULTS</button>}
+              </div>
+            </>}
+        </div>}
+        <details ref={lotteryDetailsRef} className="draft-order-details" defaultOpen={Boolean(s.order.length)>0 || ['scheduled','drafting'].includes(s.status)}>
           <summary>DRAFT ORDER · {s.order.length || 12} TEAMS</summary>
           {!s.order.length ? <p>Waiting for the scheduled lottery time.</p> : <>
             <BingoLottery
