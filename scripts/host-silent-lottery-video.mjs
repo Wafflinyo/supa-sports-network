@@ -44,7 +44,7 @@ let browser;
 try{
   await server.listen();
   browser=await chromium.launch({headless:true,args:['--no-sandbox']});
-  const context=await browser.newContext({viewport:{width:1280,height:800},deviceScaleFactor:1});
+  const context=await browser.newContext({viewport:{width:1280,height:860},deviceScaleFactor:1});
   await context.addInitScript(({teams,order})=>{window.__teams=teams;window.__order=order;},{teams,order});
   const page=await context.newPage();
   page.on('pageerror',error=>console.error('BROWSER ERROR: '+error.message));
