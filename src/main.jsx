@@ -1,4 +1,5 @@
 import PwaInstall from './PwaInstall.jsx'
+import LotteryPractice from './LotteryPractice.jsx'
 import {fantasySeasonReady} from './fantasy-scoring.js'
 import {useSeasonLeague,SeasonWorkspace,SeasonPage,SeasonPrompts,SeasonTeamTools,SeasonHome,SeasonSelector,seasonPages} from './SeasonLeague.jsx'
 import {aggregate,fantasyGames} from './season-data.js'
@@ -287,4 +288,5 @@ function App() {
 }
 function BasicPage({ kicker, title, icon, empty, detail }) { return <><div className="page-heading"><span className="eyebrow dark">{kicker}</span><h1>{title}</h1></div><div className="panel basic-panel"><Empty icon={icon} title={empty}>{detail}</Empty></div></> }
 
-createRoot(document.getElementById('root')).render(<App/>)
+const isPracticeLottery = new URLSearchParams(window.location.search).has('lottery-practice')
+createRoot(document.getElementById('root')).render(isPracticeLottery ? <LotteryPractice/> : <App/>)
