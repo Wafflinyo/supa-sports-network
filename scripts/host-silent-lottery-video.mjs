@@ -47,7 +47,7 @@ const manifest={type:'example-only',generatedAt:new Date().toISOString(),
   firstDrawPercent:100/12,
   order:order.map((id,i)=>({pick:i+1,slot:Number(id),team:teams.find(t=>t.id===id).name}))};
 const manifestFile=path.join(root,'public/videos/ssl-draft-lottery-sample-order.json');
-await fs.writeFile(manifestFile,JSON.stringify(manifest,null,2)+'\\n');
+await fs.writeFile(manifestFile,JSON.stringify(manifest,null,2)+String.fromCharCode(10));
 console.log('NEW RANDOM PREVIEW ORDER:',manifest.order.map(t=>t.team).join(' > '));
 const fps=24,durationMs=lotteryDuration(order.length)+2000,frameCount=Math.ceil(durationMs/1000*fps);
 console.log('Full silent lottery: '+frameCount+' frames, '+(durationMs/1000)+' sec.');
