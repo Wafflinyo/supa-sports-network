@@ -60,6 +60,21 @@ const defense = [
     'bobbles', {negative:true}),
 ];
 
+const postseason = [
+  {id:'playoffs-qualified',group:'playoffs',category:'Playoffs',icon:'flag',field:'madePlayoffs',threshold:1,rank:1,
+    name:'Postseason Bound',description:'Qualify among the eight franchises in the official playoff field.'},
+  {id:'playoffs-first-win',group:'playoffs',category:'Playoffs',icon:'trophy',field:'playoffWin',threshold:1,rank:2,
+    name:'Playoff Breakthrough',description:'Win an official playoff matchup.'},
+  {id:'playoffs-series',group:'playoffs',category:'Playoffs',icon:'shield',field:'seriesWin',threshold:1,rank:3,
+    name:'Series Conqueror',description:'Win a complete playoff round by clinching a best-of series.'},
+  {id:'playoffs-semifinals',group:'playoffs',category:'Playoffs',icon:'star',field:'madeSemis',threshold:1,rank:4,
+    name:'Final Four',description:'Advance into the semifinals of the SSL playoffs.'},
+  {id:'playoffs-finals',group:'playoffs',category:'Playoffs',icon:'crown',field:'madeFinals',threshold:1,rank:5,
+    name:'Championship Bound',description:'Earn a spot in the SSL Championship Series.'},
+  {id:'playoffs-champion',group:'playoffs',category:'Playoffs',icon:'crown',field:'champion',threshold:1,rank:6,
+    name:'Supa League Champion',description:'Win the best-of-five SSL Championship Series and claim the title.'},
+];
+
 const pitching = [
   ...series('team-strikeouts', 'Pitching', 'strike', 'pitchStrikeouts', [1,2,3,4,5],
     ['First Punchout', 'Swing and Miss', 'Strikeout Specialist', 'K Collector', 'Five-K Club'],
@@ -69,11 +84,11 @@ const pitching = [
   {id:'pitching-superstar-reliever',group:'pitch-special',category:'Pitching',icon:'relief',field:'reliever',threshold:1,rank:7,
     name:'Superstar Reliever',description:'A substitute enters with at least five innings remaining, finishes the game, and allows two or fewer runs. Requires verified pitching-substitution details.'},
 ];
-export const GM_ACHIEVEMENTS = Object.freeze([...wins,...offense,...defense,...pitching].map((badge,index) =>
+export const GM_ACHIEVEMENTS = Object.freeze([...wins,...offense,...defense,...pitching,...postseason].map((badge,index) =>
   Object.freeze({...badge,serial:index+1})));
-export const GM_ACHIEVEMENT_CATEGORIES = ['All', 'Wins', 'Offense', 'Defense', 'Pitching'];
-if (GM_ACHIEVEMENTS.length !== 73 || new Set(GM_ACHIEVEMENTS.map(a=>a.id)).size !== 73)
-  throw Error('GM achievements catalog must contain 73 unique badges.');
+export const GM_ACHIEVEMENT_CATEGORIES = ['All', 'Wins', 'Offense', 'Defense', 'Pitching', 'Playoffs'];
+if (GM_ACHIEVEMENTS.length !== 79 || new Set(GM_ACHIEVEMENTS.map(a=>a.id)).size !== 79)
+  throw Error('GM achievements catalog must contain 79 unique badges.');
 
 const value = v => Number.isFinite(Number(v)) && Number(v) > 0 ? Number(v) : 0;
 const asId = v => String(v ?? '');
@@ -107,6 +122,17 @@ export function achievementProgress(seasons, slot) {
     const schedule = (season.games||[]).map((game,index)=>({game,index}))
       .filter(x=>asId(x.game.home)===teamId || asId(x.game.away)===teamId)
       .sort(scheduleSort);
+    const officialPlayoffSeries=(season.playoffSeries||[]);
+    const playoffField=season.playoffTeams||[];
+    const qualifies=playoffField.some(t=>asId(t?.id??t)===teamId);
+    const inSeries=(round)=>officialPlayoffSeries.find(x=>x.round===round &&
+      (asId(x.high)===teamId||asId(x.low)===teamId));
+    const roundWon=(round)=>officialPlayoffSeries.find(x=>x.round===round && asId(x.winner)===teamId);
+    const stateStarted=['postseason','retention','offseason','archived'].includes(season.status);
+    const firstPlayoff=schedule.find(x=>x.game.phase==='playoffs' && final(x.game))?.game;
+    // Official bracket membership is sourced from the server-owned playoff
+    // field and series, not an inference from a team winning regular games.
+    const representative=firstPlayoff||schedule.find(x=>final(x.game))?.game;
     const regularGames = schedule.filter(x=>regular(x.game));
     const regularFinals = regularGames.filter(x=>final(x.game));
     let wins = 0, seasonHr = 0;
@@ -128,6 +154,8 @@ export function achievementProgress(seasons, slot) {
       const enemyScore = value(game.result?.scores?.[enemyId]);
       const isRegular = regular(game);
       const gameHr=sums('gameHr');
+      if(game.phase==='playoffs' && score>enemyScore)
+        award(GM_ACHIEVEMENTS.find(b=>b.field==='playoffWin'),game);
       if(isRegular){
         if (score>enemyScore) wins++;
         seasonHr+=gameHr;
@@ -175,12 +203,33 @@ export function achievementProgress(seasons, slot) {
           award(GM_ACHIEVEMENTS.find(b=>b.field==='reliever'),game,reliever);
       }
     }
+    const playoffBadge=field=>GM_ACHIEVEMENTS.find(b=>b.field===field);
+    const proofGame=(series)=>schedule.find(x=>x.game.seriesId===series?.id && final(x.game))?.game
+      || representative;
+    // Bracket registration and round advances may happen after the most
+    // recent match, so they are evaluated from the finalized series status.
+    if(representative && (qualifies && stateStarted || inSeries('quarterfinal')))
+      award(playoffBadge('madePlayoffs'), representative);
+    if(inSeries('semifinal') && representative)
+      award(playoffBadge('madeSemis'),proofGame(inSeries('semifinal')));
+    if(inSeries('final') && representative)
+      award(playoffBadge('madeFinals'),proofGame(inSeries('final')));
+    for (const series of officialPlayoffSeries){
+      if(asId(series.winner)!==teamId)continue;
+      // Series winners are only authoritative when a finalized game exists in
+      // the series; no prospective/preliminary brackets award titles.
+      const clinch=schedule.filter(x=>x.game.seriesId===series.id && final(x.game))
+        .map(x=>x.game).at(-1);
+      if(!clinch)continue;
+      award(playoffBadge('seriesWin'),clinch);
+      if(series.round==='final')award(playoffBadge('champion'),clinch);
+    }
   }
   return awards;
 }
 const winsBadges=GM_ACHIEVEMENTS.filter(b=>b.field==='wins');
 const seasonHrBadges=GM_ACHIEVEMENTS.filter(b=>b.field==='seasonHr');
-const gameBadges=GM_ACHIEVEMENTS.filter(b=>!b.season && !['ironArm','reliever'].includes(b.field));
+const gameBadges=GM_ACHIEVEMENTS.filter(b=>!b.season && !['ironArm','reliever','madePlayoffs','playoffWin','seriesWin','madeSemis','madeFinals','champion'].includes(b.field));
 
 export function earnedAchievements(seasons,slot,{seasonId='all'}={}){
   const progress=achievementProgress(seasons,slot);
