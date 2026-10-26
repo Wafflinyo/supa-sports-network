@@ -671,3 +671,24 @@ details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
 .ssl-voter-disclaimer{padding:0 14px 12px;margin:0!important;color:#64738b!important;font-size:11px!important;line-height:1.5!important}
 @media(max-width:680px){.ssl-voter-tracker{padding:16px 14px}.ssl-voter-columns,.ssl-voter-account-list{grid-template-columns:1fr}.ssl-voter-tally{text-align:left}.ssl-voter-heading{align-items:flex-start}}
 @media(prefers-reduced-motion:reduce){.ssl-voter-progress>span{transition:none}}
+
+/* Live lottery and personal replay share only the official server-saved order.
+   The replay progress never writes to the league, chat, or the live clock. */
+.ssl-lottery-playback-controls{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  gap:14px;margin:15px 0;padding:14px 16px;
+  border:1px solid #b99758;border-radius:9px;
+  background:linear-gradient(115deg,#142e4c,#0c1f35);
+  box-shadow:0 6px 14px #0b1a301c;color:#f9fcff
+}
+.ssl-lottery-live-indicator{display:flex;align-items:center;gap:10px;font-size:12px;line-height:1.5;font-weight:900;color:#c4f9df}
+.ssl-lottery-live-dot{width:10px;height:10px;border-radius:50%;background:#59e6a0;box-shadow:0 0 12px #52e6a09c;flex:0 0 10px}
+.ssl-lottery-playback-description{display:flex;flex-direction:column;gap:5px;flex:1;min-width:185px}
+.ssl-lottery-playback-description strong{font-weight:950;letter-spacing:.1em;font-size:12px;color:#f1ce83}
+.ssl-lottery-playback-description span{font-size:12px;line-height:1.5;color:#d3e3f3}
+.ssl-lottery-playback-buttons{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ssl-lottery-playback-buttons button{border-radius:7px;min-height:41px;padding:10px 14px;cursor:pointer;font-weight:950;font-size:11px;letter-spacing:.04em}
+.ssl-lottery-replay-button{background:#f4d184;border:1px solid #ffecba;color:#142842}
+.ssl-lottery-return-button{background:#27496a;border:1px solid #a6c0d9;color:#eff7ff}
+.ssl-lottery-playback-buttons button:focus-visible{outline:3px solid #f7cd7c;outline-offset:2px}
+@media(max-width:600px){.ssl-lottery-playback-controls{align-items:stretch;padding:12px}.ssl-lottery-playback-buttons{width:100%}.ssl-lottery-playback-buttons button{flex:1}}
