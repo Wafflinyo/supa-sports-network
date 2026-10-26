@@ -1,13 +1,15 @@
 import assert from 'node:assert/strict';
 import {GM_ACHIEVEMENTS,earnedAchievements,achievementProgress} from '../src/gm-achievements.js';
 const badges=GM_ACHIEVEMENTS;
-assert.equal(badges.length,79);
-assert.equal(new Set(badges.map(b=>b.id)).size,79);
+assert.equal(badges.length,92);
+assert.equal(new Set(badges.map(b=>b.id)).size,92);
 assert.equal(badges.filter(b=>b.category==='Wins').length,7);
 assert.equal(badges.filter(b=>b.category==='Offense').length,25);
 assert.equal(badges.filter(b=>b.category==='Defense').length,34);
 assert.equal(badges.filter(b=>b.category==='Pitching').length,7);
 assert.equal(badges.filter(b=>b.category==='Playoffs').length,6);
+assert.equal(badges.filter(b=>b.category==='Front Office').length,7);
+assert.equal(badges.filter(b=>b.category==='Season Honors').length,6);
 assert.deepEqual(badges.filter(b=>b.group==='player-putouts').map(b=>b.threshold),[5,8,10,12,15,18,20]);
 assert.deepEqual(badges.filter(b=>b.group==='player-assists').map(b=>b.threshold),[5,8,10,12,15,18,20]);
 
@@ -81,7 +83,8 @@ assert(!earnedAchievements([{...season,games:[verified]}],1).find(x=>x.id==='pit
 // Season scoping keeps the career collection even when switching seasons.
 const other={id:'season-2',name:'Season 2',teams:season.teams,games:[]};
 assert(earnedAchievements([season,other],1).some(b=>b.earned));
-assert.equal(earnedAchievements([season,other],1,{seasonId:'season-2'}).filter(b=>b.earned).length,0);
+assert(earnedAchievements([season,other],1,{seasonId:'season-2'}).some(b=>b.earned),
+  'all prior badges must remain unlocked after a new season begins');
 assert.equal(achievementProgress([season],3).get('winning-1').length,0);
 // Fully complete the 22-game regular season: all 22 must be played and won.
 const perfect=structuredClone(season);
@@ -119,7 +122,8 @@ const playoffBadges=earnedAchievements([bracket],1);
 for(const id of ['playoffs-qualified','playoffs-first-win','playoffs-series',
   'playoffs-semifinals','playoffs-finals','playoffs-champion'])
   assert(playoffBadges.find(b=>b.id===id).earned, id+' must unlock');
-assert.equal(playoffBadges.find(b=>b.id==='playoffs-series').count,3);
+assert.equal(playoffBadges.find(b=>b.id==='playoffs-series').count,1,
+  'winning multiple rounds still unlocks the badge only once');
 assert(earnedAchievements([bracket],2).find(b=>b.id==='playoffs-qualified').earned);
 assert(!earnedAchievements([bracket],2).find(b=>b.id==='playoffs-champion').earned);
 const incomplete=structuredClone(bracket);
@@ -132,4 +136,63 @@ noPostseason.playoffTeams=[];
 assert(!earnedAchievements([noPostseason],1).find(b=>b.id==='playoffs-qualified').earned);
 assert(!earnedAchievements([{...bracket,games:bracket.games.map(g=>({...g,stage:'recorded'}))}],1)
   .find(b=>b.id==='playoffs-first-win').earned);
-console.log('PASS: 79 GM achievements, single-player thresholds, season history, 22-0, playoff advancement and championship, embargo and corrections');
+// Approved trade: one trade per approved transaction, not one per traded item.
+const office=structuredClone(season);
+office.number=1;
+office.transactions=Array.from({length:10},(_,i)=>({
+ id:'deal-'+i,createdAt:new Date(Date.UTC(2026,9,1+i)).toISOString(),
+ body:{moves:[{kind:'player',id:7,from:'knights',to:'dedennes'},
+              {kind:'pick',id:i,from:'dedennes',to:'knights'}]}}));
+office.extensionOffers=[
+ {attempt:1,franchise:'knights',player:7,accepted:true},
+ {attempt:2,franchise:'knights',player:8,accepted:true},
+ {attempt:3,franchise:'knights',player:9,accepted:true},
+ {attempt:4,franchise:'knights',player:10,accepted:false}];
+office.stadiumExtensionOffers=[
+ {attempt:5,franchise:'knights',stadium:'Mario Stadium',accepted:true}];
+const fresh=earnedAchievements([office],1);
+for(const id of ['trade-season-1','trade-season-5','trade-season-10',
+ 'extension-player-1','extension-player-2','extension-player-3','extension-stadium'])
+ assert(fresh.find(b=>b.id===id).earned,id+' must unlock');
+const noApprovals=structuredClone(office);
+noApprovals.extensionOffers.forEach(o=>o.accepted=false);
+noApprovals.stadiumExtensionOffers[0].accepted=false;
+noApprovals.transactions=[];
+assert(!earnedAchievements([noApprovals],1).find(b=>b.id==='extension-player-1').earned);
+assert(!earnedAchievements([noApprovals],1).find(b=>b.id==='extension-stadium').earned);
+assert(!earnedAchievements([noApprovals],1).find(b=>b.id==='trade-season-1').earned);
+const secondOffice=structuredClone(office);
+secondOffice.id='season-2';secondOffice.name='Season 2';secondOffice.number=2;
+assert.equal(earnedAchievements([secondOffice,office],1).find(b=>b.id==='trade-season-10').count,1);
+assert.equal(earnedAchievements([secondOffice,office],1).find(b=>b.id==='extension-stadium').count,1);
+assert.equal(earnedAchievements([secondOffice,office],1).find(b=>b.id==='trade-season-10').lastEarned.seasonId,'season-1');
+
+// Build a completed 12-team, 22-game league with server-finalized rankings.
+const ids=Array.from({length:12},(_,i)=>'t'+(i+1));
+const honors={id:'honors-s1',number:1,name:'Season One',status:'postseason',
+ teams:ids.map((id,i)=>({id,slot:i+1,name:id,conference:i<6?'supa':'galaxy'})),
+ finalStandings:ids.map((id,i)=>({id,rank:i+1})),
+ conferenceChampions:{supa:'t1',galaxy:'t7'},games:[]};
+for(let i=0;i<12;i++)for(let j=i+1;j<12;j++){
+  for(let leg=0;leg<2;leg++){
+    const a=leg?'t'+(j+1):'t'+(i+1),b=leg?'t'+(i+1):'t'+(j+1);
+    honors.games.push({id:'reg-'+i+'-'+j+'-'+leg,phase:'regular',stage:'final',
+      startsAt:new Date(Date.UTC(2026,0,1,0,0,honors.games.length)).toISOString(),
+      home:a,away:b,result:{scores:{[a]:a==='t1'?10:0,[b]:b==='t1'?10:0},
+      players:[{player:100+i,team:a,stats:{homeRuns:a==='t1'?5:0,rbi:a==='t1'?8:0}},
+               {player:200+j,team:b,stats:{homeRuns:b==='t1'?5:0,rbi:b==='t1'?8:0}}]}})
+  }
+}
+assert.equal(honors.games.length,132);
+const leaders=earnedAchievements([honors],1);
+for(const id of ['honors-conference','honors-first-seed','honors-runs-per-game',
+ 'honors-fewest-runs-allowed','honors-home-runs','honors-rbis'])
+ assert(leaders.find(b=>b.id===id).earned,id+' earned after finalized standings');
+const challenger=earnedAchievements([honors],2);
+assert(!challenger.find(b=>b.id==='honors-first-seed').earned);
+assert(!challenger.find(b=>b.id==='honors-home-runs').earned);
+const unfinished=structuredClone(honors);
+unfinished.games[0].stage='recorded';
+assert(!earnedAchievements([unfinished],1).find(b=>b.id==='honors-first-seed').earned,
+ 'unfinished league cannot award season leadership');
+console.log('PASS: 92 once-only lifetime GM achievements, trades, accepted renewals, full season honors, playoffs and Rio stats');

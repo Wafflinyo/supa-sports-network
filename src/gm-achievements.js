@@ -75,6 +75,33 @@ const postseason = [
     name:'Supa League Champion',description:'Win the best-of-five SSL Championship Series and claim the title.'},
 ];
 
+const frontOffice = [
+  ...series('trade-season', 'Front Office', 'exchange', 'trades', [1,5,10],
+    ['First Deal', 'Trade Architect', 'Deal-Making Dynamo'],
+    'approved trades in a single season', {season:true}),
+  ...series('extension-player', 'Front Office', 'contract', 'playerExtensions', [1,2,3],
+    ['One More Year', 'Two to Tango', 'Core Locked In'],
+    'accepted player contract extensions in a single offseason', {season:true}),
+  {id:'extension-stadium', group:'extension', category:'Front Office',icon:'stadium',
+    field:'stadiumExtension',threshold:1,name:'Home Field Forever',rank:4,season:true,
+    description:'Successfully extend the contract of a Stadium once.'},
+];
+
+const seasonHonors = [
+  {id:'honors-conference',group:'honors',category:'Season Honors',icon:'crown',
+    field:'conferenceChampion',name:'Conference Crown',description:'Finish first in your conference standings at the end of the regular season.'},
+  {id:'honors-runs-per-game',group:'honors',category:'Season Honors',icon:'fireball',
+    field:'leagueRunsPerGame',name:'Runaway Offense',description:'Lead the league in team runs scored per game over a completed regular season.'},
+  {id:'honors-fewest-runs-allowed',group:'honors',category:'Season Honors',icon:'shield',
+    field:'leagueFewestAllowed',name:'Lockdown League',description:'Allow the fewest runs per game in the league during a completed regular season.'},
+  {id:'honors-home-runs',group:'honors',category:'Season Honors',icon:'baseball',
+    field:'leagueHomeRuns',name:'Long Ball Leaders',description:'Lead all teams in home runs over a completed regular season.'},
+  {id:'honors-rbis',group:'honors',category:'Season Honors',icon:'star',
+    field:'leagueRbi',name:'RBI Royalty',description:'Lead all teams in RBIs over a completed regular season.'},
+  {id:'honors-first-seed',group:'honors',category:'Season Honors',icon:'trophy',
+    field:'firstSeed',name:'Regular Season Royalty',description:'Finish the regular season as the league-wide number-one seed.'},
+];
+
 const pitching = [
   ...series('team-strikeouts', 'Pitching', 'strike', 'pitchStrikeouts', [1,2,3,4,5],
     ['First Punchout', 'Swing and Miss', 'Strikeout Specialist', 'K Collector', 'Five-K Club'],
@@ -84,11 +111,11 @@ const pitching = [
   {id:'pitching-superstar-reliever',group:'pitch-special',category:'Pitching',icon:'relief',field:'reliever',threshold:1,rank:7,
     name:'Superstar Reliever',description:'A substitute enters with at least five innings remaining, finishes the game, and allows two or fewer runs. Requires verified pitching-substitution details.'},
 ];
-export const GM_ACHIEVEMENTS = Object.freeze([...wins,...offense,...defense,...pitching,...postseason].map((badge,index) =>
+export const GM_ACHIEVEMENTS = Object.freeze([...wins,...offense,...defense,...pitching,...postseason,...frontOffice,...seasonHonors].map((badge,index) =>
   Object.freeze({...badge,serial:index+1})));
-export const GM_ACHIEVEMENT_CATEGORIES = ['All', 'Wins', 'Offense', 'Defense', 'Pitching', 'Playoffs'];
-if (GM_ACHIEVEMENTS.length !== 79 || new Set(GM_ACHIEVEMENTS.map(a=>a.id)).size !== 79)
-  throw Error('GM achievements catalog must contain 79 unique badges.');
+export const GM_ACHIEVEMENT_CATEGORIES = ['All', 'Wins', 'Offense', 'Defense', 'Pitching', 'Playoffs', 'Front Office', 'Season Honors'];
+if (GM_ACHIEVEMENTS.length !== 92 || new Set(GM_ACHIEVEMENTS.map(a=>a.id)).size !== 92)
+  throw Error('GM achievements catalog must contain 92 unique badges.');
 
 const value = v => Number.isFinite(Number(v)) && Number(v) > 0 ? Number(v) : 0;
 const asId = v => String(v ?? '');
@@ -108,14 +135,17 @@ const scheduleSort = (a,b) => {
   return when(a.game)-when(b.game) || a.index-b.index;
 };
 
-/** Team slots are the league's stable GM franchise identity across seasons.
- * Only released final games unlock badges. Returned entries are earned events,
- * so re-earning an achievement in another season remains visible.
+/** Team slots are the league's current persistent GM/franchise identity.
+ * Each badge unlocks exactly ONCE across a GM's entire league career.
+ * Achievements derive only from official server data and accepted transactions.
  */
 export function achievementProgress(seasons, slot) {
   const awards = new Map(GM_ACHIEVEMENTS.map(b=>[b.id, []]));
   if (slot==null || slot==='' || !Number.isFinite(Number(slot))) return awards;
-  for (const season of seasons || []) {
+  const orderedSeasons=[...(seasons||[])].sort((a,b)=>
+    Number(a.number??0)-Number(b.number??0) ||
+    String(a.createdAt||a.id||'').localeCompare(String(b.createdAt||b.id||'')));
+  for (const season of orderedSeasons) {
     const team = season.teams?.find(t=>Number(t.slot)===Number(slot));
     if (!team) continue;
     const teamId = asId(team.id);
@@ -138,7 +168,7 @@ export function achievementProgress(seasons, slot) {
     let wins = 0, seasonHr = 0;
     const stamp=(game)=>game.releasedAt||game.result?.postedAt||game.startsAt||null;
     const award=(badge,game,player=null)=>{
-      if (awards.get(badge.id).some(e=>e.seasonId===season.id&&e.gameId===game.id)) return;
+      if (!badge || awards.get(badge.id).length) return;
       awards.get(badge.id).push({
         badgeId:badge.id, seasonId:season.id, seasonName:season.name||'Season',
         teamId:team.id,teamName:team.name,gameId:game.id,earnedAt:stamp(game),
@@ -224,18 +254,101 @@ export function achievementProgress(seasons, slot) {
       award(playoffBadge('seriesWin'),clinch);
       if(series.round==='final')award(playoffBadge('champion'),clinch);
     }
+
+    // Every accepted trade is one deal, even if it transfers multiple assets.
+    // Incomplete or pending proposals are never part of season.transactions.
+    const trades=[...new Map((season.transactions||[])
+      .filter(t=>Array.isArray(t.body?.moves) && t.body.moves.some(m=>
+        asId(m.from)===teamId || asId(m.to)===teamId))
+      .map(t=>[String(t.id),t])).values()]
+      .sort((a,b)=>Date.parse(a.createdAt||0)-Date.parse(b.createdAt||0));
+    for(const [i,trade] of trades.entries()){
+      for(const badge of GM_ACHIEVEMENTS.filter(b=>b.field==='trades'&&i+1>=b.threshold))
+        award(badge,{id:'approved-trade:'+trade.id,releasedAt:trade.createdAt||null});
+    }
+
+    // Contract offers are authoritative and only accepted renewals count.
+    // An attempted/declined extension must never earn a badge.
+    const acceptedPlayers=[...new Map((season.extensionOffers||[])
+      .filter(x=>asId(x.franchise)===teamId&&x.accepted===true)
+      .map(x=>[asId(x.player),x])).values()];
+    for(const badge of GM_ACHIEVEMENTS.filter(b=>b.field==='playerExtensions'&&
+      acceptedPlayers.length>=b.threshold))
+      award(badge,{id:'player-contract:'+badge.threshold+':'+asId(acceptedPlayers[badge.threshold-1]?.attempt||acceptedPlayers[badge.threshold-1]?.player)});
+    const retainedStadium=(season.stadiumExtensionOffers||[])
+      .find(x=>asId(x.franchise)===teamId&&x.accepted===true);
+    if(retainedStadium)award(GM_ACHIEVEMENTS.find(b=>b.field==='stadiumExtension'),
+      {id:'stadium-contract:'+asId(retainedStadium.attempt||retainedStadium.stadium)});
+
+    // Final standings are calculated server-side only when the entire
+    // 12-team, 22-game regular season has been finalized and published.
+    const ranking=season.finalStandings||[];
+    const seasonTeams=season.teams||[];
+    const complete=seasonTeams.length===12 && ranking.length===12 &&
+      seasonTeams.every(t=>{
+        const id=asId(t.id);
+        const played=(season.games||[]).filter(g=>regular(g)&&final(g) &&
+          (asId(g.home)===id||asId(g.away)===id));
+        return played.length===22 &&
+          played.every(g=>g.result?.scores?.[asId(g.home)]!=null &&
+            g.result?.scores?.[asId(g.away)]!=null);
+      });
+    if(complete){
+      const reference=schedule.filter(x=>regular(x.game)&&final(x.game)).at(-1)?.game;
+      const top=ranking.find(t=>Number(t.rank)===1)||ranking[0];
+      if(asId(top?.id)===teamId)award(GM_ACHIEVEMENTS.find(b=>b.field==='firstSeed'),reference);
+
+      const conference=team.conference;
+      const officialWinner=conference && season.conferenceChampions?.[conference];
+      if(asId(officialWinner)===teamId ||
+        (!officialWinner && conference && asId(ranking.find(t=>
+          seasonTeams.some(z=>asId(z.id)===asId(t.id)&&z.conference===conference))?.id)===teamId))
+        award(GM_ACHIEVEMENTS.find(b=>b.field==='conferenceChampion'),reference);
+
+      // All 12 teams have the same 22-match denominator.
+      // Tied leaders each qualify, using the exact unrounded statistics.
+      const leaders=seasonTeams.map(t=>{
+        const tid=asId(t.id);
+        const played=season.games.filter(g=>regular(g)&&final(g)&&
+          (asId(g.home)===tid||asId(g.away)===tid));
+        return {id:tid, runs:played.reduce((n,g)=>n+value(g.result.scores[tid]),0),
+          allowed:played.reduce((n,g)=>n+value(g.result.scores[
+            asId(g.home)===tid?asId(g.away):asId(g.home)]),0),
+          homers:played.reduce((n,g)=>n+g.result.players.filter(p=>
+            asId(p.team)===tid).reduce((q,p)=>q+hrFor(p.stats||{}),0),0),
+          rbi:played.reduce((n,g)=>n+g.result.players.filter(p=>
+            asId(p.team)===tid).reduce((q,p)=>q+value(p.stats?.rbi),0),0)};
+      });
+      const topFor=(key,ascending=false)=>ascending
+        ?Math.min(...leaders.map(t=>t[key])):Math.max(...leaders.map(t=>t[key]));
+      const self=leaders.find(x=>x.id===teamId);
+      for(const [field,key,ascending] of [
+        ['leagueRunsPerGame','runs',false],['leagueFewestAllowed','allowed',true],
+        ['leagueHomeRuns','homers',false],['leagueRbi','rbi',false]]){
+        if(self?.[key]===topFor(key,ascending))
+          award(GM_ACHIEVEMENTS.find(b=>b.field===field),reference);
+      }
+    }
   }
   return awards;
 }
 const winsBadges=GM_ACHIEVEMENTS.filter(b=>b.field==='wins');
 const seasonHrBadges=GM_ACHIEVEMENTS.filter(b=>b.field==='seasonHr');
-const gameBadges=GM_ACHIEVEMENTS.filter(b=>!b.season && !['ironArm','reliever','madePlayoffs','playoffWin','seriesWin','madeSemis','madeFinals','champion'].includes(b.field));
+const gameBadges=GM_ACHIEVEMENTS.filter(b=>!b.season && ![
+  'ironArm','reliever','madePlayoffs','playoffWin','seriesWin','madeSemis',
+  'madeFinals','champion','conferenceChampion','leagueRunsPerGame',
+  'leagueFewestAllowed','leagueHomeRuns','leagueRbi','firstSeed'
+].includes(b.field));
 
 export function earnedAchievements(seasons,slot,{seasonId='all'}={}){
   const progress=achievementProgress(seasons,slot);
   return GM_ACHIEVEMENTS.map(b=>{
     const all=progress.get(b.id)||[];
-    const events=seasonId==='all'?all:all.filter(e=>String(e.seasonId)===String(seasonId));
-    return {...b,earned:events.length>0,events,count:events.length,lastEarned:events.at(-1)||null};
+    // Lifetime collection never resets when browsing an older/newer season.
+    // The selected season only determines whether its first unlock is shown.
+    const events=all;
+    return {...b,earned:events.length>0,
+      earnedInSelectedSeason:seasonId==='all'||all.some(e=>String(e.seasonId)===String(seasonId)),
+      events,count:events.length,lastEarned:events[0]||null};
   });
 }
