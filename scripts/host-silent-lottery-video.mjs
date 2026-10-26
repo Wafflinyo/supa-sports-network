@@ -1,6 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {spawn} from 'node:child_process';
+import {randomInt} from 'node:crypto';
+import {shuffleLotteryOrder} from '../src/lottery-random.js';
 import {createRequire} from 'node:module';
 import {createServer} from 'vite';
 import {lotteryProgress,lotteryDuration} from '../src/lottery-timing.js';
@@ -36,7 +38,17 @@ for(const [id,name,filename] of identity){
   teams.push({id:String(id),name,logoPath:'data:'+mime+';base64,'+bytes.toString('base64')});
   console.log('Logo ready: '+name);
 }
-const order=[7,3,1,10,6,12,4,2,8,11,5,9].map(String); // Example ONLY
+// Fresh cryptographically random, unbiased Fisher–Yates shuffle every
+// video generation. Unlike previous previews there is NO fixed draw order.
+const order=shuffleLotteryOrder(teams.map(t=>t.id),bound=>randomInt(bound));
+if(order.length!==12||new Set(order).size!==12)throw Error('Invalid lottery draw');
+const manifest={type:'example-only',generatedAt:new Date().toISOString(),
+  selection:'12 equally weighted balls drawn without replacement',
+  firstDrawPercent:100/12,
+  order:order.map((id,i)=>({pick:i+1,slot:Number(id),team:teams.find(t=>t.id===id).name}))};
+const manifestFile=path.join(root,'public/videos/ssl-draft-lottery-sample-order.json');
+await fs.writeFile(manifestFile,JSON.stringify(manifest,null,2)+'\\n');
+console.log('NEW RANDOM PREVIEW ORDER:',manifest.order.map(t=>t.team).join(' > '));
 const fps=24,durationMs=lotteryDuration(order.length)+2000,frameCount=Math.ceil(durationMs/1000*fps);
 console.log('Full silent lottery: '+frameCount+' frames, '+(durationMs/1000)+' sec.');
 const server=await createServer({configFile:false,root,base:'/',server:{host:'127.0.0.1',port:4198,strictPort:true}});
