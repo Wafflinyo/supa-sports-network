@@ -5,6 +5,7 @@ import './gm-achievements.css';
 const palettes={
   Wins:['#f6bd54','#b65c17','#fff1b4'],Offense:['#f08067','#a02e4d','#ffe0a3'],
   Defense:['#66c7ec','#174a9a','#b6eeff'],Pitching:['#b99af6','#6540a7','#f1deff'],
+  Playoffs:['#f9d36e','#9a5a17','#fff7bc'],
 };
 
 function Motif({type}) {
@@ -96,12 +97,12 @@ export default function GmAchievements({seasons=[],slot,teams=[],commissioner=fa
     <div className="achievement-hero">
       <div><span className="achievement-kicker">SLUGGERS SUPA LEAGUE • TROPHY CASE</span>
         <h2>GM ACHIEVEMENTS</h2>
-        <p>73 original collectible badges. Complete official game challenges across the seasons to bring your trophy case to life.</p>
+        <p>79 original collectible badges. Complete official game challenges across the seasons to bring your trophy case to life.</p>
         {activeTeam&&<div className="achievement-owner">TEAM • <strong>{activeTeam.name}</strong></div>}
       </div>
-      <div className="achievement-progress" aria-label={earned+' of 73 badges unlocked'}>
-        <strong>{earned}<span> / 73</span></strong><small>BADGES UNLOCKED</small>
-        <div className="achievement-track"><i style={{width:(earned/73*100)+'%'}}/></div>
+      <div className="achievement-progress" aria-label={earned+' of 79 badges unlocked'}>
+        <strong>{earned}<span> / 79</span></strong><small>BADGES UNLOCKED</small>
+        <div className="achievement-track"><i style={{width:(earned/79*100)+'%'}}/></div>
       </div>
     </div>
     {commissioner&&<div className="achievement-team-panel">
@@ -110,7 +111,7 @@ export default function GmAchievements({seasons=[],slot,teams=[],commissioner=fa
       {knownTeams.length?<div className="achievement-team-picker">
         {knownTeams.map(t=><button type="button" key={t.slot} className={t.slot===activeSlot?'active':''}
           onClick={()=>setChosenSlot(t.slot)} aria-pressed={t.slot===activeSlot}>
-          <span>{t.name}</span><strong>{teamsEarned[t.slot]||0}/73</strong></button>)}
+          <span>{t.name}</span><strong>{teamsEarned[t.slot]||0}/79</strong></button>)}
       </div>:<p>No registered teams yet. Team achievements will appear once franchises are created.</p>}
     </div>}
     <div className="achievement-toolbar">
