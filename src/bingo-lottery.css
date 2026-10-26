@@ -33,3 +33,11 @@
 @media(max-width:850px){.ssl-lottery-theater{grid-template-columns:1fr;padding:16px;gap:4px}.ssl-physics-cage{width:min(100%,315px)}.ssl-bingo-stage{min-height:315px}.ssl-ball-runway{height:140px}}
 @media(max-width:470px){.ssl-lottery-theater{padding:13px 10px}.ssl-physics-cage{width:min(100%,300px)}.ssl-ball-runway .lottery-ball{width:99px;height:99px}.ssl-ball-runway .lottery-ball img{width:77px;height:77px}}
 @media(prefers-reduced-motion:reduce){.ssl-ball-runway .ssl-roll-ball,.ssl-ball-runway .ssl-feature-ball,.ssl-ball-runway .ssl-waiting-ball{animation:none!important}}
+
+/* Stronger specificity than the older generic announcement styling in season.css. */
+.ssl-lottery-theater .ssl-ball-runway .lottery-ball{width:114px;height:114px}
+.ssl-lottery-theater .ssl-ball-runway .lottery-ball img{width:89px;height:89px}
+.ssl-lottery-theater .ssl-ball-runway .ssl-roll-ball{animation:ssl-lottery-roll 3.2s cubic-bezier(.3,.05,.25,1) both}
+.ssl-lottery-theater .ssl-ball-runway .ssl-feature-ball{animation:ssl-ball-land .55s cubic-bezier(.2,.9,.3,1.2) backwards}
+.ssl-lottery-theater .ssl-ball-runway .ssl-waiting-ball{animation:ssl-wait-pulse 1.8s ease-in-out infinite}
+@media(max-width:470px){.ssl-lottery-theater .ssl-ball-runway .lottery-ball{width:99px;height:99px}.ssl-lottery-theater .ssl-ball-runway .lottery-ball img{width:77px;height:77px}}
