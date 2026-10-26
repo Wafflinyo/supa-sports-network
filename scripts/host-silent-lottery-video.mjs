@@ -65,6 +65,12 @@ try{
         for(const animation of ball?.getAnimations()||[])animation.currentTime=ms;
       },progress.phaseElapsedMs);
     }
+    if([0,Math.floor(12*fps),Math.floor(15*fps)].includes(i)){
+      await fs.mkdir(path.join(root,'dist'),{recursive:true});
+      await page.screenshot({path:path.join(root,'dist',
+        i===0?'silent-lottery-cage.png':i===Math.floor(12*fps)?'silent-lottery-rolling.png':'silent-lottery-podium.png'),
+        type:'png',animations:'allow'});
+    }
     const jpeg=await page.screenshot({type:'jpeg',quality:82,animations:'allow'});
     if(!ff.stdin.write(jpeg))await new Promise(resolve=>ff.stdin.once('drain',resolve));
     if(i%150===0)console.log('Frame '+i+'/'+frameCount+' phase '+progress.phase+' pick '+progress.revealed);
