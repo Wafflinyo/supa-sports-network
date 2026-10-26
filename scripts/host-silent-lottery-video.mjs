@@ -37,7 +37,7 @@ for(const [id,name,filename] of identity){
   console.log('Logo ready: '+name);
 }
 const order=[7,3,1,10,6,12,4,2,8,11,5,9].map(String); // Example ONLY
-const fps=5,durationMs=lotteryDuration(order.length)+2000,frameCount=Math.ceil(durationMs/1000*fps);
+const fps=24,durationMs=lotteryDuration(order.length)+2000,frameCount=Math.ceil(durationMs/1000*fps);
 console.log('Full silent lottery: '+frameCount+' frames, '+(durationMs/1000)+' sec.');
 const server=await createServer({configFile:false,root,base:'/',server:{host:'127.0.0.1',port:4198,strictPort:true}});
 let browser;
@@ -45,20 +45,23 @@ try{
   await server.listen();
   browser=await chromium.launch({headless:true,args:['--no-sandbox']});
   const context=await browser.newContext({viewport:{width:1280,height:860},deviceScaleFactor:1});
-  await context.addInitScript(({teams,order})=>{window.__teams=teams;window.__order=order;},{teams,order});
+  await context.addInitScript(({teams,order})=>{window.__teams=teams;window.__order=order;window.__sslPreviewMode=true;},{teams,order});
   const page=await context.newPage();
   page.on('pageerror',error=>console.error('BROWSER ERROR: '+error.message));
   await page.goto('http://127.0.0.1:4198/.ssl-silent-preview/',{waitUntil:'networkidle'});
   await page.locator('.ssl-machine-canvas').waitFor();
   const ff=spawn('ffmpeg',['-hide_banner','-loglevel','error','-y','-f','image2pipe','-framerate',String(fps),
-      '-vcodec','mjpeg','-i','pipe:0','-an','-c:v','libx264','-preset','veryfast','-crf','24',
+      '-vcodec','mjpeg','-i','pipe:0','-an','-c:v','libx264','-preset','ultrafast','-crf','25',
       '-pix_fmt','yuv420p','-movflags','+faststart',output],{stdio:['pipe','inherit','inherit']});
   const finished=new Promise((resolve,reject)=>ff.on('exit',code=>code===0?resolve():reject(Error('ffmpeg exited '+code))));
   for(let i=0;i<frameCount;i++){
     const elapsed=i*1000/fps;
     const progress=lotteryProgress(order.length,'2026-10-01T10:00:00.000Z',Date.parse('2026-10-01T10:00:00.000Z')+elapsed);
     await page.evaluate(({elapsed,progress})=>window.__renderSample(elapsed,progress),{elapsed,progress});
+    // Allow React to commit the new draw phase, then advance exactly
+    // 1/24s of cage physics regardless of how long the screenshot takes.
     await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    await page.evaluate(dt=>window.__sslPreviewAdvance?.(dt),1/fps);
     if(progress.phase==='rolling'){
       await page.evaluate(ms=>{
         const ball=document.querySelector('.ssl-display-ball-rolling');
@@ -71,9 +74,9 @@ try{
         i===0?'silent-lottery-cage.png':i===Math.floor(12*fps)?'silent-lottery-rolling.png':'silent-lottery-podium.png'),
         type:'png',animations:'allow'});
     }
-    const jpeg=await page.screenshot({type:'jpeg',quality:82,animations:'allow'});
+    const jpeg=await page.screenshot({type:'jpeg',quality:72,animations:'allow'});
     if(!ff.stdin.write(jpeg))await new Promise(resolve=>ff.stdin.once('drain',resolve));
-    if(i%150===0)console.log('Frame '+i+'/'+frameCount+' phase '+progress.phase+' pick '+progress.revealed);
+    if(i%240===0)console.log('Frame '+i+'/'+frameCount+' phase '+progress.phase+' pick '+progress.revealed);
   }
   ff.stdin.end();await finished;await context.close();
 }finally{
