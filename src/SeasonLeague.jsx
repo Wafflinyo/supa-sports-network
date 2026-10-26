@@ -1,5 +1,6 @@
 import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
 import {lotteryProgress} from './lottery-timing.js';
+import {BingoLottery} from './BingoLottery.jsx';
 import {CommissionerVoteTracker} from './VoteParticipation.jsx';
 import {CalendarDays, CheckCircle2, Clock3, Vote} from 'lucide-react';
 import {heatingUpForSeason} from './heating-up.js';
@@ -716,8 +717,20 @@ function Draft({ league: l }) {
   // reloading or joining late never restarts (or races ahead of) the reveal.
   const lottery = lotteryProgress(s?.order?.length || 0, s?.lotteryAt, l.now);
   const reveal = lottery.revealed;
-  const mixing = ['intro','mixing'].includes(lottery.phase);
-  const announcement = ['announce','complete'].includes(lottery.phase);
+  const resultsShown = lottery.phase === 'rolling' ? Math.max(0,reveal-1) : reveal;
+  // The pick clock and order are server-owned; this listener only catches a
+  // returning GM up immediately instead of waiting for the 8s regular poll.
+  useEffect(()=>{
+    if(!s?.id)return;
+    const catchUp=()=>{if(document.visibilityState==='visible')l.refresh();};
+    catchUp();
+    document.addEventListener('visibilitychange',catchUp);
+    window.addEventListener('focus',catchUp);
+    return ()=>{
+      document.removeEventListener('visibilitychange',catchUp);
+      window.removeEventListener('focus',catchUp);
+    };
+  },[s?.id]);
   if (!s)
     return (
       <>
@@ -727,7 +740,8 @@ function Draft({ league: l }) {
         </Box>
       </>
     );
-  const open = s.draftAt && l.now >= new Date(s.draftAt).getTime() - 3600000,
+  const open = ['drafting','postdraft','regular','postseason','retention','offseason','archived'].includes(s.status) ||
+    (s.draftAt && l.now >= new Date(s.draftAt).getTime() - 3600000),
     next = s.picks.length,
     owner = s.nextPick?.team,
     t = s.teams.find((t) => t.id === owner),
@@ -754,6 +768,12 @@ function Draft({ league: l }) {
     <>
       <NextSeason league={l} />
       <SeasonCalendar league={l} />
+      {s.status === 'drafting' && <div className="ssl-draft-rejoin" role="status">
+        <div><strong>LIVE DRAFT · LEAVE AND REENTER ANYTIME</strong>
+          <p>Your picks and the current turn are saved on the league server. There is no automatic pick timer. Return through Draft Room whenever your next pick comes up; the room reconnects to the latest selection.</p>
+        </div>
+        <button type="button" disabled={l.busy} onClick={()=>l.refresh()}>SYNC LIVE DRAFT</button>
+      </div>}
       <Box
         title={
           s.status === "drafting"
@@ -776,37 +796,17 @@ function Draft({ league: l }) {
           fill teams below 11, skipping full teams.
         </p>
         {s.number>1 && <p>Returning-season lottery: 12th seed 55% · 11th 25% · 10th 15% · 9th 5% for first pick. Winners are removed before the next weighted draw. Seeds 8 through 1 receive picks 5 through 12, then the order snakes.</p>}
-        <details className="draft-order-details" open={s.status === "scheduled"}><summary>DRAFT ORDER · {s.order.length || 12} TEAMS</summary>
-        {!s.order.length ? (
-          <p>Waiting for the scheduled lottery time.</p>
-        ) : (
-          <>
-            <div className="lottery-reveal lottery-reveal-bingo">
-              <div className="bingo-machine" role="img" aria-label="Rotating draft lottery bingo cage with every franchise's logo on a ball">
-                <div className={`bingo-drum ${mixing?'bingo-drum-spinning':'bingo-drum-stopped'}`}>
-                  {s.teams.filter(t=>!s.order.slice(0,reveal).includes(t.id)).map((team,i,remaining)=>(
-                    <span key={team.id} className="bingo-cage-ball" style={{'--ball-angle':`${i*360/Math.max(remaining.length,1)}deg`}} title={team.name}>
-                      {team.logoPath&&<img alt="" src={teamLogo(l.supabase,team.logoPath)}/>}
-                    </span>
-                  ))}
-                </div>
-                <div className="bingo-crank" aria-hidden="true"/>
-                <div className="bingo-machine-base" aria-hidden="true"/>
-              </div>
-              <div className="bingo-announcement" aria-live="polite">
-                <span className="bingo-announcement-heading">{lottery.phase==='complete'?'THE OFFICIAL ORDER IS IN':announcement?'BALL DRAWN · PICK ANNOUNCED':lottery.phase==='intro'?'MIXING ALL 12 FRANCHISES':'MIXING FOR THE NEXT PICK'}</span>
-                <span key={announcement?reveal:'pending'} className={`lottery-ball bingo-drawn-ball ${announcement?'bingo-ball-drawn':'bingo-ball-pending'}`}>
-                  {announcement&&reveal>0?(()=>{
-                    const team=s.teams.find(t=>t.id===s.order[reveal-1]);
-                    return team?.logoPath?<img alt={`${team.name} logo on drawn bingo ball`} src={teamLogo(l.supabase,team.logoPath)}/>:reveal;
-                  })():'?'}
-                </span>
-                <strong>{announcement&&reveal?`#${reveal} · ${s.teams.find(t=>t.id===s.order[reveal-1])?.name}`:lottery.phase==='intro'?'THE CAGE IS MIXING…':'WHO WILL BE CALLED NEXT?'}</strong>
-                <small>{lottery.phase==='complete'?'DRAFT LOTTERY COMPLETE':`${s.order.length-reveal} team${s.order.length-reveal===1?'':'s'} still waiting · next reveal in ${lottery.secondsToNext}s`}</small>
-              </div>
-            </div>
-            <div className="season-draft-order">
-              {s.order.slice(0,reveal).map((id,i)=>{
+        <details className="draft-order-details" defaultOpen={['scheduled','drafting'].includes(s.status)}>
+          <summary>DRAFT ORDER · {s.order.length || 12} TEAMS</summary>
+          {!s.order.length ? <p>Waiting for the scheduled lottery time.</p> : <>
+            <BingoLottery
+              teams={s.teams}
+              order={s.order}
+              lottery={lottery}
+              logoFor={path=>teamLogo(l.supabase,path)}
+            />
+            <div className="season-draft-order" aria-label="Official lottery order already announced">
+              {s.order.slice(0,resultsShown).map((id,i)=>{
                 const team=s.teams.find(t=>t.id===id);
                 return <span key={id} className="lottery-result-team">
                   {team?.logoPath&&<img alt="" src={teamLogo(l.supabase,team.logoPath)}/>}
@@ -814,8 +814,7 @@ function Draft({ league: l }) {
                 </span>;
               })}
             </div>
-          </>
-        )}
+          </>}
         </details>
         {s.status === "drafting" && (
           <>
