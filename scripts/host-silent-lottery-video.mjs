@@ -49,6 +49,7 @@ const manifest={type:'example-only',generatedAt:new Date().toISOString(),
 const manifestFile=path.join(root,'public/videos/ssl-draft-lottery-sample-order.json');
 await fs.writeFile(manifestFile,JSON.stringify(manifest,null,2)+String.fromCharCode(10));
 console.log('NEW RANDOM PREVIEW ORDER:',manifest.order.map(t=>t.team).join(' > '));
+console.log('FIRST-BALL ODDS: exactly 1/12 per team; all picks without replacement. Example draw only.');
 const fps=24,durationMs=lotteryDuration(order.length)+2000,frameCount=Math.ceil(durationMs/1000*fps);
 console.log('Full silent lottery: '+frameCount+' frames, '+(durationMs/1000)+' sec.');
 const server=await createServer({configFile:false,root,base:'/',server:{host:'127.0.0.1',port:4198,strictPort:true}});
