@@ -1,93 +1,100 @@
-/* Cinematic physics-driven SSL lottery, larger transparent cage and runway. */
-.ssl-lottery-theater{display:grid;grid-template-columns:minmax(285px,380px) minmax(0,1fr);gap:26px;align-items:center;padding:25px 24px;background:radial-gradient(ellipse at 20% 40%,#224570,#111f3c 64%,#0a1830);border:2px solid #dbaa43;border-radius:15px;box-shadow:inset 0 0 45px #ecc56618;margin:18px 0 15px;overflow:hidden}
-.ssl-cage-side{display:flex;flex-direction:column;align-items:center;min-width:0}
-.ssl-cage-caption{width:100%;display:flex;justify-content:space-around;gap:8px;align-items:center;color:#ffe4a2;font-size:11px;letter-spacing:.1em}
-.ssl-cage-caption span{color:#b1c8e1;font-weight:800}
-.ssl-physics-cage{display:block;width:min(100%,360px);max-height:360px;aspect-ratio:1;height:auto;object-fit:contain;filter:drop-shadow(0 6px 20px #0009)}
-.ssl-lottery-sound{display:flex;align-items:center;gap:9px;justify-content:center;border:1px solid #e0b95965;border-radius:6px;color:#ffdfa0;background:#ffe18b12;padding:9px 13px;min-height:42px;font-size:11px;font-weight:900;letter-spacing:.04em;cursor:pointer}
-.ssl-lottery-sound[aria-pressed=true]{background:#1d604b70;color:#cdffe1;border-color:#71bd8a}
-.ssl-lottery-sound:focus-visible{outline:3px solid #fff6ab;outline-offset:2px}
-.ssl-bingo-stage{min-height:350px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:15px;min-width:0}
-.ssl-bingo-stage .bingo-announcement-heading{font-size:13px;color:#ffe49e;text-align:center}
-.ssl-ball-runway{position:relative;width:min(100%,330px);height:150px;display:flex;align-items:center;justify-content:center;isolation:isolate}
-.ssl-ball-runway-rail{position:absolute;z-index:-1;bottom:13px;left:4%;right:4%;height:15px;border-top:4px solid #fee8a7;border-bottom:5px solid #875821;border-radius:45% 5% 13px 10px;transform:rotate(1deg);box-shadow:0 6px 10px #0008}
-.ssl-ball-runway::before{content:'';position:absolute;bottom:14px;left:0;display:block;width:34px;height:24px;border-radius:5px 5px 0 0;background:linear-gradient(120deg,#e5af54,#7c4c24);border:2px solid #ffe19d}
-.ssl-ball-runway .lottery-ball{width:130px;height:130px;display:grid;place-items:center;font-size:39px;overflow:hidden;flex:0 0 auto}
-.ssl-ball-runway .lottery-ball img{width:113px;height:113px;object-fit:contain;filter:drop-shadow(0 2px 2px #0005)}
-.ssl-ball-runway .ssl-waiting-ball{opacity:.8;animation:ssl-wait-pulse 1.8s ease-in-out infinite}
-.ssl-ball-runway .ssl-feature-ball{animation:ssl-ball-land .55s cubic-bezier(.2,.9,.3,1.2) backwards}
-.ssl-ball-runway .ssl-roll-ball{animation-name:ssl-lottery-roll;animation-duration:3.2s;animation-timing-function:cubic-bezier(.3,.05,.25,1);animation-fill-mode:both;will-change:transform}
-.ssl-bingo-stage>strong{font:900 clamp(22px,3vw,34px)/1.09 'Barlow Condensed',Impact,sans-serif;color:#fff;text-align:center;min-height:70px;max-width:440px;display:grid;place-items:center;overflow-wrap:anywhere}
-.ssl-bingo-stage>small{color:#c1d3ef;text-align:center;font-size:12px;line-height:1.5}
-.ssl-mix-countdown{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 20px;border:1px solid #ffdb7460;border-radius:8px;background:#fedb7812;min-width:160px}
-.ssl-mix-countdown span{font-weight:800;letter-spacing:.1em;font-size:10px;color:#fee09c}
-.ssl-mix-countdown b{font:900 44px/1 'Barlow Condensed',Impact,sans-serif;color:#fff5c1;font-variant-numeric:tabular-nums}
-@keyframes ssl-lottery-roll{0%{transform:translate(-172px,-46px) rotate(-1080deg) scale(.62);opacity:.7}45%{transform:translate(-58px,7px) rotate(-580deg) scale(.84);opacity:1}76%{transform:translate(16px,0) rotate(-92deg) scale(1)}87%{transform:translate(-7px,-9px) rotate(-27deg) scale(1.02)}100%{transform:translate(0,0) rotate(0) scale(1)}}
-@keyframes ssl-ball-land{from{transform:translateY(-9px) scale(.98)}to{transform:translateY(0) scale(1)}}
-@keyframes ssl-wait-pulse{50%{transform:scale(.95);opacity:.56}}
+/* SSL lottery — polished, wholly silent broadcast stage. Geometry is all
+   based on a 960×475 artboard, so cage/chute/podium stay connected. */
+.ssl-lottery-theater{
+  margin:18px 0 20px;background:#101e34;border:1px solid #bfa06c;
+  box-shadow:0 16px 35px #12264524, inset 0 0 0 1px #ffe0a12e;
+  border-radius:14px;overflow:hidden
+}
+.ssl-machine-viewport{width:100%;overflow-x:auto;overscroll-behavior-x:contain;background:#091727}
+.ssl-machine-stage{position:relative;width:100%;min-width:640px;aspect-ratio:960/475;overflow:hidden}
+.ssl-machine-art{width:100%;height:100%;display:block}
+.ssl-machine-cage{
+  position:absolute;left:0.416666%;top:2.105263%;
+  width:37.5%;aspect-ratio:1;pointer-events:none
+}
+.ssl-machine-canvas{display:block;width:100%;height:100%;object-fit:contain}
+.ssl-machine-draw{
+  position:absolute;left:68.541667%;top:49.473684%;width:11.25%;aspect-ratio:1;
+  pointer-events:none;z-index:2
+}
+.ssl-display-ball{
+  position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 30% 23%,#fff9dd 0%,#ffecaf 17%,#f0c05d 51%,#ba792c 82%,#633c1b 100%);
+  box-shadow:inset -11px -14px 21px #67390a7b,inset 4px 5px 10px #fff2b8,
+    0 9px 18px #020c17af;
+  border:3px solid #ffe9b6;
+  display:grid;place-items:center;isolation:isolate;overflow:hidden
+}
+.ssl-display-ball-face{
+  position:relative;display:grid;place-items:center;
+  width:72%;height:72%;border-radius:50%;overflow:hidden;
+  background:#f2eee4;border:2px solid #83561f;
+  box-shadow:0 1px 3px #0007,inset 0 0 5px #fff9d7;
+  z-index:1
+}
+.ssl-display-ball-face img{
+  width:100%;height:100%;object-fit:cover;object-position:center center;display:block;
+  max-width:none;max-height:none;
+}
+.ssl-ball-number{font:bold clamp(9px,2vw,21px) Arial,sans-serif;color:#735324}
+.ssl-display-ball-glint{
+  position:absolute;top:9%;left:13%;width:37%;height:13%;
+  background:linear-gradient(90deg,#ffffffce,#ffffff00);border-radius:50%;
+  transform:rotate(-27deg);filter:blur(2px);z-index:2;pointer-events:none
+}
+.ssl-display-ball-rolling{
+  animation:ssl-downhill-ball 3200ms cubic-bezier(.19,.1,.4,1) both;
+  will-change:transform
+}
+/* A ball traveling right rotates clockwise: negative angle at the start,
+   steadily INCREASING toward zero. The slope is positive Y (down the page). */
+@keyframes ssl-downhill-ball{
+  0%{transform:translate(-344%, -75%) rotate(-1000deg) scale(.78);opacity:.8}
+  18%{transform:translate(-285%, -60%) rotate(-800deg) scale(.87);opacity:1}
+  52%{transform:translate(-158%, -34%) rotate(-430deg) scale(.95)}
+  83%{transform:translate(-9%, -2%) rotate(-42deg) scale(1.01)}
+  90%{transform:translate(3%, -8%) rotate(-22deg)}
+  100%{transform:translate(0,0) rotate(0deg) scale(1)}
+}
+.ssl-machine-counter{
+  position:absolute;left:2.1%;top:3.4%;z-index:2;
+  font:bold clamp(9px,1.22vw,13px)/1 Arial,sans-serif;
+  letter-spacing:.1em;color:#fae3af;
+  background:#0a1a2bc9;border:1px solid #ccab65a0;padding:7px 10px;border-radius:6px
+}
+.ssl-lottery-footer{
+  padding:15px 23px 18px;display:flex;align-items:center;justify-content:space-between;
+  gap:17px;background:linear-gradient(105deg,#112b47,#0c1b30 70%);
+  border-top:3px solid #bd9145;color:#f5faff;min-height:102px
+}
+.ssl-lottery-phase{display:flex;flex:1;flex-direction:column;gap:5px;min-width:0}
+.ssl-lottery-kicker{font-weight:900;font-size:11px;letter-spacing:.12em;color:#edc878}
+.ssl-lottery-phase strong{
+  font:900 clamp(19px,2.3vw,30px)/1.08 'Barlow Condensed',Impact,sans-serif;
+  color:white;overflow-wrap:anywhere
+}
+.ssl-lottery-phase small{font-size:11px;color:#adc5e1;line-height:1.45}
+.ssl-lottery-timer{display:flex;flex-direction:column;align-items:center;flex:0 0 127px;padding:9px 12px;border:1px solid #e6bf6a8c;border-radius:8px;background:#e8bb6521}
+.ssl-lottery-timer span{font-size:10px;letter-spacing:.12em;font-weight:900;color:#f3dda2}
+.ssl-lottery-timer b{font:900 37px/1.13 'Barlow Condensed',Impact,sans-serif;color:#fff1c5;font-variant-numeric:tabular-nums}
+.ssl-lottery-revealed{font-size:12px;font-weight:900;color:#e9ca80;white-space:nowrap}
 .ssl-draft-rejoin{margin:0 0 18px;padding:15px 17px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center;background:#142c4f;border-left:5px solid #e8bf4d;border-radius:5px;color:#fff}
 .ssl-draft-rejoin strong{font-size:14px;color:#fff}
 .ssl-draft-rejoin p{color:#c7d8ec!important;font-size:12px!important;line-height:1.5;margin:5px 0 0!important}
 .ssl-draft-rejoin button{white-space:nowrap;min-height:41px;padding:9px 13px;font-weight:800;color:#16365c;background:#ffda71;border:0;border-radius:5px}
 .ssl-draft-rejoin button:disabled{opacity:.6}
-@media(max-width:850px){.ssl-lottery-theater{grid-template-columns:1fr;padding:16px;gap:4px}.ssl-physics-cage{width:min(100%,315px)}.ssl-bingo-stage{min-height:315px}.ssl-ball-runway{height:140px}}
-@media(max-width:470px){.ssl-lottery-theater{padding:13px 10px}.ssl-physics-cage{width:min(100%,300px)}.ssl-ball-runway .lottery-ball{width:112px;height:112px}.ssl-ball-runway .lottery-ball img{width:97px;height:97px}}
-@media(prefers-reduced-motion:reduce){.ssl-ball-runway .ssl-roll-ball,.ssl-ball-runway .ssl-feature-ball,.ssl-ball-runway .ssl-waiting-ball{animation:none!important}}
-
-/* Stronger specificity than the older generic announcement styling in season.css. */
-.ssl-lottery-theater .ssl-ball-runway .lottery-ball{width:130px;height:130px}
-.ssl-lottery-theater .ssl-ball-runway .lottery-ball img{width:113px;height:113px}
-.ssl-lottery-theater .ssl-ball-runway .ssl-roll-ball{animation:ssl-lottery-roll 3.2s cubic-bezier(.3,.05,.25,1) both}
-.ssl-lottery-theater .ssl-ball-runway .ssl-feature-ball{animation:ssl-ball-land .55s cubic-bezier(.2,.9,.3,1.2) backwards}
-.ssl-lottery-theater .ssl-ball-runway .ssl-waiting-ball{animation:ssl-wait-pulse 1.8s ease-in-out infinite}
-@media(max-width:470px){.ssl-lottery-theater .ssl-ball-runway .lottery-ball{width:112px;height:112px}.ssl-lottery-theater .ssl-ball-runway .lottery-ball img{width:97px;height:97px}}
-
-/* Game-show music and genuine marble clinks use separate mixer channels. */
-.ssl-lottery-audio-panel{display:flex;flex-direction:column;align-items:stretch;gap:8px;width:min(100%,330px);padding:12px;border:1px solid #e2b65b66;background:#101e39d9;border-radius:10px}
-.ssl-lottery-audio-panel>.ssl-lottery-sound{width:100%;font-size:11px;min-height:38px}
-.ssl-lottery-audio-row{display:grid;grid-template-columns:33px 64px minmax(42px,1fr) 54px;gap:7px;align-items:center;min-width:0;color:#ffe3a6}
-.ssl-lottery-audio-row label{font-size:10px;font-weight:900;letter-spacing:.045em;color:#ffe1a0}
-.ssl-lottery-audio-row input[type=range]{width:100%;padding:0;border:0;accent-color:#f4ca6b;height:24px;cursor:pointer;min-width:0;background:transparent}
-.ssl-lottery-audio-row input:disabled{opacity:.46;cursor:not-allowed}
-.ssl-lottery-audio-row output{font-size:10px;color:#d2e0f8;min-width:0;font-variant-numeric:tabular-nums;text-align:right}
-.ssl-lottery-audio-row .ssl-audio-mute{width:32px;height:32px;padding:5px;background:#203956;border:1px solid #88a0bd75;color:#dce8ff;border-radius:6px;display:grid;place-items:center;cursor:pointer}
-.ssl-lottery-audio-row .ssl-audio-mute[aria-pressed=true]{background:#68313d;border-color:#dba8a8;color:#ffbec0}
-.ssl-lottery-audio-row .ssl-audio-mute:focus-visible,.ssl-lottery-audio-row input:focus-visible{outline:2px solid #ffe098;outline-offset:2px}
-@media(max-width:440px){.ssl-lottery-audio-panel{width:min(100%,320px)}.ssl-lottery-audio-row{grid-template-columns:32px 61px minmax(30px,1fr) 48px;gap:5px}}
-
-/* Actual exit chute and raised podium — the drawn ball travels left-to-right. */
-.ssl-ball-runway{height:193px;overflow:visible}
-.ssl-ball-chute{position:absolute;left:-35%;bottom:57px;width:81%;height:14px;transform:rotate(-5deg);transform-origin:right center;background:linear-gradient(180deg,#ffdf93 0%,#c99032 28%,#81541c 72%,#f5c86b 100%);border-top:2px solid #ffe5a2;border-radius:0 0 13px 0;box-shadow:0 7px 11px #0008}
-.ssl-ball-chute::before{content:'';position:absolute;left:0;right:0;top:-8px;height:4px;background:#e6b75e;border-radius:10px;box-shadow:0 2px 5px #0009}
-.ssl-podium-top{position:absolute;left:70%;bottom:41px;width:172px;height:18px;transform:translateX(-50%);background:linear-gradient(#ffe9a8,#d49d40 42%,#603f1b 92%);border:2px solid #ffdf98;border-radius:10px 10px 6px 6px;box-shadow:0 5px 9px #0009}
-.ssl-podium-column{position:absolute;left:70%;bottom:14px;width:98px;height:37px;transform:translateX(-50%);background:linear-gradient(90deg,#593917,#d99a35 24%,#eec776 48%,#9d6725 78%,#523612);border:2px solid #f8d180;border-radius:0 0 6px 6px;display:grid;place-items:center}
-.ssl-podium-column span{font:900 17px 'Barlow Condensed',Impact,sans-serif;letter-spacing:.13em;color:#3b2c17;text-shadow:0 1px #fee4ae}
-.ssl-podium-base{position:absolute;left:70%;bottom:4px;width:146px;height:13px;transform:translateX(-50%);background:linear-gradient(#f9d47e,#805421);border:2px solid #ffd77c;border-radius:4px 4px 9px 9px}
-.ssl-podium-ball-holder{position:absolute;left:70%;bottom:57px;transform:translateX(-50%);width:130px;height:130px;display:grid;place-items:center;z-index:2}
-.ssl-podium-ball-holder .lottery-ball{position:absolute;left:0;bottom:0}
-.ssl-podium-waiting{font-size:12px;font-weight:900;letter-spacing:.11em;color:#d4bb83;align-self:end;position:absolute;bottom:-8px;text-shadow:0 2px #051129}
-.ssl-lottery-theater .ssl-ball-runway .ssl-roll-ball{animation:ssl-roll-to-podium 3.2s cubic-bezier(.24,.06,.2,1) both}
-@keyframes ssl-roll-to-podium{
-  0%{transform:translate(-276px,23px) rotate(-1080deg) scale(.55);opacity:.75}
-  26%{transform:translate(-214px,27px) rotate(-810deg) scale(.68);opacity:1}
-  59%{transform:translate(-96px,11px) rotate(-360deg) scale(.82)}
-  82%{transform:translate(16px,-7px) rotate(-45deg) scale(1.03)}
-  91%{transform:translate(-7px,-13px) rotate(-14deg) scale(1.01)}
-  100%{transform:translate(0,0) rotate(0) scale(1)}
-}
-@media(max-width:850px){
-  .ssl-ball-runway{height:178px}
-  .ssl-ball-chute{left:-22%;width:77%}
+@media(max-width:780px){
+  .ssl-machine-viewport::after{content:'';display:block;height:4px;background:linear-gradient(to right,#ba8943 0 30%,#132d4a 30% 100%);opacity:.55}
+  .ssl-lottery-footer{padding:12px 14px}
+  .ssl-lottery-timer{flex-basis:93px}
+  .ssl-lottery-timer b{font-size:30px}
 }
 @media(max-width:470px){
-  .ssl-ball-chute{left:-11%;width:65%}
-  .ssl-podium-ball-holder{width:112px;height:112px}
-  .ssl-lottery-theater .ssl-ball-runway .ssl-roll-ball{animation-name:ssl-roll-to-podium-mobile}
-  @keyframes ssl-roll-to-podium-mobile{
-    0%{transform:translate(-167px,16px) rotate(-720deg) scale(.55);opacity:.8}
-    45%{transform:translate(-72px,12px) rotate(-260deg) scale(.82);opacity:1}
-    84%{transform:translate(7px,-5px) rotate(-32deg) scale(1.02)}
-    100%{transform:translate(0,0) rotate(0) scale(1)}
-  }
+  .ssl-lottery-footer{align-items:flex-start;gap:7px}
+  .ssl-lottery-phase strong{font-size:20px}
+  .ssl-lottery-timer{flex-basis:87px;padding:8px 5px}
+  .ssl-lottery-timer span{font-size:9px}
 }
-@media(prefers-reduced-motion:reduce){.ssl-lottery-theater .ssl-ball-runway .ssl-roll-ball{animation:none!important}}
+@media(prefers-reduced-motion:reduce){
+  .ssl-display-ball-rolling{animation:none!important}
+}
