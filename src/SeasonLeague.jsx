@@ -2,8 +2,6 @@ import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
 import {lotteryProgress,lotteryReplayProgress,lotteryDuration} from './lottery-timing.js';
 import {BingoLottery} from './BingoLottery.jsx';
 import DraftChat from './DraftChat.jsx';
-import {CommissionerVoteTracker} from './VoteParticipation.jsx';
-import {CalendarDays, CheckCircle2, Clock3, Vote} from 'lucide-react';
 import {heatingUpForSeason} from './heating-up.js';
 import {effectiveGameLineup,gameLineupIsEditable,teamGameLineups,savedLineupLabel} from './roster-lineups.js';
 import {
@@ -304,8 +302,6 @@ export function SeasonWorkspace({ league, registeredTeams }) {
     s = l.season,
     [newName, setNewName] = useState(""),
     [slots, setSlots] = useState([]),
-    [dates, setDates] = useState(["", ""]),
-    [deadline, setDeadline] = useState(""),
     [draft, setDraft] = useState(""),
     [lotteryMins, setLotteryMins] = useState(20),
     [finish, setFinish] = useState({ champion: "", finalist: "" }),
@@ -314,6 +310,16 @@ export function SeasonWorkspace({ league, registeredTeams }) {
     () => setSlots(s?.teams?.map((t) => t.slot) || []),
     [s?.id, s?.teams?.length],
   );
+  // Commissioner scheduling follows the current persisted league draft date.
+  // The local input is prefilled for convenient adjustments, but is never
+  // itself authoritative for the public Draft Room banner.
+  useEffect(()=>{
+    if (!s?.draftAt) {setDraft("");return;}
+    const date=new Date(s.draftAt);
+    if(!Number.isFinite(date.getTime()))return;
+    const localDate=new Date(date.getTime()-date.getTimezoneOffset()*60000);
+    setDraft(localDate.toISOString().slice(0,16));
+  },[s?.id,s?.draftAt]);
   const tabs = [
     "Season Setup",
     "Draft",
@@ -383,9 +389,9 @@ export function SeasonWorkspace({ league, registeredTeams }) {
             <>
               <Box title={`${s.name} · ${s.status.toUpperCase()}`}>
                 <p>
-                  Registered teams are managed in Team Setup. All 12 need a team name, home location, logo, and conference selection before you can open the draft-date poll.
+                  Registered teams are managed in Team Setup. All 12 need a team name, home location, logo, and conference selection before you can schedule the draft.
                 </p>
-                <p role="status"><strong>{registeredTeams.length}/12 teams registered.</strong> {registeredTeams.length < 12 ? `Waiting on ${12-registeredTeams.length} more team${12-registeredTeams.length===1?'':'s'} before draft-day voting can open.` : 'All teams registered! You can select them and open the draft-date poll.'}</p>
+                <p role="status"><strong>{registeredTeams.length}/12 teams registered.</strong> {registeredTeams.length < 12 ? `Waiting on ${12-registeredTeams.length} more team${12-registeredTeams.length===1?'':'s'} before the commissioner can schedule the draft.` : 'All teams registered! Select all twelve and schedule the draft directly below.'}</p>
                 {["setup", "poll"].includes(s.status) ? (
                   <>
                     <div className="season-team-checks">
@@ -422,115 +428,33 @@ export function SeasonWorkspace({ league, registeredTeams }) {
                   </p>
                 )}
               </Box>
-              {["setup", "poll"].includes(s.status) && (
-                <Box title="DRAFT-DATE POLL">
-                  <form
-                    className="season-form"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      l.act("poll", {
-                        options: dates
-                          .filter(Boolean)
-                          .map((d, i) => ({ id: String(i + 1), date: iso(d) })),
-                        closesAt: iso(deadline),
-                      });
-                    }}
-                  >
-                    <p>
-                      One vote per franchise, including accounts sharing a GM
-                      code. Times are entered in your device’s timezone and
-                      displayed in Eastern Time.
-                    </p>
-                    {dates.map((d, i) => (
-                      <label key={i}>
-                        Option {i + 1}
-                        <input
-                          required
-                          type="datetime-local"
-                          value={d}
-                          onChange={(e) =>
-                            setDates((a) =>
-                              a.map((x, j) => (j === i ? e.target.value : x)),
-                            )
-                          }
-                        />
-                      </label>
-                    ))}
-                    <button
-                      type="button"
-                      className="outline-btn"
-                      disabled={dates.length >= 12}
-                      onClick={() => setDates((x) => [...x, ""])}
-                    >
-                      ADD DATE OPTION
-                    </button>
+              {["setup", "poll", "scheduled"].includes(s.status) && (
+                <Box title="OFFICIAL DRAFT DATE & TIME">
+                  <p>Only the commissioner chooses or changes the draft time. No franchise voting or poll is required.</p>
+                  {s.draftAt && <p className="ssl-commissioner-scheduled-date">CURRENTLY SCHEDULED: <strong>{time(s.draftAt)}</strong></p>}
+                  <form className="season-form" onSubmit={(e)=>{
+                    e.preventDefault();
+                    if(!draft)return;
+                    l.act("schedule_draft",{
+                      draftAt:iso(draft),
+                      lotteryAt:new Date(new Date(draft).getTime()-lotteryMins*60000).toISOString(),
+                    });
+                  }}>
                     <label>
-                      Voting deadline
-                      <input
-                        required
-                        type="datetime-local"
-                        value={deadline}
-                        onChange={(e) => setDeadline(e.target.value)}
-                      />
+                      Official draft date and time
+                      <input type="datetime-local" required value={draft} onChange={e=>setDraft(e.target.value)}/>
                     </label>
-                    <button
-                      className="red-btn"
-                      disabled={l.busy || s.teams.length !== 12 || !s.conferencesSet}
-                    >
-                      OPEN / REPLACE POLL
+                    <label>
+                      Lottery minutes before draft
+                      <input type="number" min={15} max={30} required value={lotteryMins}
+                        onChange={e=>setLotteryMins(Number(e.target.value))}/>
+                    </label>
+                    <button className="red-btn" disabled={l.busy || !draft || s.teams.length!==12 || !s.conferencesSet}>
+                      {s.draftAt ? "UPDATE DRAFT DATE" : "SET DRAFT DATE"}
                     </button>
+                    <p>The Draft Room displays your saved date and a countdown. Entry opens one hour before draft time; the lottery runs at its scheduled start and its official draw is never rerolled on refresh.</p>
                   </form>
                 </Box>
-              )}
-              {["poll", "scheduled"].includes(s.status) && (
-                <>
-                  <Voting league={l} />
-                  <Box title="CONFIRM DRAFT DATE">
-                    <form
-                      className="season-form"
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        l.act("schedule_draft", {
-                          draftAt: iso(draft),
-                          lotteryAt: new Date(
-                            new Date(draft).getTime() - lotteryMins * 60000,
-                          ).toISOString(),
-                        });
-                      }}
-                    >
-                      <label>
-                        Official draft date and time
-                        <input
-                          required
-                          type="datetime-local"
-                          value={draft}
-                          onChange={(e) => setDraft(e.target.value)}
-                        />
-                      </label>
-                      <label>
-                        Lottery minutes before draft
-                        <input
-                          type="number"
-                          min={15}
-                          max={30}
-                          required
-                          value={lotteryMins}
-                          onChange={(e) =>
-                            setLotteryMins(Number(e.target.value))
-                          }
-                        />
-                      </label>
-                      <button className="red-btn" disabled={l.busy}>
-                        SET DRAFT DATE
-                      </button>
-                      <p>
-                        The room opens an hour early. Lottery order is generated
-                        once at the selected time and cannot be rerolled by
-                        refreshing.
-                      </p>
-                    </form>
-                  </Box>
-                </>
               )}
               {s.status === "postdraft" && (
                 <Box title="OPENING DAY">
@@ -656,68 +580,6 @@ function useActingTeam(l) {
   const [t, setT] = useState("");
   useEffect(() => setT(l.myTeam?.id || ""), [l.season?.id, l.myTeam?.id]);
   return [l.access.role === "commissioner" ? t : l.myTeam?.id, setT];
-}
-function Voting({ league: l }) {
-  const s = l.season,
-    [team, setTeam] = useActingTeam(l);
-  if (!s?.poll)
-    return (
-      <section className="panel ssl-voting-panel">
-        <div className="ssl-poll-hero">
-          <div className="ssl-poll-hero-icon"><Vote size={32}/></div>
-          <div><span className="ssl-poll-kicker">LEAGUE DECISION CENTER</span><h2>DRAFT-DATE VOTING</h2>
-          <p>Voting is not open yet. The commissioner will publish a poll after the 12 franchises are selected.</p></div>
-          <span className="ssl-poll-state">NOT OPEN</span>
-        </div>
-      </section>
-    );
-  const open = s.status === "poll" && l.now < new Date(s.poll.closesAt).getTime();
-  const options = s.poll.options || [];
-  const counts = Object.values(s.poll.votes || {});
-  const activeVote = team && s.poll.votes?.[team];
-  return (
-    <section className="panel ssl-voting-panel" aria-labelledby="draft-date-poll-title">
-      <div className="ssl-poll-hero">
-        <div className="ssl-poll-hero-icon"><Vote size={34}/></div>
-        <div className="ssl-poll-headline">
-          <span className="ssl-poll-kicker">SEASON {s.number || 1} · OFFICIAL FRANCHISE VOTE</span>
-          <h2 id="draft-date-poll-title">CHOOSE DRAFT NIGHT</h2>
-          <p>Help decide when the Sluggers Supa League takes the stage. Each franchise gets one vote.</p>
-        </div>
-        <span className={`ssl-poll-state ${open ? 'is-open' : 'is-closed'}`}><Clock3 size={15}/>{open ? 'VOTING OPEN' : 'VOTING CLOSED'}</span>
-      </div>
-      <div className="ssl-poll-content">
-        <div className="ssl-poll-meta">
-          <span><CalendarDays size={18}/> Closes {time(s.poll.closesAt)}</span>
-          <span><Vote size={18}/> {counts.length} of {s.teams.length} franchise votes cast</span>
-          {activeVote && <span className="ssl-vote-saved"><CheckCircle2 size={18}/> Your vote is recorded</span>}
-        </div>
-        {l.access.role === "commissioner" && <>
-          <CommissionerVoteTracker teams={s.teams || []} votedIds={Object.keys(s.poll.votes || {})}/>
-          <div className="ssl-voting-team-choice"><TeamChooser s={s} value={team} onChange={setTeam} label="Voting on behalf of franchise"/></div>
-        </>}
-        <div className="ssl-poll-options">
-          {options.map((o,i) => {
-            const votes = counts.filter(v=>v===o.id).length;
-            const selected = !!team && activeVote===o.id;
-            const share = counts.length ? votes / counts.length * 100 : 0;
-            return <article key={o.id} className={`ssl-poll-option ${selected?'is-selected':''}`}>
-              <div className="ssl-poll-option-heading"><span className="ssl-poll-option-number">OPTION {String(i+1).padStart(2,'0')}</span>
-                {selected && <span className="ssl-poll-chosen"><CheckCircle2 size={17}/> YOUR PICK</span>}
-              </div>
-              <time dateTime={o.date} className="ssl-poll-date">{time(o.date)}</time>
-              <div className="ssl-poll-vote-data"><strong>{votes} {votes===1?'vote':'votes'}</strong><span>{Math.round(share)}% of votes cast</span></div>
-              <div className="ssl-poll-meter" role="meter" aria-label={`Vote share for option ${i+1}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(share)}><span style={{width:`${share}%`}}/></div>
-              {team && open && <button className={selected?'ssl-poll-vote-button selected':'ssl-poll-vote-button'} type="button" aria-pressed={selected} disabled={l.busy || selected} onClick={()=>l.act('vote',{team,option:o.id})}>
-                {selected ? <><CheckCircle2 size={18}/> VOTE RECORDED</> : <>VOTE FOR THIS DATE <Vote size={17}/></>}
-              </button>}
-            </article>;
-          })}
-        </div>
-        <p className="ssl-poll-footnote">{open ? team ? 'You can change your vote before the deadline. The last saved choice is counted.' : 'Choose your franchise to cast its vote.' : 'Voting has ended. The commissioner will confirm the official draft date.'}</p>
-      </div>
-    </section>
-  );
 }
 function Draft({ league: l }) {
   const s = l.season;
@@ -2461,10 +2323,7 @@ export function SeasonPage({ page, league: l }) {
       ) : page === "Team Stats" ? (
         <TeamStats league={l} />
       ) : page === "Voting" ? (
-        <>
-          <PublicBallots league={l} />
-          <Voting league={l} />
-        </>
+        <PublicBallots league={l} />
       ) : page === "Draft Room" ? (
         <Draft league={l} />
       ) : page === "Free Agency" ? (
