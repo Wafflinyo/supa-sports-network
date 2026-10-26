@@ -33,7 +33,7 @@ game-rbi-10|bat|diamond|rays|10
 game-rbi-15|scoreboard|crossed-bats|sunburst|15
 game-rbi-20|diamond|fire|wreath|20
 game-rbi-25|crossed-bats|stars|laurel|25
-game-rbi-30|crown|diamond|royal|30
+game-rbi-30|diamond|crown|royal|30
 player-putouts-5|glove|ball|diagonal|5
 player-putouts-8|glove|star|sunburst|8
 player-putouts-10|glove|shield|split|10
