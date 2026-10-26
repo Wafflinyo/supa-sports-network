@@ -21,7 +21,6 @@ const slots=[
   [12,'Decalburg Dedennes','12/8ba4cb95-271c-42f2-8f63-0be56141b374.png'],
 ];
 const TEAMS=slots.map(([id,name,logoPath])=>({id:String(id),name,logoPath:NAME_PATH+logoPath}));
-const NUMBER_TO_PCT=n=>(100/n).toFixed(4).replace(/0+$/,'').replace(/\.$/,'')+'%';
 function draw(){
   const order=shuffleLotteryOrder(TEAMS.map(t=>t.id),cryptoLotteryIndex);
   return {order,startedAt:Date.now(),runId:cryptoLotteryIndex(0x100000000)};
@@ -29,7 +28,6 @@ function draw(){
 export default function LotteryPractice(){
   const [session,setSession]=useState(()=>draw());
   const [now,setNow]=useState(Date.now());
-  const [speed,setSpeed]=useState('normal');
   const clockRef=useRef(null);
   useEffect(()=>{
     clockRef.current=setInterval(()=>setNow(Date.now()),75);
@@ -38,13 +36,9 @@ export default function LotteryPractice(){
   function redraw(){
     setSession(draw());setNow(Date.now());
   }
-  const factor=speed==='fast'?3:1;
-  const elapsed=Math.max(0,(now-session.startedAt)*factor);
+  const elapsed=Math.max(0,now-session.startedAt);
   const lottery=lotteryProgress(session.order.length,new Date(session.startedAt).toISOString(),session.startedAt+elapsed);
   const shown=lottery.phase==='rolling'?Math.max(0,lottery.revealed-1):lottery.revealed;
-  const inCage=Math.max(0,TEAMS.length-shown);
-  const available=TEAMS.length-lottery.revealed+(lottery.phase==='rolling'?1:0);
-  const odds=NUMBER_TO_PCT(Math.max(1,available));
   return <main className="ssl-practice-page">
     <header className="ssl-practice-head">
       <a href="./">← SUPA SPORTS NETWORK</a>
@@ -53,8 +47,6 @@ export default function LotteryPractice(){
       <p>Each new demonstration shuffles all 12 balls with independent, equal chances. Results are saved only for this practice run; the official league draft is untouched.</p>
       <div className="ssl-practice-controls">
         <button type="button" onClick={redraw}>↻ NEW RANDOM LOTTERY</button>
-        <label htmlFor="ssl-demo-speed">Playback</label>
-        <select id="ssl-demo-speed" value={speed} onChange={e=>setSpeed(e.target.value)}><option value="normal">Normal (10s mixing)</option><option value="fast">3× practice speed</option></select>
         <span className="ssl-practice-odds">FIRST BALL: 1 / 12 = 8.3333%</span>
       </div>
     </header>
