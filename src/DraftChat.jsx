@@ -39,7 +39,7 @@ export default function DraftChat({supabase,season,access}){
         lastId.current=nextId;
         setMessages(list);
         setError('');
-        if(nearBottom)requestAnimationFrame(()=>{if(active)bottom.current?.scrollIntoView({block:'end',behavior:'instant'});});
+        if(nearBottom)requestAnimationFrame(()=>{if(active)if(viewport.current)viewport.current.scrollTop=viewport.current.scrollHeight;});
       }catch(e){if(active)setError(e.message||'Unable to load draft chat.');}
       finally{if(active)setLoading(false);busy.current=false;}
     }
@@ -96,7 +96,7 @@ export default function DraftChat({supabase,season,access}){
       </div>)}
       <div ref={bottom} />
     </div>
-    {newActivity&&<button className="ssl-chat-new" type="button" onClick={()=>{setNewActivity(false);bottom.current?.scrollIntoView({behavior:'smooth'});}}>
+    {newActivity&&<button className="ssl-chat-new" type="button" onClick={()=>{setNewActivity(false);if(viewport.current)viewport.current.scrollTo({top:viewport.current.scrollHeight,behavior:'smooth'});}}>
       <RefreshCw size={14}/> New messages · Jump to latest
     </button>}
     {error&&<p className="ssl-chat-error" role="alert">{error}</p>}
