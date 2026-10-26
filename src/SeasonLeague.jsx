@@ -1098,6 +1098,27 @@ function Teams({ league: l }) {
     </div>
   );
 }
+function ScheduleMatchupHeading({season,game}){
+  const display=matchupDisplay(season,game);
+  return <div className="ssl-matchup-card">
+    <h3 className="ssl-matchup-heading" aria-label={display.awayName+" at "+display.homeName}>
+      <span className="ssl-matchup-side ssl-matchup-away">
+        <span className="ssl-matchup-team-name">{display.awayName}</span>
+        <span className="ssl-matchup-side-label">AWAY</span>
+      </span>
+      <span className="ssl-matchup-at" aria-hidden="true">@</span>
+      <span className="ssl-matchup-side ssl-matchup-home">
+        <span className="ssl-matchup-team-name">{display.homeName}</span>
+        <span className="ssl-matchup-side-label">HOME</span>
+      </span>
+    </h3>
+    <p className="ssl-matchup-venue-line">
+      <span className="ssl-matchup-stadium">{display.stadium || "HOME STADIUM TBD"}</span>
+      <span className="ssl-matchup-separator" aria-hidden="true">•</span>
+      <time dateTime={game.startsAt||undefined} className="ssl-matchup-game-time">{game.startsAt?time(game.startsAt):"DATE & TIME TBD"}</time>
+    </p>
+  </div>;
+}
 function GameDateEditor({league:l,game:g}){
   const s=l.season;
   const [date,setDate]=useState('');
@@ -1278,24 +1299,7 @@ function Schedule({ league: l, commissioner = false }) {
                 {g.postponed ? "POSTPONED · " : ""}
                 {g.label || g.phase}
               </small>
-              <div className="ssl-matchup-card">
-                <h3 className="ssl-matchup-heading" aria-label={matchupDisplay(s,g).awayName+" at "+matchupDisplay(s,g).homeName}>
-                  <span className="ssl-matchup-side ssl-matchup-away">
-                    <span className="ssl-matchup-team-name">{matchupDisplay(s,g).awayName}</span>
-                    <span className="ssl-matchup-side-label">AWAY</span>
-                  </span>
-                  <span className="ssl-matchup-at" aria-hidden="true">@</span>
-                  <span className="ssl-matchup-side ssl-matchup-home">
-                    <span className="ssl-matchup-team-name">{matchupDisplay(s,g).homeName}</span>
-                    <span className="ssl-matchup-side-label">HOME</span>
-                  </span>
-                </h3>
-                <p className="ssl-matchup-venue-line">
-                  <span className="ssl-matchup-stadium">{matchupDisplay(s,g).stadium || "HOME STADIUM TBD"}</span>
-                  <span className="ssl-matchup-separator" aria-hidden="true">•</span>
-                  <time dateTime={g.startsAt||undefined} className="ssl-matchup-game-time">{g.startsAt?time(g.startsAt):"DATE & TIME TBD"}</time>
-                </p>
-              </div>
+              <ScheduleMatchupHeading season={s} game={g} />
               <p className="matchup-conference"><ConferenceMark id={s.teams.find(t=>t.id===g.home)?.conference} size={19}/> {matchupType(s,g)}</p>
               {g.announcement && <p>{g.announcement}</p>}
               {g.youtubeUrl && (
