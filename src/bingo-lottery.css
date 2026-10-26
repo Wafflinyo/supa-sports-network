@@ -12,8 +12,8 @@
 .ssl-ball-runway{position:relative;width:min(100%,330px);height:150px;display:flex;align-items:center;justify-content:center;isolation:isolate}
 .ssl-ball-runway-rail{position:absolute;z-index:-1;bottom:13px;left:4%;right:4%;height:15px;border-top:4px solid #fee8a7;border-bottom:5px solid #875821;border-radius:45% 5% 13px 10px;transform:rotate(1deg);box-shadow:0 6px 10px #0008}
 .ssl-ball-runway::before{content:'';position:absolute;bottom:14px;left:0;display:block;width:34px;height:24px;border-radius:5px 5px 0 0;background:linear-gradient(120deg,#e5af54,#7c4c24);border:2px solid #ffe19d}
-.ssl-ball-runway .lottery-ball{width:114px;height:114px;display:grid;place-items:center;font-size:39px;overflow:hidden;flex:0 0 auto}
-.ssl-ball-runway .lottery-ball img{width:89px;height:89px;object-fit:contain;filter:drop-shadow(0 2px 2px #0005)}
+.ssl-ball-runway .lottery-ball{width:130px;height:130px;display:grid;place-items:center;font-size:39px;overflow:hidden;flex:0 0 auto}
+.ssl-ball-runway .lottery-ball img{width:113px;height:113px;object-fit:contain;filter:drop-shadow(0 2px 2px #0005)}
 .ssl-ball-runway .ssl-waiting-ball{opacity:.8;animation:ssl-wait-pulse 1.8s ease-in-out infinite}
 .ssl-ball-runway .ssl-feature-ball{animation:ssl-ball-land .55s cubic-bezier(.2,.9,.3,1.2) backwards}
 .ssl-ball-runway .ssl-roll-ball{animation-name:ssl-lottery-roll;animation-duration:3.2s;animation-timing-function:cubic-bezier(.3,.05,.25,1);animation-fill-mode:both;will-change:transform}
@@ -31,13 +31,13 @@
 .ssl-draft-rejoin button{white-space:nowrap;min-height:41px;padding:9px 13px;font-weight:800;color:#16365c;background:#ffda71;border:0;border-radius:5px}
 .ssl-draft-rejoin button:disabled{opacity:.6}
 @media(max-width:850px){.ssl-lottery-theater{grid-template-columns:1fr;padding:16px;gap:4px}.ssl-physics-cage{width:min(100%,315px)}.ssl-bingo-stage{min-height:315px}.ssl-ball-runway{height:140px}}
-@media(max-width:470px){.ssl-lottery-theater{padding:13px 10px}.ssl-physics-cage{width:min(100%,300px)}.ssl-ball-runway .lottery-ball{width:99px;height:99px}.ssl-ball-runway .lottery-ball img{width:77px;height:77px}}
+@media(max-width:470px){.ssl-lottery-theater{padding:13px 10px}.ssl-physics-cage{width:min(100%,300px)}.ssl-ball-runway .lottery-ball{width:112px;height:112px}.ssl-ball-runway .lottery-ball img{width:97px;height:97px}}
 @media(prefers-reduced-motion:reduce){.ssl-ball-runway .ssl-roll-ball,.ssl-ball-runway .ssl-feature-ball,.ssl-ball-runway .ssl-waiting-ball{animation:none!important}}
 
 /* Stronger specificity than the older generic announcement styling in season.css. */
-.ssl-lottery-theater .ssl-ball-runway .lottery-ball{width:114px;height:114px}
-.ssl-lottery-theater .ssl-ball-runway .lottery-ball img{width:89px;height:89px}
+.ssl-lottery-theater .ssl-ball-runway .lottery-ball{width:130px;height:130px}
+.ssl-lottery-theater .ssl-ball-runway .lottery-ball img{width:113px;height:113px}
 .ssl-lottery-theater .ssl-ball-runway .ssl-roll-ball{animation:ssl-lottery-roll 3.2s cubic-bezier(.3,.05,.25,1) both}
 .ssl-lottery-theater .ssl-ball-runway .ssl-feature-ball{animation:ssl-ball-land .55s cubic-bezier(.2,.9,.3,1.2) backwards}
 .ssl-lottery-theater .ssl-ball-runway .ssl-waiting-ball{animation:ssl-wait-pulse 1.8s ease-in-out infinite}
-@media(max-width:470px){.ssl-lottery-theater .ssl-ball-runway .lottery-ball{width:99px;height:99px}.ssl-lottery-theater .ssl-ball-runway .lottery-ball img{width:77px;height:77px}}
+@media(max-width:470px){.ssl-lottery-theater .ssl-ball-runway .lottery-ball{width:112px;height:112px}.ssl-lottery-theater .ssl-ball-runway .lottery-ball img{width:97px;height:97px}}
