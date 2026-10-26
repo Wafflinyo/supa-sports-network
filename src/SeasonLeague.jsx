@@ -729,7 +729,7 @@ function Draft({ league: l }) {
   // returning GM up immediately instead of waiting for the 8s regular poll.
   useEffect(()=>{
     if(!s?.id)return;
-    const catchUp=()=>{if(document.visibilityState==='visible')l.refresh();};
+    const catchUp=()=>{if(document.visibilityState==='visible' && typeof l.refresh==='function')l.refresh();};
     catchUp();
     document.addEventListener('visibilitychange',catchUp);
     window.addEventListener('focus',catchUp);
