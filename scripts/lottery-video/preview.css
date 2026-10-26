@@ -1,0 +1,29 @@
+
+*{box-sizing:border-box}
+body{margin:0;color:#fff;background:#0b1930;font-family:Arial,Helvetica,sans-serif;overflow:hidden}
+.movie{width:1280px;height:800px;padding:13px 160px 8px;background:radial-gradient(ellipse at 50% 25%,#274363,#09172c 70%);overflow:hidden}
+.movie-header{height:103px;text-align:center}
+.movie-eyebrow{color:#f2d18f;font-size:11px;font-weight:900;letter-spacing:.19em}
+.movie h1{font:900 44px/1 Impact,'Arial Narrow',Arial,sans-serif;letter-spacing:.055em;margin:4px 0 2px;color:#fff}
+.movie h1 em{color:#f4d796;font-style:normal}
+.movie-header p{color:#c5d5e8;font-size:11px;letter-spacing:.15em;font-weight:900;margin:4px 0}
+.movie-example{color:#ffd780;font-size:11px;font-weight:800;letter-spacing:.035em}
+.movie .ssl-lottery-theater{width:960px;margin:0;border-radius:11px}
+.movie .ssl-machine-viewport{overflow:hidden}
+.movie .ssl-machine-stage{min-width:0;width:960px;height:475px}
+.movie .ssl-lottery-footer{min-height:86px;padding:11px 16px}
+.movie .ssl-lottery-phase strong{font-size:26px}
+.movie .ssl-lottery-phase small{font-size:11px}
+.movie .ssl-lottery-timer{padding:5px 9px}
+.movie .ssl-lottery-timer b{font-size:31px}
+.movie-results{margin-top:8px}
+.movie-results-head{font-size:12px;letter-spacing:.13em;font-weight:900;color:#eac477;display:flex;justify-content:space-between;margin:0 0 6px}
+.movie-results-head span{color:#e9f0f9}
+.movie-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(3,33px);gap:4px 7px}
+.movie-result{min-width:0;display:flex;align-items:center;gap:6px;border:1px solid #5e718d77;background:#ffffff0b;border-radius:5px;padding:2px 6px;font-size:10px;overflow:hidden}
+.movie-result b{font:900 16px/1 Impact,Arial,sans-serif;color:#e9c36d;min-width:20px}
+.movie-result img{width:27px;height:27px;object-fit:contain;flex:0 0 27px}
+.movie-result span{font-weight:900;color:#eef5fd;line-height:1.08}
+.movie-result i{font-style:normal;font-size:10px;letter-spacing:.045em;color:#7e93b4;font-weight:800}
+.movie-result.is-drawn{background:#8aafce22;border-color:#d4ae6477}
+.movie-bottom{text-align:center;color:#b7cce6;font-size:9px;letter-spacing:.1em;margin-top:7px;font-weight:900}
