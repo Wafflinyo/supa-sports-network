@@ -38,3 +38,12 @@ export function lotteryProgress(total, beginsAt, now) {
   }
   return {revealed:count,phase:'complete',secondsToNext:0,phaseElapsedMs:0,phaseDurationMs:0,ballNumber:count};
 }
+
+/** Local-only replay timeline. The caller passes elapsed milliseconds since
+ * pressing Replay; the official order, server clock, and stored results are
+ * never touched or randomized. */
+export function lotteryReplayProgress(total,elapsedMs) {
+  const REPLAY_BASE='2000-01-01T00:00:00.000Z';
+  const ms=Math.max(0,Number(elapsedMs)||0);
+  return lotteryProgress(total,REPLAY_BASE,Date.parse(REPLAY_BASE)+ms);
+}
