@@ -41,3 +41,16 @@
 .ssl-lottery-theater .ssl-ball-runway .ssl-feature-ball{animation:ssl-ball-land .55s cubic-bezier(.2,.9,.3,1.2) backwards}
 .ssl-lottery-theater .ssl-ball-runway .ssl-waiting-ball{animation:ssl-wait-pulse 1.8s ease-in-out infinite}
 @media(max-width:470px){.ssl-lottery-theater .ssl-ball-runway .lottery-ball{width:112px;height:112px}.ssl-lottery-theater .ssl-ball-runway .lottery-ball img{width:97px;height:97px}}
+
+/* Game-show music and genuine marble clinks use separate mixer channels. */
+.ssl-lottery-audio-panel{display:flex;flex-direction:column;align-items:stretch;gap:8px;width:min(100%,330px);padding:12px;border:1px solid #e2b65b66;background:#101e39d9;border-radius:10px}
+.ssl-lottery-audio-panel>.ssl-lottery-sound{width:100%;font-size:11px;min-height:38px}
+.ssl-lottery-audio-row{display:grid;grid-template-columns:33px 64px minmax(42px,1fr) 54px;gap:7px;align-items:center;min-width:0;color:#ffe3a6}
+.ssl-lottery-audio-row label{font-size:10px;font-weight:900;letter-spacing:.045em;color:#ffe1a0}
+.ssl-lottery-audio-row input[type=range]{width:100%;padding:0;border:0;accent-color:#f4ca6b;height:24px;cursor:pointer;min-width:0;background:transparent}
+.ssl-lottery-audio-row input:disabled{opacity:.46;cursor:not-allowed}
+.ssl-lottery-audio-row output{font-size:10px;color:#d2e0f8;min-width:0;font-variant-numeric:tabular-nums;text-align:right}
+.ssl-lottery-audio-row .ssl-audio-mute{width:32px;height:32px;padding:5px;background:#203956;border:1px solid #88a0bd75;color:#dce8ff;border-radius:6px;display:grid;place-items:center;cursor:pointer}
+.ssl-lottery-audio-row .ssl-audio-mute[aria-pressed=true]{background:#68313d;border-color:#dba8a8;color:#ffbec0}
+.ssl-lottery-audio-row .ssl-audio-mute:focus-visible,.ssl-lottery-audio-row input:focus-visible{outline:2px solid #ffe098;outline-offset:2px}
+@media(max-width:440px){.ssl-lottery-audio-panel{width:min(100%,320px)}.ssl-lottery-audio-row{grid-template-columns:32px 61px minmax(30px,1fr) 48px;gap:5px}}
