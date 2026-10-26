@@ -1,5 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Volume2, VolumeX} from 'lucide-react';
+import {Volume2, VolumeX, Music2} from 'lucide-react';
+import {LotteryAudio} from './lottery-audio.js';
 import {LOTTERY_ROLL_MS} from './lottery-timing.js';
 import './bingo-lottery.css';
 
@@ -10,68 +11,50 @@ const TWO_PI=2*Math.PI;
 
 function useBingoAudio() {
   const [enabled,setEnabled]=useState(false);
-  const audio=useRef(null), lastHit=useRef(0);
-  useEffect(()=>()=>{audio.current?.close?.().catch(()=>{});audio.current=null;},[]);
-  async function toggle() {
-    if(enabled) {setEnabled(false);return;}
+  const [musicMuted,setMusicMuted]=useState(false);
+  const [effectsMuted,setEffectsMuted]=useState(false);
+  const [musicVolume,setMusicVolume]=useState(44);
+  const [effectsVolume,setEffectsVolume]=useState(70);
+  const engine=useRef(null);
+  useEffect(()=>()=>{engine.current?.close();engine.current=null;},[]);
+  useEffect(()=>{
+    engine.current?.setVolumes({
+      music:musicVolume/100,
+      effects:effectsVolume/100,
+      musicMuted:musicMuted||!enabled,
+      effectsMuted:effectsMuted||!enabled,
+    });
+  },[musicVolume,effectsVolume,musicMuted,effectsMuted,enabled]);
+  async function toggle(){
+    if(enabled){
+      engine.current?.stopMusic();
+      setEnabled(false);
+      return;
+    }
     try {
-      const Engine=window.AudioContext||window.webkitAudioContext;
-      if(!Engine) return;
-      if(!audio.current) audio.current=new Engine();
-      await audio.current.resume();
+      if(!engine.current){
+        const Ctx=window.AudioContext||window.webkitAudioContext;
+        if(!Ctx)return;
+        const ctx=new Ctx();
+        engine.current=new LotteryAudio(ctx);
+      }
+      await engine.current.ctx.resume();
       setEnabled(true);
-    } catch {setEnabled(false);}
+      engine.current.startMusic();
+    }catch(error){console.warn('SSL lottery audio could not start',error);setEnabled(false);}
   }
-  function hit(strength=.5) {
-    if(!enabled||!audio.current||audio.current.state!=='running')return;
-    const ctx=audio.current,now=ctx.currentTime;
-    if(now-lastHit.current<.075) return;
-    lastHit.current=now;
-    const gain=ctx.createGain();
-    gain.gain.setValueAtTime(Math.min(.075,.014+strength*.04),now);
-    gain.gain.exponentialRampToValueAtTime(.0001,now+.075+strength*.035);
-    gain.connect(ctx.destination);
-    const osc=ctx.createOscillator();
-    osc.type='triangle';
-    osc.frequency.setValueAtTime(780+Math.random()*390,now);
-    osc.frequency.exponentialRampToValueAtTime(490+Math.random()*200,now+.065);
-    osc.connect(gain);osc.start(now);osc.stop(now+.12);
-    // A brief metallic high overtone makes the plastic/metal ball impact audible.
-    const high=ctx.createOscillator(),hg=ctx.createGain();
-    high.type='sine';high.frequency.value=1950+Math.random()*650;
-    hg.gain.setValueAtTime(.016*strength,now);
-    hg.gain.exponentialRampToValueAtTime(.0001,now+.035);
-    high.connect(hg);hg.connect(ctx.destination);high.start(now);high.stop(now+.05);
+  function hit(strength=.4){
+    if(enabled&&!effectsMuted)engine.current?.marbleClink(strength);
   }
-  function roll(elapsed=0) {
-    if(!enabled||!audio.current||audio.current.state!=='running')return;
-    const ctx=audio.current,now=ctx.currentTime,
-      seconds=Math.max(.12,(LOTTERY_ROLL_MS-elapsed)/1000);
-    const samples=Math.round(ctx.sampleRate*.24);
-    const buffer=ctx.createBuffer(1,samples,ctx.sampleRate);
-    const channel=buffer.getChannelData(0);
-    for(let i=0;i<samples;i++)channel[i]=(Math.random()*2-1)*(.5+.5*Math.sin(i*.09));
-    const source=ctx.createBufferSource();source.buffer=buffer;source.loop=true;
-    const filter=ctx.createBiquadFilter();
-    filter.type='lowpass';filter.frequency.setValueAtTime(580,now);
-    filter.frequency.linearRampToValueAtTime(1250,now+seconds*.65);
-    const gain=ctx.createGain();
-    gain.gain.setValueAtTime(.0001,now);
-    gain.gain.linearRampToValueAtTime(.04,now+Math.min(.18,seconds*.22));
-    gain.gain.setValueAtTime(.04,now+Math.max(.18,seconds*.45));
-    gain.gain.exponentialRampToValueAtTime(.0001,now+seconds);
-    source.connect(filter);filter.connect(gain);gain.connect(ctx.destination);
-    source.start(now);source.stop(now+seconds+.03);
-    // Small tick as the ball settles in the presentation holder.
-    const chime=ctx.createOscillator(),chimeGain=ctx.createGain();
-    chime.type='sine';chime.frequency.value=650;
-    chimeGain.gain.setValueAtTime(.0001,now+seconds*.86);
-    chimeGain.gain.linearRampToValueAtTime(.04,now+seconds*.91);
-    chimeGain.gain.exponentialRampToValueAtTime(.0001,now+seconds+.11);
-    chime.connect(chimeGain);chimeGain.connect(ctx.destination);
-    chime.start(now+seconds*.85);chime.stop(now+seconds+.13);
+  function roll(elapsed=0){
+    if(enabled&&!effectsMuted)engine.current?.rollingOnWood(elapsed,LOTTERY_ROLL_MS);
   }
-  return {enabled,toggle,hit,roll};
+  function stopMusic(){engine.current?.stopMusic();}
+  return {
+    enabled,toggle,hit,roll,stopMusic,
+    musicMuted,setMusicMuted,effectsMuted,setEffectsMuted,
+    musicVolume,setMusicVolume,effectsVolume,setEffectsVolume,
+  };
 }
 
 function paintCage(ctx,balls,spin,images,isMixing) {
@@ -246,14 +229,45 @@ export function BingoLottery({teams=[],order=[],lottery,logoFor}) {
     if(marker===prevPhase.current)return;
     prevPhase.current=marker;
     if(phase==='rolling')soundRef.current.roll(lottery.phaseElapsedMs);
+    if(phase==='complete')soundRef.current.stopMusic();
   },[phase,reveal]);
   return <div className="ssl-lottery-theater">
     <div className="ssl-cage-side">
       <div className="ssl-cage-caption"><strong>SSL LOTTERY CAGE</strong><span>{left.length} BALLS INSIDE</span></div>
       <BingoCage teams={left} logos={logos} mixing={mixing} reducedMotion={reducedMotion} onImpact={v=>soundRef.current.hit(v)}/>
-      <button type="button" className="ssl-lottery-sound" aria-pressed={audio.enabled} onClick={audio.toggle}>
-        {audio.enabled?<><Volume2 size={17}/> SOUND ON · MUTE</>:<><VolumeX size={17}/> ENABLE BALL SOUNDS</>}
-      </button>
+      <div className="ssl-lottery-audio-panel" aria-label="Lottery music and sound volume controls">
+        <button type="button" className="ssl-lottery-sound" aria-pressed={audio.enabled} onClick={audio.toggle}>
+          {audio.enabled?<><Volume2 size={16}/> AUDIO ENABLED · TURN OFF</>:<><VolumeX size={16}/> ENABLE LOTTERY AUDIO</>}
+        </button>
+        <div className="ssl-lottery-audio-row">
+          <button type="button" className="ssl-audio-mute" aria-pressed={audio.musicMuted}
+            aria-label={audio.musicMuted?'Unmute game-show music':'Mute game-show music'}
+            title={audio.musicMuted?'Unmute music':'Mute music'}
+            onClick={()=>audio.setMusicMuted(v=>!v)}>
+            {audio.musicMuted?<VolumeX size={18}/>:<Music2 size={18}/>}
+          </button>
+          <label htmlFor="ssl-lottery-music-vol">MUSIC</label>
+          <input id="ssl-lottery-music-vol" type="range" min="0" max="100" step="1"
+            disabled={!audio.enabled} value={audio.musicVolume}
+            aria-label="Game-show background music volume"
+            onChange={event=>audio.setMusicVolume(Number(event.target.value))}/>
+          <output htmlFor="ssl-lottery-music-vol">{audio.musicMuted?'MUTED':audio.musicVolume+'%'}</output>
+        </div>
+        <div className="ssl-lottery-audio-row">
+          <button type="button" className="ssl-audio-mute" aria-pressed={audio.effectsMuted}
+            aria-label={audio.effectsMuted?'Unmute ball sound effects':'Mute ball sound effects'}
+            title={audio.effectsMuted?'Unmute effects':'Mute effects'}
+            onClick={()=>audio.setEffectsMuted(v=>!v)}>
+            {audio.effectsMuted?<VolumeX size={18}/>:<Volume2 size={18}/>}
+          </button>
+          <label htmlFor="ssl-lottery-effects-vol">EFFECTS</label>
+          <input id="ssl-lottery-effects-vol" type="range" min="0" max="100" step="1"
+            disabled={!audio.enabled} value={audio.effectsVolume}
+            aria-label="Marble collision and rolling sound effects volume"
+            onChange={event=>audio.setEffectsVolume(Number(event.target.value))}/>
+          <output htmlFor="ssl-lottery-effects-vol">{audio.effectsMuted?'MUTED':audio.effectsVolume+'%'}</output>
+        </div>
+      </div>
     </div>
     <div className="bingo-announcement ssl-bingo-stage">
       <span className="bingo-announcement-heading" aria-live="polite">
