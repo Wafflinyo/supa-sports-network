@@ -2,10 +2,10 @@
 // reopening never restarts a draw or changes the official server-picked order.
 // The first ball gets a longer opening mix. Every following ball waits for
 // the previous announcement to disappear before starting a new mix countdown.
-export const LOTTERY_INTRO_MS = 26000;
-export const LOTTERY_MIX_MS = 23000;
+export const LOTTERY_INTRO_MS = 10000;
+export const LOTTERY_MIX_MS = 10000;
 export const LOTTERY_ROLL_MS = 3200;
-export const LOTTERY_ANNOUNCEMENT_MS = 11000;
+export const LOTTERY_ANNOUNCEMENT_MS = 8000;
 // Kept as a compatibility export for older preview tooling.
 export const LOTTERY_DRAW_INTERVAL_MS = LOTTERY_MIX_MS + LOTTERY_ROLL_MS + LOTTERY_ANNOUNCEMENT_MS;
 export const lotteryDuration = total => {
