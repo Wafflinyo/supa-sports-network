@@ -1,7 +1,7 @@
 
 *{box-sizing:border-box}
 body{margin:0;color:#fff;background:#0b1930;font-family:Arial,Helvetica,sans-serif;overflow:hidden}
-.movie{width:1280px;height:800px;padding:13px 160px 8px;background:radial-gradient(ellipse at 50% 25%,#274363,#09172c 70%);overflow:hidden}
+.movie{width:1280px;height:860px;padding:13px 160px 8px;background:radial-gradient(ellipse at 50% 25%,#274363,#09172c 70%);overflow:hidden}
 .movie-header{height:103px;text-align:center}
 .movie-eyebrow{color:#f2d18f;font-size:11px;font-weight:900;letter-spacing:.19em}
 .movie h1{font:900 44px/1 Impact,'Arial Narrow',Arial,sans-serif;letter-spacing:.055em;margin:4px 0 2px;color:#fff}
