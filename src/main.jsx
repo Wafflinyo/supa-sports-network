@@ -235,7 +235,7 @@ function App() {
           <span className="eyebrow dark">FIRST STEP · TEAM IDENTITY</span>
           <h2>CREATE YOUR TEAM WHEN YOU'RE READY</h2>
           <p>Pick a Mario-universe home location, choose a conference, name your team, and upload your logo below. You don't have to finish right now! Come back at any time through <strong>GM Tools → Team Name, Home Location & Logo</strong>.</p>
-          <p><strong>Before we can set a draft day:</strong> all 12 GMs must have registered teams, including their names, home locations, conferences and logos. The commissioner can't open the draft-date poll until everyone is finished.</p>
+          <p><strong>Before we can set a draft day:</strong> all 12 GMs must have registered teams, including their names, home locations, conferences and logos. The commissioner can set the official date directly in Commissioner Tools once all twelve teams are ready.</p>
           <div className="gm-welcome-actions">
             <button className="red-btn" onClick={()=>{setGmToolsTab('Team Setup');setTeamSetupExpanded(true)}}>CREATE MY TEAM</button>
             <button className="outline-btn" onClick={()=>{setTeamSetupExpanded(false);go('Home')}}>SET UP LATER</button>
