@@ -205,7 +205,9 @@ function BingoCage({teams,logos,mixing,onImpact,reducedMotion}){
         spin+=dt*1.15;
       }
       paintCage(ctx,balls,spin,images,mixing);
-      raf=requestAnimationFrame(frame);
+      // Stop painting once the drum is stationary; long drafts can stay open
+      // for hours without keeping an unnecessary animation loop running.
+      if(mixing&&!reducedMotion)raf=requestAnimationFrame(frame);
     }
     raf=requestAnimationFrame(frame);
     return ()=>cancelAnimationFrame(raf);
