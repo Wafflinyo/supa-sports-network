@@ -5,6 +5,7 @@ import {aggregate,fantasyGames} from './season-data.js'
 import {heatingUpForSeason} from './heating-up.js'
 import {HeatingUpProvider,HeatFlame} from './HeatingUpBadge.jsx'
 import {leagueNews} from './league-news.js'
+import GmAchievements from './GmAchievements.jsx'
 import PlayerData from './PlayerData.jsx'
 import {PlayerPriority} from './PlayerPriority.jsx'
 import {PlayerPortrait} from './PlayerPortrait.jsx'
@@ -229,7 +230,7 @@ function App() {
     <nav id="league-main-navigation" className={`nav ${menu ? 'open' : ''}`} aria-label="Main navigation"><div className="container nav-inner">{visibleNav.map(n => <button key={n} className={page === n ? 'active' : ''} aria-current={page === n ? 'page' : undefined} onClick={() => go(n)}>{n}</button>)}</div></nav>
     <main className="container page-content"><SeasonPrompts league={seasonLeague} go={go}/>
       {gmNeedsTeam && page !== 'GM Tools' && <aside className="season-prompt" aria-label="Team registration reminder"><strong>YOUR TEAM STILL NEEDS TO BE CREATED</strong><p>You can explore the site, but all 12 teams need a name, home location, logo and conference before the league can schedule its draft. Go to <strong>GM Tools → Team Name, Home Location & Logo</strong> whenever you're ready.</p><button className="red-btn" onClick={()=>{setTeamSetupExpanded(true);setGmToolsTab('Team Setup');go('GM Tools')}}>FINISH TEAM SETUP</button></aside>}{seasonPages.includes(page)&&canViewLeaguePage(page, !!session, access.role)&&(page==='Teams'&&!seasonLeague.season?<OfficialTeams teams={officialTeams} loading={teamsLoading} message={teamsMessage} supabase={supabase}/>:<SeasonPage page={page} league={seasonLeague}/>)}
-      {page === 'Commissioner Tools' && isCommissioner && <><div className="page-heading"><span className="eyebrow dark">LEAGUE ADMINISTRATION</span><h1>COMMISSIONER TOOLS</h1></div><div className="subnav">{['Season Management','Teams, Locations & Access'].map(t=><button key={t} className={commissionerTab===t?'active':''} onClick={()=>setCommissionerTab(t)}>{t}</button>)}</div>{commissionerTab==='Season Management'?<SeasonWorkspace league={seasonLeague} registeredTeams={officialTeams}/>:<CommissionerWorkspace supabase={supabase} access={access} teams={officialTeams} onChange={loadOfficialTeams} onAccess={setAccess}/>}</>}
+      {page === 'Commissioner Tools' && isCommissioner && <><div className="page-heading"><span className="eyebrow dark">LEAGUE ADMINISTRATION</span><h1>COMMISSIONER TOOLS</h1></div><div className="subnav">{['Season Management','Teams, Locations & Access','Achievements'].map(t=><button key={t} className={commissionerTab===t?'active':''} onClick={()=>setCommissionerTab(t)}>{t}</button>)}</div>{commissionerTab==='Season Management'?<SeasonWorkspace league={seasonLeague} registeredTeams={officialTeams}/>:commissionerTab==='Achievements'?<GmAchievements commissioner seasons={seasonLeague.seasons} teams={officialTeams}/>:<CommissionerWorkspace supabase={supabase} access={access} teams={officialTeams} onChange={loadOfficialTeams} onAccess={setAccess}/>}</>}
       {page==='GM Tools' && isGM && <><div className="page-heading"><span className="eyebrow dark">YOUR CLUB</span><h1>GM TOOLS</h1></div>
         {gmNeedsTeam && <section className="panel gm-welcome-card" aria-label="Create your SSL team">
           <span className="eyebrow dark">FIRST STEP · TEAM IDENTITY</span>
@@ -241,9 +242,9 @@ function App() {
             <button className="outline-btn" onClick={()=>{setTeamSetupExpanded(false);go('Home')}}>SET UP LATER</button>
           </div>
         </section>}
-        <div className="subnav" role="group" aria-label="GM Tools sections">{['Roster','Team Setup','Extensions'].map(section=><button key={section} type="button" className={gmToolsTab===section?'active':''} aria-pressed={gmToolsTab===section} onClick={()=>setGmToolsTab(section)}>{section}</button>)}</div>
+        <div className="subnav" role="group" aria-label="GM Tools sections">{['Roster','Team Setup','Extensions','Achievements'].map(section=><button key={section} type="button" className={gmToolsTab===section?'active':''} aria-pressed={gmToolsTab===section} onClick={()=>setGmToolsTab(section)}>{section}</button>)}</div>
         {gmToolsTab==='Team Setup'&&<details id="gm-team-identity" className="panel season-box" open={teamSetupExpanded} onToggle={e=>setTeamSetupExpanded(e.currentTarget.open)}><summary>TEAM NAME, HOME LOCATION & LOGO</summary><TeamSetup key={access.slot} supabase={supabase} access={access} teams={officialTeams} onChange={loadOfficialTeams} onAccess={setAccess}/></details>}
-        {gmToolsTab!=='Team Setup'&&<SeasonTeamTools league={seasonLeague} section={gmToolsTab}/>}
+        {gmToolsTab==='Achievements'?<GmAchievements seasons={seasonLeague.seasons} teams={officialTeams} slot={access.slot}/>:gmToolsTab!=='Team Setup'&&<SeasonTeamTools league={seasonLeague} section={gmToolsTab}/>}
         </>}
       {page === 'Home' && <><SeasonHome league={seasonLeague} go={go}/>
         <div className="home-grid"><div className="hero"><div className="hero-content"><span className="eyebrow">WELCOME TO THE LEAGUE</span><h1>THE GAME<br/><span>STARTS HERE.</span></h1><p>Follow every game, explore the player pool, and manage your fantasy league in one place.</p><button className="yellow-btn" onClick={() => go('Player Stats')}>EXPLORE PLAYERS <span>›</span></button></div><div className="hero-number">01</div></div>

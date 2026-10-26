@@ -1,0 +1,47 @@
+.achievement-section{display:grid;gap:20px;min-width:0;margin:10px 0 30px;color:#172543}
+.achievement-hero{background:radial-gradient(circle at 83% 0%,rgba(229,151,58,.35),transparent 34%),linear-gradient(132deg,#071c43 0%,#113e77 65%,#243969 100%);border:2px solid #d3a347;color:#fff;border-radius:17px;padding:27px 30px;display:flex;align-items:center;justify-content:space-between;gap:22px;box-shadow:0 14px 35px rgba(15,35,70,.14)}
+.achievement-kicker{font-size:11px;font-weight:850;letter-spacing:.17em;color:#ffd57d}
+.achievement-hero h2{font-size:clamp(26px,3.2vw,42px);line-height:1.05;letter-spacing:.012em;margin:8px 0 10px;font-weight:1000;color:#fff}
+.achievement-hero p{max-width:600px;font-size:14px;line-height:1.55;margin:0;color:#e9effb}
+.achievement-owner{margin-top:16px;font-size:11px;color:#b7ceeb;letter-spacing:.12em}
+.achievement-owner strong{color:#fff;font-size:13px;letter-spacing:normal}
+.achievement-progress{flex:0 0 180px;text-align:center;padding:13px 13px 15px;border:1px solid rgba(255,255,255,.3);background:rgba(0,0,0,.18);border-radius:14px}
+.achievement-progress strong{font-size:48px;color:#ffde83;display:block;line-height:1.2;font-variant-numeric:tabular-nums}
+.achievement-progress strong span{font-size:23px;color:#fff}
+.achievement-progress small{display:block;font-weight:800;font-size:10px;letter-spacing:.1em;color:#e8eefe}
+.achievement-track{height:7px;margin-top:10px;border-radius:8px;background:#667897;overflow:hidden}
+.achievement-track i{height:100%;display:block;border-radius:8px;background:linear-gradient(90deg,#f4b854,#fff0ac);transition:width .2s}
+.achievement-team-panel{background:#fff;border:1px solid #d5dde9;border-radius:14px;padding:20px}
+.achievement-team-panel h3{font-size:16px;font-weight:1000;letter-spacing:.08em;margin:0 0 4px;color:#12284f}
+.achievement-team-panel p{font-size:13px;margin:0 0 15px;color:#52627f}
+.achievement-team-picker{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:9px}
+.achievement-team-picker button{display:flex;align-items:center;justify-content:space-between;text-align:left;gap:7px;background:#f6f8fc;border:1px solid #d2dbe8;border-radius:9px;padding:10px 12px;color:#243957;font-size:12px;font-weight:800;cursor:pointer}
+.achievement-team-picker button strong{color:#8e5c21;white-space:nowrap}
+.achievement-team-picker button.active{background:#123b71;color:#fff;border-color:#d8a94c}
+.achievement-team-picker button.active strong{color:#ffe3a3}
+.achievement-toolbar{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}
+.achievement-category-tabs{display:flex;flex-wrap:wrap;gap:5px}
+.achievement-category-tabs button{background:#fff;border:1px solid #ced7e5;color:#384b68;border-radius:999px;font-size:12px;font-weight:900;padding:8px 13px;cursor:pointer}
+.achievement-category-tabs button.active{color:#fff;background:#103d7b;border-color:#103d7b}
+.achievement-selectors{display:flex;flex-wrap:wrap;gap:9px}
+.achievement-selectors label{font-size:11px;font-weight:900;color:#53637c;text-transform:uppercase;display:flex;gap:7px;align-items:center}
+.achievement-selectors select{border:1px solid #cbd5e2;background:#fff;border-radius:7px;font-size:12px;color:#273b57;padding:8px}
+.achievement-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px}
+.achievement-card{background:#fff;border:1px solid #d6dfea;border-radius:12px;padding:14px 11px 15px;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;min-height:272px;box-shadow:0 3px 10px rgba(24,54,91,.045)}
+.achievement-card.earned{border-color:#e4c17a;background:linear-gradient(#fffdfa,#fff)}
+.achievement-card.blooper.earned{border-color:#bf7c85}
+.achievement-insignia{width:107px;height:123px;max-width:100%;display:block;margin:0 auto 9px;flex-shrink:0;filter:drop-shadow(0 4px 3px rgba(31,44,63,.16))}
+.achievement-insignia.is-locked{filter:grayscale(1) saturate(0) brightness(.82);opacity:.63}
+.achievement-card.locked{background:#f6f7f9}
+.achievement-meta{display:flex;flex-direction:column;align-items:center;flex:1;width:100%}
+.achievement-type{font-size:9px;font-weight:1000;letter-spacing:.16em;color:#8c9bae}
+.achievement-card.earned .achievement-type{color:#ab6a24}
+.achievement-meta h3{font-size:13px;line-height:1.25;font-weight:950;color:#1a3157;margin:6px 0}
+.achievement-meta p{font-size:11px;line-height:1.4;color:#5d6c83;margin:0 0 11px}
+.achievement-status{margin-top:auto;background:#e2e5ea;color:#667384;font-size:10px;font-weight:1000;letter-spacing:.08em;border-radius:30px;padding:5px 9px}
+.achievement-status.won{background:#d7f0dc;color:#176c3a}
+.achievement-earned-line{color:#7b6250;font-size:10px;margin-top:7px;line-height:1.35}
+.achievement-footnote{font-size:12px;color:#65738a;line-height:1.55;margin:0}
+.achievement-empty{color:#596d8a;font-size:14px;text-align:center;padding:30px;background:#f8fafc;border-radius:12px}
+@media(max-width:640px){.achievement-hero{padding:19px 17px;align-items:stretch;flex-direction:column}.achievement-progress{flex-basis:auto;width:100%;max-width:240px}.achievement-gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.achievement-card{padding:11px 7px 13px;min-height:256px}.achievement-insignia{width:91px;height:110px}.achievement-meta h3{font-size:12px}.achievement-meta p{font-size:10px}.achievement-team-picker{grid-template-columns:repeat(2,minmax(0,1fr))}.achievement-team-picker button{font-size:11px}.achievement-toolbar{align-items:flex-start}}
+@media(max-width:360px){.achievement-gallery{grid-template-columns:1fr 1fr}.achievement-category-tabs button{font-size:11px;padding:7px 10px}}
