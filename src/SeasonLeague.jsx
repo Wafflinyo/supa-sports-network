@@ -946,7 +946,7 @@ function LineupEditor({ league: l, team, game, onDone }) {
     >
       <h3>{game ? "GAME LINEUP" : "DEFAULT LINEUP"}</h3>
       <p>Rows are the batting order. Assign every fielding position once.</p>
-      <p className="priority-lineup-help"><strong>Pitcher change priority:</strong> P1P captains first, P2P (7+ pitching) next, otherwise random. This is an SSL planning guide; this website does not change Dolphin AI.</p>
+      <p className="priority-lineup-help"><strong>Pitcher change priority:</strong> P1P captains first, eligible P2P pitchers next, otherwise random. This is an SSL planning guide; this website does not change Dolphin AI.</p>
       {slots.map((x, i) => (
         <div className="lineup-row" key={i}>
           <b>{i + 1}</b>
