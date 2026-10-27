@@ -745,3 +745,15 @@ details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
   .ssl-draft-room-gateway{padding:20px 17px;gap:15px}
   .ssl-draft-clock-section{flex:1 1 100%;width:100%;padding:13px}
 }
+
+
+/* Five-minute lottery alert also lives in the entry lobby; nobody has to
+   enter early just to see that the official show is about to begin. */
+.ssl-lottery-lobby-alert{display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center;
+ background:linear-gradient(140deg,#5b1b31,#832b3c);border:1px solid #ffe0a1;border-radius:8px;
+ box-shadow:0 0 0 3px #ddb66730;padding:12px 11px;width:100%}
+.ssl-lottery-lobby-alert strong{font-size:12px;color:#fff4d3;letter-spacing:.08em;font-weight:950}
+.ssl-lottery-lobby-alert span{font:900 clamp(18px,2.9vw,28px)/1.1 'Barlow Condensed',Impact,sans-serif;
+ color:#fff;letter-spacing:.055em;font-variant-numeric:tabular-nums}
+.ssl-lottery-lobby-alert small{font-size:10px;color:#f5e7d4;line-height:1.4;font-weight:800}
+.ssl-lottery-lobby-date{font-size:10px;font-weight:900;letter-spacing:.05em;color:#e9c980;line-height:1.5}
