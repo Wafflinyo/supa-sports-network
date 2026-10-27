@@ -110,7 +110,12 @@ export function DraftPlayers({league:l}) {
     </div>
     <dialog className="draft-player-dialog" ref={dialog} aria-label={selected?`${selected.name} draft profile`:'Draft player profile'} onCancel={e=>{e.preventDefault();close();}} onClick={e=>{if(e.target===dialog.current)close();}}>
       {selected&&<div className="draft-dialog-content">
-        <div className="draft-dialog-actions"><button type="button" className="outline-btn" onClick={close} autoFocus>CLOSE PLAYER</button><button type="button" className="red-btn" disabled={!canPick||l.busy||mustStage||ownership.has(selected.id)} onClick={async()=>{if(canPick&&!ownership.has(selected.id)&&await l.act('pick',{player:selected.id}))close();}}>DRAFT {selected.name.toUpperCase()}</button></div>
+        <div className="draft-dialog-actions"><button type="button" className="outline-btn" onClick={close} autoFocus>CLOSE PLAYER</button><button type="button" className="red-btn" disabled={!canPick||l.busy||mustStage||ownership.has(selected.id)} onClick={async()=>{
+          if(!canPick||l.busy||mustStage||ownership.has(selected.id))return;
+          const confirmed=window.confirm('Draft '+selected.name+' for '+(team?.name||'your team')+'? This uses your current draft pick.');
+          if(!confirmed)return;
+          if(await l.act('pick',{player:selected.id}))close();
+        }}>DRAFT {selected.name.toUpperCase()}</button></div>
         <p role="status">{ownership.has(selected.id)?`Already drafted · ${ownership.get(selected.id)}`:s.paused?'Draft paused':mustStage?'Your final remaining turn must be a Stadium Pick.':canPick?`Select for ${team?.name}. This submits the pick.`:s.status==='drafting'?`Waiting for ${team?.name||'the next team'} to pick.`:'Scouting view · drafting is not active.'}</p>
         <PlayerDataDetails player={selected}/>
       </div>}
