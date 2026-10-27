@@ -1,5 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import './bingo-lottery.css';
+import {lotteryCountdownClock} from './lottery-timing.js';
 
 // The official draw order remains server-controlled. This visual simulation
 // affects only presentation, never picks or randomization.
@@ -233,6 +234,45 @@ function MachineArtwork(){
     <path d="M20 18H139M820 18H940" stroke="#b58f56" strokeWidth="3" strokeOpacity=".6"/>
   </svg>;
 }
+function LotteryCurtain({lottery}) {
+  const phase=lottery.phase;
+  const closed=phase==='waiting'||phase==='countdown';
+  const opening=phase==='curtain-opening';
+  const final=phase==='final-countdown';
+  const syncing=phase==='awaiting-order';
+  if(!closed&&!opening&&!final&&!syncing)return null;
+  const countdown=lotteryCountdownClock(lottery.secondsToNext);
+  return <div className={'ssl-lottery-ceremony ssl-lottery-ceremony-'+phase}
+    aria-label={closed?'Lottery starting soon':final?'Lottery starting in '+lottery.secondsToNext+' seconds':'Opening the official lottery show'}>
+    {(closed||opening)&&<>
+      <div className="ssl-lottery-curtain-panel ssl-lottery-curtain-left"
+        style={opening?{animationDelay:-lottery.phaseElapsedMs+'ms'}:undefined} aria-hidden="true"/>
+      <div className="ssl-lottery-curtain-panel ssl-lottery-curtain-right"
+        style={opening?{animationDelay:-lottery.phaseElapsedMs+'ms'}:undefined} aria-hidden="true"/>
+      <div className="ssl-lottery-curtain-valance" aria-hidden="true"/>
+    </>}
+    {closed&&<div className="ssl-lottery-ceremony-center">
+      <span className="ssl-curtain-kicker">SUPA LEAGUE TV · OFFICIAL DRAFT</span>
+      <strong>LOTTERY STARTING SOON…</strong>
+      {phase==='countdown'?<>
+        <span className="ssl-curtain-clock-label">OFFICIAL LOTTERY BEGINS IN</span>
+        <span className="ssl-curtain-clock" role="timer" aria-label={countdown+' until lottery time'}>{countdown}</span>
+      </>:<p>The five-minute countdown will appear automatically before the scheduled draw.</p>}
+      <span className="ssl-curtain-stage-line">12 FRANCHISES · ONE OFFICIAL DRAW</span>
+    </div>}
+    {opening&&<div className="ssl-lottery-ceremony-message ssl-lottery-open-message">THE CURTAIN IS RISING</div>}
+    {final&&<div className="ssl-lottery-final-count" role="timer" aria-label={'Lottery begins in '+lottery.secondsToNext}>
+      <small>THE DRAW BEGINS IN</small>
+      <strong key={lottery.secondsToNext}>{lottery.secondsToNext}</strong>
+      <span>GET READY</span>
+    </div>}
+    {syncing&&<div className="ssl-lottery-awaiting-order" role="status">
+      <strong>CONFIRMING THE OFFICIAL DRAW</strong>
+      <span>The synchronized order is being loaded from the league server.</span>
+    </div>}
+  </div>;
+}
+
 export function BingoLottery({teams=[],order=[],lottery,logoFor}){
   const [reducedMotion,setReducedMotion]=useState(false);
   useEffect(()=>{
@@ -257,13 +297,14 @@ export function BingoLottery({teams=[],order=[],lottery,logoFor}){
           {displayed&&selected&&<LogoBall key={reveal} logo={logos[selected.id]} number={reveal} rolling={phase==='rolling'} phaseElapsedMs={lottery.phaseElapsedMs}/>}
         </div>
         <div className="ssl-machine-counter">{remaining.length} BALLS IN CAGE</div>
+        <LotteryCurtain lottery={lottery}/>
       </div>
     </div>
     <div className="ssl-lottery-footer">
       <div className="ssl-lottery-phase">
-        <span className="ssl-lottery-kicker">{phase==='complete'?'DRAFT ORDER COMPLETE':phase==='rolling'?'BALL IN TRANSIT':phase==='announce'?'OFFICIAL FRANCHISE DRAW':mixing?'DRUM MIXING':'DRAFT LOTTERY'}</span>
-        <strong aria-live="polite">{phase==='complete'?'ALL 12 FRANCHISES DRAWN':phase==='announce'&&selected?'#'+reveal+' · '+selected.name:phase==='rolling'?'ROLLING DOWN TO THE PODIUM…':mixing?'WHO WILL BE DRAWN NEXT?':'STANDBY'}</strong>
-        <small>{phase==='rolling'?'Chute opened · ball moving downhill':phase==='announce'?'Next mixing cycle begins when this announcement clears':phase==='complete'?'The official order has been revealed':'Every ball has its own draw'}</small>
+        <span className="ssl-lottery-kicker">{phase==='complete'?'DRAFT ORDER COMPLETE':phase==='rolling'?'BALL IN TRANSIT':phase==='announce'?'OFFICIAL FRANCHISE DRAW':mixing?'DRUM MIXING':phase==='countdown'?'FIVE-MINUTE PRE-SHOW':phase==='curtain-opening'?'CURTAINS OPENING':phase==='final-countdown'?'OFFICIAL START COUNTDOWN':phase==='awaiting-order'?'SERVER SYNC':'DRAFT LOTTERY'}</span>
+        <strong aria-live="polite">{phase==='complete'?'ALL 12 FRANCHISES DRAWN':phase==='announce'&&selected?'#'+reveal+' · '+selected.name:phase==='rolling'?'ROLLING DOWN TO THE PODIUM…':mixing?'WHO WILL BE DRAWN NEXT?':phase==='countdown'?'THE LOTTERY STARTS IN '+lotteryCountdownClock(lottery.secondsToNext):phase==='curtain-opening'?'THE STAGE IS OPENING…':phase==='final-countdown'?'GET READY · '+lottery.secondsToNext:phase==='awaiting-order'?'AWAITING THE OFFICIAL DRAW':'THE LOTTERY STARTS SOON'}</strong>
+        <small>{phase==='rolling'?'Chute opened · ball moving downhill':phase==='announce'?'Next mixing cycle begins when this announcement clears':phase==='complete'?'The official order has been revealed':mixing?'Every ball has its own draw':'All viewers see the same start time · no draw result is revealed early'}</small>
       </div>
       {mixing&&<div className="ssl-lottery-timer"><span>NEXT DRAW IN</span><b>{lottery.secondsToNext}s</b></div>}
       {phase==='announce'&&<span className="ssl-lottery-revealed">{reveal} / {order.length} REVEALED</span>}

@@ -104,3 +104,68 @@
 @media(prefers-reduced-motion:reduce){
   .ssl-display-ball-rolling{animation:none!important}
 }
+
+/* Synchronized pre-show. Curtains hide the draw until the exact scheduled
+   lottery time, then part to reveal the existing machine. Purely visual:
+   order, teams and server draft clock remain authoritative. */
+.ssl-lottery-ceremony{position:absolute;inset:0;z-index:9;isolation:isolate;display:grid;place-items:center;overflow:hidden;pointer-events:none;color:#fff}
+.ssl-lottery-curtain-panel{position:absolute;top:0;bottom:0;width:50.7%;z-index:1;border-bottom:8px solid #cfa66a;
+  background:
+    repeating-linear-gradient(90deg,transparent 0 14px,#f5aaad1c 19px,#380d20a2 33px,transparent 45px,#310819ac 61px,transparent 70px),
+    linear-gradient(105deg,#5b1729,#a43544 24%,#691b2c 53%,#3d101e 80%,#701b2e);
+  box-shadow:inset -10px 0 30px #21061191,inset 0 5px 24px #fbe1bc2c}
+.ssl-lottery-curtain-left{left:0;border-right:4px solid #e6bf77}
+.ssl-lottery-curtain-right{right:0;border-left:4px solid #e6bf77;transform:scaleX(-1)}
+.ssl-lottery-curtain-valance{position:absolute;inset:0 0 auto;height:11%;z-index:2;border-bottom:4px solid #ffdd9d;
+  background:repeating-linear-gradient(90deg,#591427 0 30px,#9c3040 40px,#501121 60px,#a13846 74px);
+  box-shadow:0 12px 22px #270819ad}
+.ssl-lottery-ceremony-center{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;
+  padding:26px 28px;background:linear-gradient(130deg,#101d34e8,#101c2bdc);border:2px solid #ebc682;border-radius:16px;
+  max-width:81%;box-shadow:0 13px 42px #1a0613b7,0 0 0 5px #ffe1ab22}
+.ssl-curtain-kicker{font-size:clamp(9px,1.15vw,14px);font-weight:900;letter-spacing:.17em;color:#f1d49b}
+.ssl-lottery-ceremony-center>strong{font:900 clamp(20px,3.65vw,46px)/1.1 'Barlow Condensed',Impact,sans-serif;letter-spacing:.035em}
+.ssl-curtain-clock-label{font-size:clamp(9px,1vw,13px);color:#e3d4b9;letter-spacing:.13em;font-weight:800}
+.ssl-curtain-clock{font:900 clamp(35px,6.3vw,77px)/1 'Barlow Condensed',Impact,sans-serif;letter-spacing:.06em;color:#fff4ca;font-variant-numeric:tabular-nums;
+  text-shadow:0 3px 20px #f4b14e4c}
+.ssl-lottery-ceremony-center p{max-width:360px;font-size:clamp(10px,1.22vw,14px);color:#d9e0ed;line-height:1.5;margin:2px 0}
+.ssl-curtain-stage-line{font-size:clamp(9px,1vw,12px);color:#e2c483;font-weight:850;letter-spacing:.12em}
+.ssl-lottery-ceremony-curtain-opening .ssl-lottery-curtain-left{animation:ssl-curtain-open-left 2000ms cubic-bezier(.2,.7,.32,1) both}
+.ssl-lottery-ceremony-curtain-opening .ssl-lottery-curtain-right{animation:ssl-curtain-open-right 2000ms cubic-bezier(.2,.7,.32,1) both}
+.ssl-lottery-ceremony-curtain-opening .ssl-lottery-curtain-valance{animation:ssl-valance-lift 2000ms ease-in-out both}
+@keyframes ssl-curtain-open-left{to{transform:translateX(-103%)}}
+@keyframes ssl-curtain-open-right{from{transform:translateX(0) scaleX(-1)}to{transform:translateX(103%) scaleX(-1)}}
+@keyframes ssl-valance-lift{to{transform:translateY(-110%)}}
+.ssl-lottery-ceremony-message{position:relative;z-index:4;font:900 clamp(21px,3.5vw,41px) 'Barlow Condensed',Impact,sans-serif;letter-spacing:.09em;
+  text-shadow:0 3px 15px #050d20,0 0 12px #ffebc077;background:#14243bcb;border:1px solid #e8b96e;border-radius:9px;padding:10px 20px}
+.ssl-lottery-ceremony-final-countdown{background:#080f1f36}
+.ssl-lottery-final-count{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;z-index:4;
+  background:#0a1835dc;border:2px solid #f9d998;border-radius:16px;padding:14px 30px;box-shadow:0 9px 42px #060b1fcc}
+.ssl-lottery-final-count small{color:#f3deac;letter-spacing:.15em;font-size:clamp(10px,1.1vw,14px);font-weight:900}
+.ssl-lottery-final-count strong{font:900 clamp(72px,12vw,156px)/1 'Barlow Condensed',Impact,sans-serif;color:#fff5ce;
+  text-shadow:0 0 28px #e9af6d75;animation:ssl-number-pop .4s ease-out}
+.ssl-lottery-final-count span{letter-spacing:.22em;font-size:clamp(9px,1.1vw,13px);font-weight:850;color:#faf2e5}
+@keyframes ssl-number-pop{from{transform:scale(1.32);opacity:.4}to{transform:scale(1);opacity:1}}
+.ssl-lottery-awaiting-order{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;padding:22px;
+ background:#0c2241ef;border:2px solid #eac578;border-radius:10px;max-width:82%}
+.ssl-lottery-awaiting-order strong{font-weight:950;font-size:clamp(15px,2.3vw,25px);letter-spacing:.05em}
+.ssl-lottery-awaiting-order span{color:#cedbea;font-size:12px}
+@media(max-width:640px){
+  .ssl-machine-stage{min-width:0}
+  .ssl-machine-counter{padding:4px 5px;font-size:8px}
+  .ssl-lottery-ceremony-center{padding:12px;gap:6px;max-width:92%;border-radius:8px}
+  .ssl-lottery-ceremony-center>strong{font-size:clamp(14px,4.3vw,25px)}
+  .ssl-curtain-clock{font-size:clamp(28px,9vw,57px)}
+  .ssl-curtain-kicker,.ssl-curtain-clock-label,.ssl-curtain-stage-line{font-size:8px;letter-spacing:.065em}
+  .ssl-lottery-ceremony-center p{font-size:9px}
+  .ssl-lottery-curtain-valance{border-bottom-width:2px}
+  .ssl-lottery-final-count{padding:7px 20px;border-radius:8px}
+  .ssl-lottery-final-count strong{font-size:clamp(46px,13vw,85px)}
+  .ssl-lottery-final-count small,.ssl-lottery-final-count span{font-size:8px}
+  .ssl-lottery-ceremony-message{font-size:14px;padding:8px}
+}
+@media(prefers-reduced-motion:reduce){
+  .ssl-lottery-ceremony-curtain-opening .ssl-lottery-curtain-left{animation:none;transform:translateX(-103%)}
+  .ssl-lottery-ceremony-curtain-opening .ssl-lottery-curtain-right{animation:none;transform:translateX(103%) scaleX(-1)}
+  .ssl-lottery-ceremony-curtain-opening .ssl-lottery-curtain-valance{animation:none;transform:translateY(-110%)}
+  .ssl-lottery-final-count strong{animation:none}
+}
