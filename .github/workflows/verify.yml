@@ -29,6 +29,7 @@ jobs:
       - run: node tests/badge-art-design.mjs
       - run: node tests/roster-lineups.mjs
       - run: node tests/schedule-matchup-records.mjs
+      - run: node tests/stadium-lighting.mjs
       - run: node tests/public-tbd-schedule.mjs
       - run: npm run build
         env:
