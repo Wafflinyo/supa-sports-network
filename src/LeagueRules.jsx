@@ -35,6 +35,7 @@ const sections = [
     'After the draft the commissioner generates 132 home-and-away matchups across Weeks 1–22, with six games per week. The generator assigns opponents, home teams and week numbers, but DOES NOT choose game dates.',
     'The commissioner enters the actual date and time for each individual game in Schedule & Results. All 132 matchups can be made public immediately with dates marked TBD. The commissioner can enter or change game dates later; they update on the public site automatically. Week 1 begins on a Sunday in Eastern Time.',
     'The Schedule labels games In Conference Matchup when both teams belong to the same conference and Out of Conference Matchup when their conferences differ.',
+    'GMs choose the Day or Night version of each future HOME game in GM Tools → Home Games if their Stadium is Mario Stadium, Peach Ice Garden, DK Jungle, Wario City, Daisy Cruiser or Yoshi Park. Choices can be saved for any future scheduled week, even while dates are TBD. The public Schedule displays the chosen version but has no editing controls. Other Stadiums do not have a Day/Night selection. Choices lock when game results are recorded or the game is otherwise locked.',
     'Team Stats displays regular-season Home Record (wins–losses) and Away Record (wins–losses). Home and away records are cumulative team statistics, not per-game averages.',
   ]],
   ['Heating Up and hot streaks', [
