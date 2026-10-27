@@ -1,5 +1,5 @@
 import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
-import {lotteryProgress,lotteryReplayProgress,lotteryDuration} from './lottery-timing.js';
+import {lotteryProgress,lotteryReplayProgress,lotteryDuration,lotteryCountdownClock} from './lottery-timing.js';
 import {BingoLottery} from './BingoLottery.jsx';
 import {matchupDisplay} from './matchup-display.js';
 import {supportsStadiumVariant,matchupStadiumVariant} from './stadium-lighting.js';
@@ -603,6 +603,9 @@ function draftCountdown(startsAt,now){
 }
 function DraftRoomEntrance({season,now,open,entered,onEnter,onLeave}){
   const remaining=draftCountdown(season?.draftAt,now);
+  const lotteryStatus=lotteryProgress(season?.order?.length||0,season?.lotteryAt,now);
+  const lotterySoon=['countdown','curtain-opening','final-countdown'].includes(lotteryStatus.phase);
+  const lotteryDate=season?.lotteryAt;
   const hasDate=Boolean(season?.draftAt && remaining);
   const finished=Boolean(season && ['postdraft','regular','postseason','retention','offseason','archived'].includes(season.status));
   const started=hasDate&&remaining.remaining===0;
@@ -621,6 +624,17 @@ function DraftRoomEntrance({season,now,open,entered,onEnter,onLeave}){
           : 'The commissioner will set the official draft date and time in Commissioner Tools.'}</p>}
     </div>
     <div className="ssl-draft-clock-section">
+      {lotterySoon&&<div className="ssl-lottery-lobby-alert" role="status">
+        <strong>LOTTERY STARTING SOON!</strong>
+        <span>{lotteryStatus.phase==='countdown'
+          ? lotteryCountdownClock(lotteryStatus.secondsToNext)+' TO LOTTERY TIME'
+          :lotteryStatus.phase==='curtain-opening'?'CURTAINS OPENING…'
+            :'3–2–1 · LOTTERY ABOUT TO BEGIN'}</span>
+        {!entered&&<small>ENTER DRAFT ROOM TO WATCH THE LIVE SHOW</small>}
+      </div>}
+      {!lotterySoon&&lotteryDate&&!entered&&<span className="ssl-lottery-lobby-date">
+        LOTTERY SHOW · {time(lotteryDate)}
+      </span>}
       {hasDate&&remaining.remaining>0
         ? <><span className="ssl-draft-clock-caption">DRAFT BEGINS IN</span><strong className="ssl-draft-clock-count" role="timer">{remaining.display}</strong></>
         : <strong className="ssl-draft-clock-status">{finished?'DRAFT FINISHED':started?'DRAFT TIME':'AWAITING DATE'}</strong>}
@@ -639,6 +653,17 @@ function Draft({ league: l }) {
   // The official lottery is always derived from the shared server clock.
   // Arriving mid-draw joins the current ball, never starts a new simulation.
   const liveLottery = lotteryProgress(s?.order?.length || 0, s?.lotteryAt, l.now);
+  // The scheduled lottery draw is performed server-side at lotteryAt. During
+  // the opening ceremony, synchronize sooner than the normal 8-second poll
+  // so everyone gets the real persisted ball order before the cage mixes.
+  const needsDrawSync=Boolean(s?.id&&s?.lotteryAt&&!s?.order?.length&&
+    Date.parse(s.lotteryAt)-l.now<=6000&&Date.parse(s.lotteryAt)-l.now>=-30000);
+  useEffect(()=>{
+    if(!needsDrawSync)return;
+    l.refresh();
+    const timer=setInterval(()=>l.refresh(),2500);
+    return()=>clearInterval(timer);
+  },[needsDrawSync,s?.id]);
   const [localReplay,setLocalReplay] = useState(null);
   const [replayElapsed,setReplayElapsed] = useState(0);
   const lotteryDetailsRef = useRef(null);
@@ -661,6 +686,11 @@ function Draft({ league: l }) {
     : liveLottery;
   const canReplay = s?.order?.length > 0 && liveLottery.phase === 'complete';
   const replayFinished = isReplaying && replayElapsed >= replayDuration;
+  useEffect(()=>{
+    if(!enteredRoom||!lotteryDetailsRef.current)return;
+    if(['countdown','curtain-opening','final-countdown'].includes(liveLottery.phase))
+      lotteryDetailsRef.current.open=true;
+  },[enteredRoom,liveLottery.phase]);
   const beginReplay=()=>{
     if(!canReplay)return;
     if(lotteryDetailsRef.current)lotteryDetailsRef.current.open=true;
@@ -733,9 +763,9 @@ function Draft({ league: l }) {
         </p>
         {s.number===1&&<p className="ssl-lottery-fairness"><strong>Season 1: Equal odds for all 12 franchises.</strong> Every team begins with a 1-in-12 (8.3333%) chance of being drawn first. A drawn ball is removed, so each remaining team then has a 1-in-11 (9.0909%) chance for second. No franchise appears twice.</p>}
         {s.number>1 && <p>Returning-season lottery: 12th seed 55% · 11th 25% · 10th 15% · 9th 5% for first pick. Winners are removed before the next weighted draw. Seeds 8 through 1 receive picks 5 through 12, then the order snakes.</p>}
-        {s.order.length>0 && <div className="ssl-lottery-playback-controls" aria-label="Official lottery playback">
+        {Boolean(s.lotteryAt) && <div className="ssl-lottery-playback-controls" aria-label="Official lottery playback">
           {!canReplay
-            ? <div className="ssl-lottery-live-indicator"><span className="ssl-lottery-live-dot"/> LIVE OFFICIAL LOTTERY · Synchronized to the server clock. Joining now shows the current draw.</div>
+            ? <div className="ssl-lottery-live-indicator"><span className="ssl-lottery-live-dot"/> {['waiting','countdown'].includes(liveLottery.phase)?'OFFICIAL LOTTERY PRE-SHOW · CURTAINS CLOSED': 'LIVE OFFICIAL LOTTERY'} · Synchronized to the server clock.</div>
             : <>
               <div className="ssl-lottery-playback-description">
                 <strong>{isReplaying?'PERSONAL LOTTERY REPLAY':'OFFICIAL LOTTERY COMPLETE'}</strong>
@@ -753,7 +783,7 @@ function Draft({ league: l }) {
         </div>}
         <details ref={lotteryDetailsRef} className="draft-order-details" defaultOpen={Boolean(s.order.length)>0 || ['scheduled','drafting'].includes(s.status)}>
           <summary>DRAFT ORDER · {s.order.length || 12} TEAMS</summary>
-          {!s.order.length ? <p>Waiting for the scheduled lottery time.</p> : <>
+          {!s.lotteryAt||!s.teams?.length ? <p>Waiting for the commissioner to schedule the official lottery.</p> : <>
             <BingoLottery
               teams={s.teams}
               order={s.order}
