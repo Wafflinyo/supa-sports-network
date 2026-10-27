@@ -12,4 +12,14 @@ assert(draft.includes('className="draft-player-stats-identity player-data-name"'
 assert(styles.includes('draft-player-stats-card'),'Draft card styling should match stats row presentation');
 assert(portraits.includes('playerPortraitStyle(player,size)'),'both derive artwork from the same portrait mapping');
 assert(!draft.includes('<PlayerPortrait player={p} size={56}/>'));
-console.log('PASS: draft player cards use Player Stats portraits, sizes, priority badges, and identity styling');
+const confirmation=draft.indexOf("const confirmed=window.confirm('Draft '+selected.name");
+const submit=draft.indexOf("if(await l.act('pick',{player:selected.id}))close();");
+assert(confirmation>0,'player Draft button must request explicit confirmation');
+assert(draft.slice(confirmation,submit).includes('if(!confirmed)return;'),
+  'canceling the player confirmation must never submit a pick');
+assert(submit>confirmation,'submission must occur after confirmation and not on card tap');
+assert(draft.includes("if(!canPick||l.busy||mustStage||ownership.has(selected.id))return;"),
+  'guard paused, unavailable, duplicate and busy pick attempts');
+assert(draft.includes("window.confirm('Draft '+selectedStadium"),
+  'existing Stadium confirmation must remain available');
+console.log('PASS: Draft Player Stats portraits, priority badges and two-step confirmed player/stadium picks');
