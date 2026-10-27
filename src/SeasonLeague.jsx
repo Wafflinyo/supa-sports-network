@@ -1,5 +1,7 @@
 import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
 import {lotteryProgress,lotteryReplayProgress,lotteryDuration,lotteryCountdownClock} from './lottery-timing.js';
+import {orderedDraftPickTeams,lotteryOrderReady,teamsInLotteryOrder} from './draft-pick-stats-order.js';
+import DraftOrderBoard from './DraftOrderBoard.jsx';
 import {BingoLottery} from './BingoLottery.jsx';
 import {matchupDisplay} from './matchup-display.js';
 import {supportsStadiumVariant,matchupStadiumVariant} from './stadium-lighting.js';
@@ -701,6 +703,8 @@ function Draft({ league: l }) {
   const stopReplay=()=>{setLocalReplay(null);setReplayElapsed(0);};
   const reveal = lottery.revealed;
   const resultsShown = lottery.phase === 'rolling' ? Math.max(0,reveal-1) : reveal;
+  const drawRevealed=lotteryOrderReady(s,l.now); // Always use LIVE time; never the private replay time.
+  const pickTimeTeams=orderedDraftPickTeams(s,l.now);
   // The pick clock and order are server-owned; this listener only catches a
   // returning GM up immediately instead of waiting for the 8s regular poll.
   useEffect(()=>{
@@ -801,6 +805,7 @@ function Draft({ league: l }) {
             </div>
           </>}
         </details>
+        {drawRevealed&&<DraftOrderBoard league={l}/>}
         {s.status === "drafting" && (
           <>
             <div className="pick-clock" aria-live="off">
@@ -857,6 +862,9 @@ function Draft({ league: l }) {
       </Box>
       <DraftPickBoard season={s} />
       <Box title="PICK TIMES & RESULTS">
+        <p className="ssl-lottery-pick-times-note">{drawRevealed
+          ? 'Teams are ranked by their official Round 1 lottery positions. Pick counts and average times update live.'
+          : 'The team list will reorder to the official lottery result once the final ball has been announced.'}</p>
         <div className="season-table">
           <table>
             <thead>
@@ -867,11 +875,11 @@ function Draft({ league: l }) {
               </tr>
             </thead>
             <tbody>
-              {s.teams.map((t) => {
+              {pickTimeTeams.map(({team:t,lotteryPosition}) => {
                 const p = s.picks.filter((p) => p.team === t.id);
                 return (
                   <tr key={t.id}>
-                    <td>{t.name}</td>
+                    <td>{lotteryPosition&&<span className="ssl-lottery-ordinal" aria-label={'Lottery position '+lotteryPosition}>{lotteryPosition}</span>}{t.name}</td>
                     <td>{p.length}</td>
                     <td>
                       {p.length
