@@ -7,7 +7,9 @@ export function lotteryOrderReady(season,now){
   if(!Array.isArray(order)||order.length!==12||!Array.isArray(teams)||teams.length!==12)return false;
   const ids=new Set(teams.map(t=>String(t.id)));
   if(new Set(order.map(String)).size!==12||order.some(id=>!ids.has(String(id))))return false;
-  return lotteryProgress(order.length,season.lotteryAt,now).phase==='complete';
+  const timestamp=typeof now==='string'?Date.parse(now):Number(now);
+  if(!Number.isFinite(timestamp))return false;
+  return lotteryProgress(order.length,season.lotteryAt,timestamp).phase==='complete';
 }
 
 export function orderedDraftPickTeams(season,now){
