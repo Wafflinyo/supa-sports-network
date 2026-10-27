@@ -2,6 +2,7 @@ import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
 import {lotteryProgress,lotteryReplayProgress,lotteryDuration} from './lottery-timing.js';
 import {BingoLottery} from './BingoLottery.jsx';
 import {matchupDisplay} from './matchup-display.js';
+import {supportsStadiumVariant,matchupStadiumVariant} from './stadium-lighting.js';
 import DraftChat from './DraftChat.jsx';
 import {heatingUpForSeason} from './heating-up.js';
 import {effectiveGameLineup,gameLineupIsEditable,teamGameLineups,savedLineupLabel} from './roster-lineups.js';
@@ -1114,6 +1115,12 @@ function ScheduleMatchupHeading({season,game}){
     </h3>
     <p className="ssl-matchup-venue-line">
       <span className="ssl-matchup-stadium">{display.stadium || "HOME STADIUM TBD"}</span>
+      {supportsStadiumVariant(display.stadium)&&<>
+        <span className="ssl-matchup-separator" aria-hidden="true">•</span>
+        <span className={matchupStadiumVariant(season,game)?'ssl-matchup-variant':'ssl-matchup-variant unset'}>
+          {matchupStadiumVariant(season,game)?.toUpperCase()||'DAY/NIGHT TBD'}
+        </span>
+      </>}
       <span className="ssl-matchup-separator" aria-hidden="true">•</span>
       <time dateTime={game.startsAt||undefined} className="ssl-matchup-game-time">{game.startsAt?time(game.startsAt):"DATE & TIME TBD"}</time>
     </p>
