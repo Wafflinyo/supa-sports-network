@@ -26,3 +26,10 @@
 .my-draft-team-detail .player-data-details{margin-top:12px}
 .my-draft-team-empty{padding:30px 12px;background:#f4f7fd;border:1px dashed #cfdaea;border-radius:10px;text-align:center;color:#596d88}
 @media(max-width:520px){.my-draft-team-grid{grid-template-columns:1fr}.my-draft-team{padding:13px}.my-draft-team-header{align-items:start}}
+
+
+.my-draft-team-info .my-draft-team-trajectory{
+  display:inline-flex;align-self:flex-start;padding:2px 7px;border:1px solid #c5d6ed;
+  border-radius:4px;background:#eef4fb;color:#204774;
+  font-size:11px;font-weight:850;letter-spacing:.025em;
+}

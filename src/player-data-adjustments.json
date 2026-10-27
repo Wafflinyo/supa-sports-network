@@ -1,7 +1,7 @@
 {
-  "label": "SSL Oct 22 2026 Balance Patch 2",
+  "label": "SSL October 27, 2026 site scouting display update",
   "rules": {
-    "trajectorySource": "Exact current main.dol (Medium, High and Low are all valid)"
+    "trajectorySource": "111 non-Mii game records from October 22 audited main.dol; 70 named Miis displayed as Low based on Mii type references; no executable changed"
   },
   "players": {}
 }

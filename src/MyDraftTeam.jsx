@@ -2,6 +2,7 @@ import React,{useState,useEffect} from 'react';
 import pool from './players.json';
 import {PlayerPortrait} from './PlayerPortrait.jsx';
 import {PlayerPriority} from './PlayerPriority.jsx';
+import playerData from './player-data.json';
 import {PlayerDataDetails} from './PlayerData.jsx';
 import {DraftPickBadge} from './DraftPickBadge.jsx';
 import {teamDraftedPlayers} from './draft-pedigree.js';
@@ -35,7 +36,7 @@ export default function MyDraftTeam({league:l}) {
             aria-label={'View '+player.name+' profile'} onClick={()=>setOpenPlayer(openPlayer===playerId?null:playerId)}>
             <div className="my-draft-team-identity"><PlayerPortrait player={player} size={38}/>
               <div className="my-draft-team-info"><strong>{player.name}</strong>
-                <PlayerPriority player={player}/><span>{player.class}</span></div>
+                <PlayerPriority player={player}/><span>{player.class}</span><span className="my-draft-team-trajectory">TRAJ · {playerData.players[player.id]?.stats?.['hit trajectory']||'—'}</span></div>
             </div>
             <DraftPickBadge playerId={playerId} seasons={l.seasons} compact/>
 

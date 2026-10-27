@@ -28,7 +28,7 @@ const sections = [
   ['Rosters and lineups', [
     'Rosters must contain 11–14 players, except for the temporary post-trade shortfall described in Free Agency. Each lineup has nine starters, one at each defensive position, a complete batting order, and the remaining roster on the bench.',
     'Every team submits a default lineup after drafting. For each upcoming game, the GM may submit a new lineup or choose the default. The default is the fallback if no game-specific lineup is submitted.',
-    'Pitcher substitution priority guide: P1P (Priority 1 Pitcher) identifies the 12 captains; captains have first replacement priority when a pitcher tires. P2P (Priority 2 Pitcher) identifies non-captains with a displayed pitching rating of 7 or higher; they come next. When neither group is available, the replacement is random. These roster labels help GMs plan lineups; the website does not operate or alter Dolphin substitutions.',
+    'Pitcher substitution priority guide: P1P (Priority 1 Pitcher) identifies the 12 captains; captains have first replacement priority when a pitcher tires. P2P (Priority 2 Pitcher) identifies eligible non-captain priority pitchers; they come next. When neither group is available, the replacement is random. These roster labels help GMs plan lineups; the website does not operate or alter Dolphin substitutions.',
     'A lineup locks when the commissioner uploads that game’s results, even if those results remain hidden ahead of a premiere. After results are published, the team prepares for its next scheduled game. Player transactions prompt a review of the default lineup; picks-only trades do not.'
   ]],
   ['Schedule, matchup labels and team records', [
