@@ -1,0 +1,36 @@
+.gm-stadium-workspace{max-width:1120px;margin:0 auto 22px}
+.gm-stadium-workspace-heading>span{display:block;color:#c13738;letter-spacing:.15em;font-size:11px;font-weight:900}
+.gm-stadium-workspace-heading h2{margin:8px 0;font-size:clamp(24px,4vw,33px);color:#142f5d;font-weight:900}
+.gm-stadium-workspace-heading>p{font-size:14px;line-height:1.6;color:#5a6c85;max-width:850px}
+.gm-stadium-home{display:flex;gap:8px;align-items:center;color:#254f82!important}
+.gm-stadium-summary{display:flex;align-items:center;flex-wrap:wrap;gap:13px;padding:13px 18px;background:#eef3fd;border-left:4px solid #17417c;margin:17px 0;border-radius:7px}
+.gm-stadium-summary strong{font-size:23px;color:#153b72}
+.gm-stadium-summary span{color:#4d617f;font-size:12px;flex:1}
+.gm-stadium-summary b{font-size:11px;background:#fff0d2;border-radius:5px;color:#84561a;padding:6px 8px}
+.gm-stadium-games{display:grid;gap:14px}
+.gm-stadium-game{border:1px solid #d8deea;background:#fff;border-radius:12px;padding:18px;box-shadow:0 3px 14px #132e5710}
+.gm-stadium-game-top{display:flex;align-items:start;justify-content:space-between;gap:12px}
+.gm-stadium-game-top>div:first-child{min-width:0}
+.gm-stadium-game-top small{display:block;color:#ba3940;letter-spacing:.095em;font-weight:900;font-size:11px}
+.gm-stadium-game h3{font-size:clamp(16px,2.4vw,19px);line-height:1.4;color:#173967;margin:7px 0}
+.gm-stadium-at{color:#c43d41;padding:0 4px}
+.gm-stadium-game-top p{margin:0;display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:12px;color:#66758e}
+.gm-stadium-current{flex:0 0 auto;max-width:170px;text-align:right}
+.gm-stadium-current span{font-size:10px;letter-spacing:.035em;font-weight:850;display:inline-flex;align-items:center;gap:5px;padding:7px 9px;border-radius:5px}
+.gm-stadium-saved{color:#116a46;background:#e7f8ee}
+.gm-stadium-unselected{color:#925b1d;background:#fff1d9}
+.gm-stadium-fixed{color:#596b84;background:#edf2f8}
+.gm-stadium-controls{display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid #e2e7f0;padding-top:15px;margin-top:15px;flex-wrap:wrap}
+.gm-stadium-choices{display:flex;gap:8px}
+.gm-stadium-choices button{display:flex;align-items:center;gap:8px;padding:11px 18px;border:2px solid #d3dcea;background:#f8faff;border-radius:8px;font-size:13px;font-weight:900;color:#3a5579;cursor:pointer}
+.gm-stadium-choices button.selected{background:#113e77;border-color:#113e77;color:#fff;box-shadow:0 2px 0 #e3be70}
+.gm-stadium-choices button:disabled{opacity:.55;cursor:not-allowed}
+.gm-stadium-controls>.red-btn{min-height:44px}
+.gm-stadium-notice{background:#e8faed;padding:9px 11px;color:#167342;border-radius:7px;font-size:12px;font-weight:700}
+.gm-stadium-error{background:#fff0ed;padding:9px 11px;color:#a42d35;border-radius:7px;font-size:12px}
+.gm-stadium-readonly{display:flex;gap:6px;align-items:center;font-size:12px;color:#68758c;margin:13px 0 0}
+.gm-stadium-help{font-size:12px;line-height:1.6;color:#6d7b90;margin:20px 0 0}
+.gm-stadium-empty{padding:34px;background:#f5f7fc;text-align:center;color:#576b86;border-radius:10px}
+.ssl-matchup-variant{font-size:11px;font-weight:900;color:#194f7c;background:#ebf4ff;border-radius:5px;padding:3px 6px;white-space:nowrap}
+.ssl-matchup-variant.unset{color:#876323;background:#fff2d6}
+@media(max-width:650px){.gm-stadium-game{padding:12px}.gm-stadium-game-top{flex-direction:column}.gm-stadium-current{max-width:100%;text-align:left}.gm-stadium-choices,.gm-stadium-choices button{flex:1;justify-content:center}.gm-stadium-controls>.red-btn{width:100%}}
