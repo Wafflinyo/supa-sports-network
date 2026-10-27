@@ -1009,7 +1009,7 @@ export function RosterManager({ league: l }) {
         {roster.length<11?<p><strong>Draft or acquire at least 11 players before saving a default lineup.</strong></p>:<>
           {hasDefault&&!editDefault&&<div className="roster-lineup-summary">
             <h3>CURRENT DEFAULT BATTING ORDER</h3>
-            {defaultLineup.starters.map((p,i)=><p key={p.player}><strong>{i+1}.</strong> <Player id={p.player}/> · {p.position}</p>)}
+            {defaultLineup.starters.map((p,i)=><p key={p.player}><strong>{i+1}.</strong> <Player id={p.player} seasons={l.seasons}/> · {p.position}</p>)}
             <p><strong>Bench:</strong> {defaultLineup.bench.map(name).join(' · ')||'None'}</p>
           </div>}
           {!canEditDefault?<p>Default-lineup editing opens after the draft and closes during the offseason.</p>:<>
@@ -2034,7 +2034,7 @@ function FreeAgency({ league: l }) {
               <summary>YOUR ROSTER · DROP PLAYERS</summary>
               {rosterOf(s, team).map((id) => (
                 <div className="roster-line" key={id}>
-                  <Player id={id} />
+                  <Player id={id} seasons={l.seasons} />
                   <button
                     className="outline-btn"
                     disabled={l.busy || rosterOf(s, team).length <= 11}
@@ -2107,7 +2107,7 @@ function FreeAgency({ league: l }) {
             )
             .map((p) => (
               <div key={p.id}>
-                <Player id={p.id} />
+                <Player id={p.id} seasons={l.seasons} />
                 <span>{p.class}</span>
                 {can && (
                   <button

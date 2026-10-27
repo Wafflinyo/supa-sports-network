@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {originalPlayerDraft,teamDraftedPlayers,sslCareerTenure} from '../src/draft-pedigree.js';
+import {originalPlayerDraft,teamDraftedPlayers,sslCareerTenure,isUndraftedSigning} from '../src/draft-pedigree.js';
 
 const player1=1,player2=2;
 const season1={
@@ -19,6 +19,25 @@ assert.deepEqual(originalPlayerDraft(1,[season1]),
 assert.deepEqual(originalPlayerDraft(2,[season1]),
  {season:1,round:3,number:25,team:'knights',supplemental:true});
 assert.equal(originalPlayerDraft(99,[season1]),null,'free agents have no invented pick');
+assert.equal(isUndraftedSigning(99,[season1]),false,
+  'an untouched AVAILABLE free agent is not yet a signed UNDRAFTED player');
+assert.equal(isUndraftedSigning(1,[season1]),false,
+  'an officially drafted roster player must retain Round and Pick #');
+const signedSeason={
+ id:'signed',number:1,status:'regular',picks:[...season1.picks],
+ rosters:{knights:[1,99,100],dedennes:[]},games:[]
+};
+assert.equal(isUndraftedSigning(99,[signedSeason]),true,
+  'a free agent signed by a franchise is labeled UNDRAFTED');
+assert.equal(isUndraftedSigning(100,[signedSeason]),true,
+  'random-fill additions without picks are also undrafted');
+assert.equal(isUndraftedSigning(1,[signedSeason]),false,
+  'drafted players never receive UNDRAFTED');
+assert.equal(isUndraftedSigning(99,[season1,signedSeason]),true,
+  'signings in any known SSL season retain UNDRAFTED');
+signedSeason.rosters={knights:[1],dedennes:[99,100]};
+assert.equal(isUndraftedSigning(99,[signedSeason]),true,
+  'an undrafted signing transferred to another team stays UNDRAFTED');
 assert.equal(originalPlayerDraft(NaN,[season1]),null);
 assert.equal(teamDraftedPlayers(season1,'knights').length,2);
 assert.equal(teamDraftedPlayers(season1,'dedennes').length,0);
@@ -53,12 +72,19 @@ assert(main.includes("gmToolsTab==='My Team'?<MyDraftTeam league={seasonLeague}/
 assert(team.includes("teamDraftedPlayers(season,team.id)")&&
  team.includes('<PlayerPortrait player={player} size={38}/>'),
  'GM only sees live roster with actual shared player portraits');
+assert(badge.includes('isUndraftedSigning(playerId,seasons)')&&badge.includes('UNDRAFTED'),
+  'shared badge must display UNDRAFTED without inventing Round/Pick for rostered free agents');
+assert(!team.includes('ACQUIRED · NO SSL DRAFT PICK'),
+  'My Team should use the exact UNDRAFTED badge instead of its old ambiguous label');
 assert(badge.includes('ROUND {draft.round}')&&badge.includes('PICK #{draft.number}'),
  'original round and overall pick must display on every player card');
 assert(draft.includes('<DraftPickBadge playerId={p.id} seasons={l.seasons} compact/>'),
  'draft pool cards show completed draft history');
 assert(main.includes('<DraftPickBadge playerId={p.id} seasons={seasonLeague.seasons} compact/>'),
  'Player Stats cards must retain pick history during season');
+assert(season.includes('<Player id={p.player} seasons={l.seasons}/>')&&
+  season.includes('<Player id={p.id} seasons={l.seasons} />'),
+  'lineup and free-agency cards must receive provenance data too');
 assert(season.includes('<Player id={id} seasons={l.seasons}/>'),
  'Team roster cards retain pick history throughout season');
 assert(playerData.includes('<DraftPickBadge playerId={p.id} seasons={seasons} compact/>'),

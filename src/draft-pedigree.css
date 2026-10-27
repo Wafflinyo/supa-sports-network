@@ -2,6 +2,8 @@
 .draft-pedigree-tag>strong{background:#173e76;color:#fff;padding:4px 7px;border-radius:4px;font-size:inherit;font-weight:900}
 .draft-pedigree-tag>span{border:1px solid #adbbd0;background:#f3f7fc;color:#143b70;padding:3px 7px;border-radius:4px;font-weight:900}
 .draft-pedigree-tag>em{font-size:10px;font-style:normal;letter-spacing:.045em;color:#74602f}
+/* No fabricated Round / Pick # for genuine free-agent signings. */
+.draft-pedigree-tag.undrafted>strong{background:#536478;color:#fff;border:1px solid #536478}
 .draft-pedigree-tag.compact{font-size:10px;gap:4px}
 .draft-pedigree-tag.compact>strong{padding:3px 5px}
 .draft-pedigree-tag.compact>span{padding:2px 5px}

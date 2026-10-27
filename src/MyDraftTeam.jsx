@@ -21,7 +21,7 @@ export default function MyDraftTeam({league:l}) {
     <div className="my-draft-team-header">
       <div><small>YOUR SSL FRANCHISE · SEASON {season.number}</small>
         <h2>MY TEAM · {team.name}</h2>
-        <p>Your live roster updates after every draft pick, trade or signing. Select a card to scout the player. Original draft round and overall pick stay on their card throughout the season.</p>
+        <p>Your live roster updates after every draft pick, trade or signing. Select a card to scout the player. Original draft round and overall pick stay on their card throughout the season. Free-agent signings without a draft pick are labeled UNDRAFTED.</p>
       </div>
       <div className="my-draft-team-count"><strong>{cards.length}</strong><span>ROSTERED PLAYERS</span></div>
     </div>
@@ -38,8 +38,7 @@ export default function MyDraftTeam({league:l}) {
                 <PlayerPriority player={player}/><span>{player.class}</span></div>
             </div>
             <DraftPickBadge playerId={playerId} seasons={l.seasons} compact/>
-            {!l.seasons.some(season=>(season.picks||[]).some(p=>Number(p.player)===playerId))&&
-              <small>ACQUIRED · NO SSL DRAFT PICK</small>}
+
           </button>;
         })}
       </div>}

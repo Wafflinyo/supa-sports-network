@@ -16,6 +16,21 @@ export function originalPlayerDraft(playerId,seasons=[]) {
   }
   return null;
 }
+/**
+ * Only display UNDRAFTED once a player has actually belonged to an official
+ * SSL team without a recorded draft selection. An untouched free-agent pool
+ * player is simply AVAILABLE, not a free-agent signing.
+ *
+ * Checking all accessible season rosters preserves the label across teams and
+ * prior seasons. An authentic original pick always takes priority.
+ */
+export function isUndraftedSigning(playerId,seasons=[]) {
+  const id=Number(playerId);
+  if(!Number.isInteger(id)||originalPlayerDraft(id,seasons))return false;
+  return seasons.some(season=>season&&Object.values(season.rosters||{}).some(roster=>
+    Array.isArray(roster)&&roster.some(rosteredId=>Number(rosteredId)===id)));
+}
+
 export function teamDraftedPlayers(season,teamId){
   if(!season||teamId==null)return [];
   const roster=season.rosters?.[String(teamId)]||[];
