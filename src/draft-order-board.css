@@ -1,0 +1,30 @@
+.ssl-draft-order-board{margin:19px 0 24px;border:1px solid #9baeca;background:#f7f9fd;border-radius:12px;overflow:hidden;box-shadow:0 7px 25px #0c22411a}
+.ssl-draft-queue-top{display:flex;align-items:end;justify-content:space-between;gap:18px;padding:20px 20px 15px;flex-wrap:wrap}
+.ssl-draft-queue-kicker{font-size:10px;font-weight:950;letter-spacing:.13em;color:#9d6731}
+.ssl-draft-queue-top h3{font:900 clamp(22px,3vw,30px)/1.1 'Barlow Condensed',Impact,sans-serif;color:#102f59;margin:5px 0!important}
+.ssl-draft-queue-top p{font-size:12px;line-height:1.5;color:#566987;margin:4px 0}
+.ssl-draft-queue-top label{display:grid;gap:7px;min-width:195px;color:#29486b;font-size:11px;font-weight:900;letter-spacing:.06em}
+.ssl-draft-queue-top select{max-width:100%;font:inherit;letter-spacing:normal;color:#193b69;background:#fff;border:1px solid #adbfda;min-height:43px;padding:8px 10px;border-radius:7px}
+.ssl-draft-queue-current{background:linear-gradient(100deg,#153b69,#0c223f);display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 20px;color:#f6faff}
+.ssl-draft-queue-current>strong{color:#f7d27f;font-size:11px;letter-spacing:.08em}
+.ssl-draft-queue-current>span{font-size:14px;font-weight:800;flex:1}
+.ssl-draft-queue-current>b{font-size:12px;letter-spacing:.05em;color:#fff1ca}
+.ssl-draft-queue-scroll{max-height:460px;overflow:auto}
+.ssl-draft-queue-list{list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin:0;padding:13px;gap:9px}
+.ssl-draft-queue-item{display:flex;gap:10px;align-items:center;padding:10px 12px;min-width:0;min-height:70px;background:#fff;border:1px solid #d6dfec;border-radius:8px}
+.ssl-draft-queue-rank{display:grid;place-items:center;flex:0 0 33px;height:33px;border-radius:6px;background:#e8eef7;color:#173f74;font:900 17px/1 'Barlow Condensed',Impact,sans-serif}
+.ssl-draft-queue-logo{width:35px;height:35px;object-fit:contain;flex:0 0 35px}
+.ssl-draft-queue-team{min-width:0;flex:1;display:flex;flex-direction:column;gap:3px}
+.ssl-draft-queue-team strong{font-size:13px;color:#173961;overflow-wrap:anywhere}
+.ssl-draft-queue-team small{font-size:10px;font-weight:800;line-height:1.25;color:#60758a}
+.ssl-draft-queue-status{font-size:9px;white-space:nowrap;color:#546b86;background:#ebf0f8;padding:5px 6px;border-radius:5px;letter-spacing:.04em;font-weight:900}
+.ssl-draft-queue-item.status-on-clock{border:2px solid #bd8b38;background:#fff9e8;box-shadow:0 0 0 2px #d8b46d2a}
+.ssl-draft-queue-item.status-on-clock .ssl-draft-queue-rank{background:#d4a84a;color:#142d4e}
+.ssl-draft-queue-item.status-on-clock .ssl-draft-queue-status{background:#133c70;color:#fff}
+.ssl-draft-queue-item.status-picked{background:#f0f4f9;opacity:.75}
+.ssl-draft-queue-item.status-picked .ssl-draft-queue-status{color:#236148;background:#d9f2e4}
+.ssl-draft-queue-item.traded{border-left:4px solid #af7c3a}
+.ssl-draft-queue-footnote{padding:0 20px 12px;color:#6c7b91;font-size:11px;line-height:1.55}
+.ssl-lottery-pick-times-note{font-size:12px;color:#566886;line-height:1.5;margin:6px 0 12px}
+.ssl-lottery-ordinal{display:inline-grid;place-items:center;min-width:27px;height:24px;background:#203c65;color:#fff;border-radius:5px;font-size:11px;font-weight:900;margin-right:10px}
+@media(max-width:750px){.ssl-draft-queue-list{grid-template-columns:1fr}.ssl-draft-queue-top{padding:13px}.ssl-draft-queue-top label{width:100%}.ssl-draft-queue-current{padding:10px 13px}.ssl-draft-queue-status{font-size:8px}}
