@@ -527,7 +527,7 @@ export function SeasonWorkspace({ league, registeredTeams }) {
                           }
                         >
                           <option value="">Choose team</option>
-                          {s.teams.map((t) => (
+                          {teamsInLotteryOrder(s,s?.serverNow).map((t) => (
                             <option key={t.id} value={t.id}>
                               {t.name}
                             </option>
@@ -577,7 +577,7 @@ function TeamChooser({ s, value, onChange, label = "Team" }) {
         onChange={(e) => onChange(e.target.value)}
       >
         <option value="">Choose team</option>
-        {s?.teams.map((t) => (
+        {teamsInLotteryOrder(s,s?.serverNow).map((t) => (
           <option key={t.id} value={t.id}>
             {t.name}
           </option>
@@ -1092,7 +1092,7 @@ function Teams({ league: l }) {
     <div className="season-team-columns">
       {[0, 1].map((col) => (
         <div key={col}>
-          {s?.teams
+          {teamsInLotteryOrder(s,s?.serverNow)
             .filter((_, i) => i % 2 === col)
             .map((t) => (
               <details className="panel season-team" key={t.id}>
@@ -1763,7 +1763,7 @@ function Trades({ league: l, messages = false }) {
                   Rosters below 11 must be filled immediately after the trade.
                 </p>
                 <details className="trade-participants"><summary>PARTICIPATING TEAMS ({participants.length})</summary><div className="season-team-checks">
-                  {s.teams.map((t) => (
+                  {teamsInLotteryOrder(s,s?.serverNow).map((t) => (
                     <label key={t.id}>
                       <input
                         type="checkbox"
@@ -2267,7 +2267,7 @@ function TeamStats({ league: l }) {
             </tr>
           </thead>
           <tbody>
-            {s?.teams.map(t => {
+            {teamsInLotteryOrder(s,s?.serverNow).map(t => {
               const games = s.games.filter(g =>
                 g.stage === "final" && [g.away, g.home].includes(t.id)
               );
@@ -2350,7 +2350,7 @@ function History({ league: l }) {
               Champion:{" "}
               {s.teams.find((t) => t.id === s.champion)?.name || "Not decided"}
             </p>
-            <p>{s.teams.map((t) => t.name).join(" · ")}</p>
+            <p>{teamsInLotteryOrder(s,s?.serverNow).map((t) => t.name).join(" · ")}</p>
             <button className="outline-btn" onClick={() => l.setSelected(s.id)}>
               VIEW THIS SEASON IN LEAGUE TABS
             </button>
