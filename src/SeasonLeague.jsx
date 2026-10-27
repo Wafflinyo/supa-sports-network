@@ -23,6 +23,7 @@ import pool from "./players.json";
 import { teamLogo } from "./TeamIdentity.jsx";
 import { ConferenceMark } from './ConferenceMark.jsx';
 import { PlayerPortrait } from "./PlayerPortrait.jsx";
+import {DraftPickBadge} from './DraftPickBadge.jsx';
 import playerData from "./player-data.json";
 import { pitcherPriorityText } from "./player-roles.js";
 import { PitcherPriorityBadge } from './PlayerData.jsx';
@@ -52,13 +53,13 @@ const time = (v) =>
     : "Not set";
 const iso = (v) => new Date(v).toISOString();
 const name = (id) => byPlayer.has(Number(id)) ? taggedName(byPlayer.get(Number(id))) : "Unknown player";
-function Player({ id }) {
+function Player({ id, seasons=[] }) {
   const p = byPlayer.get(Number(id));
   return (
     <span className="portrait-label">
       <PlayerPortrait player={p} />
       {p?.name || "Unknown player"}
-      {p && <PitcherPriorityBadge player={p} record={playerData.players[p.id]}/>} 
+      {p && <PitcherPriorityBadge player={p} record={playerData.players[p.id]}/>} {p&&<DraftPickBadge playerId={p.id} seasons={seasons} compact/>} 
     </span>
   );
 }
@@ -1001,7 +1002,7 @@ export function RosterManager({ league: l }) {
     {!chosen?<Box title="ROSTER"><p>{l.access.role==='commissioner'?'Choose a team above to manage its roster.':'Your franchise will appear once the commissioner adds it to Season 1.'}</p></Box>:<>
       <Box title={`${chosen.name.toUpperCase()} · ROSTER`}>
         <p><strong>{roster.length} players</strong> · {hasDefault?'Default lineup saved':'Default lineup not saved yet'} · {s.status.toUpperCase()}</p>
-        {roster.length===0?<p>Players will appear as they are drafted.</p>:<div className="roster-manager-players">{roster.map(id=><div key={id} className="roster-manager-player"><Player id={id}/></div>)}</div>}
+        {roster.length===0?<p>Players will appear as they are drafted.</p>:<div className="roster-manager-players">{roster.map(id=><div key={id} className="roster-manager-player"><Player id={id} seasons={l.seasons}/></div>)}</div>}
       </Box>
       <Box title="DEFAULT LINEUP">
         <p>This lineup is the fallback for every game until you submit a specific game lineup. Changes here do not overwrite a game lineup already submitted.</p>
@@ -1077,7 +1078,7 @@ function Teams({ league: l }) {
                 {s.defaults[t.id]?.starters.map((p, i) => (
                   <div className="roster-line" key={p.player}>
                     <b>{i + 1}</b>
-                    <Player id={p.player} />
+                    <Player id={p.player} seasons={l.seasons}/>
                     <span>{p.position}</span>
                   </div>
                 ))}
@@ -1089,7 +1090,7 @@ function Teams({ league: l }) {
                   )
                   .map((p) => (
                     <div key={p}>
-                      <Player id={p} />
+                      <Player id={p} seasons={l.seasons}/>
                     </div>
                   ))}
               </details>
