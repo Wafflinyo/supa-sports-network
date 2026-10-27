@@ -6,6 +6,7 @@ import {heatingUpForSeason} from './heating-up.js'
 import {HeatingUpProvider,HeatFlame} from './HeatingUpBadge.jsx'
 import {leagueNews} from './league-news.js'
 import GmAchievements from './GmAchievements.jsx'
+import GmStadiumMatchups from './GmStadiumMatchups.jsx'
 import GmAchievementNotifications from './GmAchievementNotifications.jsx'
 import PlayerData from './PlayerData.jsx'
 import {PlayerPriority} from './PlayerPriority.jsx'
@@ -243,9 +244,9 @@ function App() {
             <button className="outline-btn" onClick={()=>{setTeamSetupExpanded(false);go('Home')}}>SET UP LATER</button>
           </div>
         </section>}
-        <div className="subnav" role="group" aria-label="GM Tools sections">{['Roster','Team Setup','Extensions','Achievements'].map(section=><button key={section} type="button" className={gmToolsTab===section?'active':''} aria-pressed={gmToolsTab===section} onClick={()=>setGmToolsTab(section)}>{section}</button>)}</div>
+        <div className="subnav" role="group" aria-label="GM Tools sections">{['Roster','Home Games','Team Setup','Extensions','Achievements'].map(section=><button key={section} type="button" className={gmToolsTab===section?'active':''} aria-pressed={gmToolsTab===section} onClick={()=>setGmToolsTab(section)}>{section}</button>)}</div>
         {gmToolsTab==='Team Setup'&&<details id="gm-team-identity" className="panel season-box" open={teamSetupExpanded} onToggle={e=>setTeamSetupExpanded(e.currentTarget.open)}><summary>TEAM NAME, HOME LOCATION & LOGO</summary><TeamSetup key={access.slot} supabase={supabase} access={access} teams={officialTeams} onChange={loadOfficialTeams} onAccess={setAccess}/></details>}
-        {gmToolsTab==='Achievements'?<GmAchievements seasons={seasonLeague.seasons} teams={officialTeams} slot={access.slot}/>:gmToolsTab!=='Team Setup'&&<SeasonTeamTools league={seasonLeague} section={gmToolsTab}/>}
+        {gmToolsTab==='Home Games'?<GmStadiumMatchups league={seasonLeague}/>:gmToolsTab==='Achievements'?<GmAchievements seasons={seasonLeague.seasons} teams={officialTeams} slot={access.slot}/>:gmToolsTab!=='Team Setup'&&<SeasonTeamTools league={seasonLeague} section={gmToolsTab}/>}
         </>}
       {page === 'Home' && <><SeasonHome league={seasonLeague} go={go}/>
         <div className="home-grid"><div className="hero"><div className="hero-content"><span className="eyebrow">WELCOME TO THE LEAGUE</span><h1>THE GAME<br/><span>STARTS HERE.</span></h1><p>Follow every game, explore the player pool, and manage your fantasy league in one place.</p><button className="yellow-btn" onClick={() => go('Player Stats')}>EXPLORE PLAYERS <span>›</span></button></div><div className="hero-number">01</div></div>
