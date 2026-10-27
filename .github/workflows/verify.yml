@@ -22,6 +22,8 @@ jobs:
       - run: node tests/stadiums.mjs
       - run: node tests/draft-stadium-state.mjs
       - run: node tests/draft-player-cards.mjs
+      - run: node tests/lottery-timing.mjs
+      - run: node tests/lottery-curtain.mjs
       - run: node tests/gm-my-team-draft-history.mjs
       - run: node tests/heating-up.mjs
       - run: node tests/league-news.mjs
