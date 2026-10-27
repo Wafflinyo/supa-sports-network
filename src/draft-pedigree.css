@@ -1,0 +1,26 @@
+.draft-pedigree-tag{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap;max-width:100%;font-size:11px;font-weight:900;letter-spacing:.035em;line-height:1.35;color:#153e75;vertical-align:middle}
+.draft-pedigree-tag>strong{background:#173e76;color:#fff;padding:4px 7px;border-radius:4px;font-size:inherit;font-weight:900}
+.draft-pedigree-tag>span{border:1px solid #adbbd0;background:#f3f7fc;color:#143b70;padding:3px 7px;border-radius:4px;font-weight:900}
+.draft-pedigree-tag>em{font-size:10px;font-style:normal;letter-spacing:.045em;color:#74602f}
+.draft-pedigree-tag.compact{font-size:10px;gap:4px}
+.draft-pedigree-tag.compact>strong{padding:3px 5px}
+.draft-pedigree-tag.compact>span{padding:2px 5px}
+.my-draft-team{padding:22px;margin:12px 0}
+.my-draft-team-header{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;border-bottom:1px solid #dce4f1;padding-bottom:15px;margin-bottom:17px}
+.my-draft-team-header h2{font-size:24px;margin:5px 0;color:#183a68;font-weight:950}
+.my-draft-team-header p{color:#65738d;font-size:13px;line-height:1.5;margin:4px 0}
+.my-draft-team-count{background:#173e76;color:#fff;border-radius:8px;padding:10px 16px;text-align:center;min-width:110px}
+.my-draft-team-count strong{font-size:23px;display:block}.my-draft-team-count span{font-size:10px;font-weight:800}
+.my-draft-team-venue{background:#eef3fb;border:1px solid #d5deec;border-radius:9px;padding:12px 14px;font-size:13px;color:#183e73;margin-bottom:15px}
+.my-draft-team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:10px}
+.my-draft-team-card{border:1px solid #ced8e7;background:#fff;border-radius:9px;padding:13px;text-align:left;cursor:pointer;color:#142a50;min-width:0}
+.my-draft-team-card:hover,.my-draft-team-card:focus-visible{border-color:#bb3a46;box-shadow:0 0 0 2px #bb3a461a}
+.my-draft-team-card .draft-pedigree-tag{margin-top:10px}
+.my-draft-team-identity{display:flex;align-items:center;gap:10px}
+.my-draft-team-info{display:flex;gap:3px;flex-direction:column;min-width:0}
+.my-draft-team-info strong{font-size:14px;color:#153762}
+.my-draft-team-info>span:not(.pitcher-priority-badge){font-size:12px;color:#66738a}
+.my-draft-team-detail{margin-top:20px;padding:16px;background:#f7f9fe;border:1px solid #d9e2ef;border-radius:10px}
+.my-draft-team-detail .player-data-details{margin-top:12px}
+.my-draft-team-empty{padding:30px 12px;background:#f4f7fd;border:1px dashed #cfdaea;border-radius:10px;text-align:center;color:#596d88}
+@media(max-width:520px){.my-draft-team-grid{grid-template-columns:1fr}.my-draft-team{padding:13px}.my-draft-team-header{align-items:start}}

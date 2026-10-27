@@ -2,6 +2,8 @@ import React, {useEffect, useRef, useState} from 'react';
 import pool from './players.json';
 import {PlayerPortrait} from './PlayerPortrait.jsx';
 import {PlayerPriority} from './PlayerPriority.jsx';
+import MyDraftTeam from './MyDraftTeam.jsx';
+import {DraftPickBadge} from './DraftPickBadge.jsx';
 import {PlayerDataDetails} from './PlayerData.jsx';
 import data from './player-data.json';
 import {pitcherPriorityFor} from './player-roles.js';
@@ -45,6 +47,7 @@ export function DraftPlayers({league:l}) {
       <div className="draft-pool-tabs" role="tablist" aria-label="Draft selection type">
         <button type="button" role="tab" id="draft-tab-players" aria-controls="draft-panel-players" aria-selected={tab==='players'} className={tab==='players'?'active':''} onClick={()=>setTab('players')}>PLAYERS</button>
         <button type="button" role="tab" id="draft-tab-stadiums" aria-controls="draft-panel-stadiums" aria-selected={tab==='stadiums'} className={tab==='stadiums'?'active':''} onClick={()=>setTab('stadiums')}>STADIUMS <small>{myStadium?'✓ OWNED':availableStadiums.length+' LEFT'}</small></button>
+        {l.access.role==='gm'&&l.myTeam&&<button type="button" role="tab" id="draft-tab-my-team" aria-controls="draft-panel-my-team" aria-selected={tab==='my-team'} className={tab==='my-team'?'active':''} onClick={()=>setTab('my-team')}>MY TEAM <small>{(s.rosters?.[l.myTeam.id]||[]).length} PLAYERS</small></button>}
       </div>
     </div>
     <div id="draft-panel-stadiums" role="tabpanel" aria-labelledby="draft-tab-stadiums" hidden={tab!=='stadiums'} className="draft-stadium-panel">
@@ -89,6 +92,7 @@ export function DraftPlayers({league:l}) {
         </p>}
       </>}
     </div>
+    {l.access.role==='gm'&&l.myTeam&&<div id="draft-panel-my-team" role="tabpanel" aria-labelledby="draft-tab-my-team" hidden={tab!=='my-team'} className="draft-my-team-panel"><MyDraftTeam league={l}/></div>}
     <div id="draft-panel-players" role="tabpanel" aria-labelledby="draft-tab-players" hidden={tab!=='players'} className="draft-players-panel">
       <h3>PLAYER POOL</h3>
       <p>These use the same player portraits and pitching-priority badges as Player Stats. Tap any player for their ratings, named abilities, and chemistry. Drafted players are shaded gray.</p>
@@ -104,6 +108,7 @@ export function DraftPlayers({league:l}) {
           <span className="draft-player-stats-details"><strong>{p.name}</strong><PlayerPriority player={p}/><span className="draft-player-stats-class">{p.class}</span></span>
         </span>
         <small className="draft-player-stats-status">{ownership.has(p.id)?'DRAFTED · '+ownership.get(p.id):'AVAILABLE'}</small>
+        <DraftPickBadge playerId={p.id} seasons={l.seasons} compact/>
       </button>)}
       {!filtered.length&&<p>No players match these filters.</p>}
     </div>
@@ -117,7 +122,8 @@ export function DraftPlayers({league:l}) {
           if(await l.act('pick',{player:selected.id}))close();
         }}>DRAFT {selected.name.toUpperCase()}</button></div>
         <p role="status">{ownership.has(selected.id)?`Already drafted · ${ownership.get(selected.id)}`:s.paused?'Draft paused':mustStage?'Your final remaining turn must be a Stadium Pick.':canPick?`Select for ${team?.name}. This submits the pick.`:s.status==='drafting'?`Waiting for ${team?.name||'the next team'} to pick.`:'Scouting view · drafting is not active.'}</p>
-        <PlayerDataDetails player={selected}/>
+        <DraftPickBadge playerId={selected.id} seasons={l.seasons}/>
+        <PlayerDataDetails player={selected} seasons={l.seasons}/>
       </div>}
     </dialog>
   </section>;

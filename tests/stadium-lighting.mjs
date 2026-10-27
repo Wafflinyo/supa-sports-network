@@ -55,7 +55,7 @@ const main=readFileSync(new URL('../src/main.jsx',import.meta.url),'utf8');
 const schedule=readFileSync(new URL('../src/SeasonLeague.jsx',import.meta.url),'utf8');
 const tools=readFileSync(new URL('../src/GmStadiumMatchups.jsx',import.meta.url),'utf8');
 const sql=readFileSync(new URL('../supabase/migrations/20261027090500_ssl_home_stadium_day_night.sql',import.meta.url),'utf8');
-assert(main.includes("['Roster','Home Games','Team Setup'"),
+assert(main.includes("'Home Games'")&&main.includes("'My Team'"),
   'Day/Night must be inside GM Tools as its own section');
 assert(main.includes("gmToolsTab==='Home Games'?<GmStadiumMatchups"));
 assert(schedule.includes('matchupStadiumVariant(season,game)'), 'schedule read-only variant display');

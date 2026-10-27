@@ -22,7 +22,7 @@
 .draft-pool-tabs small{font-size:9px;color:#8b552c;background:#fff0c6;padding:4px 7px;border-radius:20px;white-space:nowrap}
 .draft-pool-tabs button.active small{color:#154173}
 .draft-stadium-panel{border:1px solid #d4deec;border-radius:14px;background:linear-gradient(135deg,#fbfcff,#eff4fc);padding:20px;margin-bottom:8px}
-.draft-stadium-panel[hidden],.draft-players-panel[hidden]{display:none!important}
+.draft-stadium-panel[hidden],.draft-players-panel[hidden],.draft-my-team-panel[hidden]{display:none!important}
 .draft-stadium-heading h3{font-size:20px;font-weight:1000;margin:0 0 6px;color:#163867}
 .draft-stadium-heading p{margin:0 0 17px;color:#596c87;font-size:13px;line-height:1.5;max-width:750px}
 .draft-stadium-status{font-size:12px;color:#334e74;font-weight:800;margin:0 0 12px}
