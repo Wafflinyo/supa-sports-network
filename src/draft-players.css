@@ -49,3 +49,22 @@
 .draft-players-panel>h3{font-size:20px;font-weight:950;margin:0 0 5px}
 .draft-players-panel>p{font-size:13px;color:#52647e;line-height:1.55}
 @media(max-width:650px){.draft-pool-tabs{width:100%}.draft-pool-tabs button{flex:1;justify-content:center;padding:12px 8px;font-size:12px}.draft-stadium-panel{padding:14px}.draft-stadium-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.draft-stadium-card{min-height:148px;padding:12px 7px}.draft-stadium-card strong{font-size:13px}.draft-stadium-confirm button{width:100%}.draft-stadium-owned{gap:9px;padding:12px;flex-wrap:wrap}.draft-stadium-owned .draft-stadium-tile-icon{width:67px;height:65px}.draft-stadium-lock{font-size:11px}}
+
+/* Draft player cards intentionally mirror the compact Player Stats identity:
+   one shared PlayerPortrait at 38px and the exact PlayerPriority label.
+   No rescaled, independently cropped, or initial-based substitute artwork. */
+.draft-player-grid{grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:10px}
+.draft-player-card.draft-player-stats-card{min-height:116px;display:flex;align-items:stretch;flex-direction:column;justify-content:space-between;gap:11px;text-align:left;padding:15px 14px;border-radius:8px}
+.draft-player-stats-identity.player-data-name{display:flex;align-items:center;gap:11px;width:100%;min-width:0;text-align:left}
+.draft-player-stats-identity .tier-portrait-wrap{flex:0 0 38px!important}
+.draft-player-stats-details{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0;line-height:1.4}
+.draft-player-stats-details strong{font-size:15px;flex:0 1 auto;color:#10244b}
+.draft-player-stats-details .pitcher-priority-badge{flex:0 0 auto}
+.draft-player-stats-class{flex:0 0 100%;font-size:12px!important;color:#69778f}
+.draft-player-card.draft-player-stats-card .draft-player-stats-status{display:block;font-size:10px;line-height:1.4;font-weight:900;letter-spacing:.04em;align-self:flex-start}
+.draft-player-card.draft-player-stats-card.is-drafted .draft-player-stats-details strong{color:#6c7585}
+.draft-player-card.draft-player-stats-card:hover .draft-player-stats-details strong{color:#cf333c}
+@media(max-width:600px){
+ .draft-player-grid{grid-template-columns:1fr;max-height:55dvh}
+ .draft-player-card.draft-player-stats-card{min-height:95px;padding:12px}
+}
