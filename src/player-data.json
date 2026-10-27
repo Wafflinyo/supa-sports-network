@@ -159,7 +159,7 @@
     "miiDatabase": {
       "count": 70
     },
-    "gameBuild": "SSL October 22 Balance Patch 2; 111 non-Mii character records synchronized directly with audited executable; all 70 named Miis set to Low trajectory in SSL website on October 27, 2026; no DOL bytes edited"
+    "gameBuild": "SSL October 22 Balance Patch 2; 111 non-Mii character records synchronized directly with audited executable; all 70 named Miis set to Low trajectory in SSL website on October 27, 2026; no DOL bytes edited; Ice Bro Mii good chemistry corrected to Light Blue only in site data"
   },
   "players": {
     "1": {
@@ -5419,7 +5419,6 @@
         47,
         36,
         28,
-        145,
         158,
         27,
         174,
@@ -5470,7 +5469,6 @@
         47,
         36,
         28,
-        145,
         158,
         27,
         174,
@@ -5521,7 +5519,6 @@
         47,
         36,
         28,
-        145,
         158,
         27,
         174,
@@ -5572,7 +5569,6 @@
         47,
         36,
         28,
-        145,
         158,
         27,
         174,
@@ -5623,7 +5619,6 @@
         47,
         36,
         28,
-        145,
         158,
         27,
         174,
@@ -6778,7 +6773,6 @@
         47,
         36,
         28,
-        145,
         158,
         27,
         174,
@@ -7740,12 +7734,6 @@
         174,
         42,
         176,
-        87,
-        88,
-        89,
-        90,
-        91,
-        124,
         179,
         181,
         99,
