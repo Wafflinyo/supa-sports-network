@@ -46,7 +46,7 @@ export default function MyDraftTeam({league:l}) {
     {active&&<section className="my-draft-team-detail" aria-label={active.name+' detailed player stats'}>
       <button type="button" className="outline-btn" onClick={()=>setOpenPlayer(null)}>CLOSE PLAYER DETAILS</button>
       <DraftPickBadge playerId={active.id} seasons={l.seasons}/>
-      <PlayerDataDetails player={active}/>
+      <PlayerDataDetails player={active} seasons={l.seasons}/>
     </section>}
   </section>;
 }
