@@ -21,6 +21,7 @@ jobs:
       - run: npm ci
       - run: node tests/stadiums.mjs
       - run: node tests/draft-stadium-state.mjs
+      - run: node tests/draft-player-cards.mjs
       - run: node tests/heating-up.mjs
       - run: node tests/league-news.mjs
       - run: node tests/gm-achievements.mjs
