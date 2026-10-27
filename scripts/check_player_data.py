@@ -43,6 +43,7 @@ assert data[str(by_name['Mario']['id'])]['stats']['slap contact size']==50
 print('29 Low trajectory characters, Patch 2 contact values, classes and Koopa values verified.')
 
 miis=[p for p in players if p['kind']=='mii']
+assert all(data[str(p['id'])]['stats']['hit trajectory']=='Low' for p in miis), 'All named Miis must have Low trajectory on site'
 assert all('mii' not in p['name'].lower() for p in miis)
 assert all(p['portrait'].startswith('portraits/mii-roster-') for p in miis)
 assert all((ROOT/'public'/p['portrait']).read_bytes()[8:12]==b'WEBP' for p in miis)
