@@ -1,13 +1,13 @@
 {
   "type": "example-only",
-  "generatedAt": "2026-10-26T11:57:33.773Z",
+  "generatedAt": "2026-10-27T15:28:10.142Z",
   "selection": "12 equally weighted balls drawn without replacement",
   "firstDrawPercent": 8.333333333333334,
   "order": [
     {
       "pick": 1,
-      "slot": 2,
-      "team": "HopeDogo Retrievers 3"
+      "slot": 11,
+      "team": "TWILIGHT TOWN TANKS"
     },
     {
       "pick": 2,
@@ -16,53 +16,53 @@
     },
     {
       "pick": 3,
-      "slot": 12,
-      "team": "Decalburg Dedennes"
-    },
-    {
-      "pick": 4,
-      "slot": 8,
-      "team": "Petalburg Pangolins"
-    },
-    {
-      "pick": 5,
-      "slot": 11,
-      "team": "TWILIGHT TOWN TANKS"
-    },
-    {
-      "pick": 6,
-      "slot": 1,
-      "team": "Delfino Dolphins"
-    },
-    {
-      "pick": 7,
-      "slot": 5,
-      "team": "Diamond City Checkers"
-    },
-    {
-      "pick": 8,
-      "slot": 6,
-      "team": "Starborn Voidstriders"
-    },
-    {
-      "pick": 9,
-      "slot": 7,
-      "team": "New Donk City Knights"
-    },
-    {
-      "pick": 10,
       "slot": 4,
       "team": "Moleville Haliban"
     },
     {
-      "pick": 11,
+      "pick": 4,
+      "slot": 5,
+      "team": "Diamond City Checkers"
+    },
+    {
+      "pick": 5,
+      "slot": 12,
+      "team": "Decalburg Dedennes"
+    },
+    {
+      "pick": 6,
+      "slot": 2,
+      "team": "HopeDogo Retrievers 3"
+    },
+    {
+      "pick": 7,
+      "slot": 8,
+      "team": "Petalburg Pangolins"
+    },
+    {
+      "pick": 8,
       "slot": 9,
       "team": "New Donk City Fuggetaboudits"
     },
     {
-      "pick": 12,
+      "pick": 9,
+      "slot": 1,
+      "team": "Delfino Dolphins"
+    },
+    {
+      "pick": 10,
+      "slot": 6,
+      "team": "Starborn Voidstriders"
+    },
+    {
+      "pick": 11,
       "slot": 10,
       "team": "Rogueport Ruffians"
+    },
+    {
+      "pick": 12,
+      "slot": 7,
+      "team": "New Donk City Knights"
     }
   ]
 }
