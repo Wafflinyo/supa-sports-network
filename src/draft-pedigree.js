@@ -21,8 +21,8 @@ export function originalPlayerDraft(playerId,seasons=[]) {
  * SSL team without a recorded draft selection. An untouched free-agent pool
  * player is simply AVAILABLE, not a free-agent signing.
  *
- * Checking all accessible seasons preserves UNDRAFTED after trades, releases
- * and moves to another roster. An authentic original pick always takes priority.
+ * Checking all accessible season rosters preserves the label across teams and
+ * prior seasons. An authentic original pick always takes priority.
  */
 export function isUndraftedSigning(playerId,seasons=[]) {
   const id=Number(playerId);
