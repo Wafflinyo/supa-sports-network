@@ -1,4 +1,4 @@
-// Badge imagery is curated against the ACTUAL 92-item achievement catalog.
+// Badge imagery is curated against the ACTUAL 93-item achievement catalog.
 // Columns: real achievement ID | illustrated main subject | supporting subject |
 // composition | meaningful engraving. Do not add awards from concept art.
 const DRAWINGS = `
@@ -94,6 +94,7 @@ honors-fewest-runs-allowed|shield|chart-down|wreath|RA
 honors-home-runs|ball|chart-up|sunburst|HR
 honors-rbis|diamond|crown|laurel|RBI
 honors-first-seed|podium|crown|royal|#1
+preseason-tournament-champion|trophy|diamond|sunburst|PRE
 `.trim();
 
 // All keys here MUST exist in src/gm-achievements.js; validation is performed
