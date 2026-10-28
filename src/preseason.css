@@ -88,3 +88,28 @@
   .ssl-power-scoreline>strong{font-size:26px}
   .ssl-power-subranks{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
 }
+
+/* Home displays a read-only bracket preview; editable results stay in the
+   dedicated Playoff Bracket -> Pre-season tab. */
+.ssl-pre-home-bracket{min-width:0;margin:18px 0 10px;padding:20px;background:linear-gradient(165deg,#f9fbff,#eef4fd);border:1px solid #d5e1ef}
+.ssl-pre-home-bracket .ssl-pre-head{align-items:center}
+.ssl-pre-home-bracket .ssl-pre-head>svg{color:#b48427;flex:none}
+.ssl-pre-home-rounds{display:grid;grid-template-columns:repeat(4,minmax(205px,1fr));gap:12px;overflow-x:auto;padding:2px 1px 9px}
+.ssl-pre-home-round{min-width:0;border-radius:10px;border:1px solid #d8e3f1;background:#fff;padding:12px;box-shadow:0 2px 9px #102f5911}
+.ssl-pre-home-round .ssl-pre-round-title{gap:5px;margin-bottom:11px}
+.ssl-pre-home-round .ssl-pre-round-title h3{font-size:12px;letter-spacing:.035em}
+.ssl-pre-home-round .ssl-pre-round-title small{font-size:9px}
+.ssl-pre-home-round .ssl-pre-games{gap:9px}
+.ssl-pre-home-round .ssl-pre-game{padding:8px;border-radius:7px;background:#fbfdff}
+.ssl-pre-home-round .ssl-pre-game>small{font-size:9px}
+.ssl-pre-home-round .ssl-pre-side{gap:5px;padding:6px 2px}
+.ssl-pre-home-round .ssl-pre-team{min-width:0;flex:1;font-size:11px;gap:5px;overflow-wrap:anywhere}
+.ssl-pre-home-round .ssl-pre-team img{width:22px;height:22px;flex-basis:22px}
+.ssl-pre-home-round .ssl-pre-side>b{min-width:19px}
+.ssl-pre-home-pending{font-size:11px;color:#687a97;line-height:1.5}
+.ssl-pre-home-link{margin:0 0 16px}
+@media(max-width:1050px){.ssl-pre-home-rounds{grid-template-columns:repeat(4,minmax(205px,1fr))}}
+@media(max-width:650px){
+ .ssl-pre-home-bracket{padding:13px}
+ .ssl-pre-home-rounds{grid-template-columns:repeat(4,minmax(225px,1fr))}
+}
