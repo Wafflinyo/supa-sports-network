@@ -41,6 +41,10 @@ function PlayerAvatar({ player, size = 38 }) {
 }
 // Project Rio's export headings, grouped for browsing. Helper columns are export internals.
 const statGroups = {
+  'Game Score': [
+    ['gamesPlayed','Games Played'],['gameScore','Game Score'],['itemScore','Item Score'],
+    ['heatingUpCount','Hot Games'],['longestHotStreak','Longest Hot Streak'],
+  ],
   'Offensive Stats': [
     ['positionsPlayed', 'Position(s) Played'], ['gamesPlayed', 'Games Played'], ['mvps', 'MVPs'], ['atBats', 'At-Bats'], ['plateAppearances', 'Plate Appearances'], ['runs', 'Runs'],
     ['hits', 'Hits'], ['rbi', 'RBI'], ['homeRuns', 'Home Runs'], ['batStrikeouts', 'Strikeouts'], ['batWalks', 'Walks'],
@@ -126,7 +130,7 @@ function App() {
   const [leagueSize, setLeagueSize] = useState(8)
   const [joinCode, setJoinCode] = useState('')
   const [query, setQuery] = useState('')
-  const [statTab, setStatTab] = useState('Offensive Stats')
+  const [statTab, setStatTab] = useState('Game Score')
   const [statView, setStatView] = useState('Totals')
   const [sort, setSort] = useState({ key: 'default', direction: 'desc' })
   const [selectedPlayer, setSelectedPlayer] = useState(null)

@@ -10,6 +10,7 @@ import {heatingUpCareer} from './heating-up.js'
 import {HeatMark} from './HeatingUpBadge.jsx'
 
 const groups = [
+  ['Game Score', [['gameScore','Game Score / Game',2]]],
   ['Batting', [['battingAverage','Batting Average',3],['onBase','On-Base %',3],['slug','Slugging %',3],['onBasePlusSlug','OPS',3],['hits','Hits / Game',2],['homeRuns','Home Runs / Game',2],['rbi','RBIs / Game',2],['runs','Runs / Game',2]]],
   ['Fielding', [['putouts','Putouts / Game',2],['assists','Assists / Game',2]]],
   ['Pitching', [['pitchStrikeouts','Strikeouts / Game',2],['era7','ERA (7 Innings)',2]]],
@@ -31,7 +32,7 @@ export default function PlayerProfile({player, PlayerAvatar, onClose,careerSeaso
     <div className="career-profile-content">
     <div className="player-modal-heading"><PlayerAvatar player={player} size={76}/><div><span className="eyebrow dark">SSL PLAYER PROFILE · #{player.rosterOrder || player.id}</span><div className="profile-name-row"><h2 id="career-player-name">{player.name}</h2><HeatMark playerId={player.id} inline/><PitcherPriorityBadge player={player} record={gameData.players[player.id]}/></div></div></div>
     <div className="career-bio"><span>{player.class}</span><span>{player.team || 'Free agent'}</span><DraftPickBadge playerId={player.id} seasons={fullSeasons}/></div>
-    <dl className="career-summary">{[['YEARS AS A SLUGGER',sslCareerTenure(player.id,fullSeasons)],['CAREER GAMES PLAYED',career.games],['CAREER MVPs',career.mvps],['HOT GAMES',heat.heatingUpCount],['LONGEST HOT STREAK',heat.longestHotStreak]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value ?? '—'}</dd></div>)}</dl>
+    <dl className="career-summary">{[['YEARS AS A SLUGGER',sslCareerTenure(player.id,fullSeasons)],['CAREER GAMES PLAYED',career.games],['CAREER MVPs',career.mvps],['CAREER GAME SCORE',career.gameScore],['HOT GAMES',heat.heatingUpCount],['LONGEST HOT STREAK',heat.longestHotStreak]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value ?? '—'}</dd></div>)}</dl>
     <details className="profile-game-data"><summary>GAME STATS & CHEMISTRY</summary><PlayerDataDetails player={player} seasons={fullSeasons}/></details>
      <h3 className="career-title">CAREER AVERAGES</h3>
     {groups.map(([title,stats])=><section className="career-category" key={title}><h4>{title}</h4><dl className="career-average-grid">{stats.map(([key,label,precision])=><div key={key}><dt>{label}</dt><dd>{career.averages[key]?.toFixed(precision) ?? '—'}</dd></div>)}</dl></section>)}
