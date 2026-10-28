@@ -1,7 +1,7 @@
 import React,{useEffect,useMemo,useState} from 'react';
 import {Trophy,Clock,Medal} from 'lucide-react';
 import {teamLogo} from './TeamIdentity.jsx';
-import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,POWER_PITCHER_COUNT} from './power-rankings.js';
+import {powerRankings} from './power-rankings.js';
 import {preseasonBracket,preseasonReady,pickTimeLabel} from './preseason.js';
 import './preseason.css';
 
@@ -13,41 +13,60 @@ function Identity({team,supabase}){
   </span>;
 }
 
+// Display-only presentation: numeric power index and three category placements.
+// The ranking model remains in power-rankings.js; no draft, roster or season state is modified.
 export function PowerRankings({season,supabase,compact=false}){
   const rankings=useMemo(()=>powerRankings(season),[season]);
   const eligible=Array.isArray(season?.teams)&&season.teams.length===12;
   const pending=eligible?(season.teams||[]).filter(team=>!rankings.some(t=>t.id===team.id)):[];
+  const categoryPlaces=useMemo(()=>{
+    const result={};
+    for(const field of ['offense','pitching','defense']){
+      [...rankings].sort((a,b)=>b[field]-a[field]||a.rank-b.rank).forEach((team,index)=>{
+        (result[team.id]??={})[field]=index+1;
+      });
+    }
+    return result;
+  },[rankings]);
   if(!rankings.length)return <section className="panel ssl-pre-panel">
     <h2>POWER RANKINGS</h2>
-    <p>Rankings open after the draft. Teams appear as each GM submits a valid nine-player default lineup—no team is scored from an estimated roster.</p>
-    {eligible&&<p><strong>0 / {season.teams.length} teams ranked.</strong> Awaiting default-lineup submissions.</p>}
+    <p>Rankings open after the draft as teams submit their default lineups.</p>
+    {eligible&&<p><strong>0 / {season.teams.length} teams ranked.</strong> Awaiting lineup submissions.</p>}
   </section>;
-  return <section className="panel ssl-pre-panel" aria-label="SSL power rankings">
-    <div className="ssl-pre-head"><div><small>SSL POWER INDEX · 0–100</small>
-      <h2>{rankings.some(t=>t.games>0)?'LIVE POWER RANKINGS':'POST-DRAFT POWER RANKINGS'}</h2>
-      <p>Calculated only from each GM's submitted nine-player default lineup: <b>{Math.round(100*POWER_WEIGHTS.offense)}% offense · {Math.round(100*POWER_WEIGHTS.pitching)}% pitching · {Math.round(100*POWER_WEIGHTS.defense)}% defense · {Math.round(100*POWER_WEIGHTS.running)}% running · {Math.round(100*POWER_WEIGHTS.chemistry)}% chemistry.</b>
-        {' '}The offensive rating includes <b>{Math.round(100*TRAJECTORY_OFFENSE_WEIGHT)}% hit trajectory</b>: High ({TRAJECTORY_SCORES.High}) &gt; Medium ({TRAJECTORY_SCORES.Medium}) &gt; Low ({TRAJECTORY_SCORES.Low}).
-        {' '}Offense: 40% Charge Hit Power, 25% trajectory, 20% Slap Hit Power, 7% Slap Contact, 8% Charge Contact. Defense: 60% fielding, 40% throwing. Pitching: 60% stamina, 18% charge speed, 14% curveball speed, 8% curve.
-        {' '}Offense, defense, running and chemistry use all nine starters. <b>Pitching uses only the top {POWER_PITCHER_COUNT} priority pitchers</b>: P1P first, P2P next, then untagged players if fewer than three are available. Within each tier, stronger pitching skill comes first; selected pitchers count equally. <b>Teams appear as soon as their saved default lineup is valid.</b>
-        {rankings.some(t=>t.games>0)?' Published regular-season performances gradually count for up to 60% of the index after eight team games.':''}
-      </p></div><Medal size={32} aria-hidden="true"/></div>
-    <p className="ssl-pre-help"><strong>{rankings.length} / {season.teams.length} teams ranked.</strong>
-      {' '}Rankings update automatically when a GM saves or revises their default lineup.
-      {pending.length>0&&<> <strong>Awaiting:</strong> {pending.map(t=>t.name).join(' · ')}.</>}</p>
-    <div className="ssl-pre-scroll"><table className="ssl-pre-table">
-      <thead><tr><th>Rank</th><th>Franchise</th><th>Score</th>{!compact&&<>
-        <th>Off.</th><th>Pitch.</th><th>Def.</th><th>Run</th><th>Chem.</th><th>Regular W–L</th>
-      </>}</tr></thead>
-      <tbody>{(compact?rankings.slice(0,5):rankings).map(t=>
-        <tr key={t.id}><td className="ssl-pre-rank">#{t.rank}</td>
-          <td><Identity team={t} supabase={supabase}/></td>
-          <td className="ssl-pre-score">{t.score.toFixed(1)}</td>
-          {!compact&&<><td>{t.offense.toFixed(1)}</td><td>{t.pitching.toFixed(1)}</td>
-            <td>{t.defense.toFixed(1)}</td><td>{t.running.toFixed(1)}</td>
-            <td>{t.chemistry.toFixed(1)}</td><td>{t.wins}–{t.losses}</td></>}
-        </tr>)}</tbody>
-    </table></div>
-    <p className="ssl-pre-help">Power rankings are projections, not the league standings. Preseason tournament results never affect this index or regular-season records.</p>
+  return <section className="panel ssl-pre-panel ssl-power-panel" aria-label="SSL power rankings">
+    <div className="ssl-pre-head ssl-power-head">
+      <div><small>SLUGGERS SUPA LEAGUE · POWER RANKINGS</small>
+        <h2>{rankings.some(t=>t.games>0)?'LIVE POWER RANKINGS':'POST-DRAFT POWER RANKINGS'}</h2>
+      </div>
+      <Medal size={34} aria-hidden="true"/>
+    </div>
+    <div className="ssl-power-status">
+      <strong>{rankings.length} / {season.teams.length}</strong> teams ranked
+      {pending.length>0&&<span> · Awaiting {pending.length} {pending.length===1?'lineup':'lineups'}</span>}
+    </div>
+    <ol className="ssl-power-board">
+      {(compact?rankings.slice(0,5):rankings).map(t=>
+        <li key={t.id} className={'ssl-power-entry'+(t.rank<=3?' ssl-power-podium':'')}
+            style={{'--ssl-power-accent':t.rank===1?'#dfab45':t.rank===2?'#99aec9':t.rank===3?'#c58a71':'#2789d2'}}>
+          <div className="ssl-power-team">
+            <span className="ssl-power-position" aria-label={'Overall rank '+t.rank}>{String(t.rank).padStart(2,'0')}</span>
+            <div className="ssl-power-identity"><Identity team={t} supabase={supabase}/></div>
+          </div>
+          <div className="ssl-power-main-score">
+            <div className="ssl-power-scoreline"><span>POWER RANKING SCORE</span>
+              <strong>{t.score.toFixed(1)}<small> / 100</small></strong></div>
+            <div className="ssl-power-meter" role="progressbar" aria-label={t.name+' power ranking score'}
+                aria-valuemin={0} aria-valuemax={100} aria-valuenow={t.score}>
+              <span className="ssl-power-meter-fill" style={{width:Math.max(0,Math.min(100,t.score))+'%'}}/>
+            </div>
+          </div>
+          <div className="ssl-power-subranks" aria-label={t.name+' category rankings'}>
+            <span>Offensive Ranking: <b>#{categoryPlaces[t.id].offense}</b></span>
+            <span>Pitching Ranking: <b>#{categoryPlaces[t.id].pitching}</b></span>
+            <span>Defensive Ranking: <b>#{categoryPlaces[t.id].defense}</b></span>
+          </div>
+        </li>)}
+    </ol>
   </section>;
 }
 
