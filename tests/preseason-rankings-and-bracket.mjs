@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {preseasonReady,preseasonSeeds,preseasonBracket,preseasonHasLeagueOpener} from '../src/preseason.js';
-import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,offenseRating,rosterPowerComponents,rankingParticipants,PITCHER_PRIORITY_ORDER,POWER_PITCHER_COUNT} from '../src/power-rankings.js';
+import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,offenseRating,rosterPowerComponents,rankingParticipants,PITCHER_PRIORITY_ORDER,POWER_PITCHER_COUNT,POWER_SUPPORT_PITCHER_COUNT} from '../src/power-rankings.js';
 import {pitcherPriorityFor} from '../src/player-roles.js';
 import {earnedAchievements,GM_ACHIEVEMENTS} from '../src/gm-achievements.js';
 
@@ -31,11 +31,12 @@ for(let i=0;i<12;i++){
   season.picks.push({number:season.picks.length+1,team:t[i].id,kind:j===11?'stage':'player',
     seconds:(i+1)*10});
 }
-// Only the three leading pitchers contribute to pitching; priority tier
-// wins before raw skill. Every player still contributes to offense / fielding
-// / running / team chemistry, with no artificial nine-player filtering.
+// The selected P counts first; three other starters follow P1P, P2P,
+// untagged, with pitching skill breaking same-tier ties. The remaining
+// categories still use all nine starters; bench players are excluded.
 assert.deepEqual(PITCHER_PRIORITY_ORDER,{P1P:1,P2P:2,other:3});
-assert.equal(POWER_PITCHER_COUNT,3);
+assert.equal(POWER_PITCHER_COUNT,4);
+assert.equal(POWER_SUPPORT_PITCHER_COUNT,3);
 const gamePlayers=JSON.parse(readFileSync(new URL('../src/players.json',import.meta.url),'utf8'));
 const stats=JSON.parse(readFileSync(new URL('../src/player-data.json',import.meta.url),'utf8')).players;
 const byName=new Map(gamePlayers.map(p=>[p.name,p]));
@@ -55,7 +56,8 @@ const pitchRaw=(s)=>{
 };
 for(const names of [powerNames,balancedNames]){
  const ids=names.map(n=>byName.get(n).id);
- const ranked=rosterPowerComponents(ids);
+ const designatedStarter=ids[0];
+ const ranked=rosterPowerComponents(ids,designatedStarter);
  assert.equal(ranked.rosterSize,9);
  const members=ids.map(id=>{
    const s=stats[id].stats,player=gamePlayers.find(p=>p.id===id);
@@ -68,16 +70,25 @@ for(const names of [powerNames,balancedNames]){
    };
  });
  const avg=k=>members.reduce((total,x)=>total+x[k],0)/9;
- const selected=[...members].sort((a,b)=>
+ const selected=[members[0],...[...members.slice(1)].sort((a,b)=>
    PITCHER_PRIORITY_ORDER[a.role]-PITCHER_PRIORITY_ORDER[b.role]||
-   b.pitch-a.pitch||a.id-b.id).slice(0,3);
+   b.pitch-a.pitch||a.id-b.id).slice(0,3)];
  assert.equal(ranked.offense,round1(avg('offense')),'every offensive player counts');
  assert.equal(ranked.defense,round1(avg('defense')),'every defender counts');
  assert.equal(ranked.running,round1(avg('running')),'all nine runners count');
- assert.equal(ranked.pitching,round1(selected.reduce((sum,p)=>sum+p.pitch,0)/3),
-   'only three tier-priority pitchers determine pitching rating');
+ assert.equal(ranked.pitching,round1(selected.reduce((sum,p)=>sum+p.pitch,0)/4),
+   'GM-selected starter and three backups determine pitching rating equally');
  assert.deepEqual(ranked.selectedPitchers.map(p=>p.id),selected.map(p=>p.id),
-   'must select designated P1P first, then P2P, then others by ability');
+   'must count starting P first and three unique priority-ranked backups');
+ assert.equal(new Set(ranked.selectedPitchers.map(p=>p.id)).size,4,
+   'must never double-count the starting pitcher');
+ const outsideStarter=ids.find(id=>!ranked.selectedPitchers.some(p=>p.id===id));
+ assert(outsideStarter!=null);
+ const changedStarter=rosterPowerComponents(ids,outsideStarter);
+ assert.equal(changedStarter.selectedPitchers[0].id,outsideStarter,
+   'the GM can start a less-skilled player who then counts toward pitching');
+ assert.notEqual(changedStarter.pitching,ranked.pitching,
+   'choosing a previously excluded starter changes the index');
  const withoutNinth=rosterPowerComponents(ids.slice(0,8));
  assert.notEqual(ranked.offense,withoutNinth.offense);
  assert.notEqual(ranked.defense,withoutNinth.defense);
@@ -91,21 +102,30 @@ for(const names of [powerNames,balancedNames]){
    }))
  }));
 }
-// Top-tier captains beat P2P even when a P2P's raw pitching ability is higher,
-// and all tagged pitchers beat untagged players when filling the three slots.
-const prioritized=rosterPowerComponents([
-  byName.get('Wario').id,byName.get('Tropical Wiggler').id,
-  byName.get('Petey Piranha').id,byName.get('Funky Kong').id,
+// A GM's chosen starter takes the first slot, irrespective of its priority;
+// the other three still obey P1P before P2P before untagged.
+const warioId=byName.get('Wario').id;
+const tropicalId=byName.get('Tropical Wiggler').id;
+const peteyId=byName.get('Petey Piranha').id;
+const priorityTestIds=[
+  warioId,tropicalId,peteyId,byName.get('Funky Kong').id,
   byName.get('Ice Bro').id,byName.get('Flower Fields Monty').id
-]);
-assert.equal(prioritized.selectedPitchers[0].id,byName.get('Wario').id,
-  'P1P must be selected ahead of a higher-ability P2P');
-assert.equal(prioritized.selectedPitchers[1].id,byName.get('Tropical Wiggler').id,
-  'P2P goes before nonpriority when no other P1P remains');
-assert.equal(prioritized.selectedPitchers[2].id,byName.get('Petey Piranha').id,
-  'fill the remaining slot from highest-ability untagged pitcher');
-assert.equal(rosterPowerComponents([byName.get('Wario').id]).selectedPitchers.length,1,
-  'rosters with fewer than three players should not invent pitching stats');
+];
+const prioritized=rosterPowerComponents(priorityTestIds,peteyId);
+assert.equal(prioritized.selectedPitchers.length,4);
+assert.equal(prioritized.selectedPitchers[0].id,peteyId,
+  'GM-selected untagged starter still comes first');
+assert.equal(prioritized.selectedPitchers[1].id,warioId,
+  'P1P reserve must rank before P2P');
+assert.equal(prioritized.selectedPitchers[2].id,tropicalId,
+  'P2P reserve must rank before untagged');
+assert.equal(new Set(prioritized.selectedPitchers.map(p=>p.id)).size,4);
+const p1pStarter=rosterPowerComponents(priorityTestIds,warioId);
+assert.equal(p1pStarter.selectedPitchers[0].id,warioId);
+assert(!p1pStarter.selectedPitchers.slice(1).some(p=>p.id===warioId),
+  'P1P starter must not appear twice in selected four');
+assert.equal(rosterPowerComponents([warioId],warioId).selectedPitchers.length,1,
+  'short rosters do not invent backups');
 
 const positions=['P','C','1B','2B','3B','SS','LF','CF','RF'];
 const lineupSeason={rosters:{test:powerIds.concat([balancedIds[0],balancedIds[1]])},defaults:{}};
@@ -138,6 +158,25 @@ const newDefault=teamId=>{
 season.defaults.t1=newDefault('t1');
 assert.equal(powerRankings(season).length,1,'first GM submission publishes just that franchise');
 assert.equal(powerRankings(season)[0].id,'t1');
+const originalPitch=powerRankings(season)[0];
+const starterRow=season.defaults.t1.starters.find(p=>p.position==='P');
+assert.equal(originalPitch.selectedPitchers[0].id,starterRow.player,
+  'Power Rankings must honor the saved P position');
+const newStartingRow=season.defaults.t1.starters.find(p=>
+  p.player!==starterRow.player&&!originalPitch.selectedPitchers.some(q=>q.id===p.player));
+assert(newStartingRow,'nine-player lineup must have a fifth pitcher candidate');
+const alternatePosition=newStartingRow.position;
+starterRow.position=alternatePosition;
+newStartingRow.position='P';
+const reassignedPitch=powerRankings(season)[0];
+assert.equal(reassignedPitch.selectedPitchers[0].id,newStartingRow.player,
+  'changing only the P position must change the selected starter');
+assert.notEqual(reassignedPitch.pitching,originalPitch.pitching,
+  'changing the GM-selected P must recalculate pitching score');
+assert.notEqual(reassignedPitch.rosterScore,originalPitch.rosterScore,
+  'GM starting pitcher selection must feed overall power score');
+newStartingRow.position=alternatePosition;
+starterRow.position='P';
 season.defaults.t2=newDefault('t2');
 assert.equal(powerRankings(season).length,2,'second GM submission adds one more team');
 const scoreBefore=powerRankings(season).find(x=>x.id==='t1').rosterScore;
