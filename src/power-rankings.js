@@ -1,4 +1,4 @@
-import gameData from './player-data.json';
+import gameData from './player-data.json' with { type: 'json' };
 
 // Transparent roster-only preseason projection. No in-game menu/display bars.
 // 40% hitting, 25% pitching, 20% defense, 10% running, 5% chemistry.
