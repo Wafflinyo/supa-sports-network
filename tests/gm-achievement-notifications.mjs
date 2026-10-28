@@ -28,7 +28,7 @@ for(const invalid of ['',null,undefined,'oops',-1,0,1.5])assert(!isValidGmSlot(i
 for(const valid of ['1',1,2,12])assert(isValidGmSlot(valid));
 
 // Real awards, not arbitrary client flags, produce the notifications.
-assert.equal(GM_ACHIEVEMENTS.length,92);
+assert.equal(GM_ACHIEVEMENTS.length,93);
 const season={id:'s1',number:1,name:'Season 1',
   teams:[{id:'team-a',slot:1,name:'Alpha'},{id:'team-b',slot:2,name:'Beta'}],
   games:[{id:'g1',stage:'final',phase:'regular',home:'team-a',away:'team-b',
@@ -60,4 +60,4 @@ assert(sql.includes("auth.uid()) = user_id"),'another GM must not see or ack use
 assert(!sql.includes('grant update')&&!sql.includes('grant delete'),
   'the client should only record notices, not mutate or delete other data');
 
-console.log('PASS: authenticated GM login/resume notices, batch awards, one-time persisted acknowledgement, cross-user isolation and 92 real achievements');
+console.log('PASS: authenticated GM login/resume notices, batch awards, one-time persisted acknowledgement, cross-user isolation and 93 real achievements');
