@@ -26,6 +26,7 @@ export default function GmAchievements({seasons=[],slot,teams=[],commissioner=fa
   const seasonId='all';
   const badges=useMemo(()=>earnedAchievements(seasons,activeSlot,{seasonId}),[seasons,activeSlot,seasonId]);
   const earned=badges.filter(b=>b.earned).length;
+  const total=GM_ACHIEVEMENTS.length;
 
   const visible=badges.filter(b=>(category==='All'||b.category===category) &&
     (status==='All badges'||(status==='Earned'?b.earned:!b.earned)));
@@ -35,12 +36,12 @@ export default function GmAchievements({seasons=[],slot,teams=[],commissioner=fa
     <div className="achievement-hero">
       <div><span className="achievement-kicker">SLUGGERS SUPA LEAGUE • TROPHY CASE</span>
         <h2>GM ACHIEVEMENTS</h2>
-        <p>92 original collectible badges. Earn each badge just once across your entire GM career. Unlocked badges stay with your collection.</p>
+        <p>93 collectible badges, including the Preseason Crown. Earn each badge just once across your entire GM career. Unlocked badges stay with your collection.</p>
         {activeTeam&&<div className="achievement-owner">TEAM • <strong>{activeTeam.name}</strong></div>}
       </div>
-      <div className="achievement-progress" aria-label={earned+' of 92 badges unlocked'}>
-        <strong>{earned}<span> / 92</span></strong><small>BADGES UNLOCKED</small>
-        <div className="achievement-track"><i style={{width:(earned/92*100)+'%'}}/></div>
+      <div className="achievement-progress" aria-label={earned+' of '+total+' badges unlocked'}>
+        <strong>{earned}<span> / {total}</span></strong><small>BADGES UNLOCKED</small>
+        <div className="achievement-track"><i style={{width:(earned/total*100)+'%'}}/></div>
       </div>
     </div>
     {commissioner&&<div className="achievement-team-panel">
@@ -49,7 +50,7 @@ export default function GmAchievements({seasons=[],slot,teams=[],commissioner=fa
       {knownTeams.length?<div className="achievement-team-picker">
         {knownTeams.map(t=><button type="button" key={t.slot} className={t.slot===activeSlot?'active':''}
           onClick={()=>setChosenSlot(t.slot)} aria-pressed={t.slot===activeSlot}>
-          <span>{t.name}</span><strong>{teamsEarned[t.slot]||0}/92</strong></button>)}
+          <span>{t.name}</span><strong>{teamsEarned[t.slot]||0}/{total}</strong></button>)}
       </div>:<p>No registered teams yet. Team achievements will appear once franchises are created.</p>}
     </div>}
     <div className="achievement-toolbar">
@@ -81,6 +82,6 @@ export default function GmAchievements({seasons=[],slot,teams=[],commissioner=fa
       </article>)}
     </div>
     {!visible.length&&<p className="achievement-empty">No badges match these filters.</p>}
-    <p className="achievement-footnote">Badges unlock only from released official match results. Season wins and season home runs are counted within each regular season. Putouts and assists require one individual player to reach the threshold; other match totals are team-wide. Badges are unlocked once for the entire GM career, not once per season. The Superstar Reliever badge requires verified substitution timing data.</p>
+    <p className="achievement-footnote">Match-performance badges unlock only from released official match results. The Preseason Crown unlocks from the separately recorded single-elimination preseason championship. Season wins and season home runs are counted within each regular season. Putouts and assists require one individual player to reach the threshold; other match totals are team-wide. Badges are unlocked once for the entire GM career, not once per season. The Superstar Reliever badge requires verified substitution timing data.</p>
   </section>;
 }

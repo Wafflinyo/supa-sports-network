@@ -1,4 +1,5 @@
 // Official Sluggers Supa League GM achievement rules.
+import {preseasonBracket} from './preseason.js';
 // Pure, read-only projections from *released* league results: corrections and
 // history automatically flow through without a second achievement database.
 
@@ -111,11 +112,14 @@ const pitching = [
   {id:'pitching-superstar-reliever',group:'pitch-special',category:'Pitching',icon:'relief',field:'reliever',threshold:1,rank:7,
     name:'Superstar Reliever',description:'A substitute enters with at least five innings remaining, finishes the game, and allows two or fewer runs. Requires verified pitching-substitution details.'},
 ];
-export const GM_ACHIEVEMENTS = Object.freeze([...wins,...offense,...defense,...pitching,...postseason,...frontOffice,...seasonHonors].map((badge,index) =>
+const preseasonAwards=[{id:'preseason-tournament-champion',group:'preseason',category:'Preseason',icon:'trophy',
+  field:'preseasonChampion',name:'Preseason Crown',rank:1,season:true,
+  description:'Win the 12-team single-elimination SSL Preseason Tournament.'}];
+export const GM_ACHIEVEMENTS = Object.freeze([...wins,...offense,...defense,...pitching,...postseason,...frontOffice,...seasonHonors,...preseasonAwards].map((badge,index) =>
   Object.freeze({...badge,serial:index+1})));
-export const GM_ACHIEVEMENT_CATEGORIES = ['All', 'Wins', 'Offense', 'Defense', 'Pitching', 'Playoffs', 'Front Office', 'Season Honors'];
-if (GM_ACHIEVEMENTS.length !== 92 || new Set(GM_ACHIEVEMENTS.map(a=>a.id)).size !== 92)
-  throw Error('GM achievements catalog must contain 92 unique badges.');
+export const GM_ACHIEVEMENT_CATEGORIES = ['All', 'Wins', 'Offense', 'Defense', 'Pitching', 'Playoffs', 'Front Office', 'Season Honors', 'Preseason'];
+if (GM_ACHIEVEMENTS.length !== 93 || new Set(GM_ACHIEVEMENTS.map(a=>a.id)).size !== 93)
+  throw Error('GM achievements catalog must contain 93 unique badges.');
 
 const value = v => Number.isFinite(Number(v)) && Number(v) > 0 ? Number(v) : 0;
 const asId = v => String(v ?? '');
@@ -175,6 +179,15 @@ export function achievementProgress(seasons, slot) {
         playerId:player?.player??null, playerName:player?.name??null,
       });
     };
+    // Preseason tournament scores are not season-game stats. The bracket is
+    // separately recorded and must be fully complete before this badge unlocks.
+    const preseason=preseasonBracket(season);
+    if(preseason.champion && asId(preseason.champion.id)===teamId){
+      const finalMatch=preseason.rounds[3]?.games[0];
+      award(GM_ACHIEVEMENTS.find(b=>b.field==='preseasonChampion'),
+        {id:'preseason-championship:'+season.id,
+          releasedAt:finalMatch?.recordedAt||null});
+    }
     for (const {game} of schedule) {
       if (!final(game)) continue;
       const rows = game.result.players.filter(p=>asId(p.team)===teamId);

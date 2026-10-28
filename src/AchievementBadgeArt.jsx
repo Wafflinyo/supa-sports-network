@@ -18,6 +18,7 @@ const palette = {
   Playoffs: ['#c18b2a','#63451c','#ffe6a2'],
   'Front Office': ['#1eab97','#07554f','#a9fbe6'],
   'Season Honors': ['#dba643','#73541d','#fff1ba'],
+  Preseason: ['#2894bb','#12476b','#ffe9a8'],
 };
 
 const lucide = {

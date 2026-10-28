@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import {GM_ACHIEVEMENTS,earnedAchievements,achievementProgress} from '../src/gm-achievements.js';
 const badges=GM_ACHIEVEMENTS;
-assert.equal(badges.length,92);
-assert.equal(new Set(badges.map(b=>b.id)).size,92);
+assert.equal(badges.length,93);
+assert.equal(new Set(badges.map(b=>b.id)).size,93);
 assert.equal(badges.filter(b=>b.category==='Wins').length,7);
 assert.equal(badges.filter(b=>b.category==='Offense').length,25);
 assert.equal(badges.filter(b=>b.category==='Defense').length,34);
@@ -10,6 +10,7 @@ assert.equal(badges.filter(b=>b.category==='Pitching').length,7);
 assert.equal(badges.filter(b=>b.category==='Playoffs').length,6);
 assert.equal(badges.filter(b=>b.category==='Front Office').length,7);
 assert.equal(badges.filter(b=>b.category==='Season Honors').length,6);
+assert.equal(badges.filter(b=>b.category==='Preseason').length,1);
 assert.deepEqual(badges.filter(b=>b.group==='player-putouts').map(b=>b.threshold),[5,8,10,12,15,18,20]);
 assert.deepEqual(badges.filter(b=>b.group==='player-assists').map(b=>b.threshold),[5,8,10,12,15,18,20]);
 
@@ -195,4 +196,4 @@ const unfinished=structuredClone(honors);
 unfinished.games[0].stage='recorded';
 assert(!earnedAchievements([unfinished],1).find(b=>b.id==='honors-first-seed').earned,
  'unfinished league cannot award season leadership');
-console.log('PASS: 92 once-only lifetime GM achievements, trades, accepted renewals, full season honors, playoffs and Rio stats');
+console.log('PASS: 93 once-only lifetime GM achievements, trades, accepted renewals, full season honors, playoffs and Rio stats');

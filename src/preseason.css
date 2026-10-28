@@ -1,0 +1,42 @@
+.ssl-pre-panel{margin:16px 0;padding:21px;min-width:0;color:#172844}
+.ssl-pre-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
+.ssl-pre-head h2{margin:4px 0 8px;font-size:23px;font-weight:900;color:#11264a}
+.ssl-pre-head small{font-size:11px;letter-spacing:.11em;font-weight:900;color:#b32a3e}
+.ssl-pre-head p{margin:0;color:#586780;line-height:1.65;font-size:13px;max-width:930px}
+.ssl-pre-scroll{overflow-x:auto;max-width:100%}
+.ssl-pre-table{border-collapse:collapse;width:100%;min-width:600px;font-size:13px}
+.ssl-pre-table th{background:#112a54;color:white;text-align:left;padding:11px 10px;white-space:nowrap}
+.ssl-pre-table td{padding:10px;border-bottom:1px solid #e1e6ee;vertical-align:middle}
+.ssl-pre-table tbody tr:nth-child(even){background:#f6f8fb}
+.ssl-pre-rank{font-weight:900;color:#b22c40;white-space:nowrap}
+.ssl-pre-score{font-size:17px;font-weight:900;color:#153e70}
+.ssl-pre-team{display:inline-flex;align-items:center;gap:8px;min-width:0;font-weight:800}
+.ssl-pre-team img{width:29px;height:29px;object-fit:contain;flex:0 0 29px}
+.ssl-pre-help{font-size:12px;color:#5a6980;line-height:1.6;margin-top:13px}
+.ssl-pre-tournament{display:grid;gap:4px}
+.ssl-pre-rounds{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:12px}
+.ssl-pre-rounds .ssl-pre-panel{margin:0;padding:15px}
+.ssl-pre-round-title{display:flex;align-items:center;justify-content:space-between;gap:7px;flex-wrap:wrap;margin-bottom:15px}
+.ssl-pre-round-title h3{font-size:15px;margin:0;color:#132a51}
+.ssl-pre-round-title small{font-size:10px;letter-spacing:.04em;font-weight:800;color:#63718b}
+.ssl-pre-games{display:grid;gap:12px}
+.ssl-pre-game{padding:12px;border:1px solid #d6deea;border-radius:8px;background:#fafcff}
+.ssl-pre-game>small{font-size:10px;color:#65748c;font-weight:800;letter-spacing:.04em}
+.ssl-pre-side{display:flex;align-items:center;gap:6px;padding:7px 3px;border-bottom:1px solid #e7eaf2}
+.ssl-pre-side>.ssl-pre-team{flex:1;min-width:0;font-size:12px}
+.ssl-pre-side>.ssl-pre-team>span{overflow-wrap:anywhere}
+.ssl-pre-side>b{min-width:22px;text-align:right}
+.ssl-pre-side.winner{background:#eef8ef;color:#116c3e;border-radius:5px}
+.ssl-pre-seed{font-size:11px;font-weight:900;white-space:nowrap;color:#ae3143}
+.ssl-pre-winner{margin:8px 0 0;color:#14704a;font-size:11px;font-weight:900}
+.ssl-pre-bye{font-size:12px;background:#eaf3ff;border:1px solid #b6d1ed;border-radius:6px;padding:8px 10px;margin:10px 0}
+.ssl-pre-score-form{display:flex;align-items:flex-end;flex-wrap:wrap;gap:6px;margin-top:12px}
+.ssl-pre-score-form label{display:grid;gap:3px;font-size:10px;color:#51617b;font-weight:800}
+.ssl-pre-score-form input{width:70px;padding:7px;font:inherit;font-size:14px;border:1px solid #bfcce0;border-radius:4px}
+.ssl-pre-score-form button{min-height:34px;padding:7px;font-size:10px;white-space:nowrap}
+.ssl-pre-champion{display:flex;gap:12px;align-items:center;background:#fff4d9;border:1px solid #d0a655;border-radius:8px;padding:16px;color:#7a511b}
+.ssl-pre-champion small{display:block;font-size:11px;font-weight:800;letter-spacing:.08em}
+.ssl-pre-champion strong{display:block;font-size:20px;color:#55350b}
+.ssl-pre-champion p{margin:4px 0 0;font-size:12px}
+.ssl-pre-error{font-size:13px;color:#a32035;background:#fff0f0;padding:8px;border-radius:4px}
+@media(max-width:650px){.ssl-pre-panel{padding:14px}.ssl-pre-rounds{grid-template-columns:1fr}.ssl-pre-head h2{font-size:20px}.ssl-pre-table{font-size:12px}}
