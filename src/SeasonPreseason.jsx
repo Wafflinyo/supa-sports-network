@@ -105,6 +105,43 @@ export function PreseasonTournament({league,compact=false}){
     <h2>PRESEASON TOURNAMENT</h2>
     <p>The automatic 12-team bracket and draft-speed seeds appear once the official draft is finished. No seed is assigned while picks are still in progress.</p>
   </section>;
+  if(compact)return <section className="panel ssl-pre-panel ssl-pre-home-bracket" aria-label="Pre-season tournament bracket">
+    <div className="ssl-pre-head">
+      <div><small>SSL PRE-SEASON · SINGLE ELIMINATION</small>
+        <h2>PRE-SEASON BRACKET</h2>
+        <p><strong>{bracket.completedGames} of {bracket.totalGames} matches completed</strong>
+          {' '}· Round-by-round results update as the tournament progresses.</p>
+      </div>
+      <Trophy size={32} aria-hidden="true"/>
+    </div>
+    {bracket.champion&&<div className="ssl-pre-champion" role="status">
+      <Trophy size={26}/><div><small>PRE-SEASON CHAMPION</small>
+        <strong>{bracket.champion.name}</strong></div></div>}
+    <div className="ssl-pre-home-rounds">
+      {bracket.rounds.map(round=><section className="ssl-pre-home-round" key={round.number}
+        aria-label={round.title}>
+        <div className="ssl-pre-round-title">
+          <h3>{round.title}</h3><small>{round.complete?'COMPLETE':round.pending?'UPCOMING':'IN PROGRESS'}</small>
+        </div>
+        {round.pending?<p className="ssl-pre-home-pending">Awaiting the previous round</p>:<>
+          {round.bye&&<div className="ssl-pre-bye"><b>BYE</b> · #{round.bye.seed} {round.bye.name}</div>}
+          <div className="ssl-pre-games">
+            {round.games.map(game=><article className="ssl-pre-game" key={game.key}>
+              <small>{game.key}</small>
+              <div className={'ssl-pre-side'+(game.winner?.id===game.high.id?' winner':'')}>
+                <span className="ssl-pre-seed">#{game.high.seed}</span>
+                <Identity team={game.high} supabase={league.supabase}/>
+                <b>{game.scoreA??'—'}</b></div>
+              <div className={'ssl-pre-side'+(game.winner?.id===game.low.id?' winner':'')}>
+                <span className="ssl-pre-seed">#{game.low.seed}</span>
+                <Identity team={game.low} supabase={league.supabase}/>
+                <b>{game.scoreB??'—'}</b></div>
+            </article>)}
+          </div>
+        </>}
+      </section>)}
+    </div>
+  </section>;
   return <div className="ssl-pre-tournament">
     <section className="panel ssl-pre-panel">
       <div className="ssl-pre-head"><div><small>SSL PRESEASON · SINGLE ELIMINATION</small>
