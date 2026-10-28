@@ -41,6 +41,7 @@ const sections = [
   ]],
   ['Heating Up and hot streaks', [
     `After each game, the commissioner uploads the Project Rio Stats and Pitching worksheets with a new "Item Score" column on Stats. The site calculates SSL Game Score automatically from 19 batting, defensive, pitching and penalty stats, adds Item Score, and awards Heating Up at ${HEATING_UP_THRESHOLD} or higher. Fantasy points and the old manually entered in-game Game Score are not used.`,
+    'Custom Game Score: Hits +4, Runs +6, RBI +8, HR +15, Doubles +4, Triples +6, 2-run HR bonus +8, 3-run HR bonus +12, Grand Slam bonus +15, Total Bases +4 each; Putouts +5, Assists +4, Buddy Jump Putouts +15, Double Plays +8, Triple Plays +18; Pitching Strikeouts +15; Bobbles -6, DP Hit Into -8, TP Hit Into -12. All applicable awards stack. Item Score is added separately; final player score is at least 0.',
     'Heating Up is automatic, with no manager selection, coin balance, player tier, recharge period, cost, or limit on the number of qualifying players.',
     `The site records each qualifying score and game, each player’s total Heating Up occurrences, the number of hot streaks, current streak length, and longest hot streak. A hot streak is two or more consecutive team games with a Game Score of ${HEATING_UP_THRESHOLD}+ for that player.`,
     `A score below ${HEATING_UP_THRESHOLD} or a team game without a qualifying player score ends that streak. Starred status applies only to the next team game. Trades do not grant a free star; eligibility is based on the player’s preceding game result.`,
