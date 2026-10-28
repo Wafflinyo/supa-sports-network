@@ -1,6 +1,7 @@
-// Official Project Rio in-game Game Score, not fantasy points. All values
-// derive from posted reports so corrections automatically recalculate history.
-export const HEATING_UP_THRESHOLD = 90;
+// Official custom SSL Game Score calculated at Project Rio import time.
+// Corrections automatically update the score, heat history and streaks.
+import {SSL_HEATING_THRESHOLD} from './ssl-game-score.js';
+export const HEATING_UP_THRESHOLD = SSL_HEATING_THRESHOLD;
 export function heatingUpForSeason(season,{includeRecorded=false}={}) {
   const players={},byGame={},ready={},lastEarned={};
   const ordered=[...(season?.games||[])].filter(g=>g.stage!=='cancelled')
