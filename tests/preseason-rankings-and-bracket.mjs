@@ -215,8 +215,10 @@ assert(powerView.includes('ssl-power-board')&&powerView.includes('ssl-power-entr
   'Power Rankings must show a branded list with one overall numeric score and progress bar');
 assert(powerView.includes('Offensive Ranking:')&&powerView.includes('Pitching Ranking:')&&
   powerView.includes('Defensive Ranking:')&&powerView.includes('categoryPlaces[t.id].offense')&&
-  powerView.includes('categoryPlaces[t.id].pitching')&&powerView.includes('categoryPlaces[t.id].defense'),
-  'Power Rankings must show three number-only category placements beneath the overall score');
+  powerView.includes('categoryPlaces[t.id].pitching')&&powerView.includes('categoryPlaces[t.id].defense')&&
+  powerView.includes('t.offense.toFixed(1)')&&powerView.includes('t.pitching.toFixed(1)')&&
+  powerView.includes('t.defense.toFixed(1)')&&powerView.includes('Score:'),
+  'Power Rankings must show numeric category scores and league placements without additional bars');
 assert.equal((powerView.match(/role="progressbar"/g)||[]).length,1,
   'Only the overall score may use a bar; category rankings must not use bars');
 assert(!powerView.includes('POWER_WEIGHTS')&&!powerView.includes('TRAJECTORY_SCORES')&&
