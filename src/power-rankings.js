@@ -8,10 +8,10 @@ import {validLineup} from './season-data.js';
 // Offense: charge power 40%, trajectory 25%, slap power 20%, slap contact 7%, charge contact 8%.
 // High trajectory > Medium > Low. The display-stat rating bars are not used.
 // Evaluate all nine starters for offense, defense, running and chemistry.
-// Only the highest-priority three eligible pitchers determine pitching:
-// P1P first, P2P second, untagged players only if needed. Within a tier,
-// the stronger actual pitching ability comes first. Count exactly those
-// three equally rather than allowing every other batter to dilute pitching.
+// Pitching uses the default lineup's designated P first, plus the best
+// three other eligible starters: P1P first, P2P second, then untagged.
+// Strongest pitching ability breaks ties within a tier. Each of the
+// four distinct players contributes equally; never count the starter twice.
 // Publish a franchise ONLY after its GM submits a valid nine-starter
 // default lineup; never rank bench players or invent unsubmitted starters.
 // During the regular season, published game form gradually earns up to 60%
@@ -23,7 +23,8 @@ const pitchVelocity=(value,min,max)=>clamp((Number(value||min)-min)/(max-min)*10
 const round=x=>Math.round(x*10)/10;
 const playerById=new Map(players.map(p=>[Number(p.id),p]));
 export const PITCHER_PRIORITY_ORDER=Object.freeze({P1P:1,P2P:2,other:3});
-export const POWER_PITCHER_COUNT=3;
+export const POWER_PITCHER_COUNT=4;
+export const POWER_SUPPORT_PITCHER_COUNT=3;
 export const POWER_WEIGHTS=Object.freeze({
   offense:.50,pitching:.15,defense:.25,running:.05,chemistry:.05
 });
@@ -56,15 +57,21 @@ function scouting(id){
     conditional:new Set(record.conditionalGoodChemistryIds||[]),
   };
 }
-function topPriorityPitchers(people){
-  return [...people].sort((a,b)=>
+function topPriorityPitchers(people,startingPitcherId=null){
+  // A designated P is always first, even if the GM chose an untagged pitcher.
+  const starter=startingPitcherId==null?null:
+    people.find(p=>p.id===Number(startingPitcherId))||null;
+  const available=people.filter(p=>p.id!==starter?.id);
+  const backups=available.sort((a,b)=>
     (PITCHER_PRIORITY_ORDER[a.pitcherPriority||'other']-
       PITCHER_PRIORITY_ORDER[b.pitcherPriority||'other']) ||
-    b.pitching-a.pitching || a.id-b.id).slice(0,POWER_PITCHER_COUNT);
+    b.pitching-a.pitching || a.id-b.id
+  ).slice(0,starter?POWER_SUPPORT_PITCHER_COUNT:POWER_PITCHER_COUNT);
+  return starter?[starter,...backups]:backups;
 }
-export function rosterPowerComponents(roster){
+export function rosterPowerComponents(roster,startingPitcherId=null){
   const people=[...new Set((roster||[]).map(Number))].map(scouting).filter(Boolean);
-  const pitchers=topPriorityPitchers(people);
+  const pitchers=topPriorityPitchers(people,startingPitcherId);
   const scoreChemistry=()=>{
     const pairs=people.reduce((sum,p,i)=>sum+people.slice(i+1).reduce((sub,q)=>{
       const bonus=p.good.has(q.id)||q.good.has(p.id)||
@@ -114,7 +121,9 @@ export function powerRankings(season){
     season.teams?.length!==12)return [];
   return season.teams.filter(team=>
     rankingParticipants(season,team.id).length===9).map(team=>{
-    const c=rosterPowerComponents(rankingParticipants(season,team.id));
+    const participants=rankingParticipants(season,team.id);
+    const starter=season.defaults?.[team.id]?.starters.find(p=>p.position==='P');
+    const c=rosterPowerComponents(participants,starter?.player);
     const record=playedRecord(season,team.id);
     const formWeight=record.games?Math.min(.60,record.games*.075):0;
     const score=(1-formWeight)*c.rosterScore+formWeight*(record.form??c.rosterScore);
