@@ -1,7 +1,7 @@
 import React,{useEffect,useMemo,useState} from 'react';
 import {Trophy,Clock,Medal} from 'lucide-react';
 import {teamLogo} from './TeamIdentity.jsx';
-import {powerRankings} from './power-rankings.js';
+import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES} from './power-rankings.js';
 import {preseasonBracket,preseasonReady,pickTimeLabel} from './preseason.js';
 import './preseason.css';
 
@@ -21,7 +21,8 @@ export function PowerRankings({season,supabase,compact=false}){
   return <section className="panel ssl-pre-panel" aria-label="SSL power rankings">
     <div className="ssl-pre-head"><div><small>SSL POWER INDEX · 0–100</small>
       <h2>{rankings.some(t=>t.games>0)?'LIVE POWER RANKINGS':'POST-DRAFT POWER RANKINGS'}</h2>
-      <p>Calculated from each team's roster: <b>40% offense · 25% pitching · 20% defense · 10% running · 5% chemistry.</b>
+      <p>Calculated from each team's roster: <b>{Math.round(100*POWER_WEIGHTS.offense)}% offense · {Math.round(100*POWER_WEIGHTS.pitching)}% pitching · {Math.round(100*POWER_WEIGHTS.defense)}% defense · {Math.round(100*POWER_WEIGHTS.running)}% running · {Math.round(100*POWER_WEIGHTS.chemistry)}% chemistry.</b>
+        {' '}The offensive rating includes <b>{Math.round(100*TRAJECTORY_OFFENSE_WEIGHT)}% hit trajectory</b>: High ({TRAJECTORY_SCORES.High}) &gt; Medium ({TRAJECTORY_SCORES.Medium}) &gt; Low ({TRAJECTORY_SCORES.Low}).
         {rankings.some(t=>t.games>0)?' Published regular-season performances gradually count for up to 60% of the index after eight team games.':''}
       </p></div><Medal size={32} aria-hidden="true"/></div>
     <div className="ssl-pre-scroll"><table className="ssl-pre-table">
