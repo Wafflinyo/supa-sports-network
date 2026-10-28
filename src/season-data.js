@@ -1,4 +1,5 @@
 import columns from "./temporary-stat-columns.json" with { type: "json" };
+import {customGameScore} from './ssl-game-score.js';
 export const positions = ["P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
 export const rosterOf = (s, t) => s?.rosters?.[t] || [];
 export const validLineup = (s, t, l) => {
@@ -51,6 +52,8 @@ export function aggregate(season) {
       const st = stats[p.player] || { gamesPlayed: 0, positionsPlayed: [] };
       st.gamesPlayed++;
       for (const [k, v] of Object.entries(p.stats)) st[k] = (st[k] || 0) + v;
+      if(typeof p.gameScore==='number'&&Number.isFinite(p.gameScore))
+        st.gameScore=(st.gameScore||0)+p.gameScore;
       st.positionsPlayed = [
         ...new Set([...st.positionsPlayed, ...(p.positions || [])]),
       ];
@@ -59,6 +62,7 @@ export function aggregate(season) {
   }
   for (const st of Object.values(stats)) {
     const ratio = (n, d) => (d ? (n || 0) / d : 0);
+    st.gameScoreAvg=ratio(st.gameScore,st.gamesPlayed);
     st.battingAverage = ratio(st.hits, st.atBats);
     st.onBase = ratio(
       (st.hits || 0) + (st.batWalks || 0) + (st.hitByPitch || 0),
@@ -217,8 +221,8 @@ export async function readRio(file, season, game, players) {
     return out;
   }
   const rawBat = rows("Stats");
-  if (!rawBat.some(r => r.gamescore != null || r.ingamescore != null))
-    throw Error('Add a "Game Score" column to the Project Rio Stats worksheet with each player\'s in-game score (not fantasy points).');
+  if(!rawBat.some(r=>Object.hasOwn(r,'itemscore')))
+    throw Error('Add an "Item Score" column to the Project Rio Stats worksheet. Enter points there; blank cells count as zero. The website calculates Game Score automatically.');
   const bat = rawBat.filter(
       (r) =>
         r.player &&
@@ -280,64 +284,58 @@ export async function readRio(file, season, game, players) {
     }),
   };
 }
+export function reportStatCount(r,key) {
+  const label = Object.values(columns).flat().find(([k]) => k === key)?.[1];
+  const names = aliases[key] || [label || key];
+  const match = names.map(normalize).find((n) => r?.[n] != null && r[n] !== "");
+  if (!match)return 0;
+  const n=Number(r[match]);
+  if(!Number.isInteger(n)||n<0)throw Error(`${r.player}: invalid ${label||key}`);
+  return n;
+}
+export function reportRowStats(row,pitchRow=null){
+  const stats=Object.fromEntries([...counts].map(k=>[k,0]));
+  for(const [key] of [...columns['Offensive Stats'],...columns['Defensive Stats']])
+    if(counts.has(key)&&key!=='mvps')stats[key]=reportStatCount(row,key);
+  stats.totalBases=stats.singles+2*stats.doubles+3*stats.triples+4*stats.homeRuns;
+  stats.plateAppearances=stats.plateAppearances||
+    stats.atBats+stats.batWalks+stats.hitByPitch+stats.sacFlys;
+  if(pitchRow){
+    for(const [key] of columns['Pitching Stats'])
+      if(counts.has(key)&&key!=='mvps')stats[key]=reportStatCount(pitchRow,key);
+    const ip=Number(pitchRow.inningspitched);
+    if(!Number.isFinite(ip)||ip<0)throw Error('Invalid innings pitched.');
+    stats.outs=Math.round(ip*3);
+  } else stats.outs=0;
+  return stats;
+}
+export function previewCustomGameScore(preview,row){
+  const pitching=preview.pitch.filter(p=>Number(p.chosen)&&Number(p.chosen)===Number(row.chosen)
+    || (normalize(p.player)===normalize(row.player)&&(!p.team||String(p.team)===row.label)));
+  if(pitching.length>1)throw Error(`Ambiguous pitching row for ${row.player}.`);
+  return customGameScore(reportRowStats(row,pitching[0]),row.itemscore===''?0:row.itemscore);
+}
 export function buildReport(preview, awayLabel, season, game, players, mvp) {
   const pickTeam = (r) => (r.label === awayLabel ? game.away : game.home),
     result = [];
-  function numeric(r, key, category) {
-    const label = Object.values(columns)
-      .flat()
-      .find(([k]) => k === key)?.[1];
-    const names = aliases[key] || [label || key];
-    const match = names.map(normalize).find((n) => r[n] != null && r[n] !== "");
-    if (!match) return 0;
-    const n = Number(r[match]);
-    if (!Number.isInteger(n) || n < 0)
-      throw Error(`${r.player}: invalid ${label || key}`);
-    return n;
-  }
   for (const r of preview.rows) {
     const player = Number(r.chosen),
       team = pickTeam(r);
     if (!player || !rosterOf(season, team).includes(player))
       throw Error(`Map ${r.player} to a player from the correct team.`);
-    const stats = Object.fromEntries([...counts].map((k) => [k, 0]));
-    for (const [key] of [
-      ...columns["Offensive Stats"],
-      ...columns["Defensive Stats"],
-    ])
-      if (counts.has(key) && key !== "mvps")
-        stats[key] = numeric(r, key, "batting");
-    stats.mvps = player === Number(mvp) ? 1 : 0;
-    const rawGameScore = r.gamescore ?? r.ingamescore;
-    const gameScore = Number(rawGameScore);
-    if (rawGameScore == null || String(rawGameScore).trim() === '' || !Number.isFinite(gameScore) || gameScore < 0 || gameScore > 999.99)
-      throw Error(`${r.player}: enter a valid Game Score (0–999.99) on the Stats worksheet.`);
-    stats.starBases = Number(r.starbaseshelper || 0);
-    stats.totalBases =
-      stats.singles +
-      2 * stats.doubles +
-      3 * stats.triples +
-      4 * stats.homeRuns;
-    stats.plateAppearances =
-      stats.plateAppearances ||
-      stats.atBats + stats.batWalks + stats.hitByPitch + stats.sacFlys;
     const pitching = preview.pitch.filter((x) => Number(x.chosen) === player);
     if (pitching.length > 1)
       throw Error(`Ambiguous pitching row for ${r.player}.`);
-    if (pitching[0]) {
-      const pr = pitching[0];
-      for (const [key] of columns["Pitching Stats"])
-        if (counts.has(key) && key !== "mvps")
-          stats[key] = numeric(pr, key, "pitching");
-      const ip = Number(pr.inningspitched);
-      if (!Number.isFinite(ip) || ip < 0)
-        throw Error("Invalid innings pitched.");
-      stats.outs = Math.round(ip * 3);
-    } else stats.outs = 0;
+    const stats=reportRowStats(r,pitching[0]);
+    stats.mvps=player===Number(mvp)?1:0;
+    stats.starBases=Number(r.starbaseshelper||0);
+    const calculated=customGameScore(stats,r.itemscore===''?0:r.itemscore);
     result.push({
       player,
       team,
-      gameScore,
+      gameScore:calculated.gameScore,
+      baseGameScore:calculated.baseGameScore,
+      itemScore:calculated.itemScore,
       positions: String(r.position)
         .split(/[\/,;→\-]+/)
         .map((x) => x.trim())
