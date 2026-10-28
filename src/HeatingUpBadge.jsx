@@ -9,7 +9,7 @@ export function HeatFlame() { return <svg viewBox="0 0 28 33" xmlns="http://www.
 export function HeatMark({playerId,inline=false}) {
   const hot=useContext(HeatingUpContext);
   if(!hot?.has(Number(playerId)))return null;
-  return <span className={inline?'heat-mark heat-mark-inline':'heat-mark'} title="Heating Up · Game Score 90+ in latest game" aria-label="Heating Up">
+  return <span className={inline?'heat-mark heat-mark-inline':'heat-mark'} title="Heating Up · Game Score 95+ in latest game" aria-label="Heating Up">
     <HeatFlame/>
   </span>;
 }
