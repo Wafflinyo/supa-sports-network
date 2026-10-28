@@ -1131,7 +1131,7 @@ function MyTeam({league:l}){
 function Teams({ league: l }) {
   const s = l.season;
   const [tab,setTab]=useState('Franchises');
-  const rankingsVisible=preseasonReady(s)&&preseasonHasLeagueOpener(s);
+  const rankingsVisible=preseasonReady(s);
   const records = new Map(standings(s).map(t=>[t.id,t]));
   return (<>
     {rankingsVisible&&<div className="subnav" role="tablist" aria-label="Team tabs">
@@ -2448,6 +2448,25 @@ function History({ league: l }) {
     </>
   );
 }
+function PlayoffBracketSections({league:l}){
+  const s=l.season;
+  const [tab,setTab]=useState('Pre-season');
+  // These are display-only tabs; preseason results remain in their dedicated
+  // table, while the existing official playoff bracket remains unchanged.
+  return <>
+    <div className="subnav" role="tablist" aria-label="Playoff bracket sections">
+      {['Playoffs','Pre-season'].map(section=><button
+        key={section} type="button" role="tab" aria-selected={tab===section}
+        className={tab===section?'active':''}
+        onClick={()=>setTab(section)}>{section}</button>)}
+    </div>
+    {tab==='Pre-season'?<PreseasonTournament league={l}/>:
+      s&&['postseason','retention','offseason','archived'].includes(s.status)?<>
+        <PlayoffPanel league={l}/>
+        <Schedule league={{...l,season:{...s,games:s.games.filter(g=>g.phase==='playoffs')}}}/>
+      </>:<Box title="PLAYOFFS CLOSED"><p>Opens after the regular season.</p></Box>}
+  </>;
+}
 export const seasonPages = [
   "Schedule",
   "Standings",
@@ -2487,27 +2506,7 @@ export function SeasonPage({ page, league: l }) {
       ) : page === "SSL History" ? (
         <History league={l} />
       ) : page === "Playoff Bracket" ? (
-        l.season &&
-        ["postseason", "retention", "offseason", "archived"].includes(
-          l.season.status,
-        ) ? (
-          <>
-            <PlayoffPanel league={l} />
-            <Schedule
-              league={{
-                ...l,
-                season: {
-                  ...l.season,
-                  games: l.season.games.filter((g) => g.phase === "playoffs"),
-                },
-              }}
-            />
-          </>
-        ) : (
-          <Box title="PLAYOFFS CLOSED">
-            <p>Opens after the regular season.</p>
-          </Box>
-        )
+        <PlayoffBracketSections league={l}/>
       ) : (
         <Trades league={l} messages={page === "Messages"} />
       )}
@@ -2567,10 +2566,12 @@ export function SeasonHome({ league: l, go }) {
           </p>
         ))}
       </Box>
-      {preseasonReady(s)&&!preseasonHasLeagueOpener(s)&&
-        <PowerRankings season={s} supabase={l.supabase}/>}
-      {preseasonReady(s)&&<button type="button" className="outline-btn"
-        onClick={()=>go('Preseason Tournament')}>VIEW PRESEASON TOURNAMENT BRACKET</button>}
+      {preseasonReady(s)&&<>
+        <PowerRankings season={s} supabase={l.supabase}/>
+        <PreseasonTournament league={l} compact/>
+        <button type="button" className="outline-btn ssl-pre-home-link"
+          onClick={()=>go('Playoff Bracket')}>OPEN FULL PRE-SEASON BRACKET</button>
+      </>}
     </div>
   );
 }
