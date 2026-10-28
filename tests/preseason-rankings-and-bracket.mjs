@@ -209,13 +209,25 @@ assert(!badgesStill.find(b=>b.id===championBadge).earned,
  'no tournament badge is awarded from a league game instead of preseason bracket');
 
 const powerUi=readFileSync(new URL('../src/SeasonPreseason.jsx',import.meta.url),'utf8');
-assert(powerUi.includes('POWER_WEIGHTS.defense')&&powerUi.includes('POWER_WEIGHTS.pitching')&&
-  powerUi.includes('TRAJECTORY_OFFENSE_WEIGHT')&&powerUi.includes('TRAJECTORY_SCORES.High'),
-  'Home and Teams must explain the exact weights and trajectory ordering');
-const scoringUi=readFileSync(new URL('../src/SeasonPreseason.jsx',import.meta.url),'utf8');
-assert(scoringUi.includes('top {POWER_PITCHER_COUNT} priority pitchers') &&
- scoringUi.includes('P1P first, P2P next'),
- 'Home and Teams scoring text must clearly explain the strict three-player priority');
+const powerView=powerUi.slice(powerUi.indexOf('export function PowerRankings('),powerUi.indexOf('function ScoreEntry('));
+assert(powerView.includes('ssl-power-board')&&powerView.includes('ssl-power-entry')&&
+  powerView.includes('ssl-power-meter')&&powerView.includes('t.score.toFixed(1)'),
+  'Power Rankings must show a branded list with one overall numeric score and progress bar');
+assert(powerView.includes('Offensive Ranking:')&&powerView.includes('Pitching Ranking:')&&
+  powerView.includes('Defensive Ranking:')&&powerView.includes('categoryPlaces[t.id].offense')&&
+  powerView.includes('categoryPlaces[t.id].pitching')&&powerView.includes('categoryPlaces[t.id].defense'),
+  'Power Rankings must show three number-only category placements beneath the overall score');
+assert.equal((powerView.match(/role="progressbar"/g)||[]).length,1,
+  'Only the overall score may use a bar; category rankings must not use bars');
+assert(!powerView.includes('POWER_WEIGHTS')&&!powerView.includes('TRAJECTORY_SCORES')&&
+  !powerView.includes('top {POWER_PITCHER_COUNT}')&&!powerView.includes('60% stamina'),
+  'Do not publish internal Power Rankings scoring formulas or calculation explanations');
+assert(!powerView.includes('t.running.toFixed')&&!powerView.includes('t.chemistry.toFixed')&&
+  !powerView.includes('Regular W–L'),
+  'Hide running, chemistry, and extra columns from the streamlined leaderboard');
+const powerStyles=readFileSync(new URL('../src/preseason.css',import.meta.url),'utf8');
+assert(powerStyles.includes('.ssl-power-subranks')&&powerStyles.includes('.ssl-power-head'),
+  'The Power Rankings redesign must retain its responsive card styling');
 const s=readFileSync(new URL('../src/SeasonLeague.jsx',import.meta.url),'utf8');
 assert(s.includes('ssl_preseason_results')&&s.includes("rpc('ssl_preseason_record'"));
 assert(s.includes('preseasonHasLeagueOpener(s)'));
