@@ -1,8 +1,24 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {preseasonReady,preseasonSeeds,preseasonBracket,preseasonHasLeagueOpener} from '../src/preseason.js';
-import {powerRankings} from '../src/power-rankings.js';
+import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,offenseRating} from '../src/power-rankings.js';
 import {earnedAchievements,GM_ACHIEVEMENTS} from '../src/gm-achievements.js';
+
+// Explicit scoring contract: defense outranks pitching, and otherwise-identical
+// batters rank High > Medium > Low for hit trajectory.
+assert.deepEqual(POWER_WEIGHTS,{offense:.40,pitching:.20,defense:.25,running:.10,chemistry:.05});
+assert.equal(Object.values(POWER_WEIGHTS).reduce((sum,n)=>sum+n,0),1);
+assert.equal(TRAJECTORY_OFFENSE_WEIGHT,.20);
+assert.deepEqual(TRAJECTORY_SCORES,{High:100,Medium:60,Low:20});
+const hitter={ 'slap hit power':50,'charge hit power':50,
+  'slap contact size':50,'charge contact size':50,
+  'displayed batting':1, 'displayed pitching':1 };
+assert.equal(offenseRating({...hitter,'hit trajectory':'High'}),60);
+assert.equal(offenseRating({...hitter,'hit trajectory':'Medium'}),52);
+assert.equal(offenseRating({...hitter,'hit trajectory':'Low'}),44);
+assert.equal(offenseRating({...hitter,'hit trajectory':'High',
+  'displayed batting':10,'displayed pitching':10}),60,
+  'hidden attribute calculation must never use the removed displayed ratings');
 
 const t=Array.from({length:12},(_,i)=>({id:'t'+(i+1),name:'Franchise '+(i+1),slot:i+1,logoPath:''}));
 const playerIds=JSON.parse(readFileSync(new URL('../src/players.json',import.meta.url),'utf8')).map(p=>p.id);
@@ -85,6 +101,10 @@ const badgesStill=earnedAchievements([season2],1);
 assert(!badgesStill.find(b=>b.id===championBadge).earned,
  'no tournament badge is awarded from a league game instead of preseason bracket');
 
+const powerUi=readFileSync(new URL('../src/SeasonPreseason.jsx',import.meta.url),'utf8');
+assert(powerUi.includes('POWER_WEIGHTS.defense')&&powerUi.includes('POWER_WEIGHTS.pitching')&&
+  powerUi.includes('TRAJECTORY_OFFENSE_WEIGHT')&&powerUi.includes('TRAJECTORY_SCORES.High'),
+  'Home and Teams must explain the exact weights and trajectory ordering');
 const s=readFileSync(new URL('../src/SeasonLeague.jsx',import.meta.url),'utf8');
 assert(s.includes('ssl_preseason_results')&&s.includes("rpc('ssl_preseason_record'"));
 assert(s.includes('preseasonHasLeagueOpener(s)'));
