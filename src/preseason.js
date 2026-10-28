@@ -13,7 +13,7 @@ export function preseasonSeeds(season){
   const draws=(season.teams||[]).map((team,i)=>{
     const picks=(season.picks||[]).filter(p=>String(p.team)===String(team.id)&&
       Number.isFinite(Number(p.seconds))&&Number(p.seconds)>=0);
-    return {...team,lotteryPosition:i,selectedPicks:picks.length,
+    return {...team,lotteryPosition:(season.order||[]).indexOf(team.id)>=0?(season.order||[]).indexOf(team.id):i+12,selectedPicks:picks.length,
       avgSeconds:picks.length?picks.reduce((n,p)=>n+Number(p.seconds),0)/picks.length:Infinity};
   }).sort((a,b)=>a.avgSeconds-b.avgSeconds || a.lotteryPosition-b.lotteryPosition);
   return draws.map((t,i)=>({...t,seed:i+1}));
