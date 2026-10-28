@@ -271,10 +271,36 @@ assert(powerStyles.includes('.ssl-power-subranks')&&powerStyles.includes('.ssl-p
   'The Power Rankings redesign must retain its responsive card styling');
 const s=readFileSync(new URL('../src/SeasonLeague.jsx',import.meta.url),'utf8');
 assert(s.includes('ssl_preseason_results')&&s.includes("rpc('ssl_preseason_record'"));
-assert(s.includes('preseasonHasLeagueOpener(s)'));
-assert(s.includes('<PowerRankings season={s} supabase={l.supabase}/>'));
-assert(s.includes('<PreseasonTournament league={l} />'));
-assert(s.includes('Power Rankings'));
+const home=s.slice(s.indexOf('export function SeasonHome('));
+const teamsView=s.slice(s.indexOf('function Teams('),s.indexOf('function ScheduleMatchupHeading('));
+const bracketTabs=s.slice(s.indexOf('function PlayoffBracketSections('),s.indexOf('export const seasonPages'));
+assert(home.includes('preseasonReady(s)&&<>')&&
+  home.includes('<PowerRankings season={s} supabase={l.supabase}/>')&&
+  home.includes('<PreseasonTournament league={l} compact/>'),
+  'Home must display Power Rankings and live pre-season bracket when the draft finishes');
+assert(!home.includes('!preseasonHasLeagueOpener(s)'),
+  'Power Rankings must remain on Home even after the regular-season opener');
+assert(teamsView.includes('const rankingsVisible=preseasonReady(s);')&&
+  teamsView.includes("['Franchises','Power Rankings']"),
+  'Teams must have Power Rankings sub-tab as soon as the post-draft rankings open');
+assert(bracketTabs.includes("['Playoffs','Pre-season']")&&
+  bracketTabs.includes("<PreseasonTournament league={l}/>")&&
+  bracketTabs.includes('<PlayoffPanel league={l}/>'),
+  'Playoff Bracket must include the Pre-season and official Playoffs sub-tabs');
+assert(s.includes("page === \"Playoff Bracket\" ? (")&&
+  s.includes('<PlayoffBracketSections league={l}/>'),
+  'Playoff Bracket page must render the accessible dual-tab view');
+assert(home.includes("onClick={()=>go('Playoff Bracket')}"),
+  'Home bracket link must open the Playoff Bracket section');
+const compactBracket=powerUi.slice(powerUi.indexOf('if(compact)return'),powerUi.indexOf('return <div className="ssl-pre-tournament">'));
+assert(compactBracket.includes('bracket.rounds.map')&&compactBracket.includes('game.winner')&&
+  compactBracket.includes('game.scoreA')&&compactBracket.includes('game.scoreB'),
+  'Home bracket preview must show live real matchups, scores and advancement');
+assert(!compactBracket.includes('<ScoreEntry'),
+  'Home preview is read-only: result editing must stay in the full bracket tab');
+const nav=readFileSync(new URL('../src/navigation.js',import.meta.url),'utf8');
+assert(nav.includes("'Playoff Bracket'")&&!nav.includes("'Draft Room', 'Preseason Tournament'"),
+  'Pre-season belongs under Playoff Bracket, not a redundant main navigation entry');
 const schema=readFileSync(new URL('../supabase/migrations/20261028162000_ssl_preseason_tournament.sql',import.meta.url),'utf8');
 assert(schema.includes("access->>'role'<>'commissioner'"));
 assert(schema.includes("public.ssl_preseason_results"));
