@@ -19,7 +19,7 @@ export function DraftPlayers({league:l}) {
   for(const t of s.teams) for(const id of s.rosters?.[t.id]||[]) ownership.set(Number(id),t.name);
   for(const pick of s.picks) if(pick.player != null && !ownership.has(Number(pick.player))) ownership.set(Number(pick.player),s.teams.find(t=>t.id===pick.team)?.name||'Drafted');
   const owner=s.nextPick?.team, team=s.teams.find(t=>t.id===owner);
-  const canPick=s.status==='drafting'&&!s.paused&&(l.access.role==='commissioner'||(l.access.role==='gm'&&l.myTeam?.id===owner));
+  const canPick=s.status==='drafting'&&(l.access.role==='commissioner'||(l.access.role==='gm'&&l.myTeam?.id===owner));
   // A GM always sees their own chosen Stadium—even while another team is on
   // the clock. Commissioner draft controls target the current picking team.
   const stadiumTeamId=l.access.role==='commissioner'?owner:l.myTeam?.id;
@@ -86,7 +86,7 @@ export function DraftPlayers({league:l}) {
         </div>
         {!canDraftStadium&&<p className="draft-stadium-note">
           {s.status!=='drafting'?'Draft picks become available when the official draft begins.':
-            s.paused?'The commissioner has paused the draft.':
+            s.paused&&canDraftStadium?'The pick timer is paused; Stadium selections remain open.':
             stadiumState.isTurn?'Stadium selection is unavailable on this turn.':
               'You can browse Stadiums now. Draft one when your team is on the clock.'}
         </p>}
@@ -121,7 +121,7 @@ export function DraftPlayers({league:l}) {
           if(!confirmed)return;
           if(await l.act('pick',{player:selected.id}))close();
         }}>DRAFT {selected.name.toUpperCase()}</button></div>
-        <p role="status">{ownership.has(selected.id)?`Already drafted · ${ownership.get(selected.id)}`:s.paused?'Draft paused':mustStage?'Your final remaining turn must be a Stadium Pick.':canPick?`Select for ${team?.name}. This submits the pick.`:s.status==='drafting'?`Waiting for ${team?.name||'the next team'} to pick.`:'Scouting view · drafting is not active.'}</p>
+        <p role="status">{ownership.has(selected.id)?`Already drafted · ${ownership.get(selected.id)}`:mustStage?'Your final remaining turn must be a Stadium Pick.':canPick?`Select for ${team?.name}. This submits the pick.`:s.status==='drafting'?`Waiting for ${team?.name||'the next team'} to pick.`:'Scouting view · drafting is not active.'}</p>
         <DraftPickBadge playerId={selected.id} seasons={l.seasons}/>
         <PlayerDataDetails player={selected} seasons={l.seasons}/>
       </div>}
