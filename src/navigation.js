@@ -1,4 +1,4 @@
-export const leagueTabs = ['Home', 'Teams', 'Schedule', 'Standings', 'Player Stats', 'Team Stats', 'Free Agency', 'Transactions', 'Voting', 'Playoff Bracket', 'Draft Room', 'Sluggers Fantasy', 'SSL History', 'League Rules']
+export const leagueTabs = ['Home', 'Teams', 'Schedule', 'Standings', 'Player Stats', 'Team Stats', 'Free Agency', 'Transactions', 'Voting', 'Playoff Bracket', 'Draft Room', 'Preseason Tournament', 'Sluggers Fantasy', 'SSL History', 'League Rules']
 
 export function visibleLeagueTabs(signedIn, role) {
   return signedIn && ['commissioner', 'gm'].includes(role)
