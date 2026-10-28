@@ -60,10 +60,13 @@ export function PowerRankings({season,supabase,compact=false}){
               <span className="ssl-power-meter-fill" style={{width:Math.max(0,Math.min(100,t.score))+'%'}}/>
             </div>
           </div>
-          <div className="ssl-power-subranks" aria-label={t.name+' category rankings'}>
-            <span>Offensive Ranking: <b>#{categoryPlaces[t.id].offense}</b></span>
-            <span>Pitching Ranking: <b>#{categoryPlaces[t.id].pitching}</b></span>
-            <span>Defensive Ranking: <b>#{categoryPlaces[t.id].defense}</b></span>
+          <div className="ssl-power-subranks" aria-label={t.name+' category rankings and scores'}>
+            <span>Offensive Ranking: <b>#{categoryPlaces[t.id].offense}</b>
+              <small>Score: <strong>{t.offense.toFixed(1)}</strong></small></span>
+            <span>Pitching Ranking: <b>#{categoryPlaces[t.id].pitching}</b>
+              <small>Score: <strong>{t.pitching.toFixed(1)}</strong></small></span>
+            <span>Defensive Ranking: <b>#{categoryPlaces[t.id].defense}</b>
+              <small>Score: <strong>{t.defense.toFixed(1)}</strong></small></span>
           </div>
         </li>)}
     </ol>
