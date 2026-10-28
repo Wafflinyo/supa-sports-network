@@ -13,8 +13,9 @@ export function playerCareer(playerId, seasons) {
     ? ratio(hits + walks + hbp, sum('plateAppearances')) : null
   const slug = ratio(sum('totalBases'), sum('atBats'))
   return {
-    seasons: rows.length || null, games, mvps: sum('mvps'),
+    seasons: rows.length || null, games, mvps: sum('mvps'),gameScore:sum('gameScore'),
     averages: {
+      gameScore:perGame('gameScore'),
       battingAverage: ratio(hits, sum('atBats')), onBase: obp, slug,
       onBasePlusSlug: obp != null && slug != null ? obp + slug : null,
       hits: perGame('hits'), homeRuns: perGame('homeRuns'), rbi: perGame('rbi'),
