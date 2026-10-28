@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {preseasonReady,preseasonSeeds,preseasonBracket,preseasonHasLeagueOpener} from '../src/preseason.js';
-import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,offenseRating} from '../src/power-rankings.js';
+import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,offenseRating,rosterPowerComponents,rankingParticipants,PITCHING_ROLE_WEIGHTS} from '../src/power-rankings.js';
+import {pitcherPriorityFor} from '../src/player-roles.js';
 import {earnedAchievements,GM_ACHIEVEMENTS} from '../src/gm-achievements.js';
 
 // Explicit scoring contract: defense outranks pitching, and otherwise-identical
@@ -30,6 +31,67 @@ for(let i=0;i<12;i++){
   season.picks.push({number:season.picks.length+1,team:t[i].id,kind:j===11?'stage':'player',
     seconds:(i+1)*10});
 }
+// Rank all nine players equally for offense, defense and running. Pitching
+// includes all nine too, with preference for the documented P1P/P2P roles.
+assert.deepEqual(PITCHING_ROLE_WEIGHTS,{P1P:3,P2P:2,other:1});
+const gamePlayers=JSON.parse(readFileSync(new URL('../src/players.json',import.meta.url),'utf8'));
+const stats=JSON.parse(readFileSync(new URL('../src/player-data.json',import.meta.url),'utf8')).players;
+const byName=new Map(gamePlayers.map(p=>[p.name,p]));
+const powerNames=['Bowser','Donkey Kong','Funky Kong','Petey Piranha','Wario',
+  'Ice Bro','Flower Fields Monty','Boom Boom','Hammer Bro'];
+const balancedNames=['Mario','Luigi','Peach','Daisy','Yoshi','Diddy Kong',
+  'Birdo','Tropical Wiggler','Orange Pianta'];
+const powerIds=powerNames.map(n=>byName.get(n).id);
+const balancedIds=balancedNames.map(n=>byName.get(n).id);
+for(const names of [powerNames,balancedNames]){
+ const ids=names.map(n=>byName.get(n).id);
+ const ranked=rosterPowerComponents(ids);
+ assert.equal(ranked.rosterSize,9);
+ const members=ids.map(id=>{
+   const s=stats[id].stats;
+   const player=gamePlayers.find(p=>p.id===id);
+   const role=pitcherPriorityFor(player,stats[id])?.code||'other';
+   return {
+     offense:offenseRating(s),
+     pitch:.52*Math.max(0,Math.min(100,Number(s['pitching stamina'])||0))+
+       .22*Math.max(0,Math.min(100,((Number(s['charge pitch speed'])||90)-90)/80*100))+
+       .16*Math.max(0,Math.min(100,((Number(s['curveball speed'])||90)-90)/65*100))+
+       .10*Math.max(0,Math.min(100,Number(s.curve)||0)),
+     defense:.53*Math.max(0,Math.min(100,Number(s.fielding)||0))+
+       .47*Math.max(0,Math.min(100,Number(s['outfield throwing speed'])||0)),
+     running:Math.max(0,Math.min(100,Number(s.speed)||0)),
+     weight:PITCHING_ROLE_WEIGHTS[role]
+   };
+ });
+ const avg=k=>members.reduce((total,x)=>total+x[k],0)/9;
+ const round1=x=>Math.round(x*10)/10;
+ assert.equal(ranked.offense,round1(avg('offense')),'every offensive player counts');
+ assert.equal(ranked.defense,round1(avg('defense')),'every defender counts');
+ assert.equal(ranked.running,round1(avg('running')),'all nine runners count');
+ assert.equal(ranked.pitching,round1(members.reduce((sum,p)=>sum+p.pitch*p.weight,0)/
+   members.reduce((sum,p)=>sum+p.weight,0)),'every pitcher counts and P1P/P2P have priority');
+ assert.equal(ranked.eligiblePitchers.length,names.filter(n=>{
+   const p=byName.get(n);return pitcherPriorityFor(p,stats[p.id]);
+ }).length,'pitching priorities use actual SSL role labels');
+ const withoutNinth=rosterPowerComponents(ids.slice(0,8));
+ assert.notEqual(ranked.offense,withoutNinth.offense);
+ assert.notEqual(ranked.defense,withoutNinth.defense);
+ assert.notEqual(ranked.pitching,withoutNinth.pitching);
+ assert.notEqual(ranked.running,withoutNinth.running);
+ console.log('Example nine-player power index',names[0],JSON.stringify({
+   overall:Math.round(ranked.rosterScore*10)/10,offense:ranked.offense,
+   defense:ranked.defense,pitching:ranked.pitching,
+   running:ranked.running,chemistry:ranked.chemistry,
+   eligiblePitchers:ranked.eligiblePitchers.map(x=>({name:gamePlayers.find(p=>p.id===x.id)?.name,role:x.role}))
+ }));
+}
+const lineupSeason={rosters:{test:powerIds.concat([balancedIds[0],balancedIds[1]])},
+ defaults:{test:{starters:powerIds.map(id=>({player:id,position:'P'}))}}};
+assert.deepEqual(rankingParticipants(lineupSeason,'test'),powerIds,
+  'use actual lineup starters for a completed eleven-player franchise');
+delete lineupSeason.defaults;
+assert.deepEqual(rankingParticipants(lineupSeason,'test'),lineupSeason.rosters.test,
+  'before the GM sets a nine-player lineup, do not arbitrarily discard bench players');
 assert(!preseasonReady(season),'live drafting must not publish ratings or a bracket');
 assert.deepEqual(preseasonSeeds(season),[]);
 assert.deepEqual(powerRankings(season),[]);
