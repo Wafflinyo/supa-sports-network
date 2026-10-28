@@ -1,6 +1,6 @@
 import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
 import {PowerRankings,PreseasonTournament} from './SeasonPreseason.jsx';
-import {preseasonReady,preseasonHasLeagueOpener} from './preseason.js';
+import {preseasonReady} from './preseason.js';
 import {lotteryProgress,lotteryReplayProgress,lotteryDuration,lotteryCountdownClock} from './lottery-timing.js';
 import {orderedDraftPickTeams,lotteryOrderReady,teamsInLotteryOrder} from './draft-pick-stats-order.js';
 import DraftOrderBoard from './DraftOrderBoard.jsx';
