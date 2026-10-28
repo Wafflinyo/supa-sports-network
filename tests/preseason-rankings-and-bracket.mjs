@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {preseasonReady,preseasonSeeds,preseasonBracket,preseasonHasLeagueOpener} from '../src/preseason.js';
-import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,offenseRating,rosterPowerComponents,rankingParticipants,PITCHING_ROLE_WEIGHTS} from '../src/power-rankings.js';
+import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,offenseRating,rosterPowerComponents,rankingParticipants,PITCHER_PRIORITY_ORDER,POWER_PITCHER_COUNT} from '../src/power-rankings.js';
 import {pitcherPriorityFor} from '../src/player-roles.js';
 import {earnedAchievements,GM_ACHIEVEMENTS} from '../src/gm-achievements.js';
 
@@ -31,9 +31,11 @@ for(let i=0;i<12;i++){
   season.picks.push({number:season.picks.length+1,team:t[i].id,kind:j===11?'stage':'player',
     seconds:(i+1)*10});
 }
-// Rank all nine players equally for offense, defense and running. Pitching
-// includes all nine too, with preference for the documented P1P/P2P roles.
-assert.deepEqual(PITCHING_ROLE_WEIGHTS,{P1P:3,P2P:2,other:1});
+// Only the three leading pitchers contribute to pitching; priority tier
+// wins before raw skill. Every player still contributes to offense / fielding
+// / running / team chemistry, with no artificial nine-player filtering.
+assert.deepEqual(PITCHER_PRIORITY_ORDER,{P1P:1,P2P:2,other:3});
+assert.equal(POWER_PITCHER_COUNT,3);
 const gamePlayers=JSON.parse(readFileSync(new URL('../src/players.json',import.meta.url),'utf8'));
 const stats=JSON.parse(readFileSync(new URL('../src/player-data.json',import.meta.url),'utf8')).players;
 const byName=new Map(gamePlayers.map(p=>[p.name,p]));
@@ -43,48 +45,68 @@ const balancedNames=['Mario','Luigi','Peach','Daisy','Yoshi','Diddy Kong',
   'Birdo','Tropical Wiggler','Orange Pianta'];
 const powerIds=powerNames.map(n=>byName.get(n).id);
 const balancedIds=balancedNames.map(n=>byName.get(n).id);
+const round1=x=>Math.round(x*10)/10;
+const pitchRaw=(s)=>{
+ const clamp100=x=>Math.max(0,Math.min(100,x));
+ return .52*clamp100(Number(s['pitching stamina'])||0)+
+   .22*clamp100(((Number(s['charge pitch speed'])||90)-90)/80*100)+
+   .16*clamp100(((Number(s['curveball speed'])||90)-90)/65*100)+
+   .10*clamp100(Number(s.curve)||0);
+};
 for(const names of [powerNames,balancedNames]){
  const ids=names.map(n=>byName.get(n).id);
  const ranked=rosterPowerComponents(ids);
  assert.equal(ranked.rosterSize,9);
  const members=ids.map(id=>{
-   const s=stats[id].stats;
-   const player=gamePlayers.find(p=>p.id===id);
-   const role=pitcherPriorityFor(player,stats[id])?.code||'other';
+   const s=stats[id].stats,player=gamePlayers.find(p=>p.id===id);
    return {
-     offense:offenseRating(s),
-     pitch:.52*Math.max(0,Math.min(100,Number(s['pitching stamina'])||0))+
-       .22*Math.max(0,Math.min(100,((Number(s['charge pitch speed'])||90)-90)/80*100))+
-       .16*Math.max(0,Math.min(100,((Number(s['curveball speed'])||90)-90)/65*100))+
-       .10*Math.max(0,Math.min(100,Number(s.curve)||0)),
+     id,offense:offenseRating(s),pitch:pitchRaw(s),
      defense:.53*Math.max(0,Math.min(100,Number(s.fielding)||0))+
        .47*Math.max(0,Math.min(100,Number(s['outfield throwing speed'])||0)),
      running:Math.max(0,Math.min(100,Number(s.speed)||0)),
-     weight:PITCHING_ROLE_WEIGHTS[role]
+     role:pitcherPriorityFor(player,stats[id])?.code||'other'
    };
  });
  const avg=k=>members.reduce((total,x)=>total+x[k],0)/9;
- const round1=x=>Math.round(x*10)/10;
+ const selected=[...members].sort((a,b)=>
+   PITCHER_PRIORITY_ORDER[a.role]-PITCHER_PRIORITY_ORDER[b.role]||
+   b.pitch-a.pitch||a.id-b.id).slice(0,3);
  assert.equal(ranked.offense,round1(avg('offense')),'every offensive player counts');
  assert.equal(ranked.defense,round1(avg('defense')),'every defender counts');
  assert.equal(ranked.running,round1(avg('running')),'all nine runners count');
- assert.equal(ranked.pitching,round1(members.reduce((sum,p)=>sum+p.pitch*p.weight,0)/
-   members.reduce((sum,p)=>sum+p.weight,0)),'every pitcher counts and P1P/P2P have priority');
- assert.equal(ranked.eligiblePitchers.length,names.filter(n=>{
-   const p=byName.get(n);return pitcherPriorityFor(p,stats[p.id]);
- }).length,'pitching priorities use actual SSL role labels');
+ assert.equal(ranked.pitching,round1(selected.reduce((sum,p)=>sum+p.pitch,0)/3),
+   'only three tier-priority pitchers determine pitching rating');
+ assert.deepEqual(ranked.selectedPitchers.map(p=>p.id),selected.map(p=>p.id),
+   'must select designated P1P first, then P2P, then others by ability');
  const withoutNinth=rosterPowerComponents(ids.slice(0,8));
  assert.notEqual(ranked.offense,withoutNinth.offense);
  assert.notEqual(ranked.defense,withoutNinth.defense);
- assert.notEqual(ranked.pitching,withoutNinth.pitching);
  assert.notEqual(ranked.running,withoutNinth.running);
  console.log('Example nine-player power index',names[0],JSON.stringify({
-   overall:Math.round(ranked.rosterScore*10)/10,offense:ranked.offense,
+   overall:round1(ranked.rosterScore),offense:ranked.offense,
    defense:ranked.defense,pitching:ranked.pitching,
    running:ranked.running,chemistry:ranked.chemistry,
-   eligiblePitchers:ranked.eligiblePitchers.map(x=>({name:gamePlayers.find(p=>p.id===x.id)?.name,role:x.role}))
+   selectedPitchers:ranked.selectedPitchers.map(x=>({
+     name:gamePlayers.find(p=>p.id===x.id)?.name,role:x.role,pitching:x.pitching
+   }))
  }));
 }
+// Top-tier captains beat P2P even when a P2P's raw pitching ability is higher,
+// and all tagged pitchers beat untagged players when filling the three slots.
+const prioritized=rosterPowerComponents([
+  byName.get('Wario').id,byName.get('Tropical Wiggler').id,
+  byName.get('Petey Piranha').id,byName.get('Funky Kong').id,
+  byName.get('Ice Bro').id,byName.get('Flower Fields Monty').id
+]);
+assert.equal(prioritized.selectedPitchers[0].id,byName.get('Wario').id,
+  'P1P must be selected ahead of a higher-ability P2P');
+assert.equal(prioritized.selectedPitchers[1].id,byName.get('Tropical Wiggler').id,
+  'P2P goes before nonpriority when no other P1P remains');
+assert.equal(prioritized.selectedPitchers[2].id,byName.get('Petey Piranha').id,
+  'fill the remaining slot from highest-ability untagged pitcher');
+assert.equal(rosterPowerComponents([byName.get('Wario').id]).selectedPitchers.length,1,
+  'rosters with fewer than three players should not invent pitching stats');
+
 const lineupSeason={rosters:{test:powerIds.concat([balancedIds[0],balancedIds[1]])},
  defaults:{test:{starters:powerIds.map(id=>({player:id,position:'P'}))}}};
 assert.deepEqual(rankingParticipants(lineupSeason,'test'),powerIds,
@@ -167,6 +189,10 @@ const powerUi=readFileSync(new URL('../src/SeasonPreseason.jsx',import.meta.url)
 assert(powerUi.includes('POWER_WEIGHTS.defense')&&powerUi.includes('POWER_WEIGHTS.pitching')&&
   powerUi.includes('TRAJECTORY_OFFENSE_WEIGHT')&&powerUi.includes('TRAJECTORY_SCORES.High'),
   'Home and Teams must explain the exact weights and trajectory ordering');
+const scoringUi=readFileSync(new URL('../src/SeasonPreseason.jsx',import.meta.url),'utf8');
+assert(scoringUi.includes('top {POWER_PITCHER_COUNT} priority pitchers') &&
+ scoringUi.includes('P1P first, P2P next'),
+ 'Home and Teams scoring text must clearly explain the strict three-player priority');
 const s=readFileSync(new URL('../src/SeasonLeague.jsx',import.meta.url),'utf8');
 assert(s.includes('ssl_preseason_results')&&s.includes("rpc('ssl_preseason_record'"));
 assert(s.includes('preseasonHasLeagueOpener(s)'));
