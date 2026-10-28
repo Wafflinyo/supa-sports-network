@@ -39,7 +39,7 @@ export function stadiumDraftState(season,teamId,canAct=false) {
   const turn=season?.nextPick;
   const isTurn=same(turn?.team,teamId);
   const mandatory=Boolean(isTurn&&turn?.mustStage&&!owned);
-  const eligible=Boolean(canAct&&season?.status==='drafting'&&!season?.paused &&
+  const eligible=Boolean(canAct&&season?.status==='drafting'&&
     isTurn&&!turn?.supplemental&&!turn?.stageAlreadyChosen&&!turn?.stadiumRetained&&!owned);
   return {owned,eligible,mandatory,isTurn,available:availableStadiums(season)};
 }
