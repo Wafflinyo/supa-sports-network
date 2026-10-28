@@ -40,3 +40,51 @@
 .ssl-pre-champion p{margin:4px 0 0;font-size:12px}
 .ssl-pre-error{font-size:13px;color:#a32035;background:#fff0f0;padding:8px;border-radius:4px}
 @media(max-width:650px){.ssl-pre-panel{padding:14px}.ssl-pre-rounds{grid-template-columns:1fr}.ssl-pre-head h2{font-size:20px}.ssl-pre-table{font-size:12px}}
+
+/* Power Rankings leaderboard — exclusively visual; tournament and draft UI unchanged. */
+.ssl-power-panel{background:linear-gradient(160deg,#f4f8fe 0%,#fff 54%,#eef5fd 100%);border:1px solid #cbd8e9;overflow:hidden}
+.ssl-power-head{position:relative;isolation:isolate;align-items:center;overflow:hidden;background:linear-gradient(113deg,#0a1c3e 0%,#143663 65%,#184e80 100%);padding:24px 25px;margin:-21px -21px 17px;border-bottom:3px solid #bf354e}
+.ssl-power-head:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 86% 18%,#ffffff22 0%,transparent 34%),repeating-linear-gradient(135deg,transparent 0 24px,#ffffff05 24px 26px);pointer-events:none}
+.ssl-power-head>div,.ssl-power-head>svg{position:relative;z-index:1}
+.ssl-power-head h2{color:#fff;font-size:clamp(20px,3vw,27px);letter-spacing:.025em;margin:5px 0 0}
+.ssl-power-head small{color:#a3d6fc;letter-spacing:.14em}
+.ssl-power-head>svg{color:#ffd37b;flex:none;filter:drop-shadow(0 3px 7px #0005)}
+.ssl-power-status{font-size:12px;color:#4f617c;margin:0 0 13px;letter-spacing:.015em}
+.ssl-power-status strong{color:#183b6d;font-size:14px}
+.ssl-power-board{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.ssl-power-entry{display:grid;grid-template-columns:minmax(215px,.87fr) minmax(0,1.13fr);grid-template-areas:"team score" "team sub";column-gap:22px;row-gap:9px;position:relative;overflow:hidden;min-width:0;background:#fff;border:1px solid #dce5f1;border-radius:13px;padding:17px 18px 16px 20px;box-shadow:0 3px 13px #17315b0b;transition:border-color .2s,box-shadow .2s}
+.ssl-power-entry:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--ssl-power-accent)}
+.ssl-power-entry:hover{border-color:#aec9e8;box-shadow:0 5px 17px #17315b16}
+.ssl-power-podium{background:linear-gradient(105deg,#f8fbff 0%,#fff 62%)}
+.ssl-power-team{grid-area:team;display:flex;gap:13px;align-items:center;min-width:0}
+.ssl-power-position{flex:none;display:flex;align-items:center;justify-content:center;width:49px;height:49px;background:#102b52;color:#fff;border:2px solid var(--ssl-power-accent);border-radius:11px;font-weight:950;font-size:20px;letter-spacing:-.04em;font-variant-numeric:tabular-nums;box-shadow:0 2px 7px #14305d22}
+.ssl-power-identity{min-width:0}
+.ssl-power-identity .ssl-pre-team{gap:11px;font-size:15px;font-weight:900;line-height:1.3;color:#152e56}
+.ssl-power-identity .ssl-pre-team img{width:42px;height:42px;flex-basis:42px;object-fit:contain}
+.ssl-power-identity .ssl-pre-team>span{overflow-wrap:anywhere}
+.ssl-power-main-score{grid-area:score;min-width:0}
+.ssl-power-scoreline{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 9px}
+.ssl-power-scoreline>span{font-size:10px;letter-spacing:.11em;font-weight:900;color:#566783}
+.ssl-power-scoreline>strong{font-size:28px;font-weight:950;letter-spacing:-.04em;line-height:1;color:#123a71;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ssl-power-scoreline small{font-size:11px;font-weight:700;color:#73809a;letter-spacing:0}
+.ssl-power-meter{height:12px;width:100%;border-radius:999px;background:#dfebf5;overflow:hidden;box-shadow:inset 0 1px 3px #0c2d4e14}
+.ssl-power-meter-fill{display:block;height:100%;background:linear-gradient(90deg,#143e78 0%,#318bd1 72%,var(--ssl-power-accent) 100%);border-radius:999px;box-shadow:inset 0 1px 1px #fff4}
+.ssl-power-subranks{grid-area:sub;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 13px;padding-top:10px;border-top:1px solid #e8eef6}
+.ssl-power-subranks>span{min-width:0;font-size:11.5px;color:#63718a;font-weight:650;line-height:1.5}
+.ssl-power-subranks b{font-weight:900;font-size:12.5px;color:#203d67;font-variant-numeric:tabular-nums}
+.ssl-power-subranks small{display:block;margin-top:2px;color:#63718a;font-size:11px;font-weight:650}
+.ssl-power-subranks small strong{font-size:12px;color:#274870;font-weight:850;font-variant-numeric:tabular-nums}
+@media(max-width:760px){
+  .ssl-power-entry{grid-template-columns:minmax(0,1fr);grid-template-areas:"team" "score" "sub";gap:11px;padding:15px 16px 14px 18px}
+  .ssl-power-team{gap:12px}
+  .ssl-power-position{width:44px;height:44px;font-size:18px}
+  .ssl-power-main-score{margin-top:1px}
+  .ssl-power-subranks{gap:8px 16px;padding-top:10px}
+}
+@media(max-width:650px){
+  .ssl-power-head{margin:-14px -14px 14px;padding:19px 17px}
+  .ssl-power-identity .ssl-pre-team{font-size:14px}
+  .ssl-power-identity .ssl-pre-team img{width:36px;height:36px;flex-basis:36px}
+  .ssl-power-scoreline>strong{font-size:26px}
+  .ssl-power-subranks{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+}
