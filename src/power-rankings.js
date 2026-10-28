@@ -1,18 +1,19 @@
 import gameData from './player-data.json' with { type: 'json' };
 import players from './players.json' with { type: 'json' };
 import {pitcherPriorityFor} from './player-roles.js';
+import {validLineup} from './season-data.js';
 
 // Transparent roster-only preseason projection. No in-game menu/display bars.
-// 40% hitting, 20% pitching, 25% defense, 10% running, 5% chemistry.
-// Offense is 80% original hit-power/contact calculation, 20% trajectory.
+// 50% offense, 15% pitching, 25% defense, 5% running, 5% chemistry.
+// Offense: charge power 40%, trajectory 25%, slap power 20%, slap contact 7%, charge contact 8%.
 // High trajectory > Medium > Low. The display-stat rating bars are not used.
 // Evaluate all nine starters for offense, defense, running and chemistry.
 // Only the highest-priority three eligible pitchers determine pitching:
 // P1P first, P2P second, untagged players only if needed. Within a tier,
 // the stronger actual pitching ability comes first. Count exactly those
 // three equally rather than allowing every other batter to dilute pitching.
-// Before a nine-player default lineup exists, use all drafted players instead
-// of silently excluding any of them from the post-draft projection.
+// Publish a franchise ONLY after its GM submits a valid nine-starter
+// default lineup; never rank bench players or invent unsubmitted starters.
 // During the regular season, published game form gradually earns up to 60%
 // influence after eight games. Preseason matches NEVER count.
 const clamp=(x,min=0,max=100)=>Math.max(min,Math.min(max,x));
@@ -24,17 +25,18 @@ const playerById=new Map(players.map(p=>[Number(p.id),p]));
 export const PITCHER_PRIORITY_ORDER=Object.freeze({P1P:1,P2P:2,other:3});
 export const POWER_PITCHER_COUNT=3;
 export const POWER_WEIGHTS=Object.freeze({
-  offense:.40,pitching:.20,defense:.25,running:.10,chemistry:.05
+  offense:.50,pitching:.15,defense:.25,running:.05,chemistry:.05
 });
-export const TRAJECTORY_OFFENSE_WEIGHT=.20;
+export const TRAJECTORY_OFFENSE_WEIGHT=.25;
 export const TRAJECTORY_SCORES=Object.freeze({High:100,Medium:60,Low:20});
 export function offenseRating(stats){
   const trajectory=String(stats?.['hit trajectory']??'Medium').trim();
   const trajectoryPoints=TRAJECTORY_SCORES[trajectory]??TRAJECTORY_SCORES.Medium;
-  const original=.32*numeric(stats,'slap hit power')+.43*numeric(stats,'charge hit power')+
-    .15*numeric(stats,'slap contact size')+.10*numeric(stats,'charge contact size');
-  return (1-TRAJECTORY_OFFENSE_WEIGHT)*original+
-    TRAJECTORY_OFFENSE_WEIGHT*trajectoryPoints;
+  return .40*numeric(stats,'charge hit power')+
+    TRAJECTORY_OFFENSE_WEIGHT*trajectoryPoints+
+    .20*numeric(stats,'slap hit power')+
+    .07*numeric(stats,'slap contact size')+
+    .08*numeric(stats,'charge contact size');
 }
 function scouting(id){
   const record=gameData.players[id];
@@ -44,10 +46,10 @@ function scouting(id){
     id:Number(id),
     pitcherPriority:pitcherPriorityFor(playerById.get(Number(id)),record)?.code||null,
     offense:offenseRating(s),
-    pitching:.52*numeric(s,'pitching stamina')+
-      .22*pitchVelocity(s['charge pitch speed'],90,170)+
-      .16*pitchVelocity(s['curveball speed'],90,155)+.10*numeric(s,'curve'),
-    defense:.53*numeric(s,'fielding')+.47*numeric(s,'outfield throwing speed'),
+    pitching:.60*numeric(s,'pitching stamina')+
+      .18*pitchVelocity(s['charge pitch speed'],90,170)+
+      .14*pitchVelocity(s['curveball speed'],90,155)+.08*numeric(s,'curve'),
+    defense:.60*numeric(s,'fielding')+.40*numeric(s,'outfield throwing speed'),
     running:numeric(s,'speed'),
     good:new Set(record.goodChemistryIds||[]),
     bad:new Set(record.badChemistryIds||[]),
@@ -87,10 +89,9 @@ export function rosterPowerComponents(roster){
 }
 export function rankingParticipants(season,teamId){
   const roster=season.rosters?.[teamId]||[];
-  const starters=season.defaults?.[teamId]?.starters?.map(p=>Number(p.player))||[];
-  if(starters.length===9 && new Set(starters).size===9 &&
-    starters.every(id=>roster.some(r=>Number(r)===id)))return starters;
-  return roster;
+  const submitted=season.defaults?.[teamId];
+  if(!validLineup(season,teamId,submitted))return [];
+  return submitted.starters.map(p=>Number(p.player));
 }
 function playedRecord(season,teamId){
   const played=(season?.games||[]).filter(g=>g.phase==='regular'&&g.stage==='final'&&
@@ -111,7 +112,8 @@ function playedRecord(season,teamId){
 export function powerRankings(season){
   if(!season || !['postdraft','regular','postseason','retention','offseason','archived'].includes(season.status) ||
     season.teams?.length!==12)return [];
-  return season.teams.map(team=>{
+  return season.teams.filter(team=>
+    rankingParticipants(season,team.id).length===9).map(team=>{
     const c=rosterPowerComponents(rankingParticipants(season,team.id));
     const record=playedRecord(season,team.id);
     const formWeight=record.games?Math.min(.60,record.games*.075):0;
