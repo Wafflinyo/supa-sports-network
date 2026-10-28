@@ -1,3 +1,4 @@
+import {HEATING_UP_THRESHOLD} from './heating-up.js';
 // Derived newsroom: headlines refresh when official reports are corrected.
 // Recorded games remain commissioner-only until their results are released.
 
@@ -68,7 +69,7 @@ export function leagueNews(seasons, players, {includeRecorded = false} = {}) {
           private: game.stage === 'recorded',
         });
 
-        if (row.gameScore != null && Number.isFinite(score) && score >= 90)
+        if (row.gameScore != null && Number.isFinite(score) && score >= HEATING_UP_THRESHOLD)
           add('heating', 'hot', 'HEATING UP', `${player} is heating up!`,
             `A ${score} Game Score against ${opponent} earns ${player} a star for the next team game.`);
 
