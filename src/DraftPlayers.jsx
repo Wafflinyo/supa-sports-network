@@ -42,6 +42,7 @@ export function DraftPlayers({league:l}) {
   },[selected]);
   function close(){setSelected(null);opener.current?.focus();}
   return <section className="draft-player-browser" aria-label="Draft room player and Stadium selections">
+    {s.status==='drafting'&&s.paused&&<p className="draft-stadium-note" role="status"><strong>PICK TIMER PAUSED:</strong> The on-clock GM or commissioner can still draft Players and Stadiums. Recorded pick times do not increase until the commissioner resumes the timer.</p>}
     <div className="draft-pool-header">
       <div><h2>DRAFT SELECTIONS</h2><p>Switch between Players and Stadiums on any draft turn. Every team gets one exclusive Stadium Pick.</p></div>
       <div className="draft-pool-tabs" role="tablist" aria-label="Draft selection type">
@@ -86,7 +87,6 @@ export function DraftPlayers({league:l}) {
         </div>
         {!canDraftStadium&&<p className="draft-stadium-note">
           {s.status!=='drafting'?'Draft picks become available when the official draft begins.':
-            s.paused&&canDraftStadium?'The pick timer is paused; Stadium selections remain open.':
             stadiumState.isTurn?'Stadium selection is unavailable on this turn.':
               'You can browse Stadiums now. Draft one when your team is on the clock.'}
         </p>}
