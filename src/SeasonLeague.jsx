@@ -8,7 +8,7 @@ import {BingoLottery} from './BingoLottery.jsx';
 import {matchupDisplay} from './matchup-display.js';
 import {supportsStadiumVariant,matchupStadiumVariant} from './stadium-lighting.js';
 import DraftChat from './DraftChat.jsx';
-import {heatingUpForSeason} from './heating-up.js';
+import {heatingUpForSeason,HEATING_UP_THRESHOLD} from './heating-up.js';
 import {effectiveGameLineup,gameLineupIsEditable,teamGameLineups,savedLineupLabel} from './roster-lineups.js';
 import {
   SeasonRuleControls,
@@ -43,6 +43,7 @@ import {
   aggregate,
   readRio,
   buildReport,
+  previewCustomGameScore,
 } from "./season-data.js";
 import "./season.css";
 const byPlayer = new Map(pool.map((p) => [p.id, p]));
@@ -946,7 +947,7 @@ function Draft({ league: l }) {
 
 function HeatingStatus({season,game,team,includeRecorded=false}) {
   const ids=heatingUpForSeason(season,{includeRecorded}).byGame[game.id]?.[team]||[];
-  return <p className="heating-up-status"><strong>★ HEATING UP · Next-game stars:</strong> {ids.length?ids.map(name).join(' · '):'None earned yet'} <small>Automatic from previous game scores of 90+.</small></p>;
+  return <p className="heating-up-status"><strong>★ HEATING UP · Next-game stars:</strong> {ids.length?ids.map(name).join(' · '):'None earned yet'} <small>Automatic from previous game scores of {HEATING_UP_THRESHOLD}+.</small></p>;
 }
 function LineupEditor({ league: l, team, game, onDone }) {
   const s = l.season,
@@ -1028,7 +1029,7 @@ function LineupEditor({ league: l, team, game, onDone }) {
           </select>
         </div>
       ))}
-      {game ? <HeatingStatus season={s} game={game} team={team} includeRecorded={l.access.role==='commissioner'}/> : <p className="heating-up-help">Players become starred automatically for their next team game after earning a Project Rio Game Score of 90 or higher. No coins, tiers, or manual star selection.</p>}
+      {game ? <HeatingStatus season={s} game={game} team={team} includeRecorded={l.access.role==='commissioner'}/> : <p className="heating-up-help">Players become starred automatically for their next team game after earning an SSL custom Game Score of {HEATING_UP_THRESHOLD} or higher. No coins, tiers, or manual star selection.</p>}
       <h4>BENCH</h4>
       <p>
         {lineup.bench.map(id => name(id)).join(" · ") ||
@@ -1531,10 +1532,11 @@ function ReportImport({ league: l, game, onDone }) {
     <div className="report-import">
       <h3>PROJECT RIO RESULT REVIEW</h3>
       <p>
-        Map report team labels and any ambiguous Mii/name rows. Include a
-        Game Score column in the Project Rio Stats worksheet (0–999.99).
-        A score of 90+ automatically grants a star next game. Replacing a
-        report recalculates Heating Up records and streaks instead of adding a second game.
+        Map team labels and any ambiguous Mii/name rows. Add an "Item Score"
+        column at the end of the Project Rio Stats worksheet. The site
+        automatically scores the game's batting, defense and pitching stats,
+        adds Item Score (blank means 0), and grants Heating Up at {HEATING_UP_THRESHOLD}+.
+        Corrected reports replace prior totals and hot streak results.
       </p>
       <input
         type="file"
@@ -1582,7 +1584,7 @@ function ReportImport({ league: l, game, onDone }) {
                 <tr>
                   <th>Rio player</th>
                   <th>Report team</th>
-                  <th>Game Score</th>
+                  <th>Item Score</th><th>Calculated Game Score</th>
                   <th>SSL player</th>
                 </tr>
               </thead>
@@ -1593,7 +1595,10 @@ function ReportImport({ league: l, game, onDone }) {
                     <tr key={i}>
                       <td>{r.player}</td>
                       <td>{r.label}</td>
-                      <td><strong>{r.gamescore ?? r.ingamescore ?? '—'}</strong>{Number(r.gamescore ?? r.ingamescore ?? 0)>=90?' ★':''}</td>
+                      <td>{r.itemscore === '' ? 0 : r.itemscore ?? 0}</td>
+                      <td>{(() => {try{const score=previewCustomGameScore(preview,r);
+                        return <><strong>{score.gameScore}</strong>{score.heatingUp?' ★':''}</>;
+                      }catch(e){return <span title={e.message}>Check stats</span>}})()}</td>
                       <td>
                         <select
                           aria-label={`Map ${r.player} row ${r.row}`}
@@ -2286,10 +2291,11 @@ function TeamStats({ league: l }) {
     "bobbles",
     "pitchStrikeouts",
     "earnedRuns",
+    "gameScore",
   ];
   const s = l.season;
   const records = new Map(standings(s).map(t => [t.id, t]));
-  const statLabel = k => k.replace(/([A-Z])/g, " $1");
+  const statLabel = k => k === 'gameScore' ? 'Game Score' : k.replace(/([A-Z])/g, " $1");
   return (
     <Box title={isAverage ? "TEAM STAT AVERAGES" : "TEAM STAT TOTALS"}>
       <div className="stat-view-switch" role="group" aria-label="Team stat display">
@@ -2325,7 +2331,7 @@ function TeamStats({ league: l }) {
                 (g.result?.players || []).filter(p => p.team === t.id)
               );
               const totals = Object.fromEntries(
-                keys.map(k => [k, all.reduce((sum, p) => sum + (Number(p.stats?.[k]) || 0), 0)])
+                keys.map(k => [k, all.reduce((sum, p) => sum + (Number(k === 'gameScore' ? p.gameScore : p.stats?.[k]) || 0), 0)])
               );
               const record = records.get(t.id);
               return (
@@ -2368,6 +2374,7 @@ function History({ league: l }) {
             homeRuns: 0,
             rbi: 0,
             pitchStrikeouts: 0,
+            gameScore: 0,
           };
           for (const k of Object.keys(row)) row[k] += stats[k] || 0;
           all[id] = row;
@@ -2417,7 +2424,7 @@ function History({ league: l }) {
         ))
       ) : (
         <Box title="CAREER LEAGUE RECORDS">
-          {["gamesPlayed", "hits", "homeRuns", "rbi", "pitchStrikeouts"].map(
+          {["gamesPlayed", "hits", "homeRuns", "rbi", "pitchStrikeouts", "gameScore"].map(
             (k) => (
               <section key={k}>
                 <h3>{k.replace(/([A-Z])/g, " $1").toUpperCase()}</h3>
