@@ -48,7 +48,9 @@ begin
     coalesce((select avg((pick.value->>'seconds')::numeric)
       from jsonb_array_elements(st->'picks') pick
       where pick.value->>'team'=team.value->>'id'
-        and pick.value->>'seconds' is not null), 1000000000), team.ord)
+        and pick.value->>'seconds' is not null), 1000000000),
+        coalesce(array_position(array(select jsonb_array_elements_text(st->'order')),
+          team.value->>'id'),team.ord+12))
     into seeds
     from jsonb_array_elements(st->'teams') with ordinality team(value,ord);
   if coalesce(array_length(seeds,1),0)<>12 then return null; end if;
