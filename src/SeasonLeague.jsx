@@ -810,7 +810,7 @@ function Draft({ league: l }) {
           <>
             <div className="pick-clock" aria-live="off">
               {clock(elapsed(s, l.now))}
-              <small>{s.paused ? "PAUSED" : "ELAPSED · NO TIME LIMIT"}</small>
+              <small>{s.paused ? "TIMER PAUSED · PICKS STILL OPEN" : "PICK TIMER RUNNING · NO PICK DEADLINE"}</small>
             </div>
             <p>
               Round {s.nextPick?.round} · Pick {next + 1}
@@ -825,7 +825,7 @@ function Draft({ league: l }) {
                 disabled={l.busy}
                 onClick={() => l.act("pause")}
               >
-                {s.paused ? "RESUME" : "PAUSE"} DRAFT
+                {s.paused ? "RESUME" : "PAUSE"} TIMER
               </button>
             )}
           </>
