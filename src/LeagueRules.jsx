@@ -1,4 +1,5 @@
 import React from 'react'
+import {HEATING_UP_THRESHOLD} from './heating-up.js'
 import rules from './fantasy-rules.json' with { type: 'json' }
 import './league-rules.css'
 
@@ -39,10 +40,10 @@ const sections = [
     'Team Stats displays regular-season Home Record (wins–losses) and Away Record (wins–losses). Home and away records are cumulative team statistics, not per-game averages.',
   ]],
   ['Heating Up and hot streaks', [
-    'After every official game, the commissioner adds each player’s Project Rio in-game Game Score to the Stats worksheet. A score of 90 or higher automatically makes that player starred for their next team game. Fantasy points do not count as Game Score.',
+    `After each game, the commissioner uploads the Project Rio Stats and Pitching worksheets with a new "Item Score" column on Stats. The site calculates SSL Game Score automatically from 19 batting, defensive, pitching and penalty stats, adds Item Score, and awards Heating Up at ${HEATING_UP_THRESHOLD} or higher. Fantasy points and the old manually entered in-game Game Score are not used.`,
     'Heating Up is automatic, with no manager selection, coin balance, player tier, recharge period, cost, or limit on the number of qualifying players.',
-    'The site records each qualifying score and game, each player’s total Heating Up occurrences, the number of hot streaks, current streak length, and longest hot streak. A hot streak is two or more consecutive team games with a Game Score of 90+ for that player.',
-    'A score below 90 or a team game without a qualifying player score ends that streak. Starred status applies only to the next team game. Trades do not grant a free star; eligibility is based on the player’s preceding game result.',
+    `The site records each qualifying score and game, each player’s total Heating Up occurrences, the number of hot streaks, current streak length, and longest hot streak. A hot streak is two or more consecutive team games with a Game Score of ${HEATING_UP_THRESHOLD}+ for that player.`,
+    `A score below ${HEATING_UP_THRESHOLD} or a team game without a qualifying player score ends that streak. Starred status applies only to the next team game. Trades do not grant a free star; eligibility is based on the player’s preceding game result.`,
     'Heating Up is a cumulative record, never a per-game average. Correcting an official Project Rio report automatically recalculates affected totals and streaks, so duplicate records are not created.',
   ]],
   ['Free agency', [
@@ -67,7 +68,7 @@ const sections = [
   ['Playoff bracket', [
     'Opening matchups are 1 vs 8, 4 vs 5, 2 vs 7, and 3 vs 6. Reseed after every round: the highest remaining seed plays the lowest remaining seed.',
     'Quarterfinals and semifinals are best of three (two wins). The championship is best of five (three wins). The higher seed hosts Game 1; home field alternates every game. The higher seed therefore hosts Games 1 and 3, and Game 5 if needed.',
-    'A series ends as soon as a team reaches the required wins. Unnecessary games are not played. Heating Up remains active in the playoffs; qualifying Game Scores of 90+ award a star in the next team game.'
+    `A series ends as soon as a team reaches the required wins. Unnecessary games are not played. Heating Up remains active in the playoffs; qualifying Game Scores of ${HEATING_UP_THRESHOLD}+ award a star in the next team game.`
   ]],
   ['Contract extensions', [
     'Each franchise receives three shared one-season extension contracts per season. A contract may be offered to a player or an owned Stadium using the same repeat-offer percentages and postseason modifiers. An accepted offer retains that player or Stadium for the following season. A Stadium that accepts replaces the franchise’s next-season Stadium Pick; the franchise keeps the Stadium but cannot draft an additional one that season. A franchise without an accepted Stadium extension receives its normal Stadium Pick. Every applied offer consumes one contract, whether accepted or rejected. Contracts cannot be traded or rolled over.',
