@@ -4,16 +4,16 @@ import {GM_ACHIEVEMENTS} from '../src/gm-achievements.js';
 import {badgeScenes,badgeSceneIds} from '../src/achievement-badge-scenes.js';
 
 const liveIds=GM_ACHIEVEMENTS.map(b=>b.id);
-assert.equal(liveIds.length,92);
-assert.equal(badgeSceneIds.length,92);
+assert.equal(liveIds.length,93);
+assert.equal(badgeSceneIds.length,93);
 assert.deepEqual([...badgeSceneIds].sort(),[...liveIds].sort(),
   'every art design must correspond to an existing achievement—no invented awards');
-assert.equal(new Set(badgeSceneIds).size,92);
+assert.equal(new Set(badgeSceneIds).size,93);
 assert.equal(new Set(Object.values(badgeScenes).map(s=>
-  [s.hero,s.detail,s.layout,s.engraving].join(':'))).size,92,
+  [s.hero,s.detail,s.layout,s.engraving].join(':'))).size,93,
   'each real award needs a unique meaningful baseball illustration');
 assert.equal(new Set(Object.values(badgeScenes).map(s=>
-  [s.hero,s.detail,s.layout].join(':'))).size,92,
+  [s.hero,s.detail,s.layout].join(':'))).size,93,
   'unique badge art cannot depend on a different number alone');
 
 const available=readFileSync(new URL('../src/AchievementBadgeArt.jsx',import.meta.url),'utf8');
@@ -38,4 +38,4 @@ for(const b of GM_ACHIEVEMENTS) {
     ['bat','ball','crossed-bats','fire','stadium','crown'].includes(scene.hero),
     'every home-run scene must convey real baseball imagery');
 }
-console.log('PASS: 92 existing awards only; 92 distinct sports scenes; exact five-finger gloves; properly tapered baseball bat');
+console.log('PASS: 93 existing awards only; 93 distinct sports scenes; exact five-finger gloves; properly tapered baseball bat');
