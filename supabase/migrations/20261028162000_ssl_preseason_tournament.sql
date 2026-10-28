@@ -60,13 +60,13 @@ begin
     if split_part(requested_match,'-',1)='R'||round_no then
       idx:=split_part(requested_match,'-',2)::integer;
       if idx>max_match or idx<1 then return null; end if;
-      return jsonb_build_object('team_a',entrants[idx],
+      return jsonb_build_object('team_a',entrants[idx+(n%2)],
         'team_b',entrants[n+1-idx]);
     end if;
     promoted:='{}'::uuid[];
     if n%2=1 then promoted:=array_append(promoted,entrants[1]); end if;
     for idx in 1..max_match loop
-      a:=entrants[idx]; b:=entrants[n+1-idx];
+      a:=entrants[idx+(n%2)]; b:=entrants[n+1-idx];
       select * into played from public.ssl_preseason_results
         where season_id=target_season and match_key='R'||round_no||'-'||idx;
       if not found or played.team_a<>a or played.team_b<>b then
