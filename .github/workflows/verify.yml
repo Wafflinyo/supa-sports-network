@@ -21,6 +21,7 @@ jobs:
       - run: npm ci
       - run: node tests/stadiums.mjs
       - run: node tests/draft-stadium-state.mjs
+      - run: node tests/pause-timer-only.mjs
       - run: node tests/draft-player-cards.mjs
       - run: node tests/site-mii-trajectories-and-chemistry.mjs
       - run: node tests/lottery-timing.mjs
