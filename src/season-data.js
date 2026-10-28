@@ -54,6 +54,8 @@ export function aggregate(season) {
       for (const [k, v] of Object.entries(p.stats)) st[k] = (st[k] || 0) + v;
       if(typeof p.gameScore==='number'&&Number.isFinite(p.gameScore))
         st.gameScore=(st.gameScore||0)+p.gameScore;
+      if(typeof p.itemScore==='number'&&Number.isFinite(p.itemScore))
+        st.itemScore=(st.itemScore||0)+p.itemScore;
       st.positionsPlayed = [
         ...new Set([...st.positionsPlayed, ...(p.positions || [])]),
       ];
