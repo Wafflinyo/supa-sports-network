@@ -6,9 +6,11 @@ import {pitcherPriorityFor} from './player-roles.js';
 // 40% hitting, 20% pitching, 25% defense, 10% running, 5% chemistry.
 // Offense is 80% original hit-power/contact calculation, 20% trajectory.
 // High trajectory > Medium > Low. The display-stat rating bars are not used.
-// Evaluate all nine starters in ALL categories; no artificial top-three pitcher
-// or best-nine selection. P1P/P2P pitchers are weighted more heavily in the
-// pitching average because those are the league's intended pitcher options.
+// Evaluate all nine starters for offense, defense, running and chemistry.
+// Only the highest-priority three eligible pitchers determine pitching:
+// P1P first, P2P second, untagged players only if needed. Within a tier,
+// the stronger actual pitching ability comes first. Count exactly those
+// three equally rather than allowing every other batter to dilute pitching.
 // Before a nine-player default lineup exists, use all drafted players instead
 // of silently excluding any of them from the post-draft projection.
 // During the regular season, published game form gradually earns up to 60%
@@ -19,7 +21,8 @@ const numeric=(stats,key)=>clamp(Number(stats?.[key])||0);
 const pitchVelocity=(value,min,max)=>clamp((Number(value||min)-min)/(max-min)*100);
 const round=x=>Math.round(x*10)/10;
 const playerById=new Map(players.map(p=>[Number(p.id),p]));
-export const PITCHING_ROLE_WEIGHTS=Object.freeze({P1P:3,P2P:2,other:1});
+export const PITCHER_PRIORITY_ORDER=Object.freeze({P1P:1,P2P:2,other:3});
+export const POWER_PITCHER_COUNT=3;
 export const POWER_WEIGHTS=Object.freeze({
   offense:.40,pitching:.20,defense:.25,running:.10,chemistry:.05
 });
@@ -51,12 +54,15 @@ function scouting(id){
     conditional:new Set(record.conditionalGoodChemistryIds||[]),
   };
 }
+function topPriorityPitchers(people){
+  return [...people].sort((a,b)=>
+    (PITCHER_PRIORITY_ORDER[a.pitcherPriority||'other']-
+      PITCHER_PRIORITY_ORDER[b.pitcherPriority||'other']) ||
+    b.pitching-a.pitching || a.id-b.id).slice(0,POWER_PITCHER_COUNT);
+}
 export function rosterPowerComponents(roster){
   const people=[...new Set((roster||[]).map(Number))].map(scouting).filter(Boolean);
-  // Every participant contributes to every stat category, including pitching.
-  // P1P / P2P are the league's designated pitchers: weight their pitch ratings
-  // 3x / 2x, without excluding their teammates (who each count 1x).
-  const pitchingWeight=p=>PITCHING_ROLE_WEIGHTS[p.pitcherPriority]||PITCHING_ROLE_WEIGHTS.other;
+  const pitchers=topPriorityPitchers(people);
   const scoreChemistry=()=>{
     const pairs=people.reduce((sum,p,i)=>sum+people.slice(i+1).reduce((sub,q)=>{
       const bonus=p.good.has(q.id)||q.good.has(p.id)||
@@ -67,9 +73,7 @@ export function rosterPowerComponents(roster){
     return clamp(50+12*pairs/Math.max(1,people.length),15,85);
   };
   const offense=average(people.map(p=>p.offense));
-  const totalPitchingWeight=people.reduce((sum,p)=>sum+pitchingWeight(p),0);
-  const pitching=totalPitchingWeight?
-    people.reduce((sum,p)=>sum+p.pitching*pitchingWeight(p),0)/totalPitchingWeight:0;
+  const pitching=average(pitchers.map(p=>p.pitching));
   const defense=average(people.map(p=>p.defense));
   const running=average(people.map(p=>p.running));
   const chemistry=scoreChemistry();
@@ -78,8 +82,8 @@ export function rosterPowerComponents(roster){
     POWER_WEIGHTS.chemistry*chemistry;
   return {offense:round(offense),pitching:round(pitching),defense:round(defense),
     running:round(running),chemistry:round(chemistry),rosterScore,
-    rosterSize:people.length,eligiblePitchers:people.filter(p=>p.pitcherPriority)
-      .map(p=>({id:p.id,role:p.pitcherPriority,weight:pitchingWeight(p)}))};
+    rosterSize:people.length,selectedPitchers:pitchers
+      .map(p=>({id:p.id,role:p.pitcherPriority||'other',pitching:round(p.pitching)}))};
 }
 export function rankingParticipants(season,teamId){
   const roster=season.rosters?.[teamId]||[];
