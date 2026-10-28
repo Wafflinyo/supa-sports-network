@@ -1,4 +1,6 @@
 import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
+import {PowerRankings,PreseasonTournament} from './SeasonPreseason.jsx';
+import {preseasonReady,preseasonHasLeagueOpener} from './preseason.js';
 import {lotteryProgress,lotteryReplayProgress,lotteryDuration,lotteryCountdownClock} from './lottery-timing.js';
 import {orderedDraftPickTeams,lotteryOrderReady,teamsInLotteryOrder} from './draft-pick-stats-order.js';
 import DraftOrderBoard from './DraftOrderBoard.jsx';
@@ -107,7 +109,23 @@ export function useSeasonLeague(supabase, access) {
       serverOffsetMs.current = serverTime - Date.now();
       setNow(Date.now() + serverOffsetMs.current);
     }
-    setSeasons(r.data || []);
+    // Public, separate exhibition results; NEVER change the live draft season state.
+    const rawSeasons = Array.isArray(r.data) ? r.data : [];
+    const ids=rawSeasons.map(s=>s.id).filter(Boolean);
+    let bySeason=new Map();
+    if(ids.length){
+      const tournament=await supabase.from('ssl_preseason_results')
+        .select('season_id,match_key,team_a,team_b,score_a,score_b,recorded_at')
+        .in('season_id',ids);
+      if(!tournament.error){
+        for(const result of tournament.data||[]){
+          const rows=bySeason.get(result.season_id)||[];
+          rows.push(result);
+          bySeason.set(result.season_id,rows);
+        }
+      }
+    }
+    setSeasons(rawSeasons.map(s=>({...s,preseasonResults:bySeason.get(s.id)||[]})));
     setError("");
     // Secure, commissioner-only roster. No account identities enter the public
     // season response; the server verifies current commissioner access.
@@ -174,6 +192,28 @@ export function useSeasonLeague(supabase, access) {
       setBusy(false);
     }
   }
+  async function recordPreseasonResult(matchKey,scoreA,scoreB){
+    if(busy||!season||access.role!=='commissioner')return false;
+    setBusy(true);setError('');setNotice('');
+    try{
+      const r=await supabase.rpc('ssl_preseason_record',{
+        target_season:season.id,target_match:matchKey,a_score:scoreA,b_score:scoreB
+      });
+      if(r.error)throw r.error;
+      await refresh();setNotice('Preseason tournament result saved. The bracket has been reseeded.');
+      return true;
+    }catch(e){setError(e.message);return false;}finally{setBusy(false);}
+  }
+  async function clearPreseasonResult(matchKey){
+    if(busy||!season||access.role!=='commissioner')return false;
+    setBusy(true);setError('');setNotice('');
+    try{
+      const r=await supabase.rpc('ssl_preseason_clear',{target_season:season.id,target_match:matchKey});
+      if(r.error)throw r.error;
+      await refresh();setNotice('Preseason result cleared.');
+      return true;
+    }catch(e){setError(e.message);return false;}finally{setBusy(false);}
+  }
   const myTeam = season?.teams?.find((t) => t.slot === Number(access.slot));
   return {
     seasons,
@@ -189,6 +229,8 @@ export function useSeasonLeague(supabase, access) {
     now,
     act,
     refresh,
+    recordPreseasonResult,
+    clearPreseasonResult,
     access,
     myTeam,
     supabase,
@@ -1087,8 +1129,16 @@ function MyTeam({league:l}){
 
 function Teams({ league: l }) {
   const s = l.season;
+  const [tab,setTab]=useState('Franchises');
+  const rankingsVisible=preseasonReady(s)&&preseasonHasLeagueOpener(s);
   const records = new Map(standings(s).map(t=>[t.id,t]));
-  return (
+  return (<>
+    {rankingsVisible&&<div className="subnav" role="tablist" aria-label="Team tabs">
+      {['Franchises','Power Rankings'].map(t=><button type="button" key={t}
+        role="tab" aria-selected={tab===t} className={tab===t?'active':''}
+        onClick={()=>setTab(t)}>{t}</button>)}
+    </div>}
+    {rankingsVisible&&tab==='Power Rankings'?<PowerRankings season={s} supabase={l.supabase}/>:
     <div className="season-team-columns">
       {[0, 1].map((col) => (
         <div key={col}>
@@ -1135,8 +1185,8 @@ function Teams({ league: l }) {
             ))}
         </div>
       ))}
-    </div>
-  );
+    </div>}
+  </>);
 }
 function ScheduleMatchupHeading({season,game}){
   const display=matchupDisplay(season,game);
@@ -2401,6 +2451,7 @@ export const seasonPages = [
   "Voting",
   "SSL History",
   "Draft Room",
+  "Preseason Tournament",
   "Free Agency",
   "Messages",
 ];
@@ -2416,6 +2467,8 @@ export function SeasonPage({ page, league: l }) {
         <Standings league={l} />
       ) : page === "Teams" ? (
         <Teams league={l} />
+      ) : page === "Preseason Tournament" ? (
+        <PreseasonTournament league={l} />
       ) : page === "Team Stats" ? (
         <TeamStats league={l} />
       ) : page === "Voting" ? (
@@ -2507,6 +2560,10 @@ export function SeasonHome({ league: l, go }) {
           </p>
         ))}
       </Box>
+      {preseasonReady(s)&&!preseasonHasLeagueOpener(s)&&
+        <PowerRankings season={s} supabase={l.supabase}/>}
+      {preseasonReady(s)&&<button type="button" className="outline-btn"
+        onClick={()=>go('Preseason Tournament')}>VIEW PRESEASON TOURNAMENT BRACKET</button>}
     </div>
   );
 }
