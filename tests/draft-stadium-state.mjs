@@ -50,7 +50,8 @@ season.nextPick.stadiumRetained=true;
 assert.equal(stadiumDraftState(season,'d',true).eligible,false);
 season.nextPick.stadiumRetained=false;
 season.paused=true;
-assert.equal(stadiumDraftState(season,'d',true).eligible,false);
+assert.equal(stadiumDraftState(season,'d',true).eligible,true,
+  'pausing the pick timer must not prevent the on-clock GM from choosing a Stadium');
 season.paused=false;
 
 season.picks=season.picks.filter(p=>p.stage!=='Mario Stadium');
