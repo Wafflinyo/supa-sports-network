@@ -15,17 +15,25 @@ function Identity({team,supabase}){
 
 export function PowerRankings({season,supabase,compact=false}){
   const rankings=useMemo(()=>powerRankings(season),[season]);
+  const eligible=Array.isArray(season?.teams)&&season.teams.length===12;
+  const pending=eligible?(season.teams||[]).filter(team=>!rankings.some(t=>t.id===team.id)):[];
   if(!rankings.length)return <section className="panel ssl-pre-panel">
-    <h2>POWER RANKINGS</h2><p>Official rankings are released automatically when all twelve teams complete the draft.</p>
+    <h2>POWER RANKINGS</h2>
+    <p>Rankings open after the draft. Teams appear as each GM submits a valid nine-player default lineup—no team is scored from an estimated roster.</p>
+    {eligible&&<p><strong>0 / {season.teams.length} teams ranked.</strong> Awaiting default-lineup submissions.</p>}
   </section>;
   return <section className="panel ssl-pre-panel" aria-label="SSL power rankings">
     <div className="ssl-pre-head"><div><small>SSL POWER INDEX · 0–100</small>
       <h2>{rankings.some(t=>t.games>0)?'LIVE POWER RANKINGS':'POST-DRAFT POWER RANKINGS'}</h2>
-      <p>Calculated from each team's roster: <b>{Math.round(100*POWER_WEIGHTS.offense)}% offense · {Math.round(100*POWER_WEIGHTS.pitching)}% pitching · {Math.round(100*POWER_WEIGHTS.defense)}% defense · {Math.round(100*POWER_WEIGHTS.running)}% running · {Math.round(100*POWER_WEIGHTS.chemistry)}% chemistry.</b>
+      <p>Calculated only from each GM's submitted nine-player default lineup: <b>{Math.round(100*POWER_WEIGHTS.offense)}% offense · {Math.round(100*POWER_WEIGHTS.pitching)}% pitching · {Math.round(100*POWER_WEIGHTS.defense)}% defense · {Math.round(100*POWER_WEIGHTS.running)}% running · {Math.round(100*POWER_WEIGHTS.chemistry)}% chemistry.</b>
         {' '}The offensive rating includes <b>{Math.round(100*TRAJECTORY_OFFENSE_WEIGHT)}% hit trajectory</b>: High ({TRAJECTORY_SCORES.High}) &gt; Medium ({TRAJECTORY_SCORES.Medium}) &gt; Low ({TRAJECTORY_SCORES.Low}).
-        {' '}Offense, defense, running and chemistry evaluate all nine starters. <b>Pitching uses only the top {POWER_PITCHER_COUNT} priority pitchers</b>: P1P first, P2P next, then untagged players if fewer than three are available. Within each priority tier, stronger pitchers come first; the selected three count equally. Before a default lineup is submitted, all drafted players count.
+        {' '}Offense: 40% Charge Hit Power, 25% trajectory, 20% Slap Hit Power, 7% Slap Contact, 8% Charge Contact. Defense: 60% fielding, 40% throwing. Pitching: 60% stamina, 18% charge speed, 14% curveball speed, 8% curve.
+        {' '}Offense, defense, running and chemistry use all nine starters. <b>Pitching uses only the top {POWER_PITCHER_COUNT} priority pitchers</b>: P1P first, P2P next, then untagged players if fewer than three are available. Within each tier, stronger pitching skill comes first; selected pitchers count equally. <b>Teams appear as soon as their saved default lineup is valid.</b>
         {rankings.some(t=>t.games>0)?' Published regular-season performances gradually count for up to 60% of the index after eight team games.':''}
       </p></div><Medal size={32} aria-hidden="true"/></div>
+    <p className="ssl-pre-help"><strong>{rankings.length} / {season.teams.length} teams ranked.</strong>
+      {' '}Rankings update automatically when a GM saves or revises their default lineup.
+      {pending.length>0&&<> <strong>Awaiting:</strong> {pending.map(t=>t.name).join(' · ')}.</>}</p>
     <div className="ssl-pre-scroll"><table className="ssl-pre-table">
       <thead><tr><th>Rank</th><th>Franchise</th><th>Score</th>{!compact&&<>
         <th>Off.</th><th>Pitch.</th><th>Def.</th><th>Run</th><th>Chem.</th><th>Regular W–L</th>
