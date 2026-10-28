@@ -7,18 +7,18 @@ import {earnedAchievements,GM_ACHIEVEMENTS} from '../src/gm-achievements.js';
 
 // Explicit scoring contract: defense outranks pitching, and otherwise-identical
 // batters rank High > Medium > Low for hit trajectory.
-assert.deepEqual(POWER_WEIGHTS,{offense:.40,pitching:.20,defense:.25,running:.10,chemistry:.05});
+assert.deepEqual(POWER_WEIGHTS,{offense:.50,pitching:.15,defense:.25,running:.05,chemistry:.05});
 assert.equal(Object.values(POWER_WEIGHTS).reduce((sum,n)=>sum+n,0),1);
-assert.equal(TRAJECTORY_OFFENSE_WEIGHT,.20);
+assert.equal(TRAJECTORY_OFFENSE_WEIGHT,.25);
 assert.deepEqual(TRAJECTORY_SCORES,{High:100,Medium:60,Low:20});
 const hitter={ 'slap hit power':50,'charge hit power':50,
   'slap contact size':50,'charge contact size':50,
   'displayed batting':1, 'displayed pitching':1 };
-assert.equal(offenseRating({...hitter,'hit trajectory':'High'}),60);
-assert.equal(offenseRating({...hitter,'hit trajectory':'Medium'}),52);
-assert.equal(offenseRating({...hitter,'hit trajectory':'Low'}),44);
+assert.equal(offenseRating({...hitter,'hit trajectory':'High'}),62.5);
+assert.equal(offenseRating({...hitter,'hit trajectory':'Medium'}),52.5);
+assert.equal(offenseRating({...hitter,'hit trajectory':'Low'}),42.5);
 assert.equal(offenseRating({...hitter,'hit trajectory':'High',
-  'displayed batting':10,'displayed pitching':10}),60,
+  'displayed batting':10,'displayed pitching':10}),62.5,
   'hidden attribute calculation must never use the removed displayed ratings');
 
 const t=Array.from({length:12},(_,i)=>({id:'t'+(i+1),name:'Franchise '+(i+1),slot:i+1,logoPath:''}));
@@ -48,10 +48,10 @@ const balancedIds=balancedNames.map(n=>byName.get(n).id);
 const round1=x=>Math.round(x*10)/10;
 const pitchRaw=(s)=>{
  const clamp100=x=>Math.max(0,Math.min(100,x));
- return .52*clamp100(Number(s['pitching stamina'])||0)+
-   .22*clamp100(((Number(s['charge pitch speed'])||90)-90)/80*100)+
-   .16*clamp100(((Number(s['curveball speed'])||90)-90)/65*100)+
-   .10*clamp100(Number(s.curve)||0);
+ return .60*clamp100(Number(s['pitching stamina'])||0)+
+   .18*clamp100(((Number(s['charge pitch speed'])||90)-90)/80*100)+
+   .14*clamp100(((Number(s['curveball speed'])||90)-90)/65*100)+
+   .08*clamp100(Number(s.curve)||0);
 };
 for(const names of [powerNames,balancedNames]){
  const ids=names.map(n=>byName.get(n).id);
@@ -61,8 +61,8 @@ for(const names of [powerNames,balancedNames]){
    const s=stats[id].stats,player=gamePlayers.find(p=>p.id===id);
    return {
      id,offense:offenseRating(s),pitch:pitchRaw(s),
-     defense:.53*Math.max(0,Math.min(100,Number(s.fielding)||0))+
-       .47*Math.max(0,Math.min(100,Number(s['outfield throwing speed'])||0)),
+     defense:.60*Math.max(0,Math.min(100,Number(s.fielding)||0))+
+       .40*Math.max(0,Math.min(100,Number(s['outfield throwing speed'])||0)),
      running:Math.max(0,Math.min(100,Number(s.speed)||0)),
      role:pitcherPriorityFor(player,stats[id])?.code||'other'
    };
@@ -107,13 +107,17 @@ assert.equal(prioritized.selectedPitchers[2].id,byName.get('Petey Piranha').id,
 assert.equal(rosterPowerComponents([byName.get('Wario').id]).selectedPitchers.length,1,
   'rosters with fewer than three players should not invent pitching stats');
 
-const lineupSeason={rosters:{test:powerIds.concat([balancedIds[0],balancedIds[1]])},
- defaults:{test:{starters:powerIds.map(id=>({player:id,position:'P'}))}}};
+const positions=['P','C','1B','2B','3B','SS','LF','CF','RF'];
+const lineupSeason={rosters:{test:powerIds.concat([balancedIds[0],balancedIds[1]])},defaults:{}};
+assert.deepEqual(rankingParticipants(lineupSeason,'test'),[],
+  'NO DEFAULT LINEUP means no Power Index score, even with eleven drafted players');
+lineupSeason.defaults.test={starters:powerIds.map((id,i)=>({player:id,position:positions[i]})),
+  bench:[balancedIds[0],balancedIds[1]]};
 assert.deepEqual(rankingParticipants(lineupSeason,'test'),powerIds,
-  'use actual lineup starters for a completed eleven-player franchise');
-delete lineupSeason.defaults;
-assert.deepEqual(rankingParticipants(lineupSeason,'test'),lineupSeason.rosters.test,
-  'before the GM sets a nine-player lineup, do not arbitrarily discard bench players');
+  'only the nine GM-submitted starters determine Power Rankings');
+lineupSeason.defaults.test.starters[1].position='P';
+assert.deepEqual(rankingParticipants(lineupSeason,'test'),[],
+  'reject incomplete/invalid default lineups instead of publishing arbitrary scores');
 assert(!preseasonReady(season),'live drafting must not publish ratings or a bracket');
 assert.deepEqual(preseasonSeeds(season),[]);
 assert.deepEqual(powerRankings(season),[]);
@@ -124,6 +128,25 @@ assert.equal(seeds.length,12);
 assert.deepEqual(seeds.map(x=>x.seed),Array.from({length:12},(_,i)=>i+1));
 assert.equal(seeds[0].avgSeconds,10);
 assert.equal(seeds[11].avgSeconds,120);
+assert.equal(powerRankings(season).length,0,'no submitted defaults means no published Power Rankings');
+season.defaults={};
+const newDefault=teamId=>{
+  const roster=season.rosters[teamId];
+  return {starters:roster.slice(0,9).map((id,i)=>({player:id,position:positions[i]})),
+    bench:roster.slice(9)};
+};
+season.defaults.t1=newDefault('t1');
+assert.equal(powerRankings(season).length,1,'first GM submission publishes just that franchise');
+assert.equal(powerRankings(season)[0].id,'t1');
+season.defaults.t2=newDefault('t2');
+assert.equal(powerRankings(season).length,2,'second GM submission adds one more team');
+const scoreBefore=powerRankings(season).find(x=>x.id==='t1').rosterScore;
+const swap=season.defaults.t1.starters[0].player;
+season.defaults.t1.starters[0].player=season.defaults.t1.bench[0];
+season.defaults.t1.bench[0]=swap;
+assert.notEqual(powerRankings(season).find(x=>x.id==='t1').rosterScore,scoreBefore,
+ 'editing submitted starters recalculates rankings automatically');
+for(const t of season.teams)season.defaults[t.id]??=newDefault(t.id);
 assert.equal(powerRankings(season).length,12);
 assert.equal(new Set(powerRankings(season).map(x=>x.rank)).size,12);
 assert(!preseasonHasLeagueOpener(season));
