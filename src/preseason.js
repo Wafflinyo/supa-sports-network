@@ -32,11 +32,13 @@ export function preseasonBracket(season){
       rounds.push({number:r,title:roundNames[r-1],games:[],bye:null,pending:true});
       continue;
     }
-    const paired=Math.floor(entrants.length/2),bye=entrants.length%2?entrants[0]:null;
+    const bye=entrants.length%2?entrants[0]:null;
+    const pairings=bye?entrants.slice(1):entrants;
+    const paired=Math.floor(pairings.length/2);
     const games=[],advancing=bye?[bye]:[];
     let complete=true;
     for(let i=0;i<paired;i++){
-      const high=entrants[i],low=entrants[entrants.length-1-i];
+      const high=pairings[i],low=pairings[pairings.length-1-i];
       const key=`R${r}-${i+1}`,row=results.get(key);
       const valid=!!row && String(row.team_a)===String(high.id)&&
         String(row.team_b)===String(low.id)&&
