@@ -97,7 +97,7 @@ export function buildLeagueAlerts({season, myTeam, role, newsItems = [], now = D
   }
   // The local matchup snapshot creates one event only when a published game
   // changed since the GM last saw it. Do not treat a new schedule as a change.
-  if(teamId)alerts.push(...scheduleChanges.filter(e=>e.id?.startsWith(id+':schedule-change:')));
+  if(teamId)alerts.push(...scheduleChanges.filter(e=>e.id?.startsWith(id+':schedule-change:') && String(e.teamId)===String(teamId)));
   if (teamId && ['regular','postseason'].includes(season.status)) {
     const nextGames=(season.games || [])
       .filter(g=>matchesTeam(g,teamId) && g.stage==='scheduled' &&
