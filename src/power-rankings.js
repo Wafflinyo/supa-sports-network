@@ -8,6 +8,9 @@ import {validLineup} from './season-data.js';
 // Offense: charge power 40%, trajectory 25%, slap power 20%, slap contact 7%, charge contact 8%.
 // High trajectory > Medium > Low. The display-stat rating bars are not used.
 // Evaluate all nine starters for offense, defense, running and chemistry.
+// Special baserunning abilities enhance offense; fielding abilities enhance defense.
+// Saved batting order and defensive positions supply situational chemistry bonuses.
+// Neutral LF/RF-to-CF incurs -6 because buddy jump requires a chemistry link.
 // Pitching uses the default lineup's designated P first, plus the best
 // three other eligible starters: P1P first, P2P second, then untagged.
 // Strongest pitching ability breaks ties within a tier. Each of the
@@ -28,6 +31,68 @@ export const POWER_SUPPORT_PITCHER_COUNT=3;
 export const POWER_WEIGHTS=Object.freeze({
   offense:.60,pitching:.15,defense:.20,running:.02,chemistry:.03
 });
+// The established +12/+9/+7/+5/+3 defensive ability tiers.
+// All extended catches (including Clamber and Hammer Throw) share Super Dive's tier.
+export const FIELDING_ABILITY_BONUSES=Object.freeze({
+  0:0,1:12,2:9,3:12,4:12,5:12,6:12,7:12,8:12,9:12,
+  10:3,11:5,12:7
+});
+export const BASERUNNING_ABILITY_BONUS=2;
+export const BATTING_CHEMISTRY_BONUSES=Object.freeze({one:2,both:4});
+export const MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT=20;
+// Good and anti-chemistry both affect BOTH defenders in the pair.
+// Neutral LF/RF-to-CF is penalized because the buddy jump needs chemistry.
+// Neutral chemistry anywhere else is zero, as is LF-to-RF (not a link).
+export const DEFENSIVE_CHEMISTRY_LINKS=Object.freeze([
+  {a:'LF',b:'CF',good:8,bad:-6,neutral:-6},
+  {a:'RF',b:'CF',good:8,bad:-6,neutral:-6},
+  {a:'SS',b:'1B',good:6,bad:-4,neutral:0},
+  {a:'2B',b:'3B',good:5,bad:-4,neutral:0},
+  ...['LF','CF','RF'].map(a=>({a,b:'1B',good:3,bad:-3,neutral:0})),
+  ...['LF','CF','RF'].map(a=>({a,b:'3B',good:2,bad:-3,neutral:0})),
+  ...['LF','CF','RF'].map(a=>({a,b:'C',good:1,bad:-1,neutral:0}))
+]);
+function chemistryRelation(a,b){
+  // An anti-chemistry link wins when data lists conflicting relationships.
+  if(a.bad.has(b.id)||b.bad.has(a.id))return 'bad';
+  if(a.good.has(b.id)||b.good.has(a.id)||
+    a.conditional.has(b.id)||b.conditional.has(a.id))return 'good';
+  return 'neutral';
+}
+// Apply only to a valid nine-slot saved batting order and defensive lineup.
+// This pure function is also used by tests with synthetic chemistry networks.
+export function lineupChemistryAdjustments(people,starters){
+  const bonuses=new Map(people.map(p=>[p.id,{offense:0,defense:0}]));
+  if(!Array.isArray(starters)||starters.length!==9||people.length!==9)return bonuses;
+  const byId=new Map(people.map(p=>[p.id,p]));
+  const ordered=starters.map(s=>byId.get(Number(s?.player)));
+  const byPosition=new Map(starters.map((s,i)=>[s.position,ordered[i]]));
+  if(ordered.some(p=>!p)||new Set(ordered.map(p=>p.id)).size!==9||
+    byPosition.size!==9)return bonuses;
+
+  // First and ninth also touch because the batting order wraps around.
+  for(let i=0;i<ordered.length;i++){
+    const batter=ordered[i];
+    const before=ordered[(i+8)%9],after=ordered[(i+1)%9];
+    const good=Number(chemistryRelation(batter,before)==='good')+
+      Number(chemistryRelation(batter,after)==='good');
+    bonuses.get(batter.id).offense=good===2?BATTING_CHEMISTRY_BONUSES.both:
+      good===1?BATTING_CHEMISTRY_BONUSES.one:0;
+  }
+  for(const link of DEFENSIVE_CHEMISTRY_LINKS){
+    const a=byPosition.get(link.a),b=byPosition.get(link.b);
+    if(!a||!b)continue;
+    const value=link[chemistryRelation(a,b)];
+    bonuses.get(a.id).defense+=value;
+    bonuses.get(b.id).defense+=value;
+  }
+  for(const p of people){
+    const b=bonuses.get(p.id);
+    b.defense=clamp(b.defense,-MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT,
+      MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT);
+  }
+  return bonuses;
+}
 export const TRAJECTORY_OFFENSE_WEIGHT=.25;
 export const TRAJECTORY_SCORES=Object.freeze({High:100,Medium:60,Low:20});
 export function offenseRating(stats){
@@ -47,6 +112,8 @@ function scouting(id){
     id:Number(id),
     pitcherPriority:pitcherPriorityFor(playerById.get(Number(id)),record)?.code||null,
     offense:offenseRating(s),
+    offenseAbilityBonus:Number(s['baserunning ability'])>0?BASERUNNING_ABILITY_BONUS:0,
+    defenseAbilityBonus:FIELDING_ABILITY_BONUSES[Number(s['fielding ability'])]??0,
     pitching:.60*numeric(s,'pitching stamina')+
       .18*pitchVelocity(s['charge pitch speed'],90,170)+
       .14*pitchVelocity(s['curveball speed'],90,155)+.08*numeric(s,'curve'),
@@ -69,9 +136,10 @@ function topPriorityPitchers(people,startingPitcherId=null){
   ).slice(0,starter?POWER_SUPPORT_PITCHER_COUNT:POWER_PITCHER_COUNT);
   return starter?[starter,...backups]:backups;
 }
-export function rosterPowerComponents(roster,startingPitcherId=null){
+export function rosterPowerComponents(roster,startingPitcherId=null,starters=null){
   const people=[...new Set((roster||[]).map(Number))].map(scouting).filter(Boolean);
   const pitchers=topPriorityPitchers(people,startingPitcherId);
+  const linked=lineupChemistryAdjustments(people,starters);
   const scoreChemistry=()=>{
     const pairs=people.reduce((sum,p,i)=>sum+people.slice(i+1).reduce((sub,q)=>{
       const bonus=p.good.has(q.id)||q.good.has(p.id)||
@@ -81,9 +149,11 @@ export function rosterPowerComponents(roster,startingPitcherId=null){
     },0),0);
     return clamp(50+12*pairs/Math.max(1,people.length),15,85);
   };
-  const offense=average(people.map(p=>p.offense));
+  const offense=average(people.map(p=>clamp(p.offense+p.offenseAbilityBonus+
+    (linked.get(p.id)?.offense||0))));
   const pitching=average(pitchers.map(p=>p.pitching));
-  const defense=average(people.map(p=>p.defense));
+  const defense=average(people.map(p=>clamp(p.defense+p.defenseAbilityBonus+
+    (linked.get(p.id)?.defense||0))));
   const running=average(people.map(p=>p.running));
   const chemistry=scoreChemistry();
   const rosterScore=POWER_WEIGHTS.offense*offense+POWER_WEIGHTS.pitching*pitching+
@@ -123,7 +193,7 @@ export function powerRankings(season){
     rankingParticipants(season,team.id).length===9).map(team=>{
     const participants=rankingParticipants(season,team.id);
     const starter=season.defaults?.[team.id]?.starters.find(p=>p.position==='P');
-    const c=rosterPowerComponents(participants,starter?.player);
+    const c=rosterPowerComponents(participants,starter?.player,season.defaults?.[team.id]?.starters);
     const record=playedRecord(season,team.id);
     const formWeight=record.games?Math.min(.60,record.games*.075):0;
     const score=(1-formWeight)*c.rosterScore+formWeight*(record.form??c.rosterScore);
