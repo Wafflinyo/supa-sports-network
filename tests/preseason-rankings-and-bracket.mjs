@@ -55,7 +55,7 @@ assert.equal(BASERUNNING_ABILITY_BONUS,2);
 assert.deepEqual(BATTING_CHEMISTRY_BONUSES,{one:2,both:4});
 assert.equal(MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT,20);
 assert.deepEqual(FIELDING_ABILITY_BONUSES,{
-  0:0,1:12,2:9,3:12,4:12,5:12,6:12,7:12,8:12,9:12,10:3,11:5,12:7
+  0:0,1:12,2:9,3:12,4:12,5:12,6:12,7:12,8:12,9:0,10:3,11:5,12:7
 });
 assert.equal(DEFENSIVE_CHEMISTRY_LINKS.length,13);
 const expectedDefensiveLinks={
