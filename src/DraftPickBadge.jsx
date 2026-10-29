@@ -1,8 +1,9 @@
 import React from 'react';
-import {originalPlayerDraft,isUndraftedSigning} from './draft-pedigree.js';
+import {originalPlayerDraft,isUndraftedSigning,draftPedigreeVisible} from './draft-pedigree.js';
 import './draft-pedigree.css';
 
 export function DraftPickBadge({playerId,seasons=[],compact=false}) {
+  if(!draftPedigreeVisible(seasons))return null;
   const draft=originalPlayerDraft(playerId,seasons);
   if(!draft){
     if(!isUndraftedSigning(playerId,seasons))return null;

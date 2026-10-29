@@ -1,4 +1,5 @@
 import { PlayerPortrait } from "./PlayerPortrait.jsx";
+import {PlayerProfileLink} from './PlayerProfileLink.jsx';
 import {taggedName,PlayerPriority} from "./PlayerPriority.jsx";
 import React, { useEffect, useMemo, useState } from "react";
 import { CalendarDays, LockKeyhole, Search, Trophy } from "lucide-react";
@@ -498,7 +499,7 @@ export function FantasyLeague({
                   <div className="draft-pool">
                     {available.map((player) => (
                       <div key={player.id} className="draft-player">
-                        <div className="portrait-label">
+                        <PlayerProfileLink player={player} className="portrait-label">
                           <PlayerPortrait player={player} />
                           <div>
                             <strong>{player.name} <PlayerPriority player={player}/></strong>
@@ -506,7 +507,7 @@ export function FantasyLeague({
                               {player.class} · #{player.id}
                             </small>
                           </div>
-                        </div>
+                        </PlayerProfileLink>
                         <button
                           disabled={
                             busy ||
@@ -611,8 +612,8 @@ export function FantasyLeague({
                     {mine
                       .filter((x) => x.slot === slot)
                       .map((row) => (
+                        <div key={row.player_id} className="fantasy-lineup-card">
                         <button
-                          key={row.player_id}
                           className={`lineup-player ${selectedStarter === row.player_id ? "chosen" : ""}`}
                           disabled={
                             busy ||
@@ -657,6 +658,8 @@ export function FantasyLeague({
                               : "BENCH"}
                           </strong>
                         </button>
+                        <PlayerProfileLink player={byId.get(row.player_id)} className="fantasy-career-link">VIEW CAREER STATS</PlayerProfileLink>
+                        </div>
                       ))}
                   </section>
                 ))}
@@ -771,10 +774,10 @@ export function FantasyLeague({
               )
               .map((p) => (
                 <div key={p.id}>
-                  <span className="portrait-label">
+                  <PlayerProfileLink player={p} className="portrait-label">
                     <PlayerPortrait player={p} />
                     {taggedName(p)}
-                  </span>
+                  </PlayerProfileLink>
                   <strong>
                     {formatScore(sumScores(scoringGames, p.id, currentWeek))}
                   </strong>
@@ -797,10 +800,10 @@ export function FantasyLeague({
               .filter((p) => !drafted.has(p.id) && eligible.has(p.id))
               .map((p) => (
                 <div key={p.id}>
-                  <span className="portrait-label">
+                  <PlayerProfileLink player={p} className="portrait-label">
                     <PlayerPortrait player={p} />
                     {taggedName(p)}
-                  </span>
+                  </PlayerProfileLink>
                   <small>{p.class}</small>
                 </div>
               ))}

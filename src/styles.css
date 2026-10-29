@@ -204,3 +204,16 @@
 
 /* Five career totals: three on the first row, two evenly sized on the second. */
 @media(max-width:520px){.career-profile .career-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.career-profile .career-summary>div{grid-column:span 1}.career-profile .career-summary>div:nth-child(4){grid-column:span 1}.career-profile .career-summary>div:nth-child(5){grid-column:span 2}}
+
+
+/* One consistent, keyboard-accessible career stats opener across league tabs.
+   :where() keeps existing card themes and layout styles authoritative. */
+:where(.ssl-player-profile-link){display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;padding:0;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.ssl-player-profile-link:focus-visible{outline:2px solid #2d80d4;outline-offset:3px;border-radius:4px}
+.ssl-player-profile-link:hover{text-decoration-color:currentColor}
+.fantasy-lineup-card{display:grid;gap:5px;margin-bottom:8px}
+.fantasy-lineup-card .lineup-player{width:100%;margin-bottom:0}
+.fantasy-career-link{justify-self:end;font-size:11px!important;font-weight:850!important;color:#285a95!important;padding:2px 5px!important}
+.draft-career-snapshot{margin:14px 0;padding:15px;border:1px solid #d9e4f1;border-radius:10px;background:#f5f9ff}
+.draft-career-snapshot h3{margin:0 0 12px;font-size:15px;color:#173965}
+.draft-career-snapshot .career-average-grid{margin:0}

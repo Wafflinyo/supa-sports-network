@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {originalPlayerDraft,teamDraftedPlayers,sslCareerTenure,isUndraftedSigning} from '../src/draft-pedigree.js';
+import {originalPlayerDraft,teamDraftedPlayers,sslCareerTenure,isUndraftedSigning,draftPedigreeVisible} from '../src/draft-pedigree.js';
 
 const player1=1,player2=2;
 const season1={
@@ -73,22 +73,35 @@ assert(team.includes("teamDraftedPlayers(season,team.id)")&&
  team.includes('<PlayerPortrait player={player} size={38}/>'),
  'GM only sees live roster with actual shared player portraits');
 assert(badge.includes('isUndraftedSigning(playerId,seasons)')&&badge.includes('UNDRAFTED'),
-  'shared badge must display UNDRAFTED without inventing Round/Pick for rostered free agents');
-assert(!team.includes('ACQUIRED · NO SSL DRAFT PICK'),
-  'My Team should use the exact UNDRAFTED badge instead of its old ambiguous label');
+  'career profile should correctly distinguish undrafted signings from drafted players');
 assert(badge.includes('ROUND {draft.round}')&&badge.includes('PICK #{draft.number}'),
- 'original round and overall pick must display on every player card');
-assert(draft.includes('<DraftPickBadge playerId={p.id} seasons={l.seasons} compact/>'),
- 'draft pool cards show completed draft history');
-assert(main.includes('<DraftPickBadge playerId={p.id} seasons={seasonLeague.seasons} compact/>'),
- 'Player Stats cards must retain pick history during season');
+  'draft pedigree remains available after the draft concludes');
+assert(badge.includes('if(!draftPedigreeVisible(seasons))return null;'),
+  'draft pedigree must be hidden until the active draft is complete');
+assert.equal(draftPedigreeVisible([season1]),false,'drafting season hides pedigree');
+assert.equal(draftPedigreeVisible([{...season1,status:'scheduled'}]),false,
+  'scheduled draft never exposes draft badges');
+assert.equal(draftPedigreeVisible([{...season1,status:'postdraft'}]),true,
+  'pedigree appears immediately when the draft concludes');
+assert.equal(draftPedigreeVisible([season2,{...season1,status:'archived'}]),true,
+  'completed seasons keep original draft pedigree');
+assert.equal(draftPedigreeVisible([{...season2,status:'drafting'},season1]),false,
+  'new current draft also hides historical round and pick badges');
+for(const [view,body] of Object.entries({main,draft,team,season,playerData})){
+  assert(!body.includes('<DraftPickBadge'),'draft badge must not appear on '+view+' cards');
+}
+assert(main.includes('PlayerProfileContext.Provider')&&
+  season.includes('<PlayerProfileLink player={p}')&&
+  team.includes('<PlayerProfileLink player={player}')&&
+  playerData.includes('<PlayerProfileLink player={p}'),
+  'player cards across league, My Team, and Data use shared career profile');
+assert(draft.includes('<PlayerCareerSnapshot player={selected} seasons={l.seasons}/>'),
+  'draft card tap must show career stats without changing pick selection');
 assert(season.includes('<Player id={p.player} seasons={l.seasons}/>')&&
   season.includes('<Player id={p.id} seasons={l.seasons} />'),
-  'lineup and free-agency cards must receive provenance data too');
+  'lineup and free agency use shared tappable player identities');
 assert(season.includes('<Player id={id} seasons={l.seasons}/>'),
- 'Team roster cards retain pick history throughout season');
-assert(playerData.includes('<DraftPickBadge playerId={p.id} seasons={seasons} compact/>'),
- 'Player Data cards include the draft history too');
+ 'Team roster cards retain shared tappable player identities');
 assert(profile.includes("'YEARS AS A SLUGGER',sslCareerTenure(player.id,fullSeasons)"),
  'career stat must show ROOKIE during first season; not raw zero seasons');
 assert(profile.includes('<DraftPickBadge playerId={player.id} seasons={fullSeasons}/>'));
@@ -97,4 +110,4 @@ assert(css.includes('.draft-my-team-panel[hidden]{display:none!important}'),
  'inactive My Team tab cannot overlap draft player pool');
 assert(draft.includes('if(await l.act(\'pick\',{player:selected.id}))close();'),
  'commissioner can still submit on-clock pick with explicit confirmation');
-console.log('PASS: commissioner unchanged; GM My Team, draft provenance on player cards and career Rookie Season 1');
+console.log('PASS: live draft unchanged; career profiles on player cards; draft round and pick visible only in career profile after draft');
