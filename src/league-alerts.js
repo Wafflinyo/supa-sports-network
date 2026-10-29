@@ -9,12 +9,15 @@ import {heatingUpForSeason} from './heating-up.js';
 const activePhases = new Set(['postdraft','regular','postseason','retention']);
 const postseasonPhases = new Set(['postseason','retention','offseason','archived']);
 const sevenDays = 7 * 24 * 60 * 60 * 1000;
+const twoDays = 2 * 24 * 60 * 60 * 1000;
 const matchesTeam = (game, id) => String(game?.home) === String(id) || String(game?.away) === String(id);
 const stamp = value => Number.isFinite(Date.parse(value || '')) ? Date.parse(value) : 0;
 const nameList = names => names.length < 2 ? (names[0] || 'Player') : names.slice(0, 3).join(', ') + (names.length > 3 ? ' and others' : '');
 const dateLabel = value => value ? new Date(value).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'America/New_York'}) : 'Date TBD';
+const gameClock = value=>value?new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}).format(new Date(value)):'Date TBD';
+const isValidDate=value=>Number.isFinite(Date.parse(value||''));
 
-export function buildLeagueAlerts({season, myTeam, role, newsItems = [], now = Date.now(), inbox = [], players = []} = {}) {
+export function buildLeagueAlerts({season, myTeam, role, newsItems = [], now = Date.now(), inbox = [], players = [], scheduleChanges = []} = {}) {
   if (!season || !['gm','commissioner'].includes(role)) return [];
   const id = String(season.id);
   const alerts = [];
@@ -51,6 +54,50 @@ export function buildLeagueAlerts({season, myTeam, role, newsItems = [], now = D
     title:'Playoff bracket is available',detail:'Check the road to the SSL championship.',
     target:{page:'Playoff Bracket',section:'Playoffs'},
   });
+  // Only official, already-released game results create notifications.
+  // Neither 'recorded' nor any private pre-premiere result may be exposed.
+  if (teamId) {
+    const released=(season.games||[])
+      .filter(g=>matchesTeam(g,teamId) && g.stage==='final' &&
+        g.result?.scores && g.result.scores[g.away]!=null && g.result.scores[g.home]!=null)
+      .sort((a,b)=>stamp(b.releasedAt||b.result?.postedAt||b.startsAt)-
+        stamp(a.releasedAt||a.result?.postedAt||a.startsAt)).slice(0,8);
+    for (const game of released) {
+      const away=teamName(game.away),home=teamName(game.home);
+      const awayScore=game.result.scores[game.away],homeScore=game.result.scores[game.home];
+      const myScore=String(game.away)===String(teamId)?awayScore:homeScore;
+      const theirScore=String(game.away)===String(teamId)?homeScore:awayScore;
+      const result=Number(myScore)>Number(theirScore)?'WIN':Number(myScore)<Number(theirScore)?'LOSS':'FINAL';
+      alerts.push({
+        id:id+':game-result:'+String(game.id),type:'announcement',
+        title:'Final result released · '+result,
+        detail:away+' '+awayScore+' – '+homeScore+' '+home+' · View game results and statistics.',
+        target:{page:'Schedule',focus:'game',gameId:game.id},
+      });
+    }
+  }
+  // Ballot objects are already personalized by the league's authorized read.
+  for (const [kind,window] of Object.entries(season.ballotWindows||{})) {
+    const closes=stamp(window?.closesAt);
+    if(!window?.open||!closes||closes<=now)continue;
+    const ballotName=window.label|| (kind==='allstar'?'All-Star Voting':'League Award Voting');
+    const hasVoted=Array.isArray(window.myChoices)&&window.myChoices.length>0;
+    alerts.push({
+      id:id+':vote-open:'+kind+':'+window.closesAt,type:'announcement',
+      title:ballotName+' is open',
+      detail:hasVoted?'Your ballot is saved. View or update it before the deadline.':'Cast your ballot before '+gameClock(window.closesAt)+'.',
+      target:{page:'Voting',focus:'ballot',ballot:kind},
+    });
+    if(!hasVoted&&closes-now<=twoDays)alerts.push({
+      id:id+':vote-deadline:'+kind+':'+window.closesAt,type:'task',
+      title:ballotName+' closes soon',
+      detail:'Voting closes '+gameClock(window.closesAt)+'. Submit your choices before the deadline.',
+      target:{page:'Voting',focus:'ballot',ballot:kind},
+    });
+  }
+  // The local matchup snapshot creates one event only when a published game
+  // changed since the GM last saw it. Do not treat a new schedule as a change.
+  if(teamId)alerts.push(...scheduleChanges.filter(e=>e.id?.startsWith(id+':schedule-change:')));
   if (teamId && ['regular','postseason'].includes(season.status)) {
     const nextGames=(season.games || [])
       .filter(g=>matchesTeam(g,teamId) && g.stage==='scheduled' &&
@@ -89,12 +136,47 @@ export function buildLeagueAlerts({season, myTeam, role, newsItems = [], now = D
         target:{page:'Home',focus:'news'},
       });
     }
-    const offers=(inbox||[]).filter(o=>['pending','ready'].includes(o.status) && !(o.accepted||[]).includes(teamId));
-    if (offers.length) alerts.push({
-      id:id+':trades:'+offers.map(o=>o.id).sort().join(','),type:'task',
-      title:offers.length===1?'Trade offer needs your response':offers.length+' trade offers need a response',
-      detail:'Review pending trade offers in Messages.',target:{page:'Messages'},
+  }
+  // The secure inbox only contains offers belonging to this GM (or all offers
+  // for the commissioner). Status-based IDs are stable and re-notify on change.
+  const offers=(inbox||[]).filter(o=>o?.id && o.body?.teams &&
+    (role==='commissioner'||(teamId&&o.body.teams.some(t=>String(t)===String(teamId)))));
+  if(teamId)for(const offer of offers.filter(o=>['pending','ready'].includes(o.status) &&
+    !(o.accepted||[]).some(t=>String(t)===String(teamId))))alerts.push({
+      id:id+':trade-action:'+offer.id,type:'task',
+      title:'Trade offer needs your response',
+      detail:'A trade offer is awaiting your decision.',
+      target:{page:'Messages',focus:'trade',offerId:offer.id},
     });
+  if(role==='commissioner')for(const offer of offers.filter(o=>o.status==='ready'))alerts.push({
+    id:id+':trade-review:'+offer.id,type:'task',
+    title:'Trade ready for commissioner approval',
+    detail:'All teams have accepted. Review the offer before processing it.',
+    target:{page:'Messages',focus:'trade',offerId:offer.id},
+  });
+  const terminal=new Set(['approved','rejected','countered','cancelled']);
+  for(const offer of offers.slice(0,40)){
+    const status=offer.status;
+    const participants=(offer.body.teams||[]).map(teamName).join(' / ');
+    if(terminal.has(status)){
+      const text={
+        approved:'approved and processed',rejected:'declined',
+        countered:'countered with a new proposal',cancelled:'cancelled',
+      }[status];
+      alerts.push({
+        id:id+':trade-update:'+offer.id+':'+status,type:'announcement',
+        title:'Trade offer '+text,
+        detail:participants+' · View the offer in Messages.',
+        target:{page:'Messages',focus:'trade',offerId:offer.id},
+      });
+    }else if(status==='ready'&&role!=='commissioner'){
+      alerts.push({
+        id:id+':trade-update:'+offer.id+':accepted',type:'announcement',
+        title:'Trade accepted by all teams',
+        detail:participants+' · Awaiting commissioner approval.',
+        target:{page:'Messages',focus:'trade',offerId:offer.id},
+      });
+    }
   }
   return alerts;
 }
