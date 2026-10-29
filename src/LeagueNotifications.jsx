@@ -1,6 +1,7 @@
 import React,{useEffect,useMemo,useRef,useState} from 'react';
-import {Bell,BellRing,CheckCheck,ChevronRight,Flame,Trophy,CalendarDays,ClipboardList,Newspaper,Handshake} from 'lucide-react';
+import {Bell,BellRing,CheckCheck,ChevronRight,Flame,Trophy,CalendarDays,ClipboardList,Newspaper,Handshake,Vote,Clock3,CheckCircle2} from 'lucide-react';
 import {buildLeagueAlerts} from './league-alerts.js';
+import {reconcileScheduleHistory} from './schedule-change-alerts.js';
 import {gameLineupIsEditable} from './roster-lineups.js';
 import {validLineup} from './season-data.js';
 import './league-notifications.css';
@@ -12,11 +13,18 @@ function readStored(key){
     return Array.isArray(result)?result.filter(x=>typeof x==='string'):[];
   }catch {return []}
 }
+function getStoredObject(key){
+  if(!key)return null;
+  try{const value=JSON.parse(window.localStorage.getItem(key)||'null');return value && typeof value==='object' && !Array.isArray(value)?value:null}catch{return null}
+}
 function AlertIcon({alert}){
   if(alert.gameId||alert.title.toLowerCase().includes('lineup'))return <ClipboardList size={20}/>;
   if(alert.id.includes(':heat:'))return <Flame size={20}/>;
   if(alert.id.includes(':news:'))return <Newspaper size={20}/>;
-  if(alert.id.includes(':trades:'))return <Handshake size={20}/>;
+  if(alert.id.includes(':trade-')||alert.id.includes(':trades:'))return <Handshake size={20}/>;
+  if(alert.id.includes(':vote-'))return <Vote size={20}/>;
+  if(alert.id.includes(':game-result:'))return <CheckCircle2 size={20}/>;
+  if(alert.id.includes(':schedule-change:'))return <Clock3 size={20}/>;
   if(alert.id.includes('bracket'))return <Trophy size={20}/>;
   return <CalendarDays size={20}/>;
 }
@@ -24,14 +32,27 @@ export default function LeagueNotifications({userId,league,newsItems=[],players=
   const [open,setOpen]=useState(false);
   const [read,setRead]=useState([]);
   const [saving,setSaving]=useState('');
+  const [scheduleChanges,setScheduleChanges]=useState([]);
   const ref=useRef(null);
   const season=league.season;
   const key=userId&&season?.id?'ssl-league-alerts:v1:'+userId+':'+season.id:null;
+  const scheduleKey=key?key+':schedule-history':null;
   const alerts=useMemo(()=>buildLeagueAlerts({
     season,myTeam:league.myTeam,role:league.access.role,now:league.now,
-    inbox:league.inbox,newsItems,players,
-  }),[season,league.myTeam,league.access.role,league.now,league.inbox,newsItems,players]);
-  useEffect(()=>{setRead(readStored(key));setOpen(false)},[key]);
+    inbox:league.inbox,newsItems,players,scheduleChanges,
+  }),[season,league.myTeam,league.access.role,league.now,league.inbox,newsItems,players,scheduleChanges]);
+  useEffect(()=>{setRead(readStored(key));setOpen(false);setScheduleChanges(getStoredObject(scheduleKey)?.history||[])},[key,scheduleKey]);
+  useEffect(()=>{
+    if(!scheduleKey||!season?.schedulePublished||!league.myTeam?.id||league.access.role!=='gm')return;
+    const stored=getStoredObject(scheduleKey);
+    const next=reconcileScheduleHistory({
+      season,teamId:league.myTeam.id,previous:stored?.snapshot??null,
+      history:Array.isArray(stored?.history)?stored.history:[],now:league.now,
+    });
+    if(!next.snapshot)return;
+    try{window.localStorage.setItem(scheduleKey,JSON.stringify(next))}catch{}
+    setScheduleChanges(next.history);
+  },[scheduleKey,season,league.myTeam?.id,league.access.role]);
   useEffect(()=>{
     if(!open)return;
     const outside=e=>{if(!ref.current?.contains(e.target))setOpen(false)};
