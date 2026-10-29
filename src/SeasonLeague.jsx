@@ -605,7 +605,7 @@ export function SeasonWorkspace({ league, registeredTeams }) {
       {tab === "Draft" && <Draft league={l} />}
       {tab === "Schedule & Results" && <Schedule league={l} commissioner />}
       {tab === "Team Rosters" && <RosterManager league={l} />}
-      {tab === "Trades" && <Trades league={l} />}
+      {tab === "Trades" && <Trades league={l} commissionerTools />}
       {tab === "Extensions" && <Extensions league={l} />}
     </>
   );
@@ -1785,6 +1785,45 @@ function ReportImport({ league: l, game, onDone }) {
     </div>
   );
 }
+function CommissionerTradeOverview({league:l,teamName,showMoves}){
+  const allOffers=(l.inbox||[]).filter(o=>Array.isArray(o.body?.teams));
+  const openOffers=allOffers.filter(o=>['pending','ready'].includes(o.status));
+  const pastOffers=allOffers.filter(o=>!['pending','ready'].includes(o.status));
+  const offerCard=(o)=>(
+    <article className="season-offer commissioner-trade-offer"
+      id={'ssl-trade-'+o.id} key={o.id} style={{scrollMarginTop:125}}>
+      <h3>{o.body.teams.map(teamName).join(' / ')}</h3>
+      <p className="commissioner-trade-meta">
+        <strong>{o.status.toUpperCase()}</strong>
+        {' · '}{Number(o.body.revision)>0
+          ? 'REVISED PROPOSAL · VERSION '+(Number(o.body.revision)+1)
+          : 'ORIGINAL PROPOSAL'}
+      </p>
+      <small>Originally submitted {time(o.createdAt)} · Sent by {teamName(o.body.sender)}</small>
+      {showMoves(o.body)}
+      {o.body.note&&<p><strong>Proposal note:</strong> {o.body.note}</p>}
+      <p><strong>Accepted by:</strong>{' '}
+        {o.accepted?.length?o.accepted.map(teamName).join(', '):'No teams yet'}
+      </p>
+      {o.status==='ready'&&<button className="red-btn"
+        disabled={l.busy}
+        onClick={()=>l.act('approve_trade',{offer:o.id})}>
+        APPROVE & PROCESS TRADE
+      </button>}
+    </article>
+  );
+  return <Box title="ALL TEAM TRADE PROPOSALS">
+    <p>Review offers submitted by every team, including their latest edited terms. Private GM negotiation messages are not displayed here.</p>
+    <p><strong>{openOffers.length} open proposal{openOffers.length===1?'':'s'}</strong>
+      {' · '}{pastOffers.length} closed or previous proposal{pastOffers.length===1?'':'s'}</p>
+    {!openOffers.length&&<p>No active proposals have been submitted.</p>}
+    {openOffers.map(offerCard)}
+    {!!pastOffers.length&&<details className="commissioner-trade-history">
+      <summary>VIEW PREVIOUS / CLOSED PROPOSALS ({pastOffers.length})</summary>
+      {pastOffers.map(offerCard)}
+    </details>}
+  </Box>;
+}
 function TradeConversation({league:l,offer,teamName}){
   const [expanded,setExpanded]=useState(false);
   const [history,setHistory]=useState([]);
@@ -1856,7 +1895,7 @@ function TradeConversation({league:l,offer,teamName}){
     </>}
   </section>;
 }
-function Trades({ league: l, messages = false }) {
+function Trades({ league: l, messages = false, commissionerTools = false }) {
   const s = l.season,
     [team, setTeam] = useActingTeam(l),
     [participants, setParticipants] = useState([]),
@@ -1907,9 +1946,16 @@ function Trades({ league: l, messages = false }) {
     );
   return (
     <>
+      {commissionerTools && admin &&
+        <CommissionerTradeOverview league={l} teamName={teamName} showMoves={showMoves}/>}
       {can && (
         <>
-          <details className={`trade-composer ${messages ? "inbox-composer" : "new-trade-composer"}`} open={!messages || !!counter}><summary>{counter?"EDIT EXISTING PROPOSAL":"WRITE A NEW TRADE OFFER"}</summary><Box title={messages ? "TRADE NEGOTIATIONS" : "PROPOSE A TRADE"}>
+          <details className={`trade-composer ${messages ? "inbox-composer" : "new-trade-composer"}`}
+            open={(!messages && !commissionerTools) || !!counter}>
+            <summary>{commissionerTools
+              ? "COMMISSIONER · CREATE A TRADE FOR A TEAM"
+              : counter?"EDIT EXISTING PROPOSAL":"WRITE A NEW TRADE OFFER"}</summary>
+            <Box title={messages ? "TRADE NEGOTIATIONS" : "PROPOSE A TRADE"}>
             {admin && (
               <TeamChooser
                 s={s}
@@ -2097,7 +2143,7 @@ function Trades({ league: l, messages = false }) {
             )}
           </Box>
           </details>
-          <Box title="YOUR TRADE INBOX">
+          {!commissionerTools && <Box title="YOUR TRADE INBOX">
             {!l.inbox.length && <p>No offers yet.</p>}
             {l.inbox.map((o) => (
               <article className="season-offer" id={'ssl-trade-'+o.id} style={{scrollMarginTop:125}} key={o.id}>
@@ -2108,7 +2154,7 @@ function Trades({ league: l, messages = false }) {
                 <small>{time(o.createdAt)}</small>
                 {showMoves(o.body)}
                 {o.body.note && <p>{o.body.note}</p>}
-                <TradeConversation league={l} offer={o} teamName={teamName}/>
+                {!admin && <TradeConversation league={l} offer={o} teamName={teamName}/>}
                 <p>Accepted: {o.accepted.map(teamName).join(", ")}</p>
                 {["pending", "ready"].includes(o.status) && (
                   <div className="season-inline">
@@ -2174,7 +2220,7 @@ function Trades({ league: l, messages = false }) {
                 )}
               </article>
             ))}
-          </Box>
+          </Box>}
         </>
       )}
       <Box title="COMPLETED TRANSACTIONS">

@@ -56,6 +56,34 @@ assert(src.includes("setHistory(Array.isArray(r.data)?r.data:[])"),
  'Messages should load directly from authenticated trade thread RPC');
 assert(!src.includes('counterTo: counter'),
  'Revising an offer must preserve the existing private conversation');
+// The commissioner sees all submitted trade terms in Commissioner Tools only.
+// The existing secure inbox RPC returns all season offers to the commissioner,
+// while GMs continue to receive just their teams' proposals.
+const inboxSql=readFileSync(new URL('../supabase/migrations/20261016025833_ssl_season_workflows.sql',import.meta.url),'utf8');
+assert(inboxSql.includes("a->>'role'='commissioner' or o.body->'teams'"),
+ 'Commissioner inbox must not be filtered to a single franchise');
+assert(src.includes('{tab === "Trades" && <Trades league={l} commissionerTools />}'),
+ 'Commissioner Tools Trades tab must use the special all-proposals view');
+const overviewStart=src.indexOf('function CommissionerTradeOverview(');
+const overviewEnd=src.indexOf('function TradeConversation(',overviewStart);
+assert(overviewStart>=0&&overviewEnd>overviewStart,
+ 'Commissioner trade overview must be a separate component');
+const overview=src.slice(overviewStart,overviewEnd);
+for(const token of ['ALL TEAM TRADE PROPOSALS','l.inbox',
+ 'o.body.revision','o.body.teams','showMoves(o.body)','o.body.note',
+ 'o.accepted','APPROVE & PROCESS TRADE','VIEW PREVIOUS / CLOSED PROPOSALS']){
+ assert(overview.includes(token),'Commissioner proposal view missing '+token);
+}
+assert(!overview.includes('TradeConversation')&&!overview.includes('ssl_trade_thread')&&
+ !overview.includes('trade_message'),
+ 'Commissioner proposal view must never request or render negotiation messages');
+assert(src.includes('{commissionerTools && admin &&') &&
+ src.includes('<CommissionerTradeOverview league={l}'),
+ 'Commissioner overview must be gated by the commissioner role');
+assert(src.includes('{!commissionerTools && <Box title="YOUR TRADE INBOX">'),
+ 'Commissioner Tools should not duplicate the GM inbox');
+assert(src.includes('{!admin && <TradeConversation'),
+ 'GM negotiation controls must not be shown to commissioner accounts');
 assert(previous.includes('ssl_manage_calendar'),
  'Existing public TBD schedule migration remains intact');
-console.log('PASS: postdraft trade opens, secure participant messages, edit/cancel and non-destructive draft regression');
+console.log('PASS: secure GM trades and commissioner all-proposals dashboard, no conversation in commissioner tools, draft preserved');
