@@ -555,11 +555,63 @@ details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
 .bingo-announcement strong{font-size:clamp(22px,3vw,32px);line-height:1.08;min-height:62px;display:grid;place-items:center}
 .bingo-announcement small{font-size:13px;letter-spacing:.035em}
 
-/* The Teams tab highlights combined W-L as well as individual home/away records. */
-.season-team summary{flex-wrap:wrap;align-items:center}
-.season-team-record{display:inline-flex;align-items:center;justify-content:center;margin-left:auto;background:#152d55;color:#f9d252;padding:6px 10px;border-radius:5px;white-space:nowrap;font-size:12px;letter-spacing:.035em;font-weight:900;font-variant-numeric:tabular-nums}
-.season-team summary small{display:flex;align-items:center;gap:6px;flex-basis:100%;margin-left:15px}
-@media(max-width:600px){.season-team-record{margin-left:0}}
+/* Team name/logo are pinned left; the W-L badge is pinned right at every
+   viewport width. If both cannot fit, the badge wraps to a right-aligned row. */
+.season-team summary{
+  display:grid;
+  grid-template-columns:14px minmax(0,1fr);
+  column-gap:10px;
+  row-gap:12px;
+  align-items:center;
+  justify-content:stretch;
+}
+.season-team summary:before{grid-column:1;grid-row:1}
+.season-team-head{
+  grid-column:2;
+  grid-row:1;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  column-gap:12px;
+  row-gap:9px;
+  min-width:0;
+}
+.season-team-identity{
+  display:inline-flex;
+  flex:0 1 auto;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+  max-width:100%;
+}
+.season-team-identity img{flex:0 0 auto}
+.season-team-name{min-width:0;overflow-wrap:anywhere;line-height:1.2}
+.season-team-record{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 auto;
+  margin-left:auto;
+  background:#152d55;
+  color:#f9d252;
+  padding:6px 10px;
+  border-radius:5px;
+  white-space:nowrap;
+  font-size:12px;
+  letter-spacing:.035em;
+  font-weight:900;
+  font-variant-numeric:tabular-nums;
+}
+.season-team summary small{
+  grid-column:2;
+  grid-row:2;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0;
+  margin-left:0;
+  overflow-wrap:anywhere;
+}
 
 /* Official draft-date polling: rich voting cards rather than bare rows. */
 .ssl-voting-panel{overflow:hidden;margin-bottom:23px}
