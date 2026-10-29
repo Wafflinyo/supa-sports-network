@@ -28,6 +28,8 @@ import { teamLogo } from "./TeamIdentity.jsx";
 import { ConferenceMark } from './ConferenceMark.jsx';
 import { PlayerPortrait } from "./PlayerPortrait.jsx";
 import {PlayerProfileLink} from './PlayerProfileLink.jsx';
+import {HeatMark} from './HeatingUpBadge.jsx';
+import {opponentScouting} from './league-alerts.js';
 import playerData from "./player-data.json";
 import { pitcherPriorityText } from "./player-roles.js";
 import { PitcherPriorityBadge } from './PlayerData.jsx';
@@ -1058,7 +1060,32 @@ function LineupEditor({ league: l, team, game, onDone }) {
     </form>
   );
 }
-export function RosterManager({ league: l }) {
+
+function OpponentScout({season,team,game}){
+  const other=String(game.home)===String(team)?game.away:game.home;
+  const opponent=season.teams.find(t=>String(t.id)===String(other));
+  const opponentName=opponent?.name||'Opponent';
+  const match=matchupDisplay(season,game);
+  const scouting=opponentScouting(season,game,other);
+  const prior=scouting?.previous;
+  const confirmed=scouting?.lineup;
+  const roster=rosterOf(season,other);
+  return <aside className="ssl-scouting-panel" aria-label={'Matchup scouting for '+opponentName}>
+    <h4>YOUR UPCOMING MATCHUP</h4>
+    <p className="ssl-scouting-context">{match.awayName} @ {match.homeName}</p>
+    <p><strong>{String(game.home)===String(team)?'HOME':'AWAY'} GAME</strong> · {match.stadium || 'Stadium TBD'} · {game.startsAt ? time(game.startsAt) : 'Date TBD'}</p>
+    <p>Your opponent is <strong>{opponentName}</strong>. Their planned lineup for this upcoming game stays private.</p>
+    <h4>{opponentName.toUpperCase()} · CURRENT ROSTER ({roster.length})</h4>
+    <div className="ssl-scouting-roster">{roster.map(id=><span key={id}>{name(id)}</span>)}</div>
+    <h4>LAST LINEUP USED</h4>
+    {prior&&confirmed?<><p>From their most recently completed match against {season.teams.find(t=>String(t.id)===String(prior.home===other?prior.away:prior.home))?.name||'an opponent'}.</p>
+      <ol className="ssl-scouting-lineup">{confirmed.starters.map((p,i)=><li key={i}>{name(p.player)} · {p.position}</li>)}</ol>
+      <p><strong>Bench:</strong> {(confirmed.bench||[]).map(name).join(' · ')||'None recorded'}</p>
+    </>:<p>No confirmed previous-game lineup is available yet. A future submitted lineup is never shown here.</p>}
+  </aside>;
+}
+
+export function RosterManager({ league: l, focus=null }) {
   const s=l.season;
   const [team,setTeam]=useActingTeam(l);
   const [editDefault,setEditDefault]=useState(false);
@@ -1071,6 +1098,14 @@ export function RosterManager({ league: l }) {
   const canEditDefault=playable && roster.length>=11;
   const hasDefault=team&&validLineup(s,team,s.defaults?.[team]);
   const fixtures=team?teamGameLineups(s,team):[];
+  useEffect(()=>{
+    if(!focus||!team)return;
+    if(focus.focus==='game'&&fixtures.some(g=>String(g.id)===String(focus.gameId))){setEditingGame(focus.gameId);setEditDefault(false)}
+    if(focus.focus==='default'){setEditDefault(true);setEditingGame(null)}
+    const id=focus.focus==='game'?'ssl-game-lineup-'+focus.gameId:focus.focus==='default'?'ssl-default-lineup':'ssl-roster-players';
+    const frame=requestAnimationFrame(()=>document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'}));
+    return ()=>cancelAnimationFrame(frame);
+  },[focus?.requestId,team,s?.id]);
   const ready=fixtures.filter(g=>gameLineupIsEditable(s,team,g));
   const defaultLineup=s.defaults?.[team];
   return <>
@@ -1079,11 +1114,11 @@ export function RosterManager({ league: l }) {
       <TeamChooser s={s} value={team} onChange={setTeam} label="Manage franchise roster"/>
     </Box>}
     {!chosen?<Box title="ROSTER"><p>{l.access.role==='commissioner'?'Choose a team above to manage its roster.':'Your franchise will appear once the commissioner adds it to Season 1.'}</p></Box>:<>
-      <Box title={`${chosen.name.toUpperCase()} · ROSTER`}>
+      <div id="ssl-roster-players" className="ssl-roster-notification-focus"><Box title={`${chosen.name.toUpperCase()} · ROSTER`}>
         <p><strong>{roster.length} players</strong> · {hasDefault?'Default lineup saved':'Default lineup not saved yet'} · {s.status.toUpperCase()}</p>
-        {roster.length===0?<p>Players will appear as they are drafted.</p>:<div className="roster-manager-players">{roster.map(id=><div key={id} className="roster-manager-player"><Player id={id} seasons={l.seasons}/></div>)}</div>}
-      </Box>
-      <Box title="DEFAULT LINEUP">
+        {roster.length===0?<p>Players will appear as they are drafted.</p>:<div className="roster-manager-players">{roster.map(id=><div key={id} className="roster-manager-player"><Player id={id} seasons={l.seasons}/><HeatMark playerId={id} inline/></div>)}</div>}
+      </Box></div>
+      <div id="ssl-default-lineup" className="ssl-roster-notification-focus"><Box title="DEFAULT LINEUP">
         <p>This lineup is the fallback for every game until you submit a specific game lineup. Changes here do not overwrite a game lineup already submitted.</p>
         {roster.length<11?<p><strong>Draft or acquire at least 11 players before saving a default lineup.</strong></p>:<>
           {hasDefault&&!editDefault&&<div className="roster-lineup-summary">
@@ -1097,7 +1132,7 @@ export function RosterManager({ league: l }) {
             {editDefault&&<LineupEditor key={s.id+':'+team+':default'} league={l} team={team} onDone={()=>setEditDefault(false)}/>}
           </>}
         </>}
-      </Box>
+      </Box></div>
       <Box title="UPCOMING GAME LINEUPS">
         <p>Select a scheduled game, then submit the nine starters, batting order, defensive positions and bench. Your saved lineup appears automatically in Schedule and replaces the default for that matchup only. You may edit it again until the game is locked by its result upload.</p>
         {!s.schedulePublished?<p><strong>The commissioner must publish the schedule before game-specific lineups can be submitted.</strong></p>:!fixtures.length?<p>No scheduled games for this franchise yet.</p>:<>
@@ -1106,14 +1141,14 @@ export function RosterManager({ league: l }) {
             const opponent=s.teams.find(t=>t.id===(g.away===team?g.home:g.away));
             const existing=effectiveGameLineup(s,team,g);
             const active=editingGame===g.id;
-            return <section className="roster-fixture" key={g.id}>
+            return <section className="roster-fixture ssl-roster-notification-focus" id={'ssl-game-lineup-'+g.id} key={g.id}>
               <div className="roster-fixture-heading">
                 <div><h3>{g.away===team?'VS':'AT'} {opponent?.name||'Opponent'}</h3>
                 <p>{time(g.startsAt)} · {g.stage.toUpperCase()} · <strong>{savedLineupLabel(s,team,g)}</strong></p></div>
                 {editable&&<button type="button" className="outline-btn" aria-expanded={active} onClick={()=>setEditingGame(active?null:g.id)}>{active?'CLOSE EDITOR':g.lineups?.[team]?'EDIT GAME LINEUP':'SUBMIT GAME LINEUP'}</button>}
               </div>
               {!active&&existing?.starters?.length>0&&<details><summary>VIEW LINEUP ON SCHEDULE</summary>{existing.starters.map((p,i)=><p key={i}>{i+1}. {name(p.player)} · {p.position}</p>)}<p><strong>Bench:</strong> {existing.bench?.map(name).join(' · ')||'None'}</p></details>}
-              {active&&editable&&<LineupEditor key={s.id+':'+team+':'+g.id} league={l} team={team} game={g} onDone={()=>setEditingGame(null)}/>}
+              {active&&editable&&<><OpponentScout season={s} team={team} game={g}/><LineupEditor key={s.id+':'+team+':'+g.id} league={l} team={team} game={g} onDone={()=>setEditingGame(null)}/></>}
               {!editable&&<p className="roster-lock-status">{g.stage==='recorded'||g.stage==='final'||g.lockedAt?'Lineup locked after result upload.':'Lineup edits are unavailable for this game.'}</p>}
             </section>;
           })}
@@ -2446,9 +2481,10 @@ function History({ league: l }) {
     </>
   );
 }
-function PlayoffBracketSections({league:l}){
+function PlayoffBracketSections({league:l,initialTab='Pre-season'}){
   const s=l.season;
-  const [tab,setTab]=useState('Pre-season');
+  const [tab,setTab]=useState(initialTab);
+  useEffect(()=>{setTab(initialTab)},[initialTab]);
   // These are display-only tabs; preseason results remain in their dedicated
   // table, while the existing official playoff bracket remains unchanged.
   return <>
@@ -2479,7 +2515,7 @@ export const seasonPages = [
   "Free Agency",
   "Messages",
 ];
-export function SeasonPage({ page, league: l }) {
+export function SeasonPage({ page, league: l, section='Pre-season' }) {
   return (
     <>
       <Title>{page.toUpperCase()}</Title>
@@ -2504,18 +2540,18 @@ export function SeasonPage({ page, league: l }) {
       ) : page === "SSL History" ? (
         <History league={l} />
       ) : page === "Playoff Bracket" ? (
-        <PlayoffBracketSections league={l}/>
+        <PlayoffBracketSections league={l} initialTab={section||'Pre-season'}/>
       ) : (
         <Trades league={l} messages={page === "Messages"} />
       )}
     </>
   );
 }
-export function SeasonTeamTools({ league, section='Roster' }) {
+export function SeasonTeamTools({ league, section='Roster', focus=null }) {
   return <>
     <SeasonSelector league={league}/>
     <SeasonFeedback league={league}/>
-    {section==='Roster'&&<RosterManager league={league}/>}
+    {section==='Roster'&&<RosterManager league={league} focus={focus}/>}
     {section==='Extensions'&&<Extensions league={league}/>}
   </>;
 }
