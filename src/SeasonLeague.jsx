@@ -1091,6 +1091,14 @@ export function RosterManager({ league: l, focus=null }) {
   const [editDefault,setEditDefault]=useState(false);
   const [editingGame,setEditingGame]=useState(null);
   useEffect(()=>{setEditDefault(false);setEditingGame(null)},[s?.id,team]);
+  useEffect(()=>{
+    if(!focus||!team||!s)return;
+    if(focus.focus==='game'&&teamGameLineups(s,team).some(g=>String(g.id)===String(focus.gameId))){setEditingGame(focus.gameId);setEditDefault(false)}
+    if(focus.focus==='default'){setEditDefault(true);setEditingGame(null)}
+    const id=focus.focus==='game'?'ssl-game-lineup-'+focus.gameId:focus.focus==='default'?'ssl-default-lineup':'ssl-roster-players';
+    const frame=requestAnimationFrame(()=>document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'}));
+    return ()=>cancelAnimationFrame(frame);
+  },[focus?.requestId,team,s?.id]);
   if(!s)return <Box title="ROSTER"><p>No season has been created yet. Team rosters will appear after the draft starts.</p></Box>;
   const chosen=s.teams.find(t=>t.id===team);
   const roster=team?rosterOf(s,team):[];
@@ -1098,14 +1106,6 @@ export function RosterManager({ league: l, focus=null }) {
   const canEditDefault=playable && roster.length>=11;
   const hasDefault=team&&validLineup(s,team,s.defaults?.[team]);
   const fixtures=team?teamGameLineups(s,team):[];
-  useEffect(()=>{
-    if(!focus||!team)return;
-    if(focus.focus==='game'&&fixtures.some(g=>String(g.id)===String(focus.gameId))){setEditingGame(focus.gameId);setEditDefault(false)}
-    if(focus.focus==='default'){setEditDefault(true);setEditingGame(null)}
-    const id=focus.focus==='game'?'ssl-game-lineup-'+focus.gameId:focus.focus==='default'?'ssl-default-lineup':'ssl-roster-players';
-    const frame=requestAnimationFrame(()=>document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'}));
-    return ()=>cancelAnimationFrame(frame);
-  },[focus?.requestId,team,s?.id]);
   const ready=fixtures.filter(g=>gameLineupIsEditable(s,team,g));
   const defaultLineup=s.defaults?.[team];
   return <>
