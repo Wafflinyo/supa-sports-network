@@ -1181,17 +1181,21 @@ function Teams({ league: l }) {
             .map((t) => (
               <details className="panel season-team" key={t.id}>
                 <summary>
-                  {t.logoPath && (
-                    <img
-                      alt=""
-                      width="35"
-                      height="35"
-                      style={{ objectFit: "contain" }}
-                      src={teamLogo(l.supabase, t.logoPath)}
-                    />
-                  )}{" "}
-                  {t.name}
-                  <span className="season-team-record" title="Overall regular-season wins and losses">RECORD · {records.get(t.id)?.wins ?? 0}–{records.get(t.id)?.losses ?? 0}</span>
+                  <span className="season-team-head">
+                    <span className="season-team-identity">
+                      {t.logoPath && (
+                        <img
+                          alt=""
+                          width="35"
+                          height="35"
+                          style={{ objectFit: "contain" }}
+                          src={teamLogo(l.supabase, t.logoPath)}
+                        />
+                      )}
+                      <span className="season-team-name">{t.name}</span>
+                    </span>
+                    <span className="season-team-record" title="Overall regular-season wins and losses">RECORD · {records.get(t.id)?.wins ?? 0}–{records.get(t.id)?.losses ?? 0}</span>
+                  </span>
                   <small>
                     <ConferenceMark id={t.conference} size={29}/>{conferences[t.conference] || "Conference pending"} ·{" "}
                     {rosterOf(s, t.id).length} players
