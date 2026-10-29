@@ -121,7 +121,7 @@ assert.equal(noDuplicates.history.length,1,'polling unchanged schedule does not 
 const finalAlerts=buildLeagueAlerts({...args,season:changedSeason,
   scheduleChanges:detected.history});
 assert(find(finalAlerts,':schedule-change:upcoming:'),'history events appear in GM bell');
-assert(!find(buildLeagueAlerts({...args,season:changedSeason,myTeam:opponent,
+assert(!find(buildLeagueAlerts({...args,season:changedSeason,myTeam:teams[3],
   scheduleChanges:detected.history}),':schedule-change:upcoming:'),
   'other teams do not receive private GM-specific change history');
 
