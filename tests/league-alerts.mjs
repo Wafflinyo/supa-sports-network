@@ -15,7 +15,7 @@ const base={
 };
 const playerPool=[...roster,...opponentRoster].map(id=>({id,name:'Player '+id}));
 const args={season:base,myTeam:team,role:'gm',players:playerPool,now:Date.parse('2026-11-01T12:00:00Z')};
-const find=(rows,suffix)=>rows.find(row=>row.id.endsWith(suffix));
+const find=(rows,fragment)=>rows.find(row=>row.id.includes(fragment));
 
 assert.deepEqual(buildLeagueAlerts(args),[], 'do not notify during a live draft');
 const post={...base,status:'postdraft',picks:Array.from({length:12},(_,i)=>({team:teams[i].id,seconds:10}))};
