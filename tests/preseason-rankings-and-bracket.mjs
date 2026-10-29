@@ -55,7 +55,7 @@ assert.equal(BASERUNNING_ABILITY_BONUS,2);
 assert.deepEqual(BATTING_CHEMISTRY_BONUSES,{one:3,both:6});
 assert.equal(MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT,20);
 assert.equal(UNLISTED_FIELDING_CHEMISTRY_BONUS,1);
-assert.equal(MISSING_MIDDLE_INFIELD_CATCH_PENALTY,6);
+assert.equal(MISSING_MIDDLE_INFIELD_CATCH_PENALTY,12);
 assert.deepEqual(FIELDING_ABILITY_BONUSES,{
   0:0,1:12,2:9,3:12,4:12,5:12,6:12,7:12,8:12,9:0,10:3,11:5,12:7
 });
@@ -78,31 +78,31 @@ for(const ability of SPECIAL_CATCH_ABILITY_IDS){
  assert.equal(fieldingAbilityBonus(ability),0,'no position is not a free special-catch bonus');
 }
 for(const pos of ['P','C','1B','2B','3B','SS']){
- const expected=['2B','SS'].includes(pos)?-4:2;
+ const expected=['2B','SS'].includes(pos)?-10:2;
  assert.equal(fieldingAbilityBonus(2,pos),expected,
-   'Super Jump keeps +2 everywhere else but non-catch middle infielders lose 6');
+   'Super Jump keeps +2 everywhere else but non-catch middle infielders lose 12');
 }
 assert.equal(fieldingAbilityBonus(2,'CF'),9);
 assert.equal(fieldingAbilityBonus(2,'LF'),6);
 assert.equal(fieldingAbilityBonus(2,'RF'),6);
 assert.equal(fieldingAbilityBonus(2),0,'Super Jump needs a saved defensive position');
 for(const pos of [...positions,null]){
- const expected=['2B','SS'].includes(pos)?-6:0;
+ const expected=['2B','SS'].includes(pos)?-12:0;
  assert.equal(fieldingAbilityBonus(9,pos),expected,
    'Clamber gives zero ability bonus and never avoids a missing-catcher penalty');
 }
 for(const [id,base] of [[10,3],[11,5],[12,7]]){
  for(const pos of [...positions,null]){
-   const expected=['2B','SS'].includes(pos)?base-6:base;
+   const expected=['2B','SS'].includes(pos)?base-12:base;
    assert.equal(fieldingAbilityBonus(id,pos),expected,
      'a different fielding ability keeps its own bonus but must not avoid the catch penalty');
  }
 }
 for(const pos of ['2B','SS']){
- assert.equal(fieldingAbilityBonus(0,pos),-6,
-   'no active fielding ability at middle infield applies minus six');
- assert.equal(fieldingAbilityBonus(undefined,pos),-6,
-   'missing ability record cannot avoid minus six');
+ assert.equal(fieldingAbilityBonus(0,pos),-12,
+   'no active fielding ability at middle infield applies minus twelve');
+ assert.equal(fieldingAbilityBonus(undefined,pos),-12,
+   'missing ability record cannot avoid minus twelve');
 }
 const positionalPeople=positions.map((p,i)=>({id:i+1,fieldingAbilityId:0}));
 const byPos=position=>positionalPeople[positions.indexOf(position)];
@@ -119,8 +119,8 @@ assert.equal(positionBonuses.get(byPos('2B').id)+positionBonuses.get(byPos('SS')
 byPos('SS').fieldingAbilityId=9; // Clamber receives no bonus
 positionBonuses=lineupFieldingAbilityBonuses(positionalPeople,positionalLineup);
 assert.equal(positionBonuses.get(byPos('2B').id),12);
-assert.equal(positionBonuses.get(byPos('SS').id),-6,
-  'SS with Clamber receives minus six even if 2B has Super Dive');
+assert.equal(positionBonuses.get(byPos('SS').id),-12,
+  'SS with Clamber receives minus twelve even if 2B has Super Dive');
 const swapCF=positionalLineup.map(s=>({...s}));
 const center=swapCF.find(s=>s.position==='CF'),first=swapCF.find(s=>s.position==='1B');
 center.position='1B';first.position='CF';
@@ -131,14 +131,14 @@ assert.equal(lineupFieldingAbilityBonuses(positionalPeople,null)
  .get(byPos('2B').id),0,'missing field positions must not imply a middle-infield bonus');
 const missingBoth=positions.map((position,i)=>({id:i+1,fieldingAbilityId:0}));
 const missingBothBonuses=lineupFieldingAbilityBonuses(missingBoth,positionalLineup);
-assert.equal(missingBothBonuses.get(missingBoth[positions.indexOf('2B')].id),-6,
-  '2B without a special catch loses six defensive points');
-assert.equal(missingBothBonuses.get(missingBoth[positions.indexOf('SS')].id),-6,
-  'SS without a special catch loses six defensive points');
+assert.equal(missingBothBonuses.get(missingBoth[positions.indexOf('2B')].id),-12,
+  '2B without a special catch loses twelve defensive points');
+assert.equal(missingBothBonuses.get(missingBoth[positions.indexOf('SS')].id),-12,
+  'SS without a special catch loses twelve defensive points');
 assert.equal(missingBothBonuses.get(missingBoth[positions.indexOf('1B')].id),0,
   'other field positions must not receive a missing-catch penalty');
-assert.equal([...missingBothBonuses.values()].reduce((sum,x)=>sum+x,0),-12,
-  'both missing special catches combine to minus twelve total rating points');
+assert.equal([...missingBothBonuses.values()].reduce((sum,x)=>sum+x,0),-24,
+  'both missing special catches combine to minus twenty-four total rating points');
 assert.equal(DEFENSIVE_CHEMISTRY_LINKS.length,13);
 const expectedDefensiveLinks={
  'LF-CF':[8,-6,-6],'RF-CF':[8,-6,-6],
