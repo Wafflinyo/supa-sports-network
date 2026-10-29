@@ -153,7 +153,7 @@ function Ballot({ league: l, kind, w }) {
   const countFor = (conference) => chosen.filter(id=>candidates.some(p=>p.player===id && p.conference===conference)).length;
   const toggle = id => setChosen(v=>isAllStar ? (v.includes(id)?v.filter(x=>x!==id):[...v,id]) : (v.includes(id)?[]:[id]));
   return (
-    <section className="panel ssl-ballot-panel" aria-label={w.label}>
+    <section className="panel ssl-ballot-panel" id={'ssl-voting-'+kind} style={{scrollMarginTop:125}} aria-label={w.label}>
       <div className="ssl-ballot-banner">
         <div className="ssl-ballot-symbol">{isAllStar ? <Star size={34}/> : <Trophy size={34}/>}</div>
         <div className="ssl-ballot-title">
