@@ -1423,7 +1423,7 @@ function Schedule({ league: l, commissioner = false }) {
         games.map((g,i) => (
           <React.Fragment key={g.id}>
           {g.week && (i===0 || games[i-1].week!==g.week) && <h2 className="schedule-week-heading">WEEK {g.week} <small>· SIX MATCHUPS</small></h2>}
-          <section className="panel season-game">
+          <section className="panel season-game" id={'ssl-schedule-game-'+g.id} style={{scrollMarginTop:125}}>
             <div>
               <small className="ssl-matchup-week-label">
                 {g.postponed ? "POSTPONED · " : ""}
@@ -2031,7 +2031,7 @@ function Trades({ league: l, messages = false }) {
           <Box title="YOUR TRADE INBOX">
             {!l.inbox.length && <p>No offers yet.</p>}
             {l.inbox.map((o) => (
-              <article className="season-offer" key={o.id}>
+              <article className="season-offer" id={'ssl-trade-'+o.id} style={{scrollMarginTop:125}} key={o.id}>
                 <h3>
                   {o.body.teams.map(teamName).join(" / ")} ·{" "}
                   {o.status.toUpperCase()}
