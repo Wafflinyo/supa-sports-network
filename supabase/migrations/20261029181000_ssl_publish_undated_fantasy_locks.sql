@@ -25,11 +25,17 @@ DECLARE
   update league_private.ssl_season_states set state=st where id=target;$newcal$;
 BEGIN
   core_src:=pg_get_functiondef('league_private.ssl_manage_core(text,uuid,jsonb)'::regprocedure);
-  if strpos(core_src,old_core)=0 then raise exception 'Unexpected manage_core implementation: aborting schedule-fix migration';end if;
-  execute replace(core_src,old_core,new_core);
+  if strpos(core_src,old_core)>0 then
+    execute replace(core_src,old_core,new_core);
+  elsif strpos(core_src,new_core)=0 then
+    raise exception 'Unexpected manage_core implementation: aborting schedule-fix migration';
+  end if;
 
   calendar_src:=pg_get_functiondef('league_private.ssl_manage_calendar(text,uuid,jsonb)'::regprocedure);
-  if strpos(calendar_src,old_calendar)=0 then raise exception 'Unexpected manage_calendar implementation: aborting schedule-fix migration';end if;
-  execute replace(calendar_src,old_calendar,new_calendar);
+  if strpos(calendar_src,old_calendar)>0 then
+    execute replace(calendar_src,old_calendar,new_calendar);
+  elsif strpos(calendar_src,new_calendar)=0 then
+    raise exception 'Unexpected manage_calendar implementation: aborting schedule-fix migration';
+  end if;
 END
 $migration$;
