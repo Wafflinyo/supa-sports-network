@@ -2540,7 +2540,7 @@ export function SeasonPage({ page, league: l, section=null }) {
       ) : page === "SSL History" ? (
         <History league={l} />
       ) : page === "Playoff Bracket" ? (
-        {section?<PlayoffBracketSections league={l} initialTab={section}/>:<PlayoffBracketSections league={l}/>}
+        section?<PlayoffBracketSections league={l} initialTab={section}/>:<PlayoffBracketSections league={l}/>
       ) : (
         <Trades league={l} messages={page === "Messages"} />
       )}
