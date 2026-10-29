@@ -7,7 +7,7 @@ const src=readFileSync(new URL('../src/SeasonLeague.jsx',import.meta.url),'utf8'
 const previous=readFileSync(new URL('../supabase/migrations/20261029181000_ssl_publish_undated_fantasy_locks.sql',import.meta.url),'utf8');
 
 for(const check of [
- ['postdraft trading opens immediately when draft ends', /'status','postdraft','needsDefault',st->'order','tradingOpen',true/],
+ ['postdraft trading opens immediately when draft ends', /''postdraft'',''needsDefault'',st->''order'',''tradingOpen'',true/],
  ['existing Season 1 goes live without regenerating picks or calendar', /where number=1[\s\S]*state->>'status'='postdraft'[\s\S]*jsonb_array_length\(coalesce\(state->'picks'/],
  ['messages stored in league-private schema', /create table if not exists league_private\.ssl_trade_messages/],
  ['no public direct table grants', /revoke all on league_private\.ssl_trade_messages from public,anon,authenticated/],
