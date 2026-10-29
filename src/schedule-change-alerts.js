@@ -43,7 +43,7 @@ export function reconcileScheduleHistory({season,teamId,previous=null,history=[]
     const identifier=String(season.id)+':schedule-change:'+gameId+':'+
       [next.startsAt,next.stadium,next.postponed,next.cancelled,now].join(':');
     events.unshift({
-      id:identifier,type:'announcement',title:'Matchup schedule updated',
+      id:identifier,teamId:String(teamId),type:'announcement',title:'Matchup schedule updated',
       detail:away+' @ '+home+' · '+changes.join(' · '),
       target:{page:'Schedule',focus:'game',gameId},
       createdAt:now,
