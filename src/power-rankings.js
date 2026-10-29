@@ -80,9 +80,11 @@ export function lineupFieldingAbilityBonuses(people,starters){
 export const BASERUNNING_ABILITY_BONUS=2;
 export const BATTING_CHEMISTRY_BONUSES=Object.freeze({one:3,both:6});
 export const MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT=20;
+export const UNLISTED_FIELDING_CHEMISTRY_BONUS=1;
 // Good and anti-chemistry both affect BOTH defenders in the pair.
 // Neutral LF/RF-to-CF is penalized because the buddy jump needs chemistry.
-// Neutral chemistry anywhere else is zero, as is LF-to-RF (not a link).
+// Unlisted positive links give +1 to each player; neutral and anti give zero.
+// Each pair scores exactly once: priority links never also gain the generic +1.
 export const DEFENSIVE_CHEMISTRY_LINKS=Object.freeze([
   {a:'LF',b:'CF',good:8,bad:-6,neutral:-6},
   {a:'RF',b:'CF',good:8,bad:-6,neutral:-6},
@@ -90,7 +92,7 @@ export const DEFENSIVE_CHEMISTRY_LINKS=Object.freeze([
   {a:'2B',b:'3B',good:5,bad:-4,neutral:0},
   ...['LF','CF','RF'].map(a=>({a,b:'1B',good:3,bad:-3,neutral:0})),
   ...['LF','CF','RF'].map(a=>({a,b:'3B',good:2,bad:-3,neutral:0})),
-  ...['LF','CF','RF'].map(a=>({a,b:'C',good:1,bad:-1,neutral:0}))
+  ...['LF','CF','RF'].map(a=>({a,b:'C',good:2,bad:-1,neutral:0}))
 ]);
 function chemistryRelation(a,b){
   // An anti-chemistry link wins when data lists conflicting relationships.
@@ -125,6 +127,21 @@ export function lineupChemistryAdjustments(people,starters){
     const value=link[chemistryRelation(a,b)];
     bonuses.get(a.id).defense+=value;
     bonuses.get(b.id).defense+=value;
+  }
+  // Any other good chemistry link between two fielders still contributes to
+  // defense, but priority links above replace (never stack with) this bonus.
+  const priorityPairs=new Set(DEFENSIVE_CHEMISTRY_LINKS.map(link=>
+    [link.a,link.b].sort().join('|')));
+  const fielders=[...byPosition.entries()];
+  for(let i=0;i<fielders.length;i++){
+    const [aPosition,a]=fielders[i];
+    for(let j=i+1;j<fielders.length;j++){
+      const [bPosition,b]=fielders[j];
+      if(priorityPairs.has([aPosition,bPosition].sort().join('|')))continue;
+      if(chemistryRelation(a,b)!=='good')continue;
+      bonuses.get(a.id).defense+=UNLISTED_FIELDING_CHEMISTRY_BONUS;
+      bonuses.get(b.id).defense+=UNLISTED_FIELDING_CHEMISTRY_BONUS;
+    }
   }
   for(const p of people){
     const b=bonuses.get(p.id);
