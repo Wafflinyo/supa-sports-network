@@ -32,9 +32,9 @@ export const POWER_WEIGHTS=Object.freeze({
   offense:.60,pitching:.15,defense:.20,running:.02,chemistry:.03
 });
 // The established +12/+9/+7/+5/+3 defensive ability tiers.
-// All extended catches (including Clamber and Hammer Throw) share Super Dive's tier.
+// Extended active catches share Super Dive's tier; Clamber gives no bonus in CPU vs CPU.
 export const FIELDING_ABILITY_BONUSES=Object.freeze({
-  0:0,1:12,2:9,3:12,4:12,5:12,6:12,7:12,8:12,9:12,
+  0:0,1:12,2:9,3:12,4:12,5:12,6:12,7:12,8:12,9:0,
   10:3,11:5,12:7
 });
 export const BASERUNNING_ABILITY_BONUS=2;
