@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {preseasonReady,preseasonSeeds,preseasonBracket,preseasonHasLeagueOpener} from '../src/preseason.js';
-import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,offenseRating,rosterPowerComponents,rankingParticipants,PITCHER_PRIORITY_ORDER,POWER_PITCHER_COUNT,POWER_SUPPORT_PITCHER_COUNT,FIELDING_ABILITY_BONUSES,BASERUNNING_ABILITY_BONUS,BATTING_CHEMISTRY_BONUSES,DEFENSIVE_CHEMISTRY_LINKS,MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT,UNLISTED_FIELDING_CHEMISTRY_BONUS,lineupChemistryAdjustments,fieldingAbilityBonus,lineupFieldingAbilityBonuses,POSITIONAL_FIELDING_ABILITY_BONUSES,SPECIAL_CATCH_ABILITY_IDS} from '../src/power-rankings.js';
+import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,offenseRating,rosterPowerComponents,rankingParticipants,PITCHER_PRIORITY_ORDER,POWER_PITCHER_COUNT,POWER_SUPPORT_PITCHER_COUNT,FIELDING_ABILITY_BONUSES,BASERUNNING_ABILITY_BONUS,BATTING_CHEMISTRY_BONUSES,DEFENSIVE_CHEMISTRY_LINKS,MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT,UNLISTED_FIELDING_CHEMISTRY_BONUS,lineupChemistryAdjustments,fieldingAbilityBonus,lineupFieldingAbilityBonuses,POSITIONAL_FIELDING_ABILITY_BONUSES,SPECIAL_CATCH_ABILITY_IDS,MISSING_MIDDLE_INFIELD_CATCH_PENALTY} from '../src/power-rankings.js';
 import {pitcherPriorityFor} from '../src/player-roles.js';
 import {earnedAchievements,GM_ACHIEVEMENTS} from '../src/gm-achievements.js';
 
@@ -55,6 +55,7 @@ assert.equal(BASERUNNING_ABILITY_BONUS,2);
 assert.deepEqual(BATTING_CHEMISTRY_BONUSES,{one:3,both:6});
 assert.equal(MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT,20);
 assert.equal(UNLISTED_FIELDING_CHEMISTRY_BONUS,1);
+assert.equal(MISSING_MIDDLE_INFIELD_CATCH_PENALTY,6);
 assert.deepEqual(FIELDING_ABILITY_BONUSES,{
   0:0,1:12,2:9,3:12,4:12,5:12,6:12,7:12,8:12,9:0,10:3,11:5,12:7
 });
@@ -77,18 +78,31 @@ for(const ability of SPECIAL_CATCH_ABILITY_IDS){
  assert.equal(fieldingAbilityBonus(ability),0,'no position is not a free special-catch bonus');
 }
 for(const pos of ['P','C','1B','2B','3B','SS']){
- assert.equal(fieldingAbilityBonus(2,pos),2,'Super Jump gets +2 outside the outfield');
+ const expected=['2B','SS'].includes(pos)?-4:2;
+ assert.equal(fieldingAbilityBonus(2,pos),expected,
+   'Super Jump keeps +2 everywhere else but non-catch middle infielders lose 6');
 }
 assert.equal(fieldingAbilityBonus(2,'CF'),9);
 assert.equal(fieldingAbilityBonus(2,'LF'),6);
 assert.equal(fieldingAbilityBonus(2,'RF'),6);
 assert.equal(fieldingAbilityBonus(2),0,'Super Jump needs a saved defensive position');
 for(const pos of [...positions,null]){
- assert.equal(fieldingAbilityBonus(9,pos,1),0,'Clamber must stay zero');
+ const expected=['2B','SS'].includes(pos)?-6:0;
+ assert.equal(fieldingAbilityBonus(9,pos),expected,
+   'Clamber gives zero ability bonus and never avoids a missing-catcher penalty');
 }
-for(const [id,expected] of [[10,3],[11,5],[12,7]]){
- for(const pos of [...positions,null])assert.equal(fieldingAbilityBonus(id,pos),expected,
-   'other fielding skill tiers do not change with position');
+for(const [id,base] of [[10,3],[11,5],[12,7]]){
+ for(const pos of [...positions,null]){
+   const expected=['2B','SS'].includes(pos)?base-6:base;
+   assert.equal(fieldingAbilityBonus(id,pos),expected,
+     'a different fielding ability keeps its own bonus but must not avoid the catch penalty');
+ }
+}
+for(const pos of ['2B','SS']){
+ assert.equal(fieldingAbilityBonus(0,pos),-6,
+   'no active fielding ability at middle infield applies minus six');
+ assert.equal(fieldingAbilityBonus(undefined,pos),-6,
+   'missing ability record cannot avoid minus six');
 }
 const positionalPeople=positions.map((p,i)=>({id:i+1,fieldingAbilityId:0}));
 const byPos=position=>positionalPeople[positions.indexOf(position)];
@@ -105,7 +119,8 @@ assert.equal(positionBonuses.get(byPos('2B').id)+positionBonuses.get(byPos('SS')
 byPos('SS').fieldingAbilityId=9; // Clamber receives no bonus
 positionBonuses=lineupFieldingAbilityBonuses(positionalPeople,positionalLineup);
 assert.equal(positionBonuses.get(byPos('2B').id),12);
-assert.equal(positionBonuses.get(byPos('SS').id),0);
+assert.equal(positionBonuses.get(byPos('SS').id),-6,
+  'SS with Clamber receives minus six even if 2B has Super Dive');
 const swapCF=positionalLineup.map(s=>({...s}));
 const center=swapCF.find(s=>s.position==='CF'),first=swapCF.find(s=>s.position==='1B');
 center.position='1B';first.position='CF';
@@ -114,6 +129,16 @@ assert.equal(positionBonuses.get(byPos('CF').id),2,
   'moving a Super Jumper from CF to first base reduces its bonus to +2');
 assert.equal(lineupFieldingAbilityBonuses(positionalPeople,null)
  .get(byPos('2B').id),0,'missing field positions must not imply a middle-infield bonus');
+const missingBoth=positions.map((position,i)=>({id:i+1,fieldingAbilityId:0}));
+const missingBothBonuses=lineupFieldingAbilityBonuses(missingBoth,positionalLineup);
+assert.equal(missingBothBonuses.get(missingBoth[positions.indexOf('2B')].id),-6,
+  '2B without a special catch loses six defensive points');
+assert.equal(missingBothBonuses.get(missingBoth[positions.indexOf('SS')].id),-6,
+  'SS without a special catch loses six defensive points');
+assert.equal(missingBothBonuses.get(missingBoth[positions.indexOf('1B')].id),0,
+  'other field positions must not receive a missing-catch penalty');
+assert.equal([...missingBothBonuses.values()].reduce((sum,x)=>sum+x,0),-12,
+  'both missing special catches combine to minus twelve total rating points');
 assert.equal(DEFENSIVE_CHEMISTRY_LINKS.length,13);
 const expectedDefensiveLinks={
  'LF-CF':[8,-6,-6],'RF-CF':[8,-6,-6],

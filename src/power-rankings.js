@@ -46,21 +46,29 @@ export const POSITIONAL_FIELDING_ABILITY_BONUSES=Object.freeze({
   superJump:Object.freeze({CF:9,LF:6,RF:6,other:2}),
   specialCatch:Object.freeze({middleInfield:12,outfield:5,other:2})
 });
-// Clamber (ID 9) receives no bonus at any position. Super Jump receives +2
-// away from the outfield. Catcher, pitcher,
-// first base and third base count as "other" for active special catches.
+// A 2B or SS without Super Dive / another active special catch loses six
+// defensive rating points, independently of any other ability bonus.
+// Clamber remains worth zero ability points and does NOT count as a catch.
+export const MISSING_MIDDLE_INFIELD_CATCH_PENALTY=6;
 export function fieldingAbilityBonus(abilityId,position=null){
   const id=Number(abilityId);
-  if(id===9)return 0;
-  if(id===2)return POSITIONAL_FIELDING_ABILITY_BONUSES.superJump[position]??
-    (defensivePositions.has(position)?POSITIONAL_FIELDING_ABILITY_BONUSES.superJump.other:0);
-  if(specialCatchIds.has(id)){
-    const bonus=POSITIONAL_FIELDING_ABILITY_BONUSES.specialCatch;
-    if(position==='2B'||position==='SS')return bonus.middleInfield;
-    if(['LF','CF','RF'].includes(position))return bonus.outfield;
-    return defensivePositions.has(position)?bonus.other:0;
+  let bonus=0;
+  if(id===9){
+    bonus=0; // Clamber provides no CPU-versus-CPU fielding benefit.
+  }else if(id===2){
+    bonus=POSITIONAL_FIELDING_ABILITY_BONUSES.superJump[position]??
+      (defensivePositions.has(position)?POSITIONAL_FIELDING_ABILITY_BONUSES.superJump.other:0);
+  }else if(specialCatchIds.has(id)){
+    const catchBonus=POSITIONAL_FIELDING_ABILITY_BONUSES.specialCatch;
+    if(position==='2B'||position==='SS')bonus=catchBonus.middleInfield;
+    else if(['LF','CF','RF'].includes(position))bonus=catchBonus.outfield;
+    else bonus=defensivePositions.has(position)?catchBonus.other:0;
+  }else{
+    bonus=FIELDING_ABILITY_BONUSES[id]??0;
   }
-  return FIELDING_ABILITY_BONUSES[id]??0;
+  return (position==='2B'||position==='SS')&&!specialCatchIds.has(id)
+    ? bonus-MISSING_MIDDLE_INFIELD_CATCH_PENALTY
+    : bonus;
 }
 // Use the GM's saved fielding positions. Do not infer positions from
 // batting order when there is no valid full starting nine.
