@@ -1,0 +1,28 @@
+name: Validate GM notification bell
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/league-alerts.js'
+      - 'src/LeagueNotifications.jsx'
+      - 'src/league-notifications.css'
+      - 'src/SeasonLeague.jsx'
+      - 'src/main.jsx'
+      - 'tests/league-alerts.mjs'
+      - '.github/workflows/notification-validation.yml'
+permissions:
+  contents: read
+jobs:
+  notifications:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node tests/league-alerts.mjs
+      - run: npm run build
+        env:
+          GITHUB_PAGES_BASE: /supa-sports-network/
