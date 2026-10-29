@@ -27,7 +27,7 @@ import pool from "./players.json";
 import { teamLogo } from "./TeamIdentity.jsx";
 import { ConferenceMark } from './ConferenceMark.jsx';
 import { PlayerPortrait } from "./PlayerPortrait.jsx";
-import {DraftPickBadge} from './DraftPickBadge.jsx';
+import {PlayerProfileLink} from './PlayerProfileLink.jsx';
 import playerData from "./player-data.json";
 import { pitcherPriorityText } from "./player-roles.js";
 import { PitcherPriorityBadge } from './PlayerData.jsx';
@@ -60,13 +60,11 @@ const iso = (v) => new Date(v).toISOString();
 const name = (id) => byPlayer.has(Number(id)) ? taggedName(byPlayer.get(Number(id))) : "Unknown player";
 function Player({ id, seasons=[] }) {
   const p = byPlayer.get(Number(id));
-  return (
-    <span className="portrait-label">
-      <PlayerPortrait player={p} />
-      {p?.name || "Unknown player"}
-      {p && <PitcherPriorityBadge player={p} record={playerData.players[p.id]}/>} {p&&<DraftPickBadge playerId={p.id} seasons={seasons} compact/>} 
-    </span>
-  );
+  return <PlayerProfileLink player={p} className="portrait-label">
+    <PlayerPortrait player={p} />
+    {p?.name || 'Unknown player'}
+    {p&&<PitcherPriorityBadge player={p} record={playerData.players[p.id]}/>}
+  </PlayerProfileLink>;
 }
 function Title({ children, detail }) {
   return (
