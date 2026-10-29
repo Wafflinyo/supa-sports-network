@@ -46,10 +46,10 @@ export const POSITIONAL_FIELDING_ABILITY_BONUSES=Object.freeze({
   superJump:Object.freeze({CF:9,LF:6,RF:6,other:2}),
   specialCatch:Object.freeze({middleInfield:12,outfield:5,other:2})
 });
-// A 2B or SS without Super Dive / another active special catch loses six
+// A 2B or SS without Super Dive / another active special catch loses twelve
 // defensive rating points, independently of any other ability bonus.
 // Clamber remains worth zero ability points and does NOT count as a catch.
-export const MISSING_MIDDLE_INFIELD_CATCH_PENALTY=6;
+export const MISSING_MIDDLE_INFIELD_CATCH_PENALTY=12;
 export function fieldingAbilityBonus(abilityId,position=null){
   const id=Number(abilityId);
   let bonus=0;
