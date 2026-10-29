@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {preseasonReady,preseasonSeeds,preseasonBracket,preseasonHasLeagueOpener} from '../src/preseason.js';
-import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,offenseRating,rosterPowerComponents,rankingParticipants,PITCHER_PRIORITY_ORDER,POWER_PITCHER_COUNT,POWER_SUPPORT_PITCHER_COUNT,FIELDING_ABILITY_BONUSES,BASERUNNING_ABILITY_BONUS,BATTING_CHEMISTRY_BONUSES,DEFENSIVE_CHEMISTRY_LINKS,MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT,lineupChemistryAdjustments,fieldingAbilityBonus,lineupFieldingAbilityBonuses,POSITIONAL_FIELDING_ABILITY_BONUSES,SPECIAL_CATCH_ABILITY_IDS} from '../src/power-rankings.js';
+import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,offenseRating,rosterPowerComponents,rankingParticipants,PITCHER_PRIORITY_ORDER,POWER_PITCHER_COUNT,POWER_SUPPORT_PITCHER_COUNT,FIELDING_ABILITY_BONUSES,BASERUNNING_ABILITY_BONUS,BATTING_CHEMISTRY_BONUSES,DEFENSIVE_CHEMISTRY_LINKS,MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT,UNLISTED_FIELDING_CHEMISTRY_BONUS,lineupChemistryAdjustments,fieldingAbilityBonus,lineupFieldingAbilityBonuses,POSITIONAL_FIELDING_ABILITY_BONUSES,SPECIAL_CATCH_ABILITY_IDS} from '../src/power-rankings.js';
 import {pitcherPriorityFor} from '../src/player-roles.js';
 import {earnedAchievements,GM_ACHIEVEMENTS} from '../src/gm-achievements.js';
 
@@ -54,6 +54,7 @@ const positions=['P','C','1B','2B','3B','SS','LF','CF','RF'];
 assert.equal(BASERUNNING_ABILITY_BONUS,2);
 assert.deepEqual(BATTING_CHEMISTRY_BONUSES,{one:3,both:6});
 assert.equal(MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT,20);
+assert.equal(UNLISTED_FIELDING_CHEMISTRY_BONUS,1);
 assert.deepEqual(FIELDING_ABILITY_BONUSES,{
   0:0,1:12,2:9,3:12,4:12,5:12,6:12,7:12,8:12,9:0,10:3,11:5,12:7
 });
@@ -119,7 +120,7 @@ const expectedDefensiveLinks={
  'SS-1B':[6,-4,0],'2B-3B':[5,-4,0],
  'LF-1B':[3,-3,0],'CF-1B':[3,-3,0],'RF-1B':[3,-3,0],
  'LF-3B':[2,-3,0],'CF-3B':[2,-3,0],'RF-3B':[2,-3,0],
- 'LF-C':[1,-1,0],'CF-C':[1,-1,0],'RF-C':[1,-1,0]
+ 'LF-C':[2,-1,0],'CF-C':[2,-1,0],'RF-C':[2,-1,0]
 };
 assert.deepEqual(Object.fromEntries(DEFENSIVE_CHEMISTRY_LINKS.map(x=>[
   x.a+'-'+x.b,[x.good,x.bad,x.neutral]])),expectedDefensiveLinks,
@@ -168,11 +169,48 @@ assert.equal(bonus(batting,'P').offense,3,'anti batting chemistry gives no extra
 assert.equal(bonus(batting,'RF').offense,0,'anti batting chemistry must not subtract offense');
 assert.equal(lineupChemistryAdjustments(neutralNine,null).get(7).defense,0,
  'no saved defensive positions means no arbitrary chemistry penalties');
-// Links at LF and RF should never be double-counted through a direct LF-RF edge.
+// Any other good fielding connection contributes +1 to each of its partners.
 const unrelated=fakePeople();
 at(unrelated,'LF').good.add(at(unrelated,'RF').id);
-assert.equal(bonus(unrelated,'LF').defense,-6);
-assert.equal(bonus(unrelated,'RF').defense,-6);
+assert.equal(bonus(unrelated,'LF').defense,-5,
+  'LF gains +1 for an unlisted LF-RF link, while neutral LF-CF stays -6');
+assert.equal(bonus(unrelated,'RF').defense,-5,
+  'RF gains +1 for an unlisted LF-RF link');
+const generic=fakePeople();
+at(generic,'P').good.add(at(generic,'SS').id);
+at(generic,'P').conditional.add(at(generic,'2B').id);
+assert.equal(bonus(generic,'P').defense,2,'two unlisted good links grant +1 each');
+assert.equal(bonus(generic,'SS').defense,1,'unlisted chemistry helps both partners');
+assert.equal(bonus(generic,'2B').defense,1,'conditional good contributes +1');
+const antiGeneric=fakePeople();
+at(antiGeneric,'P').bad.add(at(antiGeneric,'SS').id);
+assert.equal(bonus(antiGeneric,'P').defense,0,'unlisted anti gives no penalty');
+assert.equal(bonus(antiGeneric,'SS').defense,0,'unlisted anti gives no penalty to partner');
+const conflictGeneric=fakePeople();
+at(conflictGeneric,'P').good.add(at(conflictGeneric,'SS').id);
+at(conflictGeneric,'SS').bad.add(at(conflictGeneric,'P').id);
+assert.equal(bonus(conflictGeneric,'P').defense,0,'anti overrides conflicting good');
+for(const link of DEFENSIVE_CHEMISTRY_LINKS){
+ const preferred=fakePeople();
+ at(preferred,link.a).good.add(at(preferred,link.b).id);
+ const baselineA=bonus(neutralNine,link.a).defense;
+ const baselineB=bonus(neutralNine,link.b).defense;
+ assert.equal(bonus(preferred,link.a).defense-baselineA,
+   link.good-link.neutral,'priority pair cannot also get generic +1: '+link.a);
+ assert.equal(bonus(preferred,link.b).defense-baselineB,
+   link.good-link.neutral,'priority pair cannot also get generic +1: '+link.b);
+}
+const catcherPair=fakePeople();
+at(catcherPair,'CF').good.add(at(catcherPair,'C').id);
+assert.equal(bonus(catcherPair,'C').defense,2,'outfielder-to-catcher good gives +2');
+assert.equal(bonus(catcherPair,'CF').defense,-10,
+  'CF gains exactly +2 for catcher; two neutral buddy-jump penalties remain');
+const allGood=fakePeople();
+for(let i=0;i<allGood.length;i++)
+ for(let j=i+1;j<allGood.length;j++)allGood[i].good.add(allGood[j].id);
+for(const person of allGood)
+ assert(bonus(allGood,positions[person.id-1]).defense<=20,
+   'existing +20 positional chemistry cap still applies');
 
 const pitchRaw=(s)=>{
  const clamp100=x=>Math.max(0,Math.min(100,x));
