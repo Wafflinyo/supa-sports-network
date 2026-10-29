@@ -81,7 +81,7 @@ export function lineupFieldingAbilityBonuses(people,starters){
   return bonuses;
 }
 export const BASERUNNING_ABILITY_BONUS=2;
-export const BATTING_CHEMISTRY_BONUSES=Object.freeze({one:2,both:4});
+export const BATTING_CHEMISTRY_BONUSES=Object.freeze({one:3,both:6});
 export const MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT=20;
 // Good and anti-chemistry both affect BOTH defenders in the pair.
 // Neutral LF/RF-to-CF is penalized because the buddy jump needs chemistry.
