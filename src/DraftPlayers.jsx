@@ -3,7 +3,8 @@ import pool from './players.json';
 import {PlayerPortrait} from './PlayerPortrait.jsx';
 import {PlayerPriority} from './PlayerPriority.jsx';
 import MyDraftTeam from './MyDraftTeam.jsx';
-import {DraftPickBadge} from './DraftPickBadge.jsx';
+import {PlayerProfileLink} from './PlayerProfileLink.jsx';
+import {PlayerCareerSnapshot} from './PlayerCareerSnapshot.jsx';
 import {PlayerDataDetails} from './PlayerData.jsx';
 import data from './player-data.json';
 import {pitcherPriorityFor} from './player-roles.js';
@@ -95,7 +96,7 @@ export function DraftPlayers({league:l}) {
     {l.access.role==='gm'&&l.myTeam&&<div id="draft-panel-my-team" role="tabpanel" aria-labelledby="draft-tab-my-team" hidden={tab!=='my-team'} className="draft-my-team-panel"><MyDraftTeam league={l}/></div>}
     <div id="draft-panel-players" role="tabpanel" aria-labelledby="draft-tab-players" hidden={tab!=='players'} className="draft-players-panel">
       <h3>PLAYER POOL</h3>
-      <p>These use the same player portraits and pitching-priority badges as Player Stats. Tap any player for their hit trajectory, hidden gameplay attributes, named abilities, and chemistry. Drafted players are shaded gray.</p>
+      <p>These use the same player portraits and pitching-priority badges as Player Stats. Tap any player for their career statistics, hit trajectory, hidden gameplay attributes, named abilities, and chemistry. Drafted players are shaded gray.</p>
     <div className="draft-pool-filters">
       <label>Search players<input aria-label="Search draft players" placeholder="Search players" value={query} onChange={e=>setQuery(e.target.value)}/></label>
       <label>Class<select aria-label="Filter draft class" value={category} onChange={e=>setCategory(e.target.value)}>{['All classes','Balanced','Power','Speed','Technique'].map(c=><option key={c}>{c}</option>)}</select></label>
@@ -108,7 +109,6 @@ export function DraftPlayers({league:l}) {
           <span className="draft-player-stats-details"><strong>{p.name}</strong><PlayerPriority player={p}/><span className="draft-player-stats-class">{p.class}</span><span className="draft-player-stats-traj">TRAJ · {data.players[p.id]?.stats?.['hit trajectory']||'—'}</span></span>
         </span>
         <small className="draft-player-stats-status">{ownership.has(p.id)?'DRAFTED · '+ownership.get(p.id):'AVAILABLE'}</small>
-        <DraftPickBadge playerId={p.id} seasons={l.seasons} compact/>
       </button>)}
       {!filtered.length&&<p>No players match these filters.</p>}
     </div>
@@ -122,7 +122,7 @@ export function DraftPlayers({league:l}) {
           if(await l.act('pick',{player:selected.id}))close();
         }}>DRAFT {selected.name.toUpperCase()}</button></div>
         <p role="status">{ownership.has(selected.id)?`Already drafted · ${ownership.get(selected.id)}`:mustStage?'Your final remaining turn must be a Stadium Pick.':canPick?`Select for ${team?.name}. This submits the pick.`:s.status==='drafting'?`Waiting for ${team?.name||'the next team'} to pick.`:'Scouting view · drafting is not active.'}</p>
-        <DraftPickBadge playerId={selected.id} seasons={l.seasons}/>
+        <PlayerCareerSnapshot player={selected} seasons={l.seasons}/>
         <PlayerDataDetails player={selected} seasons={l.seasons}/>
       </div>}
     </dialog>
@@ -139,6 +139,6 @@ export function DraftPickBoard({season:s}) {
     <h2>ROUNDS & PICKS</h2>
     <p role="status">{latest?`Latest pick: #${latest.number} · ${pickName(latest)} → ${s.teams.find(t=>t.id===latest.team)?.name}`:'No picks yet. Selections will appear here as they happen.'}</p>
     <label>Show round <select aria-label="Filter draft round" value={round} onChange={e=>setRound(e.target.value)}><option value="all">All rounds · latest first</option>{rounds.map(r=><option key={r} value={r}>Round {r}</option>)}</select></label>
-    <div className="season-table draft-picks-scroll" tabIndex={0} aria-label="Scrollable draft pick results"><table><caption>Completed picks · latest first</caption><thead><tr><th>Pick</th><th>Round</th><th>Player / Stadium</th><th>Team</th><th>Pick time</th></tr></thead><tbody>{picks.map(p=><tr key={p.number} className={p.number===latest?.number?'latest-pick':undefined}><td>#{p.number}{p.number===latest?.number?' · LATEST':''}</td><td>{p.round}{p.supplemental?' · Fill':''}</td><td><span className="portrait-label">{p.kind==='stage'?<strong>STADIUM · {p.stage}</strong>:<><PlayerPortrait player={player(p.player)}/>{player(p.player)?.name}{pitcherPriorityFor(player(p.player),data.players[p.player])&&<span className="draft-priority-tag">{pitcherPriorityFor(player(p.player),data.players[p.player]).code}</span>}</>}</span></td><td>{s.teams.find(t=>t.id===p.team)?.name}</td><td>{Math.floor(Number(p.seconds)||0)}s</td></tr>)}</tbody></table></div>
+    <div className="season-table draft-picks-scroll" tabIndex={0} aria-label="Scrollable draft pick results"><table><caption>Completed picks · latest first</caption><thead><tr><th>Pick</th><th>Round</th><th>Player / Stadium</th><th>Team</th><th>Pick time</th></tr></thead><tbody>{picks.map(p=><tr key={p.number} className={p.number===latest?.number?'latest-pick':undefined}><td>#{p.number}{p.number===latest?.number?' · LATEST':''}</td><td>{p.round}{p.supplemental?' · Fill':''}</td><td>{p.kind==='stage'?<span className="portrait-label"><strong>STADIUM · {p.stage}</strong></span>:<PlayerProfileLink player={player(p.player)} className="portrait-label"><PlayerPortrait player={player(p.player)}/>{player(p.player)?.name}{pitcherPriorityFor(player(p.player),data.players[p.player])&&<span className="draft-priority-tag">{pitcherPriorityFor(player(p.player),data.players[p.player]).code}</span>}</PlayerProfileLink>}</td><td>{s.teams.find(t=>t.id===p.team)?.name}</td><td>{Math.floor(Number(p.seconds)||0)}s</td></tr>)}</tbody></table></div>
   </section>;
 }
