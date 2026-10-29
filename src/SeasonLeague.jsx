@@ -1785,6 +1785,77 @@ function ReportImport({ league: l, game, onDone }) {
     </div>
   );
 }
+function TradeConversation({league:l,offer,teamName}){
+  const [expanded,setExpanded]=useState(false);
+  const [history,setHistory]=useState([]);
+  const [message,setMessage]=useState('');
+  const [problem,setProblem]=useState('');
+  const [sending,setSending]=useState(false);
+  const seasonId=l.season?.id;
+  async function loadThread(){
+    if(!seasonId||!l.supabase)return;
+    const r=await l.supabase.rpc('ssl_trade_thread',{
+      target_season:seasonId,target_offer:offer.id
+    });
+    if(r.error){setProblem(r.error.message);return;}
+    setHistory(Array.isArray(r.data)?r.data:[]);
+    setProblem('');
+  }
+  useEffect(()=>{
+    if(!expanded||!seasonId||!l.supabase)return;
+    let active=true;
+    const refreshThread=async()=>{
+      const r=await l.supabase.rpc('ssl_trade_thread',{
+        target_season:seasonId,target_offer:offer.id
+      });
+      if(!active)return;
+      if(r.error){setProblem(r.error.message);return;}
+      setHistory(Array.isArray(r.data)?r.data:[]);
+      setProblem('');
+    };
+    refreshThread();
+    const timer=setInterval(refreshThread,5000);
+    return ()=>{active=false;clearInterval(timer);};
+  },[expanded,seasonId,l.supabase,offer.id]);
+  const active=['pending','ready'].includes(offer.status);
+  return <section className="trade-conversation">
+    <button type="button" className="outline-btn"
+      aria-expanded={expanded} onClick={()=>setExpanded(v=>!v)}>
+      {expanded?'HIDE NEGOTIATION MESSAGES':'OPEN PRIVATE TRADE NEGOTIATION'}
+    </button>
+    {expanded&&<>
+      <p className="trade-chat-note">Only participating GMs and the commissioner can read these messages. The discussion stays with the proposal when the terms change.</p>
+      <div className="trade-message-history" aria-live="polite">
+        {!history.length&&<p>No messages yet. Discuss players and picks before accepting.</p>}
+        {history.map(m=><div key={m.id} className={'trade-message '+(m.kind==='revision'?'trade-message-revision':'')}>
+          <strong>{m.commissioner?'Commissioner':teamName(m.senderTeam)}</strong>
+          <small> · {time(m.sentAt)}</small>
+          <p>{m.text}</p>
+        </div>)}
+      </div>
+      {problem&&<p className="inline-message season-error" role="alert">{problem}</p>}
+      {active&&<form className="trade-message-form" onSubmit={async e=>{
+        e.preventDefault();
+        if(!message.trim()||sending||l.busy)return;
+        setSending(true);
+        try{
+          const ok=await l.act('trade_message',{offer:offer.id,message:message.trim()});
+          if(ok){setMessage('');await loadThread();}
+        }finally{setSending(false);}
+      }}>
+        <label>Message the other GM
+          <textarea rows={3} maxLength={1000} value={message}
+            placeholder="Discuss the players, picks or changes you want…"
+            onChange={e=>setMessage(e.target.value)}/>
+        </label>
+        <button type="submit" className="red-btn"
+          disabled={sending||l.busy||!message.trim()}>
+          {sending?'SENDING…':'SEND MESSAGE'}
+        </button>
+      </form>}
+    </>}
+  </section>;
+}
 function Trades({ league: l, messages = false }) {
   const s = l.season,
     [team, setTeam] = useActingTeam(l),
@@ -1838,7 +1909,7 @@ function Trades({ league: l, messages = false }) {
     <>
       {can && (
         <>
-          <details className={`trade-composer ${messages ? "inbox-composer" : "new-trade-composer"}`} open={!messages || !!counter}><summary>WRITE A NEW OFFER / COUNTEROFFER</summary><Box title={messages ? "TRADE MESSAGES" : "PROPOSE A TRADE"}>
+          <details className={`trade-composer ${messages ? "inbox-composer" : "new-trade-composer"}`} open={!messages || !!counter}><summary>{counter?"EDIT EXISTING PROPOSAL":"WRITE A NEW TRADE OFFER"}</summary><Box title={messages ? "TRADE NEGOTIATIONS" : "PROPOSE A TRADE"}>
             {admin && (
               <TeamChooser
                 s={s}
@@ -1850,8 +1921,7 @@ function Trades({ league: l, messages = false }) {
             {s.tradingOpen && team ? (
               <>
                 <p>
-                  All involved teams must accept the same offer, followed by
-                  commissioner approval. Keep at least nine tradable next-season player picks. Without a retained Stadium, the team also receives a nontradable Stadium Pick (ten turns minimum); teams retaining a Stadium get no new Stadium Pick. Stadium Picks can never be traded.
+                  GMs can discuss and revise a proposal privately. All teams must accept the final terms before commissioner approval. Keep at least nine tradable next-season player picks. Without a retained Stadium, the team also receives a nontradable Stadium Pick (ten turns minimum); teams retaining a Stadium get no new Stadium Pick. Stadium Picks can never be traded.
                   Rosters below 11 must be filled immediately after the trade.
                 </p>
                 <details className="trade-participants"><summary>PARTICIPATING TEAMS ({participants.length})</summary><div className="season-team-checks">
@@ -1860,7 +1930,7 @@ function Trades({ league: l, messages = false }) {
                       <input
                         type="checkbox"
                         checked={participants.includes(t.id)}
-                        disabled={t.id === team}
+                        disabled={t.id === team || !!counter}
                         onChange={() => {
                           setMoves([]);
                           setParticipants((a) =>
@@ -1997,8 +2067,7 @@ function Trades({ league: l, messages = false }) {
                 </label>
                 {counter && (
                   <p>
-                    Counteroffer to {counter.slice(0, 8)}. Sending it replaces
-                    that pending offer.
+                    Editing proposal {counter.id.slice(0, 8)}. Saving new terms preserves the conversation and resets prior acceptances. Every team must review the revision.
                   </p>
                 )}
                 <button
@@ -2006,13 +2075,9 @@ function Trades({ league: l, messages = false }) {
                   disabled={l.busy || participants.length < 2 || !moves.length}
                   onClick={async () => {
                     if (
-                      await l.act("submit_trade", {
-                        team,
-                        teams: participants,
-                        moves,
-                        note,
-                        counterTo: counter,
-                      })
+                      await l.act(counter ? "edit_trade" : "submit_trade", counter
+                        ? {offer:counter.id,expectedRevision:counter.revision,moves,note}
+                        : {team,teams:participants,moves,note})
                     ) {
                       setMoves([]);
                       setNote("");
@@ -2020,7 +2085,7 @@ function Trades({ league: l, messages = false }) {
                     }
                   }}
                 >
-                  SUBMIT {counter ? "COUNTEROFFER" : "TRADE OFFER"}
+                  {counter ? "SAVE REVISED PROPOSAL" : "SUBMIT TRADE PROPOSAL"}
                 </button>
               </>
             ) : (
@@ -2043,6 +2108,7 @@ function Trades({ league: l, messages = false }) {
                 <small>{time(o.createdAt)}</small>
                 {showMoves(o.body)}
                 {o.body.note && <p>{o.body.note}</p>}
+                <TradeConversation league={l} offer={o} teamName={teamName}/>
                 <p>Accepted: {o.accepted.map(teamName).join(", ")}</p>
                 {["pending", "ready"].includes(o.status) && (
                   <div className="season-inline">
@@ -2076,15 +2142,15 @@ function Trades({ league: l, messages = false }) {
                             setParticipants(o.body.teams);
                             setMoves(o.body.moves);
                             setNote(o.body.note || "");
-                            setCounter(o.id);
-                            window.scrollTo({ top: 0, behavior: "smooth" });
+                            setCounter({id:o.id,revision:Number(o.body.revision)||0});
+                            document.querySelector(".trade-composer")?.scrollIntoView({behavior:"smooth"});
                           }}
                         >
-                          COUNTER
+                          EDIT PROPOSAL
                         </button>
                       </>
                     )}
-                    {(admin || o.body.sender === team) && (
+                    {(admin || o.body.teams.includes(team)) && (
                       <button
                         disabled={l.busy}
                         className="outline-btn"
@@ -2092,7 +2158,7 @@ function Trades({ league: l, messages = false }) {
                           l.act("cancel_trade", { team, offer: o.id })
                         }
                       >
-                        CANCEL
+                        CANCEL PROPOSAL
                       </button>
                     )}
                     {admin && o.status === "ready" && (

@@ -809,3 +809,16 @@ details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
  color:#fff;letter-spacing:.055em;font-variant-numeric:tabular-nums}
 .ssl-lottery-lobby-alert small{font-size:10px;color:#f5e7d4;line-height:1.4;font-weight:800}
 .ssl-lottery-lobby-date{font-size:10px;font-weight:900;letter-spacing:.05em;color:#e9c980;line-height:1.5}
+
+/* Trade proposal negotiation is available only through participant-protected RPCs. */
+.trade-conversation{margin:1rem 0;padding:.9rem;border:1px solid var(--border,#adb5bd);border-radius:12px}
+.trade-chat-note{font-size:.85rem;opacity:.78}
+.trade-message-history{max-height:320px;overflow-y:auto;display:grid;gap:.5rem;margin:.8rem 0}
+.trade-message{border:1px solid rgba(128,128,128,.22);border-radius:9px;padding:.65rem .8rem;background:rgba(128,128,128,.07);overflow-wrap:anywhere}
+.trade-message p{margin:.3rem 0 0;white-space:pre-wrap}
+.trade-message small{opacity:.72}
+.trade-message-revision{border-style:dashed}
+.trade-message-form{display:grid;gap:.65rem;margin-top:.7rem}
+.trade-message-form label{display:grid;gap:.35rem}
+.trade-message-form textarea{width:100%;max-width:100%;box-sizing:border-box}
+.trade-message-form button{justify-self:start}

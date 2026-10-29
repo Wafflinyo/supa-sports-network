@@ -39,6 +39,7 @@ jobs:
       - run: node tests/schedule-matchup-records.mjs
       - run: node tests/stadium-lighting.mjs
       - run: node tests/public-tbd-schedule.mjs
+      - run: node tests/trade-negotiation.mjs
       - run: npm run build
         env:
           GITHUB_PAGES_BASE: /supa-sports-network/
