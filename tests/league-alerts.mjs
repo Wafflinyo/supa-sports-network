@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {buildLeagueAlerts,opponentScouting} from '../src/league-alerts.js';
 import {HEATING_UP_THRESHOLD} from '../src/heating-up.js';
+import {snapshotTeamSchedule,reconcileScheduleHistory} from '../src/schedule-change-alerts.js';
 
 const positions=['P','C','1B','2B','3B','SS','LF','CF','RF'];
 const roster=Array.from({length:11},(_,i)=>i+1);
@@ -53,4 +54,80 @@ alerts=buildLeagueAlerts({...args,season:submitted});
 assert(!find(alerts,':game-lineup:upcoming'),'submission resolves the task automatically');
 const play={...regular,status:'postseason'};
 assert(find(buildLeagueAlerts({...args,season:play}),':playoff-bracket'),'announce playoff bracket');
-console.log('PASS: notifications wait for draft completion, route lineups, announce brackets/schedule, feature heat/news, and preserve opponent scouting privacy.');
+
+// Released match alerts are based exclusively on public final records.
+assert(find(buildLeagueAlerts({...args,season:regular}),':game-result:previous'),'final score is announced');
+const embargo={...regular,games:[{...previous,stage:'recorded'},upcoming]};
+assert(!find(buildLeagueAlerts({...args,season:embargo}),':game-result:previous'),
+  'private/pre-premiere scores must not produce GM alerts');
+assert.equal(find(buildLeagueAlerts({...args,season:regular}),':game-result:previous').target.gameId,'previous',
+  'final result alert opens the correct matchup');
+
+// Voting opens immediately and reminds non-voters in the final 48 hours.
+const close='2026-11-02T11:00:00Z';
+const voteWindow={open:true,label:'All-Star Voting',closesAt:close,myChoices:[]};
+const voting={...regular,ballotWindows:{allstar:voteWindow}};
+const voteAlerts=buildLeagueAlerts({...args,season:voting});
+assert(find(voteAlerts,':vote-open:allstar:'),'opening announcement shown');
+assert(find(voteAlerts,':vote-deadline:allstar:'),'48-hour reminder shown');
+assert.equal(find(voteAlerts,':vote-deadline:allstar:').target.ballot,'allstar');
+const voted=buildLeagueAlerts({...args,season:{...voting,ballotWindows:{
+  allstar:{...voteWindow,myChoices:[1,2]}}}});
+assert(!find(voted,':vote-deadline:'),'no deadline nag for submitted ballots');
+assert(!find(buildLeagueAlerts({...args,season:voting,now:Date.parse(close)+1}),':vote-open:'),
+  'closed ballots cannot trigger alerts');
+
+// Trade participants get actionable offers and durable state-transition updates;
+// the commissioner is notified when an accepted offer needs final approval.
+const trade={id:'offer-1',body:{teams:['a','b'],sender:'a'},accepted:['b'],status:'pending'};
+const tradeAlert=buildLeagueAlerts({...args,season:regular,inbox:[trade]});
+assert(find(tradeAlert,':trade-action:offer-1'),'pending offer needs a response');
+assert.equal(find(tradeAlert,':trade-action:offer-1').target.offerId,'offer-1');
+const accepted={...trade,accepted:['a','b'],status:'ready'};
+const acceptedAlert=buildLeagueAlerts({...args,season:regular,inbox:[accepted]});
+assert(find(acceptedAlert,':trade-update:offer-1:accepted'),'all-team acceptance announcement shown');
+assert(!find(acceptedAlert,':trade-action:offer-1'),'no need to accept again');
+assert(find(buildLeagueAlerts({...args,season:regular,inbox:[accepted],role:'commissioner'}),
+  ':trade-review:offer-1'),'commissioner approval task');
+for(const status of ['approved','rejected','countered','cancelled']){
+  const transitions=buildLeagueAlerts({...args,season:regular,inbox:[{...trade,status}]});
+  assert(find(transitions,':trade-update:offer-1:'+status),'trade '+status+' status must be announced');
+}
+assert(!find(buildLeagueAlerts({...args,season:regular,inbox:[
+  {...trade,id:'other-team-offer',body:{teams:['b','z0']}}
+]}),':trade-action:other-team-offer'),'do not alert uninvolved GMs');
+
+// Schedule changes are compared against the last known published version.
+// They must never be fabricated on first visit or for the other team's match.
+const otherGame={id:'other-game',home:'z0',away:'z1',phase:'regular',stage:'scheduled',
+  startsAt:'2026-11-06T17:00:00Z'};
+const beforeSchedule={...regular,games:[previous,upcoming,otherGame]};
+const initial=reconcileScheduleHistory({season:beforeSchedule,teamId:'a',now:args.now});
+assert(initial.snapshot && initial.history.length===0,'first observation creates baseline');
+assert.equal(Object.keys(initial.snapshot).length,1,'only relevant future active matchups tracked');
+const changedGame={...upcoming,startsAt:'2026-11-04T19:30:00Z',postponed:true};
+const changedSeason={...beforeSchedule,games:[previous,changedGame,
+  {...otherGame,startsAt:'2026-11-07T17:00:00Z'}]};
+const detected=reconcileScheduleHistory({season:changedSeason,teamId:'a',
+  previous:initial.snapshot,history:initial.history,now:args.now+8000});
+assert.equal(detected.history.length,1,'one notification for affected matchup, not other team');
+assert(find(detected.history,':schedule-change:upcoming:'),'date and postponement detected');
+assert(detected.history[0].detail.includes('New date:')&&detected.history[0].detail.includes('Game postponed'),
+  'schedule notification explains exactly what changed');
+assert.equal(detected.history[0].target.gameId,'upcoming','schedule alert deep links to matchup');
+const noDuplicates=reconcileScheduleHistory({season:changedSeason,teamId:'a',
+  previous:detected.snapshot,history:detected.history,now:args.now+16000});
+assert.equal(noDuplicates.history.length,1,'polling unchanged schedule does not duplicate alert');
+const finalAlerts=buildLeagueAlerts({...args,season:changedSeason,
+  scheduleChanges:detected.history});
+assert(find(finalAlerts,':schedule-change:upcoming:'),'history events appear in GM bell');
+assert(!find(buildLeagueAlerts({...args,season:changedSeason,myTeam:opponent,
+  scheduleChanges:detected.history}),':schedule-change:upcoming:'),
+  'other teams do not receive private GM-specific change history');
+
+// A newly published schedule is one official release notification, not
+// dozens of fabricated individual rescheduling alerts.
+assert.equal(reconcileScheduleHistory({season:post,teamId:'a'}).snapshot,null);
+assert(snapshotTeamSchedule(beforeSchedule,'a').upcoming,'published schedule snapshot is stable');
+
+console.log('PASS: GM alerts for published results, ballots and deadlines, trade approvals/rejections, schedule edits, and the original draft/lineup privacy guards.');
