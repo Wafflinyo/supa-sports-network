@@ -2,7 +2,14 @@ import React from 'react';
 import {originalPlayerDraft,isUndraftedSigning} from './draft-pedigree.js';
 import './draft-pedigree.css';
 
+// Never reveal draft-pick pedigree before the current official draft is complete.
+const finishedDraftStatuses=new Set(['postdraft','regular','postseason','retention','offseason','archived']);
+export function draftPedigreeVisible(seasons=[]){
+  const current=[...seasons].filter(Boolean).sort((a,b)=>Number(b.number||0)-Number(a.number||0))[0];
+  return !!current && finishedDraftStatuses.has(current.status);
+}
 export function DraftPickBadge({playerId,seasons=[],compact=false}) {
+  if(!draftPedigreeVisible(seasons))return null;
   const draft=originalPlayerDraft(playerId,seasons);
   if(!draft){
     if(!isUndraftedSigning(playerId,seasons))return null;
