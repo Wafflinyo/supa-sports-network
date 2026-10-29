@@ -5,9 +5,11 @@ import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,
 import {pitcherPriorityFor} from '../src/player-roles.js';
 import {earnedAchievements,GM_ACHIEVEMENTS} from '../src/gm-achievements.js';
 
-// Explicit scoring contract: defense outranks pitching, and otherwise-identical
-// batters rank High > Medium > Low for hit trajectory.
-assert.deepEqual(POWER_WEIGHTS,{offense:.50,pitching:.15,defense:.25,running:.05,chemistry:.05});
+// Explicit scoring contract: offense dominates (60%), defense outranks
+// pitching, and otherwise-identical batters rank High > Medium > Low.
+assert.deepEqual(POWER_WEIGHTS,{offense:.60,pitching:.15,defense:.20,running:.02,chemistry:.03});
+assert(POWER_WEIGHTS.offense>POWER_WEIGHTS.defense+POWER_WEIGHTS.pitching,
+  'offense must outweigh defense and pitching combined');
 assert.equal(Object.values(POWER_WEIGHTS).reduce((sum,n)=>sum+n,0),1);
 assert.equal(TRAJECTORY_OFFENSE_WEIGHT,.25);
 assert.deepEqual(TRAJECTORY_SCORES,{High:100,Medium:60,Low:20});
@@ -76,6 +78,12 @@ for(const names of [powerNames,balancedNames]){
  assert.equal(ranked.offense,round1(avg('offense')),'every offensive player counts');
  assert.equal(ranked.defense,round1(avg('defense')),'every defender counts');
  assert.equal(ranked.running,round1(avg('running')),'all nine runners count');
+ // The composite must use exactly the requested coefficients, without
+ // changing underlying player ratings or the selected starting pitcher.
+ const expectedScore=.60*ranked.offense+.20*ranked.defense+
+   .15*ranked.pitching+.02*ranked.running+.03*ranked.chemistry;
+ assert(Math.abs(ranked.rosterScore-expectedScore)<.051,
+   'rankings must weight offense 60%, defense 20%, pitching 15%, running 2%, chemistry 3%');
  assert.equal(ranked.pitching,round1(selected.reduce((sum,p)=>sum+p.pitch,0)/4),
    'GM-selected starter and three backups determine pitching rating equally');
  assert.deepEqual(ranked.selectedPitchers.map(p=>p.id),selected.map(p=>p.id),
