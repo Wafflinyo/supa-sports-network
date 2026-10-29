@@ -28,7 +28,7 @@ assert.equal(find(alerts,':default-lineup').target.page,'GM Tools');
 const previous={id:'previous',home:'a',away:'b',stage:'final',phase:'regular',
   startsAt:'2026-10-30T17:00:00Z',
   lineups:{b:lineupFor(opponentRoster)},
-  result:{players:[{player:1,team:'a',gameScore:HEATING_UP_THRESHOLD}]}};
+  result:{scores:{a:4,b:2},players:[{player:1,team:'a',gameScore:HEATING_UP_THRESHOLD}]}};
 const upcoming={id:'upcoming',home:'b',away:'a',stage:'scheduled',phase:'regular',
   startsAt:'2026-11-03T17:00:00Z',lineups:{b:{starters:[{player:999,position:'P'}]}}};
 const regular={...post,status:'regular',schedulePublished:true,needsDefault:[],
