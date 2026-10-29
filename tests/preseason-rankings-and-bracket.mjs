@@ -59,28 +59,29 @@ assert.deepEqual(FIELDING_ABILITY_BONUSES,{
 });
 // Positional ability values are separate from the existing chemistry links.
 assert.deepEqual(POSITIONAL_FIELDING_ABILITY_BONUSES,{
- superJump:{CF:9,LF:6,RF:6},
- specialCatch:{middleInfield:12,middleInfieldPairExtra:4,outfield:4,other:2}
+ superJump:{CF:9,LF:6,RF:6,other:2},
+ specialCatch:{middleInfield:12,outfield:5,other:2}
 });
 for(const ability of SPECIAL_CATCH_ABILITY_IDS){
  assert.equal(fieldingAbilityBonus(ability,'2B'),12);
  assert.equal(fieldingAbilityBonus(ability,'SS'),12);
- assert.equal(fieldingAbilityBonus(ability,'2B',1),16,
-   'a catch at 2B + an active catch at SS gets the middle-infield synergy');
- assert.equal(fieldingAbilityBonus(ability,'SS',3),16,
-   'SS gets the same partner bonus');
+ assert.equal(fieldingAbilityBonus(ability,'2B',1),12,
+   '2B remains +12 even with a catching partner at SS');
+ assert.equal(fieldingAbilityBonus(ability,'SS',3),12,
+   'SS remains +12 even with a catching partner at 2B');
  assert.equal(fieldingAbilityBonus(ability,'2B',9),12,
-   'Clamber does not activate the dual-catcher bonus');
- for(const pos of ['LF','CF','RF'])assert.equal(fieldingAbilityBonus(ability,pos),4);
+   'Clamber at SS has no effect on the 2B catch bonus');
+ for(const pos of ['LF','CF','RF'])assert.equal(fieldingAbilityBonus(ability,pos),5);
  for(const pos of ['P','C','1B','3B'])assert.equal(fieldingAbilityBonus(ability,pos),2);
  assert.equal(fieldingAbilityBonus(ability),0,'no position is not a free special-catch bonus');
 }
 for(const pos of ['P','C','1B','2B','3B','SS']){
- assert.equal(fieldingAbilityBonus(2,pos),0,'Super Jump never benefits infielders');
+ assert.equal(fieldingAbilityBonus(2,pos),2,'Super Jump gets +2 outside the outfield');
 }
 assert.equal(fieldingAbilityBonus(2,'CF'),9);
 assert.equal(fieldingAbilityBonus(2,'LF'),6);
 assert.equal(fieldingAbilityBonus(2,'RF'),6);
+assert.equal(fieldingAbilityBonus(2),0,'Super Jump needs a saved defensive position');
 for(const pos of [...positions,null]){
  assert.equal(fieldingAbilityBonus(9,pos,1),0,'Clamber must stay zero');
 }
@@ -95,10 +96,12 @@ byPos('2B').fieldingAbilityId=1; // Super Dive
 byPos('SS').fieldingAbilityId=3; // Tongue Catch
 byPos('CF').fieldingAbilityId=2; // Super Jump
 let positionBonuses=lineupFieldingAbilityBonuses(positionalPeople,positionalLineup);
-assert.equal(positionBonuses.get(byPos('2B').id),16);
-assert.equal(positionBonuses.get(byPos('SS').id),16);
+assert.equal(positionBonuses.get(byPos('2B').id),12);
+assert.equal(positionBonuses.get(byPos('SS').id),12);
 assert.equal(positionBonuses.get(byPos('CF').id),9);
-byPos('SS').fieldingAbilityId=9; // Clamber cancels the synergy
+assert.equal(positionBonuses.get(byPos('2B').id)+positionBonuses.get(byPos('SS').id),24,
+  'two middle-infield catches grant +12 each without an added synergy');
+byPos('SS').fieldingAbilityId=9; // Clamber receives no bonus
 positionBonuses=lineupFieldingAbilityBonuses(positionalPeople,positionalLineup);
 assert.equal(positionBonuses.get(byPos('2B').id),12);
 assert.equal(positionBonuses.get(byPos('SS').id),0);
@@ -106,8 +109,8 @@ const swapCF=positionalLineup.map(s=>({...s}));
 const center=swapCF.find(s=>s.position==='CF'),first=swapCF.find(s=>s.position==='1B');
 center.position='1B';first.position='CF';
 positionBonuses=lineupFieldingAbilityBonuses(positionalPeople,swapCF);
-assert.equal(positionBonuses.get(byPos('CF').id),0,
-  'moving a Super Jumper from CF to first base removes its bonus');
+assert.equal(positionBonuses.get(byPos('CF').id),2,
+  'moving a Super Jumper from CF to first base reduces its bonus to +2');
 assert.equal(lineupFieldingAbilityBonuses(positionalPeople,null)
  .get(byPos('2B').id),0,'missing field positions must not imply a middle-infield bonus');
 assert.equal(DEFENSIVE_CHEMISTRY_LINKS.length,13);
