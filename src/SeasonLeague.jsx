@@ -2515,7 +2515,7 @@ export const seasonPages = [
   "Free Agency",
   "Messages",
 ];
-export function SeasonPage({ page, league: l, section='Pre-season' }) {
+export function SeasonPage({ page, league: l, section=null }) {
   return (
     <>
       <Title>{page.toUpperCase()}</Title>
@@ -2540,7 +2540,7 @@ export function SeasonPage({ page, league: l, section='Pre-season' }) {
       ) : page === "SSL History" ? (
         <History league={l} />
       ) : page === "Playoff Bracket" ? (
-        <PlayoffBracketSections league={l} initialTab={section||'Pre-season'}/>
+        {section?<PlayoffBracketSections league={l} initialTab={section}/>:<PlayoffBracketSections league={l}/>}
       ) : (
         <Trades league={l} messages={page === "Messages"} />
       )}
