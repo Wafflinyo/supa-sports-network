@@ -101,9 +101,8 @@ export function buildLeagueAlerts({season, myTeam, role, newsItems = [], now = D
 
 // The opponent's most recent *completed* game is the only permissible scouting
 // source. Never fall back to their current default or pending next-game lineup.
-export function opponentScouting(season,game) {
+export function opponentScouting(season,game,opponentId) {
   if (!season || !game) return null;
-  const opponentId=game.scoutingTeam;
   if (!opponentId) return null;
   const previous=(season.games||[]).filter(g=>g.id!==game.id && g.stage==='final' &&
     matchesTeam(g,opponentId) && (!stamp(game.startsAt) || stamp(g.startsAt)<stamp(game.startsAt)))
