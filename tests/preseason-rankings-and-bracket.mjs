@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {preseasonReady,preseasonSeeds,preseasonBracket,preseasonHasLeagueOpener} from '../src/preseason.js';
-import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,offenseRating,rosterPowerComponents,rankingParticipants,PITCHER_PRIORITY_ORDER,POWER_PITCHER_COUNT,POWER_SUPPORT_PITCHER_COUNT,FIELDING_ABILITY_BONUSES,BASERUNNING_ABILITY_BONUS,BATTING_CHEMISTRY_BONUSES,DEFENSIVE_CHEMISTRY_LINKS,MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT,lineupChemistryAdjustments} from '../src/power-rankings.js';
+import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,offenseRating,rosterPowerComponents,rankingParticipants,PITCHER_PRIORITY_ORDER,POWER_PITCHER_COUNT,POWER_SUPPORT_PITCHER_COUNT,FIELDING_ABILITY_BONUSES,BASERUNNING_ABILITY_BONUS,BATTING_CHEMISTRY_BONUSES,DEFENSIVE_CHEMISTRY_LINKS,MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT,lineupChemistryAdjustments,fieldingAbilityBonus,lineupFieldingAbilityBonuses,POSITIONAL_FIELDING_ABILITY_BONUSES,SPECIAL_CATCH_ABILITY_IDS} from '../src/power-rankings.js';
 import {pitcherPriorityFor} from '../src/player-roles.js';
 import {earnedAchievements,GM_ACHIEVEMENTS} from '../src/gm-achievements.js';
 
@@ -52,11 +52,64 @@ const round1=x=>Math.round(x*10)/10;
 
 const positions=['P','C','1B','2B','3B','SS','LF','CF','RF'];
 assert.equal(BASERUNNING_ABILITY_BONUS,2);
-assert.deepEqual(BATTING_CHEMISTRY_BONUSES,{one:2,both:4});
+assert.deepEqual(BATTING_CHEMISTRY_BONUSES,{one:3,both:6});
 assert.equal(MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT,20);
 assert.deepEqual(FIELDING_ABILITY_BONUSES,{
   0:0,1:12,2:9,3:12,4:12,5:12,6:12,7:12,8:12,9:0,10:3,11:5,12:7
 });
+// Positional ability values are separate from the existing chemistry links.
+assert.deepEqual(POSITIONAL_FIELDING_ABILITY_BONUSES,{
+ superJump:{CF:9,LF:6,RF:6},
+ specialCatch:{middleInfield:12,middleInfieldPairExtra:4,outfield:4,other:2}
+});
+for(const ability of SPECIAL_CATCH_ABILITY_IDS){
+ assert.equal(fieldingAbilityBonus(ability,'2B'),12);
+ assert.equal(fieldingAbilityBonus(ability,'SS'),12);
+ assert.equal(fieldingAbilityBonus(ability,'2B',1),16,
+   'a catch at 2B + an active catch at SS gets the middle-infield synergy');
+ assert.equal(fieldingAbilityBonus(ability,'SS',3),16,
+   'SS gets the same partner bonus');
+ assert.equal(fieldingAbilityBonus(ability,'2B',9),12,
+   'Clamber does not activate the dual-catcher bonus');
+ for(const pos of ['LF','CF','RF'])assert.equal(fieldingAbilityBonus(ability,pos),4);
+ for(const pos of ['P','C','1B','3B'])assert.equal(fieldingAbilityBonus(ability,pos),2);
+ assert.equal(fieldingAbilityBonus(ability),0,'no position is not a free special-catch bonus');
+}
+for(const pos of ['P','C','1B','2B','3B','SS']){
+ assert.equal(fieldingAbilityBonus(2,pos),0,'Super Jump never benefits infielders');
+}
+assert.equal(fieldingAbilityBonus(2,'CF'),9);
+assert.equal(fieldingAbilityBonus(2,'LF'),6);
+assert.equal(fieldingAbilityBonus(2,'RF'),6);
+for(const pos of [...positions,null]){
+ assert.equal(fieldingAbilityBonus(9,pos,1),0,'Clamber must stay zero');
+}
+for(const [id,expected] of [[10,3],[11,5],[12,7]]){
+ for(const pos of [...positions,null])assert.equal(fieldingAbilityBonus(id,pos),expected,
+   'other fielding skill tiers do not change with position');
+}
+const positionalPeople=positions.map((p,i)=>({id:i+1,fieldingAbilityId:0}));
+const byPos=position=>positionalPeople[positions.indexOf(position)];
+const positionalLineup=positions.map((position,i)=>({position,player:i+1}));
+byPos('2B').fieldingAbilityId=1; // Super Dive
+byPos('SS').fieldingAbilityId=3; // Tongue Catch
+byPos('CF').fieldingAbilityId=2; // Super Jump
+let positionBonuses=lineupFieldingAbilityBonuses(positionalPeople,positionalLineup);
+assert.equal(positionBonuses.get(byPos('2B').id),16);
+assert.equal(positionBonuses.get(byPos('SS').id),16);
+assert.equal(positionBonuses.get(byPos('CF').id),9);
+byPos('SS').fieldingAbilityId=9; // Clamber cancels the synergy
+positionBonuses=lineupFieldingAbilityBonuses(positionalPeople,positionalLineup);
+assert.equal(positionBonuses.get(byPos('2B').id),12);
+assert.equal(positionBonuses.get(byPos('SS').id),0);
+const swapCF=positionalLineup.map(s=>({...s}));
+const center=swapCF.find(s=>s.position==='CF'),first=swapCF.find(s=>s.position==='1B');
+center.position='1B';first.position='CF';
+positionBonuses=lineupFieldingAbilityBonuses(positionalPeople,swapCF);
+assert.equal(positionBonuses.get(byPos('CF').id),0,
+  'moving a Super Jumper from CF to first base removes its bonus');
+assert.equal(lineupFieldingAbilityBonuses(positionalPeople,null)
+ .get(byPos('2B').id),0,'missing field positions must not imply a middle-infield bonus');
 assert.equal(DEFENSIVE_CHEMISTRY_LINKS.length,13);
 const expectedDefensiveLinks={
  'LF-CF':[8,-6,-6],'RF-CF':[8,-6,-6],
@@ -88,7 +141,7 @@ at(joined,'CF').conditional.add(at(joined,'RF').id);
 assert.equal(bonus(joined,'LF').defense,8);
 assert.equal(bonus(joined,'RF').defense,8);
 assert.equal(bonus(joined,'CF').defense,16,'two buddy jump links benefit the center fielder');
-assert.equal(bonus(joined,'CF').offense,4,'batting neighbors on both sides add four offense');
+assert.equal(bonus(joined,'CF').offense,6,'batting neighbors on both sides add six offense');
 const antiBuddy=fakePeople();
 at(antiBuddy,'LF').bad.add(at(antiBuddy,'CF').id);
 assert.equal(bonus(antiBuddy,'LF').defense,-6,'anti LF-to-CF is minus six');
@@ -104,11 +157,11 @@ for(const link of DEFENSIVE_CHEMISTRY_LINKS.filter(x=>x.neutral===0)){
 const batting=fakePeople();
 at(batting,'P').good.add(at(batting,'RF').id); // Ninth hitter wraps to first
 at(batting,'C').good.add(at(batting,'P').id);
-assert.equal(bonus(batting,'P').offense,4,'two good neighboring batters');
-assert.equal(bonus(batting,'RF').offense,2,'ninth is adjacent to first');
-assert.equal(bonus(batting,'C').offense,2,'one good neighboring batter');
+assert.equal(bonus(batting,'P').offense,6,'two good neighboring batters');
+assert.equal(bonus(batting,'RF').offense,3,'ninth is adjacent to first');
+assert.equal(bonus(batting,'C').offense,3,'one good neighboring batter');
 at(batting,'P').bad.add(at(batting,'RF').id);
-assert.equal(bonus(batting,'P').offense,2,'anti batting chemistry gives no extra penalty');
+assert.equal(bonus(batting,'P').offense,3,'anti batting chemistry gives no extra penalty');
 assert.equal(bonus(batting,'RF').offense,0,'anti batting chemistry must not subtract offense');
 assert.equal(lineupChemistryAdjustments(neutralNine,null).get(7).defense,0,
  'no saved defensive positions means no arbitrary chemistry penalties');
@@ -137,7 +190,7 @@ for(const names of [powerNames,balancedNames]){
        (Number(s['baserunning ability'])>0?BASERUNNING_ABILITY_BONUS:0)),pitch:pitchRaw(s),
      defense:Math.min(100,.60*Math.max(0,Math.min(100,Number(s.fielding)||0))+
        .40*Math.max(0,Math.min(100,Number(s['outfield throwing speed'])||0))+
-       FIELDING_ABILITY_BONUSES[Number(s['fielding ability'])]),
+       fieldingAbilityBonus(Number(s['fielding ability']))),
      running:Math.max(0,Math.min(100,Number(s.speed)||0)),
      role:pitcherPriorityFor(player,stats[id])?.code||'other'
    };

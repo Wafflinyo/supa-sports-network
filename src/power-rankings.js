@@ -8,7 +8,8 @@ import {validLineup} from './season-data.js';
 // Offense: charge power 40%, trajectory 25%, slap power 20%, slap contact 7%, charge contact 8%.
 // High trajectory > Medium > Low. The display-stat rating bars are not used.
 // Evaluate all nine starters for offense, defense, running and chemistry.
-// Special baserunning abilities enhance offense; fielding abilities enhance defense.
+// Special baserunning abilities enhance offense; fielding abilities use each saved defensive position.
+// Middle-infield catchers receive a paired bonus when both 2B and SS have active catches.
 // Saved batting order and defensive positions supply situational chemistry bonuses.
 // Neutral LF/RF-to-CF incurs -6 because buddy jump requires a chemistry link.
 // Pitching uses the default lineup's designated P first, plus the best
@@ -31,14 +32,56 @@ export const POWER_SUPPORT_PITCHER_COUNT=3;
 export const POWER_WEIGHTS=Object.freeze({
   offense:.60,pitching:.15,defense:.20,running:.02,chemistry:.03
 });
-// The established +12/+9/+7/+5/+3 defensive ability tiers.
-// Extended active catches share Super Dive's tier; Clamber gives no bonus in CPU vs CPU.
+// Maximum skill tiers for the standard fielding abilities.
+// Special catches and Super Jump are position-dependent (see below).
+// Clamber remains ineffective in CPU-vs-CPU play and ALWAYS scores zero.
 export const FIELDING_ABILITY_BONUSES=Object.freeze({
   0:0,1:12,2:9,3:12,4:12,5:12,6:12,7:12,8:12,9:0,
   10:3,11:5,12:7
 });
+export const SPECIAL_CATCH_ABILITY_IDS=Object.freeze([1,3,4,5,6,7,8]);
+const specialCatchIds=new Set(SPECIAL_CATCH_ABILITY_IDS);
+const defensivePositions=new Set(['P','C','1B','2B','3B','SS','LF','CF','RF']);
+export const POSITIONAL_FIELDING_ABILITY_BONUSES=Object.freeze({
+  superJump:Object.freeze({CF:9,LF:6,RF:6}),
+  specialCatch:Object.freeze({middleInfield:12,middleInfieldPairExtra:4,outfield:4,other:2})
+});
+// Clamber (ID 9) receives no bonus at any position. Catcher, pitcher,
+// first base and third base count as "other" for active special catches.
+export function fieldingAbilityBonus(abilityId,position=null,partnerAbilityId=null){
+  const id=Number(abilityId);
+  if(id===9)return 0;
+  if(id===2)return POSITIONAL_FIELDING_ABILITY_BONUSES.superJump[position]||0;
+  if(specialCatchIds.has(id)){
+    const bonus=POSITIONAL_FIELDING_ABILITY_BONUSES.specialCatch;
+    if(position==='2B'||position==='SS')
+      return bonus.middleInfield+(specialCatchIds.has(Number(partnerAbilityId))?
+        bonus.middleInfieldPairExtra:0);
+    if(['LF','CF','RF'].includes(position))return bonus.outfield;
+    return defensivePositions.has(position)?bonus.other:0;
+  }
+  return FIELDING_ABILITY_BONUSES[id]??0;
+}
+// Use the GM's saved fielding positions. Do not infer positions from
+// batting order when there is no valid full starting nine.
+export function lineupFieldingAbilityBonuses(people,starters){
+  const bonuses=new Map(people.map(p=>[p.id,fieldingAbilityBonus(p.fieldingAbilityId)]));
+  if(!Array.isArray(starters)||starters.length!==9||people.length!==9)return bonuses;
+  const byId=new Map(people.map(p=>[p.id,p]));
+  const fielded=starters.map(s=>({player:byId.get(Number(s?.player)),position:s?.position}));
+  if(fielded.some(x=>!x.player||!defensivePositions.has(x.position))||
+    new Set(fielded.map(x=>x.player.id)).size!==9||
+    new Set(fielded.map(x=>x.position)).size!==9)return bonuses;
+  const byPosition=new Map(fielded.map(x=>[x.position,x.player]));
+  for(const {player,position} of fielded){
+    const partner=position==='2B'?'SS':position==='SS'?'2B':null;
+    bonuses.set(player.id,fieldingAbilityBonus(player.fieldingAbilityId,position,
+      partner?byPosition.get(partner)?.fieldingAbilityId:null));
+  }
+  return bonuses;
+}
 export const BASERUNNING_ABILITY_BONUS=2;
-export const BATTING_CHEMISTRY_BONUSES=Object.freeze({one:2,both:4});
+export const BATTING_CHEMISTRY_BONUSES=Object.freeze({one:3,both:6});
 export const MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT=20;
 // Good and anti-chemistry both affect BOTH defenders in the pair.
 // Neutral LF/RF-to-CF is penalized because the buddy jump needs chemistry.
@@ -113,7 +156,7 @@ function scouting(id){
     pitcherPriority:pitcherPriorityFor(playerById.get(Number(id)),record)?.code||null,
     offense:offenseRating(s),
     offenseAbilityBonus:Number(s['baserunning ability'])>0?BASERUNNING_ABILITY_BONUS:0,
-    defenseAbilityBonus:FIELDING_ABILITY_BONUSES[Number(s['fielding ability'])]??0,
+    fieldingAbilityId:Number(s['fielding ability']),
     pitching:.60*numeric(s,'pitching stamina')+
       .18*pitchVelocity(s['charge pitch speed'],90,170)+
       .14*pitchVelocity(s['curveball speed'],90,155)+.08*numeric(s,'curve'),
@@ -140,6 +183,7 @@ export function rosterPowerComponents(roster,startingPitcherId=null,starters=nul
   const people=[...new Set((roster||[]).map(Number))].map(scouting).filter(Boolean);
   const pitchers=topPriorityPitchers(people,startingPitcherId);
   const linked=lineupChemistryAdjustments(people,starters);
+  const abilityBonuses=lineupFieldingAbilityBonuses(people,starters);
   const scoreChemistry=()=>{
     const pairs=people.reduce((sum,p,i)=>sum+people.slice(i+1).reduce((sub,q)=>{
       const bonus=p.good.has(q.id)||q.good.has(p.id)||
@@ -152,7 +196,7 @@ export function rosterPowerComponents(roster,startingPitcherId=null,starters=nul
   const offense=average(people.map(p=>clamp(p.offense+p.offenseAbilityBonus+
     (linked.get(p.id)?.offense||0))));
   const pitching=average(pitchers.map(p=>p.pitching));
-  const defense=average(people.map(p=>clamp(p.defense+p.defenseAbilityBonus+
+  const defense=average(people.map(p=>clamp(p.defense+(abilityBonuses.get(p.id)||0)+
     (linked.get(p.id)?.defense||0))));
   const running=average(people.map(p=>p.running));
   const chemistry=scoreChemistry();
