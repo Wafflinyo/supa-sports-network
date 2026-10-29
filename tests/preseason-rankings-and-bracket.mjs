@@ -52,7 +52,7 @@ const round1=x=>Math.round(x*10)/10;
 
 const positions=['P','C','1B','2B','3B','SS','LF','CF','RF'];
 assert.equal(BASERUNNING_ABILITY_BONUS,2);
-assert.deepEqual(BATTING_CHEMISTRY_BONUSES,{one:2,both:4});
+assert.deepEqual(BATTING_CHEMISTRY_BONUSES,{one:3,both:6});
 assert.equal(MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT,20);
 assert.deepEqual(FIELDING_ABILITY_BONUSES,{
   0:0,1:12,2:9,3:12,4:12,5:12,6:12,7:12,8:12,9:0,10:3,11:5,12:7
@@ -141,7 +141,7 @@ at(joined,'CF').conditional.add(at(joined,'RF').id);
 assert.equal(bonus(joined,'LF').defense,8);
 assert.equal(bonus(joined,'RF').defense,8);
 assert.equal(bonus(joined,'CF').defense,16,'two buddy jump links benefit the center fielder');
-assert.equal(bonus(joined,'CF').offense,4,'batting neighbors on both sides add four offense');
+assert.equal(bonus(joined,'CF').offense,6,'batting neighbors on both sides add six offense');
 const antiBuddy=fakePeople();
 at(antiBuddy,'LF').bad.add(at(antiBuddy,'CF').id);
 assert.equal(bonus(antiBuddy,'LF').defense,-6,'anti LF-to-CF is minus six');
@@ -157,11 +157,11 @@ for(const link of DEFENSIVE_CHEMISTRY_LINKS.filter(x=>x.neutral===0)){
 const batting=fakePeople();
 at(batting,'P').good.add(at(batting,'RF').id); // Ninth hitter wraps to first
 at(batting,'C').good.add(at(batting,'P').id);
-assert.equal(bonus(batting,'P').offense,4,'two good neighboring batters');
-assert.equal(bonus(batting,'RF').offense,2,'ninth is adjacent to first');
-assert.equal(bonus(batting,'C').offense,2,'one good neighboring batter');
+assert.equal(bonus(batting,'P').offense,6,'two good neighboring batters');
+assert.equal(bonus(batting,'RF').offense,3,'ninth is adjacent to first');
+assert.equal(bonus(batting,'C').offense,3,'one good neighboring batter');
 at(batting,'P').bad.add(at(batting,'RF').id);
-assert.equal(bonus(batting,'P').offense,2,'anti batting chemistry gives no extra penalty');
+assert.equal(bonus(batting,'P').offense,3,'anti batting chemistry gives no extra penalty');
 assert.equal(bonus(batting,'RF').offense,0,'anti batting chemistry must not subtract offense');
 assert.equal(lineupChemistryAdjustments(neutralNine,null).get(7).defense,0,
  'no saved defensive positions means no arbitrary chemistry penalties');
