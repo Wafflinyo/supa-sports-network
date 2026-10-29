@@ -4,7 +4,7 @@ import {pitcherPriorityFor} from './player-roles.js';
 import {validLineup} from './season-data.js';
 
 // Transparent roster-only preseason projection. No in-game menu/display bars.
-// 50% offense, 15% pitching, 25% defense, 5% running, 5% chemistry.
+// 60% offense, 15% pitching, 20% defense, 2% running, 3% chemistry.
 // Offense: charge power 40%, trajectory 25%, slap power 20%, slap contact 7%, charge contact 8%.
 // High trajectory > Medium > Low. The display-stat rating bars are not used.
 // Evaluate all nine starters for offense, defense, running and chemistry.
@@ -26,7 +26,7 @@ export const PITCHER_PRIORITY_ORDER=Object.freeze({P1P:1,P2P:2,other:3});
 export const POWER_PITCHER_COUNT=4;
 export const POWER_SUPPORT_PITCHER_COUNT=3;
 export const POWER_WEIGHTS=Object.freeze({
-  offense:.50,pitching:.15,defense:.25,running:.05,chemistry:.05
+  offense:.60,pitching:.15,defense:.20,running:.02,chemistry:.03
 });
 export const TRAJECTORY_OFFENSE_WEIGHT=.25;
 export const TRAJECTORY_SCORES=Object.freeze({High:100,Medium:60,Low:20});
