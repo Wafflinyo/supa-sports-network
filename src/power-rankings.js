@@ -9,7 +9,7 @@ import {validLineup} from './season-data.js';
 // High trajectory > Medium > Low. The display-stat rating bars are not used.
 // Evaluate all nine starters for offense, defense, running and chemistry.
 // Special baserunning abilities enhance offense; fielding abilities use each saved defensive position.
-// Middle-infield catchers receive a paired bonus when both 2B and SS have active catches.
+// Active catches earn +12 at either 2B or SS, without a paired-position bonus.
 // Saved batting order and defensive positions supply situational chemistry bonuses.
 // Neutral LF/RF-to-CF incurs -6 because buddy jump requires a chemistry link.
 // Pitching uses the default lineup's designated P first, plus the best
@@ -43,20 +43,20 @@ export const SPECIAL_CATCH_ABILITY_IDS=Object.freeze([1,3,4,5,6,7,8]);
 const specialCatchIds=new Set(SPECIAL_CATCH_ABILITY_IDS);
 const defensivePositions=new Set(['P','C','1B','2B','3B','SS','LF','CF','RF']);
 export const POSITIONAL_FIELDING_ABILITY_BONUSES=Object.freeze({
-  superJump:Object.freeze({CF:9,LF:6,RF:6}),
-  specialCatch:Object.freeze({middleInfield:12,middleInfieldPairExtra:4,outfield:4,other:2})
+  superJump:Object.freeze({CF:9,LF:6,RF:6,other:2}),
+  specialCatch:Object.freeze({middleInfield:12,outfield:5,other:2})
 });
-// Clamber (ID 9) receives no bonus at any position. Catcher, pitcher,
+// Clamber (ID 9) receives no bonus at any position. Super Jump receives +2
+// away from the outfield. Catcher, pitcher,
 // first base and third base count as "other" for active special catches.
-export function fieldingAbilityBonus(abilityId,position=null,partnerAbilityId=null){
+export function fieldingAbilityBonus(abilityId,position=null){
   const id=Number(abilityId);
   if(id===9)return 0;
-  if(id===2)return POSITIONAL_FIELDING_ABILITY_BONUSES.superJump[position]||0;
+  if(id===2)return POSITIONAL_FIELDING_ABILITY_BONUSES.superJump[position]??
+    (defensivePositions.has(position)?POSITIONAL_FIELDING_ABILITY_BONUSES.superJump.other:0);
   if(specialCatchIds.has(id)){
     const bonus=POSITIONAL_FIELDING_ABILITY_BONUSES.specialCatch;
-    if(position==='2B'||position==='SS')
-      return bonus.middleInfield+(specialCatchIds.has(Number(partnerAbilityId))?
-        bonus.middleInfieldPairExtra:0);
+    if(position==='2B'||position==='SS')return bonus.middleInfield;
     if(['LF','CF','RF'].includes(position))return bonus.outfield;
     return defensivePositions.has(position)?bonus.other:0;
   }
@@ -72,11 +72,8 @@ export function lineupFieldingAbilityBonuses(people,starters){
   if(fielded.some(x=>!x.player||!defensivePositions.has(x.position))||
     new Set(fielded.map(x=>x.player.id)).size!==9||
     new Set(fielded.map(x=>x.position)).size!==9)return bonuses;
-  const byPosition=new Map(fielded.map(x=>[x.position,x.player]));
   for(const {player,position} of fielded){
-    const partner=position==='2B'?'SS':position==='SS'?'2B':null;
-    bonuses.set(player.id,fieldingAbilityBonus(player.fieldingAbilityId,position,
-      partner?byPosition.get(partner)?.fieldingAbilityId:null));
+    bonuses.set(player.id,fieldingAbilityBonus(player.fieldingAbilityId,position));
   }
   return bonuses;
 }
