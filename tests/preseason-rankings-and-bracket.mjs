@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {preseasonReady,preseasonSeeds,preseasonBracket,preseasonHasLeagueOpener} from '../src/preseason.js';
-import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,offenseRating,rosterPowerComponents,rankingParticipants,PITCHER_PRIORITY_ORDER,POWER_PITCHER_COUNT,POWER_SUPPORT_PITCHER_COUNT} from '../src/power-rankings.js';
+import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,offenseRating,rosterPowerComponents,rankingParticipants,PITCHER_PRIORITY_ORDER,POWER_PITCHER_COUNT,POWER_SUPPORT_PITCHER_COUNT,FIELDING_ABILITY_BONUSES,BASERUNNING_ABILITY_BONUS,BATTING_CHEMISTRY_BONUSES,DEFENSIVE_CHEMISTRY_LINKS,MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT,lineupChemistryAdjustments} from '../src/power-rankings.js';
 import {pitcherPriorityFor} from '../src/player-roles.js';
 import {earnedAchievements,GM_ACHIEVEMENTS} from '../src/gm-achievements.js';
 
@@ -49,6 +49,75 @@ const balancedNames=['Mario','Luigi','Peach','Daisy','Yoshi','Diddy Kong',
 const powerIds=powerNames.map(n=>byName.get(n).id);
 const balancedIds=balancedNames.map(n=>byName.get(n).id);
 const round1=x=>Math.round(x*10)/10;
+
+const positions=['P','C','1B','2B','3B','SS','LF','CF','RF'];
+assert.equal(BASERUNNING_ABILITY_BONUS,2);
+assert.deepEqual(BATTING_CHEMISTRY_BONUSES,{one:2,both:4});
+assert.equal(MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT,20);
+assert.deepEqual(FIELDING_ABILITY_BONUSES,{
+  0:0,1:12,2:9,3:12,4:12,5:12,6:12,7:12,8:12,9:12,10:3,11:5,12:7
+});
+assert.equal(DEFENSIVE_CHEMISTRY_LINKS.length,13);
+const expectedDefensiveLinks={
+ 'LF-CF':[8,-6,-6],'RF-CF':[8,-6,-6],
+ 'SS-1B':[6,-4,0],'2B-3B':[5,-4,0],
+ 'LF-1B':[3,-3,0],'CF-1B':[3,-3,0],'RF-1B':[3,-3,0],
+ 'LF-3B':[2,-3,0],'CF-3B':[2,-3,0],'RF-3B':[2,-3,0],
+ 'LF-C':[1,-1,0],'CF-C':[1,-1,0],'RF-C':[1,-1,0]
+};
+assert.deepEqual(Object.fromEntries(DEFENSIVE_CHEMISTRY_LINKS.map(x=>[
+  x.a+'-'+x.b,[x.good,x.bad,x.neutral]])),expectedDefensiveLinks,
+  'field chemistry preserves the ordered boosts and reduced anti-chem penalties');
+const fakePeople=()=>positions.map((position,i)=>({
+  id:i+1,good:new Set(),bad:new Set(),conditional:new Set()
+}));
+const fakeStarters=positions.map((position,i)=>({player:i+1,position}));
+const at=(people,position)=>people[positions.indexOf(position)];
+const bonus=(people,position)=>lineupChemistryAdjustments(people,fakeStarters)
+  .get(at(people,position).id);
+const neutralNine=fakePeople();
+assert.equal(bonus(neutralNine,'LF').defense,-6,'neutral LF-CF prevents buddy jump');
+assert.equal(bonus(neutralNine,'RF').defense,-6,'neutral RF-CF prevents buddy jump');
+assert.equal(bonus(neutralNine,'CF').defense,-12,'CF has two separate neutral buddy-jump links');
+assert.equal(bonus(neutralNine,'SS').defense,0,'all other neutral links are harmless');
+assert.equal(bonus(neutralNine,'1B').defense,0,'neutral 1B connection must not subtract');
+assert.equal(bonus(neutralNine,'C').defense,0,'neutral home connection must not subtract');
+const joined=fakePeople();
+at(joined,'LF').good.add(at(joined,'CF').id);
+at(joined,'CF').conditional.add(at(joined,'RF').id);
+assert.equal(bonus(joined,'LF').defense,8);
+assert.equal(bonus(joined,'RF').defense,8);
+assert.equal(bonus(joined,'CF').defense,16,'two buddy jump links benefit the center fielder');
+assert.equal(bonus(joined,'CF').offense,4,'batting neighbors on both sides add four offense');
+const antiBuddy=fakePeople();
+at(antiBuddy,'LF').bad.add(at(antiBuddy,'CF').id);
+assert.equal(bonus(antiBuddy,'LF').defense,-6,'anti LF-to-CF is minus six');
+assert.equal(bonus(antiBuddy,'CF').defense,-12,'bad LF + neutral RF are each minus six');
+for(const link of DEFENSIVE_CHEMISTRY_LINKS.filter(x=>x.neutral===0)){
+ const bad=fakePeople();
+ at(bad,link.a).bad.add(at(bad,link.b).id);
+ const aDelta=bonus(bad,link.a).defense-bonus(neutralNine,link.a).defense;
+ const bDelta=bonus(bad,link.b).defense-bonus(neutralNine,link.b).defense;
+ assert.equal(aDelta,link.bad,'anti link penalty on '+link.a+' to '+link.b);
+ assert.equal(bDelta,link.bad,'anti link penalty on '+link.b+' to '+link.a);
+}
+const batting=fakePeople();
+at(batting,'P').good.add(at(batting,'RF').id); // Ninth hitter wraps to first
+at(batting,'C').good.add(at(batting,'P').id);
+assert.equal(bonus(batting,'P').offense,4,'two good neighboring batters');
+assert.equal(bonus(batting,'RF').offense,2,'ninth is adjacent to first');
+assert.equal(bonus(batting,'C').offense,2,'one good neighboring batter');
+at(batting,'P').bad.add(at(batting,'RF').id);
+assert.equal(bonus(batting,'P').offense,2,'anti batting chemistry gives no extra penalty');
+assert.equal(bonus(batting,'RF').offense,0,'anti batting chemistry must not subtract offense');
+assert.equal(lineupChemistryAdjustments(neutralNine,null).get(7).defense,0,
+ 'no saved defensive positions means no arbitrary chemistry penalties');
+// Links at LF and RF should never be double-counted through a direct LF-RF edge.
+const unrelated=fakePeople();
+at(unrelated,'LF').good.add(at(unrelated,'RF').id);
+assert.equal(bonus(unrelated,'LF').defense,-6);
+assert.equal(bonus(unrelated,'RF').defense,-6);
+
 const pitchRaw=(s)=>{
  const clamp100=x=>Math.max(0,Math.min(100,x));
  return .60*clamp100(Number(s['pitching stamina'])||0)+
@@ -64,9 +133,11 @@ for(const names of [powerNames,balancedNames]){
  const members=ids.map(id=>{
    const s=stats[id].stats,player=gamePlayers.find(p=>p.id===id);
    return {
-     id,offense:offenseRating(s),pitch:pitchRaw(s),
-     defense:.60*Math.max(0,Math.min(100,Number(s.fielding)||0))+
-       .40*Math.max(0,Math.min(100,Number(s['outfield throwing speed'])||0)),
+     id,offense:Math.min(100,offenseRating(s)+
+       (Number(s['baserunning ability'])>0?BASERUNNING_ABILITY_BONUS:0)),pitch:pitchRaw(s),
+     defense:Math.min(100,.60*Math.max(0,Math.min(100,Number(s.fielding)||0))+
+       .40*Math.max(0,Math.min(100,Number(s['outfield throwing speed'])||0))+
+       FIELDING_ABILITY_BONUSES[Number(s['fielding ability'])]),
      running:Math.max(0,Math.min(100,Number(s.speed)||0)),
      role:pitcherPriorityFor(player,stats[id])?.code||'other'
    };
@@ -135,7 +206,6 @@ assert(!p1pStarter.selectedPitchers.slice(1).some(p=>p.id===warioId),
 assert.equal(rosterPowerComponents([warioId],warioId).selectedPitchers.length,1,
   'short rosters do not invent backups');
 
-const positions=['P','C','1B','2B','3B','SS','LF','CF','RF'];
 const lineupSeason={rosters:{test:powerIds.concat([balancedIds[0],balancedIds[1]])},defaults:{}};
 assert.deepEqual(rankingParticipants(lineupSeason,'test'),[],
   'NO DEFAULT LINEUP means no Power Index score, even with eleven drafted players');
