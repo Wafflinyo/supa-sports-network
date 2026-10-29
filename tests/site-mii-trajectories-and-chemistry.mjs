@@ -50,8 +50,9 @@ assert(draft.includes('<PlayerDataDetails player={selected} seasons={l.seasons}/
   'selected draft player modal inherits cleaned-up rating-free details');
 assert(team.includes("['hit trajectory']")&&team.includes('my-draft-team-trajectory'),
   'GM My Team roster cards show accurate hit trajectory');
-assert(team.includes('<PlayerDataDetails player={active} seasons={l.seasons}/>'),
-  'GM My Team details share rating-free player view');
+assert(team.includes('<PlayerProfileLink player={player}')&&
+  read('src/PlayerProfile.jsx').includes('<PlayerDataDetails player={player} seasons={fullSeasons}/>'),
+  'GM My Team player cards open shared career profiles with cleaned-up rating-free scouting');
 assert(priority.includes("record?.stats?.['displayed pitching']"),
   'P2P eligibility must still use actual underlying pitching rating');
 assert(priorityLabel.includes('pitcherPriorityFor(player, gameData.players[player.id])'),
