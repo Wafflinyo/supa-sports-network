@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {originalPlayerDraft,teamDraftedPlayers,sslCareerTenure,isUndraftedSigning} from '../src/draft-pedigree.js';
-import {draftPedigreeVisible} from '../src/DraftPickBadge.jsx';
+import {originalPlayerDraft,teamDraftedPlayers,sslCareerTenure,isUndraftedSigning,draftPedigreeVisible} from '../src/draft-pedigree.js';
 
 const player1=1,player2=2;
 const season1={
