@@ -17,7 +17,9 @@ assert(migration.includes("g->>'startsAt' is null"),'publishing must skip undate
 assert(migration.includes("if coalesce((st->>'schedulePublished')::boolean,false) then"),
   'subsequent dated matchups synchronize locks after public publication');
 assert(migration.includes('execute replace(core_src,old_core,new_core)')&&
-  migration.includes('execute replace(calendar_src,old_calendar,new_calendar)'),
+  migration.includes('execute replace(calendar_src,old_calendar,new_calendar)')&&
+  migration.includes('elsif strpos(core_src,new_core)=0')&&
+  migration.includes('elsif strpos(calendar_src,new_calendar)=0'),
   'migration should patch only existing calendar/lock functions');
 
 console.log('PASS: public undated fixtures and DB fantasy locks skip TBD matchups; assigning dates activates locks');
