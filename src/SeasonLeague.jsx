@@ -1571,9 +1571,13 @@ function ReportImport({ league: l, game, onDone }) {
       <p>
         Map team labels and any ambiguous Mii/name rows. Add an "Item Score"
         column at the end of the Project Rio Stats worksheet. The site
-        automatically scores the game's batting, defense and pitching stats,
-        adds Item Score (blank means 0), and grants Heating Up at {HEATING_UP_THRESHOLD}+.
-        Corrected reports replace prior totals and hot streak results.
+        automatically scores batting, defense and pitching, adds Item Score
+        (blank means 0), awards +10 for the selected match MVP, and grants
+        Heating Up at {HEATING_UP_THRESHOLD}+. Pitching receives +3 per full
+        scoreless inning, -3 per earned run, -10 per HR allowed and +5 for a
+        complete game. Enter scoreless innings for pitchers who allowed runs;
+        Rio's aggregate data cannot determine them. Corrected reports
+        replace prior totals and hot streak results.
       </p>
       <input
         type="file"
@@ -1592,6 +1596,7 @@ function ReportImport({ league: l, game, onDone }) {
               pool,
             );
             setPreview(p);
+            setMvp("");
             setAwayLabel(p.labels[0]);
           } catch (e) {
             setError(e.message);
@@ -1633,7 +1638,7 @@ function ReportImport({ league: l, game, onDone }) {
                       <td>{r.player}</td>
                       <td>{r.label}</td>
                       <td>{r.itemscore === '' ? 0 : r.itemscore ?? 0}</td>
-                      <td>{(() => {try{const score=previewCustomGameScore(preview,r);
+                      <td>{(() => {try{const score=previewCustomGameScore(preview,r,mvp);
                         return <><strong>{score.gameScore}</strong>{score.heatingUp?' ★':''}</>;
                       }catch(e){return <span title={e.message}>Check stats</span>}})()}</td>
                       <td>
@@ -1671,7 +1676,11 @@ function ReportImport({ league: l, game, onDone }) {
           <h4>REVIEW PITCHERS</h4>
           <p>
             Assign each pitching row to one player. Two Miis with the same
-            report name must be mapped separately.
+            report name must be mapped separately. Scoreless innings count
+            only complete innings without any runs; zero-run appearances are
+            pre-filled. Enter the exact number for any pitcher who allowed
+            runs. Mark Complete Game only if that pitcher finished the entire
+            game without relief pitching.
           </p>
           <div className="season-table">
             <table>
@@ -1681,6 +1690,10 @@ function ReportImport({ league: l, game, onDone }) {
                   <th>Team</th>
                   <th>IP</th>
                   <th>K</th>
+                  <th>ER</th>
+                  <th>HR allowed</th>
+                  <th>Scoreless innings</th>
+                  <th>Complete game</th>
                   <th>SSL player</th>
                 </tr>
               </thead>
@@ -1693,6 +1706,22 @@ function ReportImport({ league: l, game, onDone }) {
                       <td>{r.label}</td>
                       <td>{Number(r.inningspitched).toFixed(2)}</td>
                       <td>{r.strikeouts || 0}</td>
+                      <td>{r.earnedruns || 0}</td>
+                      <td>{r.hrallowed || 0}</td>
+                      <td><input type="number" min="0" step="1"
+                        max={Math.floor(Math.round(Number(r.inningspitched||0)*3)/3)}
+                        aria-label={`Scoreless innings for ${r.player}`}
+                        value={r.scorelessinnings??""}
+                        onChange={e=>setPreview(p=>({...p,
+                          pitch:p.pitch.map((v,j)=>i===j?{...v,scorelessinnings:e.target.value}:v)
+                        }))}/></td>
+                      <td><input type="checkbox"
+                        aria-label={`Complete game by ${r.player}`}
+                        checked={Number(r.completegames)===1}
+                        disabled={preview.pitch.filter(v=>v.label===r.label).length!==1}
+                        onChange={e=>setPreview(p=>({...p,
+                          pitch:p.pitch.map((v,j)=>i===j?{...v,completegames:e.target.checked?1:0}:v)
+                        }))}/></td>
                       <td>
                         <select
                           aria-label={`Map pitcher row ${r.row}`}
@@ -1757,7 +1786,7 @@ function ReportImport({ league: l, game, onDone }) {
             disabled={
               l.busy ||
               preview.rows.some((r) => !r.chosen) ||
-              preview.pitch.some((r) => !r.chosen)
+              preview.pitch.some((r) => !r.chosen || r.scorelessinnings==='')
             }
             onClick={async () => {
               try {

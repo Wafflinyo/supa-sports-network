@@ -155,6 +155,8 @@ const counts = new Set(
         ![
           "gamesPlayed",
           "inningsPitched",
+          "scorelessInnings",
+          "completeGames",
           "battingAverage",
           "onBase",
           "slug",
@@ -273,6 +275,14 @@ export async function readRio(file, season, game, players) {
     labels,
     rows: targetRows,
     pitch: pitch.map((r) => {
+      // Rio does not include inning-by-inning runs. A zero-run pitching
+      // appearance has all complete innings scoreless; otherwise the
+      // commissioner must enter the actual number during report review.
+      const maxWholeInnings=Math.floor(Math.round(Number(r.inningspitched||0)*3)/3);
+      const scoreless=r.scorelessinnings===undefined
+        ? (Number(r.runsallowed||0)===0||maxWholeInnings===0?maxWholeInnings:'')
+        : r.scorelessinnings;
+      const complete=/^(1|yes|true)$/i.test(String(r.completegames??'').trim())?1:0;
       const matches = targetRows.filter(
         (b) =>
           normalize(b.player) === normalize(r.player) &&
@@ -280,6 +290,8 @@ export async function readRio(file, season, game, players) {
       );
       return {
         ...r,
+        scorelessinnings:scoreless,
+        completegames:complete,
         label: String(r.team || matches[0]?.label || ""),
         chosen: matches.length === 1 ? matches[0].chosen : "",
       };
@@ -308,14 +320,29 @@ export function reportRowStats(row,pitchRow=null){
     const ip=Number(pitchRow.inningspitched);
     if(!Number.isFinite(ip)||ip<0)throw Error('Invalid innings pitched.');
     stats.outs=Math.round(ip*3);
-  } else stats.outs=0;
+    const maxWhole=Math.floor(stats.outs/3);
+    const rawScoreless=pitchRow.scorelessinnings;
+    if(rawScoreless===''||rawScoreless==null){
+      if(stats.runsAllowed>0&&maxWhole>0)
+        throw Error(`${row.player}: enter the number of scoreless innings in the pitcher review; Rio only reports total runs allowed.`);
+      stats.scorelessInnings=maxWhole;
+    }else{
+      const n=Number(rawScoreless);
+      if(!Number.isInteger(n)||n<0||n>maxWhole)
+        throw Error(`${row.player}: scoreless innings must be 0–${maxWhole} completed innings.`);
+      stats.scorelessInnings=n;
+    }
+    stats.completeGames=/^(1|yes|true)$/i.test(String(pitchRow.completegames??'').trim())?1:0;
+  } else {stats.outs=0;stats.scorelessInnings=0;stats.completeGames=0;}
   return stats;
 }
-export function previewCustomGameScore(preview,row){
+export function previewCustomGameScore(preview,row,mvp=null){
   const pitching=preview.pitch.filter(p=>Number(p.chosen)&&Number(p.chosen)===Number(row.chosen)
     || (normalize(p.player)===normalize(row.player)&&(!p.team||String(p.team)===row.label)));
   if(pitching.length>1)throw Error(`Ambiguous pitching row for ${row.player}.`);
-  return customGameScore(reportRowStats(row,pitching[0]),row.itemscore===''?0:row.itemscore);
+  const stats=reportRowStats(row,pitching[0]);
+  stats.mvps=mvp!=null&&Number(row.chosen)===Number(mvp)?1:0;
+  return customGameScore(stats,row.itemscore===''?0:row.itemscore);
 }
 export function buildReport(preview, awayLabel, season, game, players, mvp) {
   const pickTeam = (r) => (r.label === awayLabel ? game.away : game.home),
@@ -348,6 +375,10 @@ export function buildReport(preview, awayLabel, season, game, players, mvp) {
   if (new Set(result.map((x) => x.player)).size !== result.length)
     throw Error("A player was mapped more than once.");
   for (const pitcher of preview.pitch) {
+    if (Number(pitcher.completegames)===1 &&
+       (preview.pitch.filter(p=>p.label===pitcher.label).length!==1 ||
+        Number(pitcher.inningspitched)<=0))
+      throw Error(`${pitcher.player}: a complete game requires that pitcher to throw the entire game, with no relief pitchers for the same team.`);
     if (
       !pitcher.chosen ||
       !result.some(
