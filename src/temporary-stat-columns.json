@@ -197,6 +197,14 @@
       "Innings Pitched"
     ],
     [
+      "scorelessInnings",
+      "Scoreless Innings"
+    ],
+    [
+      "completeGames",
+      "Complete Games"
+    ],
+    [
       "pitches",
       "Pitches"
     ],
