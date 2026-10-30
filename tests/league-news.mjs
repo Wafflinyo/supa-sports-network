@@ -5,7 +5,7 @@ const names = [{id: 1, name: 'Tropical Wiggler'}, {id: 2, name: 'Pink Noki'}];
 const teams = [{id: 'sizzlers', name: 'Beachside Sizzlers'},
   {id: 'crushers', name: 'Color Clash Crushers'}];
 const first = {
-  player: 1, team: 'sizzlers', gameScore: 95,
+  player: 1, team: 'sizzlers', gameScore: 100,
   stats: {
     homeRuns: 2, oneHr: 1, twoHr: 0, threeHr: 1, grandSlams: 0,
     runs: 3, rbi: 3, putouts: 4, assists: 2, doublePlays: 2,
