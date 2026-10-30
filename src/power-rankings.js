@@ -98,7 +98,9 @@ export const DEFENSIVE_CHEMISTRY_LINKS=Object.freeze([
   {a:'RF',b:'CF',good:8,bad:-6,neutral:-6},
   {a:'SS',b:'1B',good:6,bad:-4,neutral:0},
   {a:'2B',b:'3B',good:5,bad:-4,neutral:0},
-  ...['LF','CF','RF'].map(a=>({a,b:'1B',good:3,bad:-3,neutral:0})),
+  // First and third base form ONE symmetric link: +4 per defender, not +8.
+  {a:'1B',b:'3B',good:4,bad:0,neutral:0},
+  ...['LF','CF','RF'].map(a=>({a,b:'1B',good:2,bad:-3,neutral:0})),
   ...['LF','CF','RF'].map(a=>({a,b:'3B',good:2,bad:-3,neutral:0})),
   ...['LF','CF','RF'].map(a=>({a,b:'C',good:2,bad:-1,neutral:0}))
 ]);
