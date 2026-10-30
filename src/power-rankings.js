@@ -4,10 +4,14 @@ import {pitcherPriorityFor} from './player-roles.js';
 import {validLineup} from './season-data.js';
 
 // Transparent roster-only preseason projection. No in-game menu/display bars.
-// 60% offense, 15% pitching, 20% defense, 2% running, 3% chemistry.
-// Offense: charge power 40%, trajectory 25%, slap power 20%, slap contact 7%, charge contact 8%.
+// Overall: 65% offense, 20% defense, 15% pitching.
+// Offense: 95% of hitter skills (charge power 40%, trajectory 25%, slap power
+// 20%, slap contact 7%, charge contact 8%) plus 5% speed.
+// Defense: 92% of defensive skills (fielding 60%, throw speed 40%) plus 8% speed.
 // High trajectory > Medium > Low. The display-stat rating bars are not used.
-// Evaluate all nine starters for offense, defense, running and chemistry.
+// Evaluate all nine starters for offense and defense; speed enters both.
+// Chemistry applies through the saved batting order and defensive positions,
+// not as a separate overall score.
 // Special baserunning abilities enhance offense; fielding abilities use each saved defensive position.
 // Active catches earn +12 at either 2B or SS, without a paired-position bonus.
 // Saved batting order and defensive positions supply situational chemistry bonuses.
@@ -30,8 +34,12 @@ export const PITCHER_PRIORITY_ORDER=Object.freeze({P1P:1,P2P:2,other:3});
 export const POWER_PITCHER_COUNT=4;
 export const POWER_SUPPORT_PITCHER_COUNT=3;
 export const POWER_WEIGHTS=Object.freeze({
-  offense:.60,pitching:.15,defense:.20,running:.02,chemistry:.03
+  offense:.65,pitching:.15,defense:.20
 });
+// Blend speed into the base skill score before applying the existing
+// situational chemistry and special-ability bonuses.
+export const OFFENSE_SPEED_WEIGHT=.05;
+export const DEFENSE_SPEED_WEIGHT=.08;
 // Maximum skill tiers for the standard fielding abilities.
 // Special catches and Super Jump are position-dependent (see below).
 // Clamber remains ineffective in CPU-vs-CPU play and ALWAYS scores zero.
@@ -208,27 +216,17 @@ export function rosterPowerComponents(roster,startingPitcherId=null,starters=nul
   const pitchers=topPriorityPitchers(people,startingPitcherId);
   const linked=lineupChemistryAdjustments(people,starters);
   const abilityBonuses=lineupFieldingAbilityBonuses(people,starters);
-  const scoreChemistry=()=>{
-    const pairs=people.reduce((sum,p,i)=>sum+people.slice(i+1).reduce((sub,q)=>{
-      const bonus=p.good.has(q.id)||q.good.has(p.id)||
-        p.conditional.has(q.id)||q.conditional.has(p.id);
-      const penalty=p.bad.has(q.id)||q.bad.has(p.id);
-      return sub+(bonus?1:0)-(penalty?1:0);
-    },0),0);
-    return clamp(50+12*pairs/Math.max(1,people.length),15,85);
-  };
-  const offense=average(people.map(p=>clamp(p.offense+p.offenseAbilityBonus+
-    (linked.get(p.id)?.offense||0))));
+  const offense=average(people.map(p=>clamp(
+    (1-OFFENSE_SPEED_WEIGHT)*p.offense+OFFENSE_SPEED_WEIGHT*p.running+
+    p.offenseAbilityBonus+(linked.get(p.id)?.offense||0))));
   const pitching=average(pitchers.map(p=>p.pitching));
-  const defense=average(people.map(p=>clamp(p.defense+(abilityBonuses.get(p.id)||0)+
-    (linked.get(p.id)?.defense||0))));
-  const running=average(people.map(p=>p.running));
-  const chemistry=scoreChemistry();
-  const rosterScore=POWER_WEIGHTS.offense*offense+POWER_WEIGHTS.pitching*pitching+
-    POWER_WEIGHTS.defense*defense+POWER_WEIGHTS.running*running+
-    POWER_WEIGHTS.chemistry*chemistry;
+  const defense=average(people.map(p=>clamp(
+    (1-DEFENSE_SPEED_WEIGHT)*p.defense+DEFENSE_SPEED_WEIGHT*p.running+
+    (abilityBonuses.get(p.id)||0)+(linked.get(p.id)?.defense||0))));
+  const rosterScore=POWER_WEIGHTS.offense*offense+
+    POWER_WEIGHTS.pitching*pitching+POWER_WEIGHTS.defense*defense;
   return {offense:round(offense),pitching:round(pitching),defense:round(defense),
-    running:round(running),chemistry:round(chemistry),rosterScore,
+    rosterScore,
     rosterSize:people.length,selectedPitchers:pitchers
       .map(p=>({id:p.id,role:p.pitcherPriority||'other',pitching:round(p.pitching)}))};
 }

@@ -1,13 +1,17 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {preseasonReady,preseasonSeeds,preseasonBracket,preseasonHasLeagueOpener} from '../src/preseason.js';
-import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,offenseRating,rosterPowerComponents,rankingParticipants,PITCHER_PRIORITY_ORDER,POWER_PITCHER_COUNT,POWER_SUPPORT_PITCHER_COUNT,FIELDING_ABILITY_BONUSES,BASERUNNING_ABILITY_BONUS,BATTING_CHEMISTRY_BONUSES,DEFENSIVE_CHEMISTRY_LINKS,MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT,UNLISTED_FIELDING_CHEMISTRY_BONUS,lineupChemistryAdjustments,fieldingAbilityBonus,lineupFieldingAbilityBonuses,POSITIONAL_FIELDING_ABILITY_BONUSES,SPECIAL_CATCH_ABILITY_IDS,MISSING_MIDDLE_INFIELD_CATCH_PENALTY} from '../src/power-rankings.js';
+import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,offenseRating,rosterPowerComponents,rankingParticipants,PITCHER_PRIORITY_ORDER,POWER_PITCHER_COUNT,POWER_SUPPORT_PITCHER_COUNT,FIELDING_ABILITY_BONUSES,BASERUNNING_ABILITY_BONUS,BATTING_CHEMISTRY_BONUSES,DEFENSIVE_CHEMISTRY_LINKS,MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT,UNLISTED_FIELDING_CHEMISTRY_BONUS,lineupChemistryAdjustments,fieldingAbilityBonus,lineupFieldingAbilityBonuses,POSITIONAL_FIELDING_ABILITY_BONUSES,SPECIAL_CATCH_ABILITY_IDS,MISSING_MIDDLE_INFIELD_CATCH_PENALTY,OFFENSE_SPEED_WEIGHT,DEFENSE_SPEED_WEIGHT} from '../src/power-rankings.js';
 import {pitcherPriorityFor} from '../src/player-roles.js';
 import {earnedAchievements,GM_ACHIEVEMENTS} from '../src/gm-achievements.js';
 
-// Explicit scoring contract: offense dominates (60%), defense outranks
-// pitching, and otherwise-identical batters rank High > Medium > Low.
-assert.deepEqual(POWER_WEIGHTS,{offense:.60,pitching:.15,defense:.20,running:.02,chemistry:.03});
+// Offense dominates at 65%, defense remains 20%, pitching stays 15%.
+// Running and chemistry are no longer standalone composite categories.
+assert.deepEqual(POWER_WEIGHTS,{offense:.65,pitching:.15,defense:.20});
+assert.equal(OFFENSE_SPEED_WEIGHT,.05);
+assert.equal(DEFENSE_SPEED_WEIGHT,.08);
+assert.equal(POWER_WEIGHTS.running,undefined);
+assert.equal(POWER_WEIGHTS.chemistry,undefined);
 assert(POWER_WEIGHTS.offense>POWER_WEIGHTS.defense+POWER_WEIGHTS.pitching,
   'offense must outweigh defense and pitching combined');
 assert.equal(Object.values(POWER_WEIGHTS).reduce((sum,n)=>sum+n,0),1);
@@ -277,13 +281,15 @@ for(const names of [powerNames,balancedNames]){
  assert.equal(ranked.rosterSize,9);
  const members=ids.map(id=>{
    const s=stats[id].stats,player=gamePlayers.find(p=>p.id===id);
+   const running=Math.max(0,Math.min(100,Number(s.speed)||0));
+   const defenseSkills=.60*Math.max(0,Math.min(100,Number(s.fielding)||0))+
+     .40*Math.max(0,Math.min(100,Number(s['outfield throwing speed'])||0));
    return {
-     id,offense:Math.min(100,offenseRating(s)+
+     id,offense:Math.min(100,.95*offenseRating(s)+.05*running+
        (Number(s['baserunning ability'])>0?BASERUNNING_ABILITY_BONUS:0)),pitch:pitchRaw(s),
-     defense:Math.min(100,.60*Math.max(0,Math.min(100,Number(s.fielding)||0))+
-       .40*Math.max(0,Math.min(100,Number(s['outfield throwing speed'])||0))+
+     defense:Math.min(100,.92*defenseSkills+.08*running+
        fieldingAbilityBonus(Number(s['fielding ability']))),
-     running:Math.max(0,Math.min(100,Number(s.speed)||0)),
+     running,
      role:pitcherPriorityFor(player,stats[id])?.code||'other'
    };
  });
@@ -291,15 +297,16 @@ for(const names of [powerNames,balancedNames]){
  const selected=[members[0],...[...members.slice(1)].sort((a,b)=>
    PITCHER_PRIORITY_ORDER[a.role]-PITCHER_PRIORITY_ORDER[b.role]||
    b.pitch-a.pitch||a.id-b.id).slice(0,3)];
- assert.equal(ranked.offense,round1(avg('offense')),'every offensive player counts');
- assert.equal(ranked.defense,round1(avg('defense')),'every defender counts');
- assert.equal(ranked.running,round1(avg('running')),'all nine runners count');
- // The composite must use exactly the requested coefficients, without
- // changing underlying player ratings or the selected starting pitcher.
- const expectedScore=.60*ranked.offense+.20*ranked.defense+
-   .15*ranked.pitching+.02*ranked.running+.03*ranked.chemistry;
- assert(Math.abs(ranked.rosterScore-expectedScore)<.051,
-   'rankings must weight offense 60%, defense 20%, pitching 15%, running 2%, chemistry 3%');
+ assert.equal(ranked.offense,round1(avg('offense')),'all nine hitters include 5% speed');
+ assert.equal(ranked.defense,round1(avg('defense')),'all nine defenders include 8% speed');
+ assert.equal(ranked.running,undefined,'there is no separate running category');
+ assert.equal(ranked.chemistry,undefined,'there is no separate chemistry category');
+ // The composite uses exactly three categories and is calculated from the
+ // unrounded components, leaving pitching priority and chemistry bonuses intact.
+ const expectedScore=.65*avg('offense')+.20*avg('defense')+
+   .15*selected.reduce((sum,p)=>sum+p.pitch,0)/4;
+ assert(Math.abs(ranked.rosterScore-expectedScore)<.001,
+   'overall score must be 65% offense, 20% defense, 15% pitching');
  assert.equal(ranked.pitching,round1(selected.reduce((sum,p)=>sum+p.pitch,0)/4),
    'GM-selected starter and three backups determine pitching rating equally');
  assert.deepEqual(ranked.selectedPitchers.map(p=>p.id),selected.map(p=>p.id),
@@ -316,11 +323,9 @@ for(const names of [powerNames,balancedNames]){
  const withoutNinth=rosterPowerComponents(ids.slice(0,8));
  assert.notEqual(ranked.offense,withoutNinth.offense);
  assert.notEqual(ranked.defense,withoutNinth.defense);
- assert.notEqual(ranked.running,withoutNinth.running);
  console.log('Example nine-player power index',names[0],JSON.stringify({
    overall:round1(ranked.rosterScore),offense:ranked.offense,
    defense:ranked.defense,pitching:ranked.pitching,
-   running:ranked.running,chemistry:ranked.chemistry,
    selectedPitchers:ranked.selectedPitchers.map(x=>({
      name:gamePlayers.find(p=>p.id===x.id)?.name,role:x.role,pitching:x.pitching
    }))
