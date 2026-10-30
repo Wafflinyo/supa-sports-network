@@ -139,11 +139,12 @@ assert.equal(missingBothBonuses.get(missingBoth[positions.indexOf('1B')].id),0,
   'other field positions must not receive a missing-catch penalty');
 assert.equal([...missingBothBonuses.values()].reduce((sum,x)=>sum+x,0),-24,
   'both missing special catches combine to minus twenty-four total rating points');
-assert.equal(DEFENSIVE_CHEMISTRY_LINKS.length,13);
+assert.equal(DEFENSIVE_CHEMISTRY_LINKS.length,14);
 const expectedDefensiveLinks={
  'LF-CF':[8,-6,-6],'RF-CF':[8,-6,-6],
  'SS-1B':[6,-4,0],'2B-3B':[5,-4,0],
- 'LF-1B':[3,-3,0],'CF-1B':[3,-3,0],'RF-1B':[3,-3,0],
+ '1B-3B':[4,0,0],
+ 'LF-1B':[2,-3,0],'CF-1B':[2,-3,0],'RF-1B':[2,-3,0],
  'LF-3B':[2,-3,0],'CF-3B':[2,-3,0],'RF-3B':[2,-3,0],
  'LF-C':[2,-1,0],'CF-C':[2,-1,0],'RF-C':[2,-1,0]
 };
@@ -171,6 +172,31 @@ assert.equal(bonus(joined,'LF').defense,8);
 assert.equal(bonus(joined,'RF').defense,8);
 assert.equal(bonus(joined,'CF').defense,16,'two buddy jump links benefit the center fielder');
 assert.equal(bonus(joined,'CF').offense,6,'batting neighbors on both sides add six offense');
+const firstThird=fakePeople();
+at(firstThird,'1B').good.add(at(firstThird,'3B').id);
+at(firstThird,'3B').good.add(at(firstThird,'1B').id);
+assert.equal(bonus(firstThird,'1B').defense,4,
+  '1B receives +4 once from 3B despite reciprocal chemistry data');
+assert.equal(bonus(firstThird,'3B').defense,4,
+  '3B receives +4 once from 1B despite reciprocal chemistry data');
+assert.equal(bonus(firstThird,'2B').defense,0,
+  'adding the first-to-third link does not affect an unrelated fielder');
+const firstThirdAnti=fakePeople();
+at(firstThirdAnti,'1B').bad.add(at(firstThirdAnti,'3B').id);
+assert.equal(bonus(firstThirdAnti,'1B').defense,0,
+  'new first-to-third priority link has no unrequested anti-chemistry penalty');
+assert.equal(bonus(firstThirdAnti,'3B').defense,0,
+  'new first-to-third priority link has no unrequested anti-chemistry penalty');
+const outfieldFirst=fakePeople();
+at(outfieldFirst,'LF').good.add(at(outfieldFirst,'1B').id);
+assert.equal(bonus(outfieldFirst,'1B').defense,2,
+  'good outfield-to-first chemistry is +2, not the previous +3 or generic +1');
+assert.equal(bonus(outfieldFirst,'LF').defense,-4,
+  'LF receives +2 for 1B while its neutral LF–CF link still costs −6');
+const outfieldFirstAnti=fakePeople();
+at(outfieldFirstAnti,'LF').bad.add(at(outfieldFirstAnti,'1B').id);
+assert.equal(bonus(outfieldFirstAnti,'1B').defense,-3,
+  'outfield-to-first anti-chemistry retains its existing -3 penalty');
 const antiBuddy=fakePeople();
 at(antiBuddy,'LF').bad.add(at(antiBuddy,'CF').id);
 assert.equal(bonus(antiBuddy,'LF').defense,-6,'anti LF-to-CF is minus six');
