@@ -1,4 +1,19 @@
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const verifySql=readFileSync(new URL('../supabase/migrations/20261029223700_ssl_pitching_game_score_and_mvp.sql',import.meta.url),'utf8');
+for(const [name,term] of Object.entries({
+ scorelessInnings:"+ 3*coalesce((score_row->'stats'->>'scorelessInnings')",
+ earnedRuns:"- 3*coalesce((score_row->'stats'->>'earnedRuns')",
+ completeGames:"+ 5*coalesce((score_row->'stats'->>'completeGames')",
+ hrAllowed:"- 10*coalesce((score_row->'stats'->>'hrAllowed')",
+ mvps:"+ 10*coalesce((score_row->'stats'->>'mvps')"
+})){
+ assert(verifySql.includes(term),'Backend must validate new scoring weight '+name);
+}
+assert(verifySql.includes("pg_get_functiondef('league_private.ssl_manage(text,uuid,jsonb)'"),
+ 'New scoring must preserve the live existing commissioner security wrapper');
+assert(!/update league_private\.ssl_season_states/.test(verifySql),
+ 'Scoring migration must never mutate existing draft, lineups or saved game data');
 import {customGameScore,SSL_GAME_SCORE_WEIGHTS,SSL_HEATING_THRESHOLD} from '../src/ssl-game-score.js';
 import {buildReport,previewCustomGameScore,aggregate} from '../src/season-data.js';
 import {heatingUpForSeason} from '../src/heating-up.js';
