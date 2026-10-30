@@ -10,7 +10,7 @@ export const SSL_GAME_SCORE_WEIGHTS=Object.freeze({
   completeGames:8,hrAllowed:-10,mvps:10,
   bobbles:-6,doublePlaysHitInto:-8,triplePlaysHitInto:-12
 });
-export const SSL_HEATING_THRESHOLD=95;
+export const SSL_HEATING_THRESHOLD=100;
 const round2=n=>Math.round((n+Number.EPSILON)*100)/100;
 export function customGameScore(stats,itemScore=0){
   const item=Number(itemScore);

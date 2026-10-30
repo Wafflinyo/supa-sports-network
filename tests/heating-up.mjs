@@ -8,7 +8,7 @@ const game=(id,day,score,stage='final')=>({
  {result:{players:[{player:7,team:'a',gameScore:score},{player:8,team:'b',gameScore:0}]}}:{})
 });
 const season={number:1,name:'Season 1',rosters:teams,games:[
- game('g1',1,95),game('g2',2,97),game('g3',3,94),game('g4',4,null,'scheduled'),game('g5',5,null,'scheduled')
+ game('g1',1,100),game('g2',2,102),game('g3',3,99),game('g4',4,null,'scheduled'),game('g5',5,null,'scheduled')
 ]};
 let r=heatingUpForSeason(season);
 assert.equal(r.players[7].heatingUpCount,2);
@@ -20,7 +20,7 @@ assert.deepEqual(r.byGame.g2.a,[7]);
 assert.deepEqual(r.byGame.g3.a,[7]);
 assert.deepEqual(r.byGame.g4.a,[]);
 const fixed=structuredClone(season);
-fixed.games[2].result.players[0].gameScore=95;
+fixed.games[2].result.players[0].gameScore=100;
 r=heatingUpForSeason(fixed);
 assert.equal(r.players[7].heatingUpCount,3);
 assert.equal(r.players[7].longestHotStreak,3);
@@ -36,7 +36,7 @@ assert.equal(career.events.length,3);
 assert.equal(heatingUpForSeason(season).players[7].heatingUpCount,2,'Original report must not be mutated');
 const preview=structuredClone(fixed);
 preview.games[3].stage='recorded';
-preview.games[3].result={players:[{player:7,team:'a',gameScore:96}]};
+preview.games[3].result={players:[{player:7,team:'a',gameScore:100}]};
 assert.deepEqual(heatingUpForSeason(preview).byGame.g5.a,[],'Public streaks must not reveal recorded results');
 assert.deepEqual(heatingUpForSeason(preview,{includeRecorded:true}).byGame.g5.a,[7],'Commissioner preview should show next-game star after upload');
-console.log('PASS: 95+ qualification, automatic next-game star, 2+ streak, longest streak, corrections and no duplicate events');
+console.log('PASS: 100+ qualification, automatic next-game star, 2+ streak, longest streak, corrections and no duplicate events');

@@ -19,7 +19,7 @@ import {customGameScore,SSL_GAME_SCORE_WEIGHTS,SSL_HEATING_THRESHOLD} from '../s
 import {buildReport,previewCustomGameScore,aggregate} from '../src/season-data.js';
 import {heatingUpForSeason} from '../src/heating-up.js';
 import {playerCareer} from '../src/player-career.js';
-assert.equal(SSL_HEATING_THRESHOLD,95);
+assert.equal(SSL_HEATING_THRESHOLD,100);
 assert.deepEqual(SSL_GAME_SCORE_WEIGHTS,{
   hits:4,runs:6,rbi:8,homeRuns:15,doubles:4,triples:6,
   twoHr:8,threeHr:12,grandSlams:15,totalBases:4,
@@ -56,12 +56,19 @@ assert.deepEqual(Object.fromEntries(Object.entries(customGameScore(sample,10).de
  putouts:5,pitchStrikeouts:15,bobbles:-6
 });
 assert.equal(customGameScore(sample).gameScore,95);
+assert.equal(customGameScore(sample).heatingUp,false,'95 points no longer qualifies');
+assert.equal(customGameScore({hits:25}).heatingUp,true,'100 qualifies exactly');
+assert.equal(customGameScore({hits:24},3.99).heatingUp,false,'99.99 is below threshold');
+assert.equal(customGameScore({hits:24},4).heatingUp,true,'100.00 is the new inclusive cutoff');
 assert.equal(customGameScore(sample,10).gameScore,105,'Item Score adds to custom raw stat score');
 assert.throws(()=>customGameScore(sample,-1),/Item Score/);
 assert.equal(customGameScore({bobbles:10}).gameScore,0,'negative totals floor at zero');
 assert.equal(customGameScore({hits:400}).gameScore,1600,'do not cap large legitimate Game Scores');
 assert.equal(customGameScore({...sample,bobbles:2},0).gameScore,89);
 assert.equal(customGameScore({...sample,bobbles:2},6).gameScore,95);
+assert.equal(customGameScore({...sample,bobbles:2},6).heatingUp,false);
+assert.equal(customGameScore({...sample,bobbles:2},11).gameScore,100);
+assert.equal(customGameScore({...sample,bobbles:2},11).heatingUp,true);
 const row={player:'Bowser',position:'P',label:'A',chosen:10,
  hits:2,runs:1,rbi:2,homeruns:1,doubles:1,'2hr':1,putouts:1,bobbles:1,
  itemscore:10};
@@ -108,14 +115,14 @@ const avg=playerCareer(10,[{id:'s1',playerStats:aggregate(season)}]);
 assert.equal(avg.gameScore,109);
 assert.equal(avg.averages.gameScore,109);
 const below={...game,id:'g0',startsAt:'2026-10-31T17:00:00Z',
-  result:{players:[{...report.players[0],gameScore:94}]}};
+  result:{players:[{...report.players[0],gameScore:99}]}};
 const hotSeason={...season,games:[below,g,{...game,id:'g2',stage:'scheduled',
  startsAt:'2026-11-02T17:00:00Z'}]};
 const heat=heatingUpForSeason(hotSeason);
 assert.equal(heat.players[10].heatingUpCount,1);
 assert.deepEqual(heat.byGame.g2.a,[10]);
 assert.deepEqual(heat.byGame.g1.a,[]);
-const corrected={...hotSeason,games:[{...below,result:{players:[{...below.result.players[0],gameScore:95}]}},g,hotSeason.games[2]]};
+const corrected={...hotSeason,games:[{...below,result:{players:[{...below.result.players[0],gameScore:100}]}},g,hotSeason.games[2]]};
 assert.equal(heatingUpForSeason(corrected).players[10].heatingUpCount,2,
  'corrected report recomputes historical qualifications, not duplicate them');
-console.log('PASS: custom 25-category Game Score, +2/IP +0.5/strike +8 CG, MVP +10, 95+ Heating Up and career totals');
+console.log('PASS: custom 25-category Game Score, +2/IP +0.5/strike +8 CG, MVP +10, 100+ Heating Up and career totals');
