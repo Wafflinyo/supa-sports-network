@@ -155,7 +155,6 @@ const counts = new Set(
         ![
           "gamesPlayed",
           "inningsPitched",
-          "scorelessInnings",
           "completeGames",
           "battingAverage",
           "onBase",
@@ -275,13 +274,8 @@ export async function readRio(file, season, game, players) {
     labels,
     rows: targetRows,
     pitch: pitch.map((r) => {
-      // Rio does not include inning-by-inning runs. A zero-run pitching
-      // appearance has all complete innings scoreless; otherwise the
-      // commissioner must enter the actual number during report review.
-      const maxWholeInnings=Math.floor(Math.round(Number(r.inningspitched||0)*3)/3);
-      const scoreless=r.scorelessinnings===undefined
-        ? (Number(r.runsallowed||0)===0||maxWholeInnings===0?maxWholeInnings:'')
-        : r.scorelessinnings;
+      // Project Rio supplies recorded strikes and IP. Convert IP to outs
+      // during reporting to score partial innings accurately.
       const complete=/^(1|yes|true)$/i.test(String(r.completegames??'').trim())?1:0;
       const matches = targetRows.filter(
         (b) =>
@@ -290,7 +284,6 @@ export async function readRio(file, season, game, players) {
       );
       return {
         ...r,
-        scorelessinnings:scoreless,
         completegames:complete,
         label: String(r.team || matches[0]?.label || ""),
         chosen: matches.length === 1 ? matches[0].chosen : "",
@@ -320,20 +313,8 @@ export function reportRowStats(row,pitchRow=null){
     const ip=Number(pitchRow.inningspitched);
     if(!Number.isFinite(ip)||ip<0)throw Error('Invalid innings pitched.');
     stats.outs=Math.round(ip*3);
-    const maxWhole=Math.floor(stats.outs/3);
-    const rawScoreless=pitchRow.scorelessinnings;
-    if(rawScoreless===''||rawScoreless==null){
-      if(stats.runsAllowed>0&&maxWhole>0)
-        throw Error(`${row.player}: enter the number of scoreless innings in the pitcher review; Rio only reports total runs allowed.`);
-      stats.scorelessInnings=maxWhole;
-    }else{
-      const n=Number(rawScoreless);
-      if(!Number.isInteger(n)||n<0||n>maxWhole)
-        throw Error(`${row.player}: scoreless innings must be 0–${maxWhole} completed innings.`);
-      stats.scorelessInnings=n;
-    }
     stats.completeGames=/^(1|yes|true)$/i.test(String(pitchRow.completegames??'').trim())?1:0;
-  } else {stats.outs=0;stats.scorelessInnings=0;stats.completeGames=0;}
+  } else {stats.outs=0;stats.completeGames=0;}
   return stats;
 }
 export function previewCustomGameScore(preview,row,mvp=null){

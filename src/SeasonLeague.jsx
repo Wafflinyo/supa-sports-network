@@ -1573,10 +1573,10 @@ function ReportImport({ league: l, game, onDone }) {
         column at the end of the Project Rio Stats worksheet. The site
         automatically scores batting, defense and pitching, adds Item Score
         (blank means 0), awards +10 for the selected match MVP, and grants
-        Heating Up at {HEATING_UP_THRESHOLD}+. Pitching receives +3 per full
-        scoreless inning, -3 per earned run, -10 per HR allowed and +5 for a
-        complete game. Enter scoreless innings for pitchers who allowed runs;
-        Rio's aggregate data cannot determine them. Corrected reports
+        Heating Up at {HEATING_UP_THRESHOLD}+. Pitching receives +2 per
+        inning pitched (including partial innings), +0.5 per strike, -3 per
+        earned run, -10 per HR allowed and +8 for a complete game. Rio
+        provides innings and strikes automatically. Corrected reports
         replace prior totals and hot streak results.
       </p>
       <input
@@ -1676,11 +1676,10 @@ function ReportImport({ league: l, game, onDone }) {
           <h4>REVIEW PITCHERS</h4>
           <p>
             Assign each pitching row to one player. Two Miis with the same
-            report name must be mapped separately. Scoreless innings count
-            only complete innings without any runs; zero-run appearances are
-            pre-filled. Enter the exact number for any pitcher who allowed
-            runs. Mark Complete Game only if that pitcher finished the entire
-            game without relief pitching.
+            report name must be mapped separately. The Pitching worksheet
+            supplies innings pitched and total strikes automatically. Mark
+            Complete Game only if that pitcher finished the entire game
+            without relief pitching.
           </p>
           <div className="season-table">
             <table>
@@ -1690,9 +1689,9 @@ function ReportImport({ league: l, game, onDone }) {
                   <th>Team</th>
                   <th>IP</th>
                   <th>K</th>
+                  <th>Strikes</th>
                   <th>ER</th>
                   <th>HR allowed</th>
-                  <th>Scoreless innings</th>
                   <th>Complete game</th>
                   <th>SSL player</th>
                 </tr>
@@ -1706,15 +1705,9 @@ function ReportImport({ league: l, game, onDone }) {
                       <td>{r.label}</td>
                       <td>{Number(r.inningspitched).toFixed(2)}</td>
                       <td>{r.strikeouts || 0}</td>
+                      <td>{r.strikes || 0}</td>
                       <td>{r.earnedruns || 0}</td>
                       <td>{r.hrallowed || 0}</td>
-                      <td><input type="number" min="0" step="1"
-                        max={Math.floor(Math.round(Number(r.inningspitched||0)*3)/3)}
-                        aria-label={`Scoreless innings for ${r.player}`}
-                        value={r.scorelessinnings??""}
-                        onChange={e=>setPreview(p=>({...p,
-                          pitch:p.pitch.map((v,j)=>i===j?{...v,scorelessinnings:e.target.value}:v)
-                        }))}/></td>
                       <td><input type="checkbox"
                         aria-label={`Complete game by ${r.player}`}
                         checked={Number(r.completegames)===1}
@@ -1786,7 +1779,7 @@ function ReportImport({ league: l, game, onDone }) {
             disabled={
               l.busy ||
               preview.rows.some((r) => !r.chosen) ||
-              preview.pitch.some((r) => !r.chosen || r.scorelessinnings==='')
+              preview.pitch.some((r) => !r.chosen)
             }
             onClick={async () => {
               try {

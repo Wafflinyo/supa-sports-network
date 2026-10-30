@@ -4,8 +4,10 @@ export const SSL_GAME_SCORE_WEIGHTS=Object.freeze({
   hits:4,runs:6,rbi:8,homeRuns:15,doubles:4,triples:6,
   twoHr:8,threeHr:12,grandSlams:15,totalBases:4,
   putouts:5,assists:4,buddyJumpPutouts:15,doublePlays:8,triplePlays:18,
-  pitchStrikeouts:15,scorelessInnings:3,earnedRuns:-3,
-  completeGames:5,hrAllowed:-10,mvps:10,
+  // Every three recorded pitching outs equal one inning (+2 total).
+  // Score full and partial innings proportionally; don't use rounded Rio IP.
+  pitchStrikeouts:15,outs:2/3,strikes:.5,earnedRuns:-3,
+  completeGames:8,hrAllowed:-10,mvps:10,
   bobbles:-6,doublePlaysHitInto:-8,triplePlaysHitInto:-12
 });
 export const SSL_HEATING_THRESHOLD=95;
