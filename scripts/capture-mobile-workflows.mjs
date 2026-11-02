@@ -51,6 +51,7 @@ try {
    await page.goto('http://127.0.0.1:4197/.mobile-preview/?mode='+mode,{waitUntil:'networkidle'})
    await page.getByRole('heading',{name:mode==='draft'?'DRAFT ROOM':mode==='receive'?'MESSAGES':mode==='lineup'?'GAME LINEUP':mode==='roster'?'ROSTER':'TRANSACTIONS',exact:true}).waitFor()
    if(mode==='draft'){
+    await page.getByRole('button',{name:'ENTER DRAFT ROOM',exact:true}).click()
     const cards=page.locator('.draft-player-card')
     assert.equal(await cards.count(),await page.evaluate(()=>document.querySelector('.draft-pool-count').textContent.match(/(\d+) shown/)[1]).then(Number))
     assert.equal(await page.locator('.draft-player-card.is-drafted').count(),24)
@@ -119,6 +120,7 @@ try {
  await page.getByRole('button',{name:'CANCEL DEFAULT LINEUP EDIT',exact:true}).click()
  for(const scenario of ['paused','viewer','other-turn','commissioner']){
   await page.goto('http://127.0.0.1:4197/.mobile-preview/?mode=draft&scenario='+scenario,{waitUntil:'networkidle'})
+  await page.getByRole('button',{name:'ENTER DRAFT ROOM',exact:true}).click()
   await page.locator('.draft-player-card:not(.is-drafted)').first().click()
   assert.equal(await page.getByRole('dialog').getByRole('button',{name:/^DRAFT /}).isEnabled(),scenario==='commissioner','Pick permissions: '+scenario)
   await page.keyboard.press('Escape')
