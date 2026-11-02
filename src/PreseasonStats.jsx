@@ -1,6 +1,6 @@
 import React,{useMemo,useState} from 'react'
 import playerPool from './players.json'
-import preseasonRecords from './preseason-stats.json'
+import {preseasonGames,preseasonPlayerStats,preseasonTeamStats} from './preseason-game-data.js'
 import {PlayerPortrait} from './PlayerPortrait.jsx'
 
 // Preseason records are isolated from official regular-season statistics.
@@ -55,7 +55,7 @@ const rateKeys=new Set(['battingAverage','onBase','slug','onBasePlusSlug','starS
 const ratePrecision=new Set(['battingAverage','onBase','slug','onBasePlusSlug','starSlug','era7','era9','whip','baAgainst','obAgainst','slgAgainst','opsAgainst'])
 function renderValue(row,key,view){
   const value=row.stats?.[key]
-  if(value==null)return '—'
+  if(value==null)return rateKeys.has(key)?'—':0
   if(key==='positionsPlayed')return Array.isArray(value)?value.join(', '):value
   if(view==='Averages per Game'&&key!=='gamesPlayed'){
     const avg=row.perGame?.[key]??(!rateKeys.has(key)&&Number(row.stats?.gamesPlayed)>0&&typeof value==='number'?value/row.stats.gamesPlayed:null)
@@ -64,54 +64,64 @@ function renderValue(row,key,view){
   return typeof value==='number'&&ratePrecision.has(key)?value.toFixed(3):value
 }
 export default function PreseasonStats({season}){
+  const [scope,setScope]=useState('Players')
   const [category,setCategory]=useState('Game Score')
   const [view,setView]=useState('Totals')
   const [query,setQuery]=useState('')
   const [sort,setSort]=useState(null)
-  const records=useMemo(()=>Array.isArray(preseasonRecords)?preseasonRecords:[],[])
-  const rows=useMemo(()=>{
-    if(!season?.id)return []
-    const byId=new Map(playerPool.map(player=>[String(player.id),player]))
-    return records.filter(row=>String(row.seasonId)===String(season.id)&&byId.has(String(row.playerId))&&Number(row.stats?.gamesPlayed)>0)
-      .map(row=>({...row,player:byId.get(String(row.playerId))}))
-  },[season?.id,records])
+  const playerRows=useMemo(()=>preseasonPlayerStats(),[])
+  const teamRows=useMemo(()=>preseasonTeamStats(),[])
+  const rows=scope==='Teams'?teamRows:playerRows
+  const byId=useMemo(()=>new Map(playerPool.map(p=>[String(p.id),p])),[])
   const visible=useMemo(()=>{
     const q=query.trim().toLowerCase()
-    const selected=rows.filter(row=>!q||row.player.name.toLowerCase().includes(q)||String(season?.teams?.find(t=>String(t.id)===String(row.teamId))?.name||'').toLowerCase().includes(q))
-    if(sort)selected.sort((a,b)=>{
-      const va=sort.key==='name'?a.player.name:sort.key==='team'?season?.teams?.find(t=>String(t.id)===String(a.teamId))?.name:renderValue(a,sort.key,view)
-      const vb=sort.key==='name'?b.player.name:sort.key==='team'?season?.teams?.find(t=>String(t.id)===String(b.teamId))?.name:renderValue(b,sort.key,view)
-      const na=Number(va),nb=Number(vb)
-      const result=va!=='—'&&vb!=='—'&&Number.isFinite(na)&&Number.isFinite(nb)?na-nb:String(va??'').localeCompare(String(vb??''))
-      return result*(sort.desc?-1:1)
+    const filtered=rows.filter(row=>(!q||row.teamName.toLowerCase().includes(q)||
+      (row.playerId&&byId.get(String(row.playerId))?.name?.toLowerCase().includes(q))))
+    const cell=(row,key)=>key==='name'?byId.get(String(row.playerId))?.name||'':key==='team'?row.teamName:row.stats[key]??0
+    if(sort)filtered.sort((a,b)=>{
+      const aa=view==='Averages per Game'&&sort.key!=='name'&&sort.key!=='team'?a.perGame?.[sort.key]??0:cell(a,sort.key)
+      const bb=view==='Averages per Game'&&sort.key!=='name'&&sort.key!=='team'?b.perGame?.[sort.key]??0:cell(b,sort.key)
+      const result=typeof aa==='number'&&typeof bb==='number'?aa-bb:String(aa).localeCompare(String(bb))
+      return sort.desc?-result:result
     })
-    return selected
-  },[rows,query,sort,view,season?.teams])
+    return filtered
+  },[rows,query,sort,view,byId])
   const columns=statGroups[category]
   const toggleSort=key=>setSort(prev=>({key,desc:prev?.key===key?!prev.desc:true}))
-  return <section aria-label="Preseason player statistics">
+  return <section className="panel" aria-label="Preseason statistics">
     <h3>Preseason Stats</h3>
-    <p>Only players who appear in uploaded preseason game reports are included. Preseason totals are separate from regular-season and career statistics.</p>
-    <div className="subnav" role="tablist" aria-label="Preseason stat categories">
+    <p>Separate preseason-only statistics, calculated from imported Project Rio reports. Only players who took part appear here; these stats do not affect regular-season or career totals.</p>
+    <p><strong>{preseasonGames.length} game{preseasonGames.length===1?'':'s'} recorded · {playerRows.length} players</strong></p>
+    <div className="subnav" role="tablist" aria-label="Preseason stats scope">
+      {['Players','Teams'].map(name=><button key={name} type="button" role="tab" aria-selected={scope===name} className={scope===name?'active':''} onClick={()=>{setScope(name);setSort(null);setQuery('')}}>{name}</button>)}
+    </div>
+    <div className="subnav" role="tablist" aria-label="Preseason statistical categories">
       {Object.keys(statGroups).map(name=><button key={name} type="button" role="tab" aria-selected={category===name} className={category===name?'active':''} onClick={()=>{setCategory(name);setSort(null)}}>{name}</button>)}
     </div>
-    <div className="subnav" role="tablist" aria-label="Preseason stat view">
+    <div className="subnav" role="tablist" aria-label="Preseason stats view">
       {['Totals','Averages per Game'].map(name=><button key={name} type="button" role="tab" aria-selected={view===name} className={view===name?'active':''} onClick={()=>setView(name)}>{name}</button>)}
     </div>
-    {rows.length===0?<div className="empty"><h3>No preseason statistics yet</h3><p>Player statistics will appear here after preseason Project Rio sheets are uploaded and imported.</p></div>:<>
-      <input aria-label="Search preseason players or teams" type="search" placeholder="Search preseason players or teams" value={query} onChange={e=>setQuery(e.target.value)}/>
+    {rows.length===0?<div className="empty"><h3>No preseason statistics yet</h3><p>Stats appear after Project Rio preseason game reports are imported.</p></div>:<>
+      <input aria-label="Search preseason players or teams" type="search" placeholder="Search players or teams" value={query} onChange={e=>setQuery(e.target.value)}/>
       <div style={{overflowX:'auto',marginTop:12}}>
-        <table className="stats-table"><thead><tr>
-          <th><button type="button" onClick={()=>toggleSort('name')}>Player</button></th>
-          <th><button type="button" onClick={()=>toggleSort('team')}>Team</button></th>
-          {columns.map(([key,label])=><th key={key}><button type="button" onClick={()=>toggleSort(key)}>{label}</button></th>)}
-        </tr></thead><tbody>{visible.map(row=><tr key={row.playerId}>
-          <td><span style={{display:'inline-flex',alignItems:'center',gap:8}}><PlayerPortrait player={row.player} size={32}/>{row.player.name}</span></td>
-          <td>{season?.teams?.find(t=>String(t.id)===String(row.teamId))?.name||'—'}</td>
-          {columns.map(([key])=><td key={key}>{renderValue(row,key,view)}</td>)}
-        </tr>)}</tbody></table>
+        <table className="stats-table">
+          <thead><tr>
+            {scope==='Players'&&<th><button type="button" onClick={()=>toggleSort('name')}>Player</button></th>}
+            <th><button type="button" onClick={()=>toggleSort('team')}>Team</button></th>
+            {scope==='Teams'&&<><th>Runs For</th><th>Runs Against</th></>}
+            {columns.map(([key,label])=><th key={key}><button type="button" onClick={()=>toggleSort(key)}>{label}</button></th>)}
+          </tr></thead>
+          <tbody>{visible.map(row=><tr key={String(row.playerId||'team')+'-'+row.teamName}>
+            {scope==='Players'&&<td><span style={{display:'inline-flex',alignItems:'center',gap:8}}>
+              <PlayerPortrait player={byId.get(String(row.playerId))} size={32}/>
+              {byId.get(String(row.playerId))?.name||'Unknown player'}</span></td>}
+            <td>{row.teamName}</td>
+            {scope==='Teams'&&<><td>{view==='Totals'?row.stats.runsScored:row.perGame.runsScored.toFixed(2)}</td><td>{view==='Totals'?row.stats.runsAllowed:row.perGame.runsAllowed.toFixed(2)}</td></>}
+            {columns.map(([key])=><td key={key}>{renderValue(row,key,view)}</td>)}
+          </tr>)}</tbody>
+        </table>
       </div>
-      {visible.length===0&&<p>No matching preseason players.</p>}
+      {visible.length===0&&<p>No matching preseason players or teams.</p>}
     </>}
   </section>
 }
