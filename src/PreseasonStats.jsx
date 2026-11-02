@@ -2,6 +2,7 @@ import React,{useMemo,useState} from 'react'
 import playerPool from './players.json'
 import {preseasonGames,preseasonPlayerStats,preseasonTeamStats} from './preseason-game-data.js'
 import {PlayerPortrait} from './PlayerPortrait.jsx'
+import './preseason-stats.css'
 
 // Preseason records are isolated from official regular-season statistics.
 // Importers should add only participants from uploaded preseason sheets.
@@ -103,21 +104,35 @@ export default function PreseasonStats({season}){
     </div>
     {rows.length===0?<div className="empty"><h3>No preseason statistics yet</h3><p>Stats appear after Project Rio preseason game reports are imported.</p></div>:<>
       <input aria-label="Search preseason players or teams" type="search" placeholder="Search players or teams" value={query} onChange={e=>setQuery(e.target.value)}/>
-      <div style={{overflowX:'auto',marginTop:12}}>
-        <table className="stats-table">
+      <div className="ssl-pre-stats-scroll" role="region" aria-label="Preseason statistics table" tabIndex={0}>
+        <table className="ssl-pre-stats-table">
           <thead><tr>
-            {scope==='Players'&&<th><button type="button" onClick={()=>toggleSort('name')}>Player</button></th>}
-            <th><button type="button" onClick={()=>toggleSort('team')}>Team</button></th>
-            {scope==='Teams'&&<><th>Runs For</th><th>Runs Against</th></>}
-            {columns.map(([key,label])=><th key={key}><button type="button" onClick={()=>toggleSort(key)}>{label}</button></th>)}
+            {scope==='Players'&&<th scope="col" className="ssl-pre-stats-text" aria-sort={sort?.key==='name'?(sort.desc?'descending':'ascending'):'none'}>
+              <button type="button" onClick={()=>toggleSort('name')}>Player</button>
+            </th>}
+            <th scope="col" className="ssl-pre-stats-text" aria-sort={sort?.key==='team'?(sort.desc?'descending':'ascending'):'none'}>
+              <button type="button" onClick={()=>toggleSort('team')}>Team</button>
+            </th>
+            {scope==='Teams'&&<>
+              <th scope="col" className="ssl-pre-stats-number">Runs For</th>
+              <th scope="col" className="ssl-pre-stats-number">Runs Against</th>
+            </>}
+            {columns.map(([key,label])=><th key={key} scope="col"
+              className={key==='positionsPlayed'?'ssl-pre-stats-text ssl-pre-stats-position':'ssl-pre-stats-number'}
+              aria-sort={sort?.key===key?(sort.desc?'descending':'ascending'):'none'}>
+              <button type="button" onClick={()=>toggleSort(key)}>{label}</button>
+            </th>)}
           </tr></thead>
           <tbody>{visible.map(row=><tr key={String(row.playerId||'team')+'-'+row.teamName}>
-            {scope==='Players'&&<td><span style={{display:'inline-flex',alignItems:'center',gap:8}}>
+            {scope==='Players'&&<td className="ssl-pre-stats-text"><span className="ssl-pre-stats-player">
               {byId.has(String(row.playerId))&&<PlayerPortrait player={byId.get(String(row.playerId))} size={32}/>}
               {row.playerName||byId.get(String(row.playerId))?.name||'Unknown player'}</span></td>}
-            <td>{row.teamName}</td>
-            {scope==='Teams'&&<><td>{view==='Totals'?row.stats.runsScored:row.perGame.runsScored.toFixed(2)}</td><td>{view==='Totals'?row.stats.runsAllowed:row.perGame.runsAllowed.toFixed(2)}</td></>}
-            {columns.map(([key])=><td key={key}>{renderValue(row,key,view)}</td>)}
+            <td className="ssl-pre-stats-text">{row.teamName}</td>
+            {scope==='Teams'&&<>
+              <td className="ssl-pre-stats-number">{view==='Totals'?row.stats.runsScored:row.perGame.runsScored.toFixed(2)}</td>
+              <td className="ssl-pre-stats-number">{view==='Totals'?row.stats.runsAllowed:row.perGame.runsAllowed.toFixed(2)}</td>
+            </>}
+            {columns.map(([key])=><td className={key==='positionsPlayed'?'ssl-pre-stats-text ssl-pre-stats-position':'ssl-pre-stats-number'} key={key}>{renderValue(row,key,view)}</td>)}
           </tr>)}</tbody>
         </table>
       </div>
