@@ -2,6 +2,7 @@ import React,{useMemo,useState} from 'react'
 import playerPool from './players.json'
 import {preseasonGames,preseasonPlayerStats,preseasonTeamStats} from './preseason-game-data.js'
 import {PlayerPortrait} from './PlayerPortrait.jsx'
+import {visibleGamePointFields} from './game-point-columns.js'
 import './preseason-stats.css'
 
 // Preseason records are isolated from official regular-season statistics.
@@ -87,7 +88,7 @@ export default function PreseasonStats({season}){
     })
     return filtered
   },[rows,query,sort,view,byId])
-  const columns=statGroups[category]
+  const columns=visibleGamePointFields(statGroups[category],view)
   const toggleSort=key=>setSort(prev=>({key,desc:prev?.key===key?!prev.desc:true}))
   return <section className="panel" aria-label="Preseason statistics">
     <h3>Preseason Stats</h3>
@@ -100,7 +101,7 @@ export default function PreseasonStats({season}){
       {Object.keys(statGroups).map(name=><button key={name} type="button" role="tab" aria-selected={category===name} className={category===name?'active':''} onClick={()=>{setCategory(name);setSort(null)}}>{name}</button>)}
     </div>
     <div className="subnav" role="tablist" aria-label="Preseason stats view">
-      {['Totals','Averages per Game'].map(name=><button key={name} type="button" role="tab" aria-selected={view===name} className={view===name?'active':''} onClick={()=>setView(name)}>{name}</button>)}
+      {['Totals','Averages per Game'].map(name=><button key={name} type="button" role="tab" aria-selected={view===name} className={view===name?'active':''} onClick={()=>{setView(name);setSort(null)}}>{name}</button>)}
     </div>
     {rows.length===0?<div className="empty"><h3>No preseason statistics yet</h3><p>Stats appear after Project Rio preseason game reports are imported.</p></div>:<>
       <input aria-label="Search preseason players or teams" type="search" placeholder="Search players or teams" value={query} onChange={e=>setQuery(e.target.value)}/>

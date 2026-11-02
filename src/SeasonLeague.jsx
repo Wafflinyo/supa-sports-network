@@ -1,5 +1,6 @@
 import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
 import {PowerRankings,PreseasonTournament} from './SeasonPreseason.jsx';
+import {visibleGamePointFields} from './game-point-columns.js';
 import PreseasonStats from './PreseasonStats.jsx';
 import {preseasonReady} from './preseason.js';
 import {lotteryProgress,lotteryReplayProgress,lotteryDuration,lotteryCountdownClock} from './lottery-timing.js';
@@ -2443,7 +2444,7 @@ function Standings({ league: l }) {
 function TeamStats({ league: l }) {
   const [view, setView] = useState("Totals");
   const isAverage = view === "Averages per Game";
-  const keys = [
+  const allKeys = [
     "atBats",
     "hits",
     "runs",
@@ -2457,6 +2458,7 @@ function TeamStats({ league: l }) {
     "gameScore",
     "ogp", "dgp", "pgp", "tgp", "agp",
   ];
+  const keys=visibleGamePointFields(allKeys,view);
   const s = l.season;
   const records = new Map(standings(s).map(t => [t.id, t]));
   const statLabel = k => ({gameScore:'Game Score',ogp:'OGP',dgp:'DGP',pgp:'PGP',tgp:'TGP',agp:'AGP'})[k] || k.replace(/([A-Z])/g, " $1");
@@ -2483,7 +2485,7 @@ function TeamStats({ league: l }) {
               <th>Team</th>
               <th>GP</th>
               <th>Record (W–L)</th><th>Home Record (W–L)</th><th>Away Record (W–L)</th>
-              {keys.map(k => <th key={k}>{statLabel(k)}{isAverage ? " / G" : ""}</th>)}
+              {keys.map(k => <th key={k}>{statLabel(k)}{isAverage && k!=='agp' ? " / G" : ""}</th>)}
             </tr>
           </thead>
           <tbody>
@@ -2495,7 +2497,7 @@ function TeamStats({ league: l }) {
                 (g.result?.players || []).filter(p => p.team === t.id)
               );
               const totals = Object.fromEntries(
-                keys.filter(k=>k!=='agp').map(k => [k, all.reduce((sum, p) => sum + (Number(['ogp','dgp','pgp','tgp'].includes(k) ? gamePointsForReport(p)[k] : k === 'gameScore' ? p.gameScore : p.stats?.[k]) || 0), 0)])
+                allKeys.filter(k=>k!=='agp').map(k => [k, all.reduce((sum, p) => sum + (Number(['ogp','dgp','pgp','tgp'].includes(k) ? gamePointsForReport(p)[k] : k === 'gameScore' ? p.gameScore : p.stats?.[k]) || 0), 0)])
               );
               totals.agp=games.length?totals.tgp/games.length:null;
               const record = records.get(t.id);
