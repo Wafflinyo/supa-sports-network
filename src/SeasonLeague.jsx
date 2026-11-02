@@ -1,5 +1,6 @@
 import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
 import {PowerRankings,PreseasonTournament} from './SeasonPreseason.jsx';
+import PreseasonStats from './PreseasonStats.jsx';
 import {preseasonReady} from './preseason.js';
 import {lotteryProgress,lotteryReplayProgress,lotteryDuration,lotteryCountdownClock} from './lottery-timing.js';
 import {orderedDraftPickTeams,lotteryOrderReady,teamsInLotteryOrder} from './draft-pick-stats-order.js';
@@ -2615,6 +2616,7 @@ function History({ league: l }) {
 function PlayoffBracketSections({league:l,initialTab='Pre-season'}){
   const s=l.season;
   const [tab,setTab]=useState(initialTab);
+  const [preseasonTab,setPreseasonTab]=useState('Bracket');
   useEffect(()=>{setTab(initialTab)},[initialTab]);
   // These are display-only tabs; preseason results remain in their dedicated
   // table, while the existing official playoff bracket remains unchanged.
@@ -2625,7 +2627,12 @@ function PlayoffBracketSections({league:l,initialTab='Pre-season'}){
         className={tab===section?'active':''}
         onClick={()=>setTab(section)}>{section}</button>)}
     </div>
-    {tab==='Pre-season'?<PreseasonTournament league={l}/>:
+    {tab==='Pre-season'?<>
+      <div className="subnav" role="tablist" aria-label="Preseason sections">
+        {['Bracket','Preseason Stats'].map(section=><button key={section} type="button" role="tab" aria-selected={preseasonTab===section} className={preseasonTab===section?'active':''} onClick={()=>setPreseasonTab(section)}>{section}</button>)}
+      </div>
+      {preseasonTab==='Bracket'?<PreseasonTournament league={l}/>:<PreseasonStats season={s}/>}
+    </>:
       s&&['postseason','retention','offseason','archived'].includes(s.status)?<>
         <PlayoffPanel league={l}/>
         <Schedule league={{...l,season:{...s,games:s.games.filter(g=>g.phase==='playoffs')}}}/>
