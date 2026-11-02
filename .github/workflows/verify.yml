@@ -37,6 +37,7 @@ jobs:
       - run: node tests/preseason-ruffians-dedennes-import.mjs
       - run: node tests/preseason-knights-dolphins-import.mjs
       - run: node tests/preseason-hopedogo-voidstriders-import.mjs
+      - run: node tests/preseason-haliban-petilils-import.mjs
       - run: node tests/gm-achievement-notifications.mjs
       - run: node tests/badge-art-design.mjs
       - run: node tests/roster-lineups.mjs
