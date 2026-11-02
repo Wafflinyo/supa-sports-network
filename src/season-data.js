@@ -1,5 +1,6 @@
 import columns from "./temporary-stat-columns.json" with { type: "json" };
 import {customGameScore} from './ssl-game-score.js';
+import {gamePointsForReport} from './game-points.js';
 export const positions = ["P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
 export const rosterOf = (s, t) => s?.rosters?.[t] || [];
 export const validLineup = (s, t, l) => {
@@ -56,6 +57,8 @@ export function aggregate(season) {
         st.gameScore=(st.gameScore||0)+p.gameScore;
       if(typeof p.itemScore==='number'&&Number.isFinite(p.itemScore))
         st.itemScore=(st.itemScore||0)+p.itemScore;
+      const gp=gamePointsForReport(p);
+      for(const key of ['ogp','dgp','pgp','tgp'])st[key]=Math.round(((st[key]||0)+gp[key]+Number.EPSILON)*100)/100;
       st.positionsPlayed = [
         ...new Set([...st.positionsPlayed, ...(p.positions || [])]),
       ];
@@ -65,6 +68,7 @@ export function aggregate(season) {
   for (const st of Object.values(stats)) {
     const ratio = (n, d) => (d ? (n || 0) / d : 0);
     st.gameScoreAvg=ratio(st.gameScore,st.gamesPlayed);
+    st.agp=ratio(st.tgp,st.gamesPlayed);
     st.battingAverage = ratio(st.hits, st.atBats);
     st.onBase = ratio(
       (st.hits || 0) + (st.batWalks || 0) + (st.hitByPitch || 0),
@@ -324,6 +328,21 @@ export function previewCustomGameScore(preview,row,mvp=null){
   const stats=reportRowStats(row,pitching[0]);
   stats.mvps=mvp!=null&&Number(row.chosen)===Number(mvp)?1:0;
   return customGameScore(stats,row.itemscore===''?0:row.itemscore);
+}
+// Determine the MVP before adding any MVP points; only the winning team's
+// highest-scoring mapped player is eligible. A tied or incomplete match gets no award.
+export function automaticReportMvp(preview,awayLabel){
+  if(!preview?.rows?.length||!awayLabel||preview.rows.some(r=>!Number(r.chosen)))return null;
+  const totals=new Map();
+  for(const row of preview.rows)totals.set(row.label,(totals.get(row.label)||0)+Number(row.runs||0));
+  const labels=preview.labels||[...totals.keys()];
+  if(labels.length!==2||totals.get(labels[0])===totals.get(labels[1]))return null;
+  const winner=(totals.get(labels[0])||0)>(totals.get(labels[1])||0)?labels[0]:labels[1];
+  const candidates=preview.rows.filter(r=>r.label===winner).map(r=>({
+    player:Number(r.chosen),score:previewCustomGameScore(preview,r,null).gameScore
+  }));
+  candidates.sort((a,b)=>b.score-a.score||a.player-b.player);
+  return candidates[0]?.player??null;
 }
 export function buildReport(preview, awayLabel, season, game, players, mvp) {
   const pickTeam = (r) => (r.label === awayLabel ? game.away : game.home),

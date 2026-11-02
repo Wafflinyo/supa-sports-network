@@ -16,7 +16,8 @@ assert(verifySql.includes("pg_get_functiondef('league_private.ssl_manage(text,uu
 assert(!/update league_private\.ssl_season_states/.test(verifySql),
  'Scoring migration must never mutate existing draft, lineups or saved game data');
 import {customGameScore,SSL_GAME_SCORE_WEIGHTS,SSL_HEATING_THRESHOLD} from '../src/ssl-game-score.js';
-import {buildReport,previewCustomGameScore,aggregate} from '../src/season-data.js';
+import {gamePointComponents,gamePointsForReport} from '../src/game-points.js';
+import {buildReport,automaticReportMvp,previewCustomGameScore,aggregate} from '../src/season-data.js';
 import {heatingUpForSeason} from '../src/heating-up.js';
 import {playerCareer} from '../src/player-career.js';
 assert.equal(SSL_HEATING_THRESHOLD,100);
@@ -43,8 +44,8 @@ assert.equal(customGameScore({scorelessInnings:6}).gameScore,0,
  'retired scoreless-innings field must never earn points');
 assert.equal(customGameScore({outs:3,strikes:4,completeGames:1}).gameScore,12,
  'complete game earns +8 and innings and strikes still count');
-assert.equal(customGameScore({earnedRuns:3,hrAllowed:2}).gameScore,0,
- 'pitching penalties cannot create negative final game scores');
+assert.equal(customGameScore({earnedRuns:3,hrAllowed:2}).gameScore,-29,
+ 'pitching penalties can create negative final game scores');
 assert.equal(customGameScore({mvps:1}).gameScore,10,
  'Match MVP bonus is 10, never 20');
 const sample={
@@ -62,7 +63,7 @@ assert.equal(customGameScore({hits:24},3.99).heatingUp,false,'99.99 is below thr
 assert.equal(customGameScore({hits:24},4).heatingUp,true,'100.00 is the new inclusive cutoff');
 assert.equal(customGameScore(sample,10).gameScore,105,'Item Score adds to custom raw stat score');
 assert.throws(()=>customGameScore(sample,-1),/Item Score/);
-assert.equal(customGameScore({bobbles:10}).gameScore,0,'negative totals floor at zero');
+assert.equal(customGameScore({bobbles:10}).gameScore,-60,'negative Game Points are not floored at zero');
 assert.equal(customGameScore({hits:400}).gameScore,1600,'do not cap large legitimate Game Scores');
 assert.equal(customGameScore({...sample,bobbles:2},0).gameScore,89);
 assert.equal(customGameScore({...sample,bobbles:2},6).gameScore,95);
@@ -78,6 +79,15 @@ assert.equal(previewCustomGameScore(preview,row).gameScore,109,
  'one inning +2 and four strikes +2 in the report preview');
 assert.equal(previewCustomGameScore(preview,row,10).gameScore,119,
  'selecting the MVP immediately includes the ten-point award in preview');
+const otherPlayer={player:'Rival',position:'C',label:'B',chosen:1,hits:30,runs:0,itemscore:0};
+const forMvp={...preview,labels:['A','B'],rows:[row,otherPlayer]};
+assert.equal(automaticReportMvp(forMvp,'A'),10,
+ 'Only the highest scoring player on the winning team can be automatic MVP, even when an opponent scores more');
+assert.equal(automaticReportMvp({...forMvp,rows:[{...row,runs:0},otherPlayer]},'A'),null,
+ 'Tied scores cannot produce an automatic MVP');
+assert.equal(automaticReportMvp({...forMvp,rows:[{...row,chosen:0},otherPlayer]},'A'),null,
+ 'All players must be mapped before choosing MVP');
+
 const season={id:'s1',name:'Season 1',number:1,rosters:{a:[10],b:[1]},games:[]};
 const game={id:'g1',away:'a',home:'b',phase:'regular',
   stage:'final',startsAt:'2026-11-01T17:00:00Z'};
@@ -85,6 +95,9 @@ const report=buildReport(preview,'A',season,game,[],null);
 assert.equal(report.players[0].gameScore,109,'saved report score calculated from Rio stats');
 assert.equal(report.players[0].baseGameScore,99);
 assert.equal(report.players[0].itemScore,10);
+assert.deepEqual(gamePointComponents(report.players[0].stats),{ogp:81,dgp:-1,pgp:19});
+assert.deepEqual(gamePointsForReport(report.players[0]),{ogp:81,dgp:-1,pgp:19,tgp:109});
+assert.equal(gamePointsForReport({...report.players[0],gameScore:-8}).tgp,-8,'saved signed score remains authoritative');
 assert.equal(report.players[0].stats.totalBases,6,'TB derived from hit types');
 assert.equal(report.players[0].stats.pitchStrikeouts,1,'pitching strikeouts from Pitching sheet');
 assert.equal(report.players[0].stats.outs,3);
@@ -111,9 +124,13 @@ season.games=[g];
 assert.equal(aggregate(season)[10].gameScore,109,'store total custom score separately from fantasy score');
 assert.equal(aggregate(season)[10].itemScore,10);
 assert.equal(aggregate(season)[10].gameScoreAvg,109);
+for(const [key,value] of Object.entries({ogp:81,dgp:-1,pgp:19,tgp:109,agp:109}))
+ assert.equal(aggregate(season)[10][key],value,'season Game Points '+key);
 const avg=playerCareer(10,[{id:'s1',playerStats:aggregate(season)}]);
 assert.equal(avg.gameScore,109);
 assert.equal(avg.averages.gameScore,109);
+assert.deepEqual([avg.ogp,avg.dgp,avg.pgp,avg.tgp,avg.agp],[81,-1,19,109,109]);
+assert.equal(avg.averages.agp,109);
 const below={...game,id:'g0',startsAt:'2026-10-31T17:00:00Z',
   result:{players:[{...report.players[0],gameScore:99}]}};
 const hotSeason={...season,games:[below,g,{...game,id:'g2',stage:'scheduled',

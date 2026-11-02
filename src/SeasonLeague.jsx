@@ -9,6 +9,7 @@ import {matchupDisplay} from './matchup-display.js';
 import {supportsStadiumVariant,matchupStadiumVariant} from './stadium-lighting.js';
 import DraftChat from './DraftChat.jsx';
 import {heatingUpForSeason,HEATING_UP_THRESHOLD} from './heating-up.js';
+import {gamePointsForReport} from './game-points.js';
 import {effectiveGameLineup,gameLineupIsEditable,teamGameLineups,savedLineupLabel} from './roster-lineups.js';
 import {
   SeasonRuleControls,
@@ -46,6 +47,7 @@ import {
   readRio,
   buildReport,
   previewCustomGameScore,
+  automaticReportMvp,
 } from "./season-data.js";
 import "./season.css";
 const byPlayer = new Map(pool.map((p) => [p.id, p]));
@@ -1562,9 +1564,11 @@ function Schedule({ league: l, commissioner = false }) {
 function ReportImport({ league: l, game, onDone }) {
   const [preview, setPreview] = useState(null),
     [awayLabel, setAwayLabel] = useState(""),
-    [mvp, setMvp] = useState(""),
     [error, setError] = useState(""),
     [loading, setLoading] = useState(false);
+  const autoMvp = useMemo(()=>{
+    try{return preview&&automaticReportMvp(preview,awayLabel)}catch{return null}
+  },[preview,awayLabel]);
   return (
     <div className="report-import">
       <h3>PROJECT RIO RESULT REVIEW</h3>
@@ -1572,7 +1576,7 @@ function ReportImport({ league: l, game, onDone }) {
         Map team labels and any ambiguous Mii/name rows. Add an "Item Score"
         column at the end of the Project Rio Stats worksheet. The site
         automatically scores batting, defense and pitching, adds Item Score
-        (blank means 0), awards +10 for the selected match MVP, and grants
+        (blank means 0), automatically awards +10 MVP points to the highest-scoring player on the winning team, and grants
         Heating Up at {HEATING_UP_THRESHOLD}+. Pitching receives +2 per
         inning pitched (including partial innings), +0.5 per strike, -3 per
         earned run, -10 per HR allowed and +8 for a complete game. Rio
@@ -1596,7 +1600,6 @@ function ReportImport({ league: l, game, onDone }) {
               pool,
             );
             setPreview(p);
-            setMvp("");
             setAwayLabel(p.labels[0]);
           } catch (e) {
             setError(e.message);
@@ -1638,7 +1641,7 @@ function ReportImport({ league: l, game, onDone }) {
                       <td>{r.player}</td>
                       <td>{r.label}</td>
                       <td>{r.itemscore === '' ? 0 : r.itemscore ?? 0}</td>
-                      <td>{(() => {try{const score=previewCustomGameScore(preview,r,mvp);
+                      <td>{(() => {try{const score=previewCustomGameScore(preview,r,autoMvp);
                         return <><strong>{score.gameScore}</strong>{score.heatingUp?' ★':''}</>;
                       }catch(e){return <span title={e.message}>Check stats</span>}})()}</td>
                       <td>
@@ -1761,25 +1764,13 @@ function ReportImport({ league: l, game, onDone }) {
               hits
             </p>
           ))}
-          <label>
-            Game MVP (optional)
-            <select value={mvp} onChange={(e) => setMvp(e.target.value)}>
-              <option value="">None / not recorded</option>
-              {preview.rows
-                .filter((r) => r.chosen)
-                .map((r) => (
-                  <option key={r.row} value={r.chosen}>
-                    {name(r.chosen)}
-                  </option>
-                ))}
-            </select>
-          </label>
+          <p><strong>Automatic Match MVP:</strong> {autoMvp ? name(autoMvp) : 'Map both teams to determine MVP (no tied game)'}</p>
           <button
             className="red-btn"
             disabled={
               l.busy ||
               preview.rows.some((r) => !r.chosen) ||
-              preview.pitch.some((r) => !r.chosen)
+              preview.pitch.some((r) => !r.chosen) || !autoMvp
             }
             onClick={async () => {
               try {
@@ -1792,7 +1783,7 @@ function ReportImport({ league: l, game, onDone }) {
                   },
                   game,
                   pool,
-                  mvp,
+                  autoMvp,
                 );
                 if (await l.act("result", { game: game.id, report })) onDone();
               } catch (e) {
@@ -2463,10 +2454,11 @@ function TeamStats({ league: l }) {
     "pitchStrikeouts",
     "earnedRuns",
     "gameScore",
+    "ogp", "dgp", "pgp", "tgp", "agp",
   ];
   const s = l.season;
   const records = new Map(standings(s).map(t => [t.id, t]));
-  const statLabel = k => k === 'gameScore' ? 'Game Score' : k.replace(/([A-Z])/g, " $1");
+  const statLabel = k => ({gameScore:'Game Score',ogp:'OGP',dgp:'DGP',pgp:'PGP',tgp:'TGP',agp:'AGP'})[k] || k.replace(/([A-Z])/g, " $1");
   return (
     <Box title={isAverage ? "TEAM STAT AVERAGES" : "TEAM STAT TOTALS"}>
       <div className="stat-view-switch" role="group" aria-label="Team stat display">
@@ -2502,8 +2494,9 @@ function TeamStats({ league: l }) {
                 (g.result?.players || []).filter(p => p.team === t.id)
               );
               const totals = Object.fromEntries(
-                keys.map(k => [k, all.reduce((sum, p) => sum + (Number(k === 'gameScore' ? p.gameScore : p.stats?.[k]) || 0), 0)])
+                keys.filter(k=>k!=='agp').map(k => [k, all.reduce((sum, p) => sum + (Number(['ogp','dgp','pgp','tgp'].includes(k) ? gamePointsForReport(p)[k] : k === 'gameScore' ? p.gameScore : p.stats?.[k]) || 0), 0)])
               );
+              totals.agp=games.length?totals.tgp/games.length:null;
               const record = records.get(t.id);
               return (
                 <tr key={t.id}>
@@ -2514,9 +2507,9 @@ function TeamStats({ league: l }) {
                   <td>{record?.awayWins ?? 0}–{record?.awayLosses ?? 0}</td>
                   {keys.map(k => (
                     <td key={k} className="team-stats-number">
-                      {isAverage
+                      {k==='agp' ? (totals.agp?.toFixed(2)??'—') : isAverage
                         ? games.length ? (totals[k] / games.length).toFixed(2) : "—"
-                        : totals[k]}
+                        : ['ogp','dgp','pgp','tgp'].includes(k) ? totals[k].toFixed(2) : totals[k]}
                     </td>
                   ))}
                 </tr>
@@ -2527,8 +2520,8 @@ function TeamStats({ league: l }) {
       </div>
       <p className="team-stats-explainer">
         {isAverage
-          ? "Team averages are the sum of all players' stats divided by the team's completed games. GP and all W–L records remain totals; teams without completed games show a dash."
-          : "Team totals combine every player's stats from completed games."}
+          ? "Team averages are the sum of all players' stats divided by the team's completed games. AGP is the team's total Game Points per completed game. GP and all W–L records remain totals; teams without completed games show a dash."
+          : "Team totals combine every player's stats from completed games. OGP, DGP and PGP are weighted components. TGP also includes Item Score and MVP points; AGP is always per game."}
         {" "}Overall, Home and Away Records count released regular-season games only.
       </p>
     </Box>
