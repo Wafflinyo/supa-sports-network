@@ -14,8 +14,10 @@ export function playerCareer(playerId, seasons) {
   const slug = ratio(sum('totalBases'), sum('atBats'))
   return {
     seasons: rows.length || null, games, mvps: sum('mvps'),gameScore:sum('gameScore'),
+    ogp:sum('ogp'),dgp:sum('dgp'),pgp:sum('pgp'),tgp:sum('tgp'),agp:perGame('tgp'),
     averages: {
       gameScore:perGame('gameScore'),
+      ogp:perGame('ogp'),dgp:perGame('dgp'),pgp:perGame('pgp'),tgp:perGame('tgp'),agp:perGame('tgp'),
       battingAverage: ratio(hits, sum('atBats')), onBase: obp, slug,
       onBasePlusSlug: obp != null && slug != null ? obp + slug : null,
       hits: perGame('hits'), homeRuns: perGame('homeRuns'), rbi: perGame('rbi'),
