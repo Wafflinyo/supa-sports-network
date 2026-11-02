@@ -26,6 +26,7 @@ try {
   return route.abort()
  })
  page=await context.newPage();page.on('pageerror',e=>errors.push(e.message))
+ page.on('dialog',dialog=>dialog.accept()) // non-live sample: accept the real draft confirmation
  const fit=async(label)=>{
   const metrics=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,body:document.body.scrollWidth}))
   if(metrics.scroll>metrics.width+1||metrics.body>metrics.width+1){const offenders=await page.locator('body *').evaluateAll(nodes=>nodes.filter(n=>{const r=n.getBoundingClientRect();return r.width&&r.right>innerWidth+1&&getComputedStyle(n).position!=='absolute'}).slice(0,12).map(n=>({tag:n.tagName,class:n.className,text:n.textContent.slice(0,90),width:n.getBoundingClientRect().width,right:n.getBoundingClientRect().right})));throw Error(label+' overflows: '+JSON.stringify({metrics,offenders}))}
