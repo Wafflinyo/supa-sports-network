@@ -6,7 +6,7 @@ assert.ok(game,'Hopedogo @ Voidstriders must be imported');
 assert.equal(game.away,'HopeDogo Retrievers 3');
 assert.equal(game.home,'Starborn Voidstriders');
 assert.deepEqual([game.awayScore,game.homeScore],[8,3]);
-assert.equal(game.mvp,57,'SSL winner-team MVP goes to Funky Kong, not sheet's Donkey Kong label');
+assert.equal(game.mvp,57,"SSL winner-team MVP goes to Funky Kong, not the sheet MVP label");
 const players=preseasonPlayerStatsForGame(game);
 assert.equal(players.length,18);
 assert.equal(new Set(players.map(p=>p.playerId)).size,18);
