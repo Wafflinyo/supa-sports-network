@@ -1,5 +1,6 @@
 import columns from "./temporary-stat-columns.json" with { type: "json" };
 import {customGameScore} from './ssl-game-score.js';
+import {gamePointsForReport} from './game-points.js';
 export const positions = ["P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
 export const rosterOf = (s, t) => s?.rosters?.[t] || [];
 export const validLineup = (s, t, l) => {
@@ -56,6 +57,8 @@ export function aggregate(season) {
         st.gameScore=(st.gameScore||0)+p.gameScore;
       if(typeof p.itemScore==='number'&&Number.isFinite(p.itemScore))
         st.itemScore=(st.itemScore||0)+p.itemScore;
+      const gp=gamePointsForReport(p);
+      for(const key of ['ogp','dgp','pgp','tgp'])st[key]=Math.round(((st[key]||0)+gp[key]+Number.EPSILON)*100)/100;
       st.positionsPlayed = [
         ...new Set([...st.positionsPlayed, ...(p.positions || [])]),
       ];
@@ -65,6 +68,7 @@ export function aggregate(season) {
   for (const st of Object.values(stats)) {
     const ratio = (n, d) => (d ? (n || 0) / d : 0);
     st.gameScoreAvg=ratio(st.gameScore,st.gamesPlayed);
+    st.agp=ratio(st.tgp,st.gamesPlayed);
     st.battingAverage = ratio(st.hits, st.atBats);
     st.onBase = ratio(
       (st.hits || 0) + (st.batWalks || 0) + (st.hitByPitch || 0),
