@@ -43,10 +43,12 @@ function PlayerAvatar({ player, size = 38 }) {
 // Project Rio's export headings, grouped for browsing. Helper columns are export internals.
 const statGroups = {
   'Game Score': [
-    ['gamesPlayed','Games Played'],['gameScore','Game Score'],['itemScore','Item Score'],
+    ['gamesPlayed','Games Played'],['gameScore','Game Score'],
+    ['ogp','OGP'],['dgp','DGP'],['pgp','PGP'],['tgp','TGP'],['agp','AGP'],['itemScore','Item Score'],
     ['heatingUpCount','Hot Games'],['longestHotStreak','Longest Hot Streak'],
   ],
   'Offensive Stats': [
+    ['ogp','Offensive Game Points (OGP)'],
     ['positionsPlayed', 'Position(s) Played'], ['gamesPlayed', 'Games Played'], ['mvps', 'MVPs'], ['atBats', 'At-Bats'], ['plateAppearances', 'Plate Appearances'], ['runs', 'Runs'],
     ['hits', 'Hits'], ['rbi', 'RBI'], ['homeRuns', 'Home Runs'], ['batStrikeouts', 'Strikeouts'], ['batWalks', 'Walks'],
     ['hitByPitch', 'Hit By Pitch'], ['singles', 'Singles'], ['doubles', 'Doubles'],
@@ -62,11 +64,13 @@ const statGroups = {
     ['stealAttempts', 'Steal Attempts'],
   ],
   'Defensive Stats': [
+    ['dgp','Defensive Game Points (DGP)'],
     ['positionsPlayed', 'Position(s) Played'], ['gamesPlayed', 'Games Played'], ['mvps', 'MVPs'], ['putouts', 'Putouts'], ['assists', 'Assists'], ['buddyJumpPutouts', 'Buddy Jump Putouts'],
     ['buddyJumpAttempts', 'Buddy Jump Attempts'], ['doublePlays', 'Double Plays'],
     ['triplePlays', 'Triple Plays'], ['bobbles', 'Bobbles'],
   ],
   'Pitching Stats': [
+    ['pgp','Pitching Game Points (PGP)'],
     ['positionsPlayed', 'Position(s) Played'], ['gamesPlayed', 'Games Played'], ['mvps', 'MVPs'], ['battersFaced', 'Batters Faced'], ['inningsPitched', 'Innings Pitched'],
     ['pitches', 'Pitches'], ['strikes', 'Strikes'], ['balls', 'Balls'],
     ['pitchStrikeouts', 'Strikeouts'], ['pitchWalks', 'Walks'], ['beanBalls', 'Bean Balls'],
@@ -83,7 +87,7 @@ const statGroups = {
 }
 // Rates and baseball innings need per-game export values; dividing season rates or 3.1 IP is misleading.
 const perGameOnly = new Set(['battingAverage', 'onBase', 'slug', 'onBasePlusSlug', 'starSlug',
-  'inningsPitched', 'era7', 'era9', 'whip', 'baAgainst', 'obAgainst', 'slgAgainst', 'opsAgainst'])
+  'inningsPitched', 'agp', 'era7', 'era9', 'whip', 'baAgainst', 'obAgainst', 'slgAgainst', 'opsAgainst'])
 
 function statValue(player, key, view) {
   const total = player.stats?.[key] ?? player[key]
@@ -101,9 +105,9 @@ function displayStat(value, view, key) {
   if (value == null) return '—'
   if (key === 'gamesPlayed' || ['heatingUpCount','hotStreaks','longestHotStreak','currentHotStreak'].includes(key)) return value
   if(key==='positionsPlayed')return Array.isArray(value)?value.join(', '):value
-  if(view==='Totals'&&perGameOnly.has(key)&&typeof value==='number')return value.toFixed(key==='inningsPitched'?2:3)
+  if(view==='Totals'&&perGameOnly.has(key)&&typeof value==='number')return value.toFixed(key==='inningsPitched'||key==='agp'?2:3)
   return view === 'Averages per Game' && typeof value === 'number'
-    ? value.toFixed(perGameOnly.has(key) && key !== 'inningsPitched' ? 3 : 2) : value
+    ? value.toFixed(perGameOnly.has(key) && !['inningsPitched','agp'].includes(key) ? 3 : 2) : value
 }
 
 function Empty({ icon: Icon = CalendarDays, title, children }) {
