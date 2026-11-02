@@ -329,6 +329,21 @@ export function previewCustomGameScore(preview,row,mvp=null){
   stats.mvps=mvp!=null&&Number(row.chosen)===Number(mvp)?1:0;
   return customGameScore(stats,row.itemscore===''?0:row.itemscore);
 }
+// Determine the MVP before adding any MVP points; only the winning team's
+// highest-scoring mapped player is eligible. A tied or incomplete match gets no award.
+export function automaticReportMvp(preview,awayLabel){
+  if(!preview?.rows?.length||!awayLabel||preview.rows.some(r=>!Number(r.chosen)))return null;
+  const totals=new Map();
+  for(const row of preview.rows)totals.set(row.label,(totals.get(row.label)||0)+Number(row.runs||0));
+  const labels=preview.labels||[...totals.keys()];
+  if(labels.length!==2||totals.get(labels[0])===totals.get(labels[1]))return null;
+  const winner=(totals.get(labels[0])||0)>(totals.get(labels[1])||0)?labels[0]:labels[1];
+  const candidates=preview.rows.filter(r=>r.label===winner).map(r=>({
+    player:Number(r.chosen),score:previewCustomGameScore(preview,r,null).gameScore
+  }));
+  candidates.sort((a,b)=>b.score-a.score||a.player-b.player);
+  return candidates[0]?.player??null;
+}
 export function buildReport(preview, awayLabel, season, game, players, mvp) {
   const pickTeam = (r) => (r.label === awayLabel ? game.away : game.home),
     result = [];
