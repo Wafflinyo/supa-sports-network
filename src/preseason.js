@@ -45,12 +45,12 @@ export function preseasonBracket(season){
       // the draft produces the official pairings. Attach only an exact Round 1
       // team-name match, never to an unrelated pairing. Server results win.
       const imported=r===1?importedPreseasonGames.find(match=>
-        match.round===r&&[match.away,match.home].includes(high.name)&&
-        [match.away,match.home].includes(low.name)):null;
+        match.round===r&&[match.away,match.home].some(name=>name.toLowerCase()===String(high.name).toLowerCase())&&
+        [match.away,match.home].some(name=>name.toLowerCase()===String(low.name).toLowerCase())):null;
       const fallback=imported?{
         match_key:key,team_a:high.id,team_b:low.id,
-        score_a:high.name===imported.away?imported.awayScore:imported.homeScore,
-        score_b:low.name===imported.away?imported.awayScore:imported.homeScore,
+        score_a:high.name.toLowerCase()===imported.away.toLowerCase()?imported.awayScore:imported.homeScore,
+        score_b:low.name.toLowerCase()===imported.away.toLowerCase()?imported.awayScore:imported.homeScore,
         recorded_at:null
       }:null;
       const row=results.get(key)||fallback;
