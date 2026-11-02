@@ -3,6 +3,8 @@ import {Trophy,Clock,Medal} from 'lucide-react';
 import {teamLogo} from './TeamIdentity.jsx';
 import {powerRankings} from './power-rankings.js';
 import {preseasonBracket,preseasonReady,pickTimeLabel} from './preseason.js';
+import {preseasonGames,preseasonPlayerStatsForGame} from './preseason-game-data.js';
+import preseasonPlayers from './players.json';
 import './preseason.css';
 
 function Identity({team,supabase}){
@@ -97,14 +99,43 @@ function ScoreEntry({game,league}){
       }}>CLEAR</button>}
   </form>;
 }
+function ImportedPreseasonResults(){
+  const names=new Map(preseasonPlayers.map(p=>[p.id,p.name]));
+  return <section className="panel ssl-pre-panel" aria-label="Imported preseason results">
+    <h3>RECORDED PRESEASON RESULTS</h3>
+    {preseasonGames.map(game=>{
+      const scorers=preseasonPlayerStatsForGame(game);
+      const shown=n=>Math.round((n+Number.EPSILON)*100)/100;
+      return <article key={game.gameId}>
+        <p><strong>ROUND {game.round}: {game.away} @ {game.home}</strong></p>
+        <p><strong>FINAL: {game.away} {game.awayScore} — {game.home} {game.homeScore}</strong></p>
+        <details><summary>View player Game Points (OGP / DGP / PGP / TGP)</summary>
+          {[[game.away,'Away'],[game.home,'Home']].map(([team,side])=><div key={team}>
+            <h4>{team}</h4>
+            <div className="ssl-pre-scroll"><table className="ssl-pre-table">
+              <thead><tr><th>Player</th><th>OGP</th><th>DGP</th><th>PGP</th><th>Item</th><th>TGP</th></tr></thead>
+              <tbody>{scorers.filter(p=>p.teamName===team).sort((a,b)=>b.stats.tgp-a.stats.tgp).map(p=>
+                <tr key={p.playerId}><td>{names.get(p.playerId)||p.playerId}{p.playerId===game.mvp?' (MVP)':''}</td>
+                <td>{shown(p.stats.ogp)}</td><td>{shown(p.stats.dgp)}</td><td>{shown(p.stats.pgp)}</td>
+                <td>{shown(p.stats.itemScore||0)}</td><td>{shown(p.stats.tgp)}</td></tr>
+              )}</tbody>
+            </table></div>
+            <p><strong>Team Total Game Points: {shown(scorers.filter(p=>p.teamName===team).reduce((n,p)=>n+p.stats.tgp,0))}</strong></p>
+          </div>)}
+        </details>
+      </article>
+    })}
+  </section>
+}
+
 export function PreseasonTournament({league,compact=false}){
   const season=league.season;
   const bracket=useMemo(()=>preseasonBracket(season),[season]);
   const ready=preseasonReady(season);
-  if(!ready)return <section className="panel ssl-pre-panel">
+  if(!ready)return <><section className="panel ssl-pre-panel">
     <h2>PRESEASON TOURNAMENT</h2>
     <p>The automatic 12-team bracket and draft-speed seeds appear once the official draft is finished. No seed is assigned while picks are still in progress.</p>
-  </section>;
+  </section><ImportedPreseasonResults/></>;
   if(compact)return <section className="panel ssl-pre-panel ssl-pre-home-bracket" aria-label="Pre-season tournament bracket">
     <div className="ssl-pre-head">
       <div><small>SSL PRE-SEASON · SINGLE ELIMINATION</small>
@@ -143,6 +174,7 @@ export function PreseasonTournament({league,compact=false}){
     </div>
   </section>;
   return <div className="ssl-pre-tournament">
+    <ImportedPreseasonResults/>
     <section className="panel ssl-pre-panel">
       <div className="ssl-pre-head"><div><small>SSL PRESEASON · SINGLE ELIMINATION</small>
         <h2>PRESEASON TOURNAMENT</h2>
