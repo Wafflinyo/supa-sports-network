@@ -37,7 +37,7 @@ export function preseasonPlayerStats(){
       Object.assign(stats,parts,{gameScore:parts.tgp,agp:parts.tgp});
       const key=String(playerId)+'|'+teamName;
       let row=byPlayer.get(key);
-      if(!row){row={playerId,teamName,stats:{gamesPlayed:0,positionsPlayed:[]},_games:[]};byPlayer.set(key,row)}
+      if(!row){row={playerId,playerName:game.playerNames?.[String(playerId)]||null,teamName,stats:{gamesPlayed:0,positionsPlayed:[]},_games:[]};byPlayer.set(key,row)}
       add(row.stats,stats);
       row.stats.gamesPlayed+=1;
       row.stats.positionsPlayed=[...new Set([...row.stats.positionsPlayed,...stats.positionsPlayed])];
@@ -81,6 +81,6 @@ export function preseasonPlayerStatsForGame(game){
     stats.mvps=Number(game.mvp===playerId);
     if(typeof stats.inningsPitched==='number')stats.outs=Math.round(stats.inningsPitched*3);
     const points=gamePointsForReport({stats,itemScore:stats.itemScore||0});
-    return {playerId,teamName:homeFlag?game.home:game.away,stats:{...stats,...points,gameScore:points.tgp}};
+    return {playerId,playerName:game.playerNames?.[String(playerId)]||null,teamName:homeFlag?game.home:game.away,stats:{...stats,...points,gameScore:points.tgp}};
   });
 }
