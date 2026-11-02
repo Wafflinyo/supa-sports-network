@@ -73,7 +73,7 @@ export function preseasonTeamStats(){
     delete row._games;return row;
   });
 }
-function preseasonPlayerStatsForGame(game){
+export function preseasonPlayerStatsForGame(game){
   // The source format allows subsequent game imports without duplicating players.
   return game.players.map(([playerId,homeFlag,positions,values])=>{
     const stats={};
