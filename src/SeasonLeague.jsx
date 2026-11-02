@@ -9,6 +9,7 @@ import {matchupDisplay} from './matchup-display.js';
 import {supportsStadiumVariant,matchupStadiumVariant} from './stadium-lighting.js';
 import DraftChat from './DraftChat.jsx';
 import {heatingUpForSeason,HEATING_UP_THRESHOLD} from './heating-up.js';
+import {gamePointsForReport} from './game-points.js';
 import {effectiveGameLineup,gameLineupIsEditable,teamGameLineups,savedLineupLabel} from './roster-lineups.js';
 import {
   SeasonRuleControls,
@@ -2463,10 +2464,11 @@ function TeamStats({ league: l }) {
     "pitchStrikeouts",
     "earnedRuns",
     "gameScore",
+    "ogp", "dgp", "pgp", "tgp", "agp",
   ];
   const s = l.season;
   const records = new Map(standings(s).map(t => [t.id, t]));
-  const statLabel = k => k === 'gameScore' ? 'Game Score' : k.replace(/([A-Z])/g, " $1");
+  const statLabel = k => ({gameScore:'Game Score',ogp:'OGP',dgp:'DGP',pgp:'PGP',tgp:'TGP',agp:'AGP'})[k] || k.replace(/([A-Z])/g, " $1");
   return (
     <Box title={isAverage ? "TEAM STAT AVERAGES" : "TEAM STAT TOTALS"}>
       <div className="stat-view-switch" role="group" aria-label="Team stat display">
@@ -2502,8 +2504,9 @@ function TeamStats({ league: l }) {
                 (g.result?.players || []).filter(p => p.team === t.id)
               );
               const totals = Object.fromEntries(
-                keys.map(k => [k, all.reduce((sum, p) => sum + (Number(k === 'gameScore' ? p.gameScore : p.stats?.[k]) || 0), 0)])
+                keys.filter(k=>k!=='agp').map(k => [k, all.reduce((sum, p) => sum + (Number(['ogp','dgp','pgp','tgp'].includes(k) ? gamePointsForReport(p)[k] : k === 'gameScore' ? p.gameScore : p.stats?.[k]) || 0), 0)])
               );
+              totals.agp=games.length?totals.tgp/games.length:null;
               const record = records.get(t.id);
               return (
                 <tr key={t.id}>
@@ -2514,9 +2517,9 @@ function TeamStats({ league: l }) {
                   <td>{record?.awayWins ?? 0}–{record?.awayLosses ?? 0}</td>
                   {keys.map(k => (
                     <td key={k} className="team-stats-number">
-                      {isAverage
+                      {k==='agp' ? (totals.agp?.toFixed(2)??'—') : isAverage
                         ? games.length ? (totals[k] / games.length).toFixed(2) : "—"
-                        : totals[k]}
+                        : ['ogp','dgp','pgp','tgp'].includes(k) ? totals[k].toFixed(2) : totals[k]}
                     </td>
                   ))}
                 </tr>
@@ -2527,8 +2530,8 @@ function TeamStats({ league: l }) {
       </div>
       <p className="team-stats-explainer">
         {isAverage
-          ? "Team averages are the sum of all players' stats divided by the team's completed games. GP and all W–L records remain totals; teams without completed games show a dash."
-          : "Team totals combine every player's stats from completed games."}
+          ? "Team averages are the sum of all players' stats divided by the team's completed games. AGP is the team's total Game Points per completed game. GP and all W–L records remain totals; teams without completed games show a dash."
+          : "Team totals combine every player's stats from completed games. OGP, DGP and PGP are weighted components. TGP also includes Item Score and MVP points; AGP is always per game."}
         {" "}Overall, Home and Away Records count released regular-season games only.
       </p>
     </Box>
