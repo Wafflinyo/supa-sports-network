@@ -24,7 +24,7 @@ export function customGameScore(stats,itemScore=0){
     raw+=detail[key];
   }
   raw=round2(raw+item);
-  return {gameScore:Math.max(0,raw),baseGameScore:round2(raw-item),
+  return {gameScore:raw,baseGameScore:round2(raw-item),
     itemScore:round2(item),rawScore:raw,detail,
-    heatingUp:Math.max(0,raw)>=SSL_HEATING_THRESHOLD};
+    heatingUp:raw>=SSL_HEATING_THRESHOLD};
 }
