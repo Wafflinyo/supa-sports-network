@@ -17,7 +17,7 @@ assert(!/update league_private\.ssl_season_states/.test(verifySql),
  'Scoring migration must never mutate existing draft, lineups or saved game data');
 import {customGameScore,SSL_GAME_SCORE_WEIGHTS,SSL_HEATING_THRESHOLD} from '../src/ssl-game-score.js';
 import {gamePointComponents,gamePointsForReport} from '../src/game-points.js';
-import {buildReport,previewCustomGameScore,aggregate} from '../src/season-data.js';
+import {buildReport,automaticReportMvp,previewCustomGameScore,aggregate} from '../src/season-data.js';
 import {heatingUpForSeason} from '../src/heating-up.js';
 import {playerCareer} from '../src/player-career.js';
 assert.equal(SSL_HEATING_THRESHOLD,100);
@@ -79,6 +79,15 @@ assert.equal(previewCustomGameScore(preview,row).gameScore,109,
  'one inning +2 and four strikes +2 in the report preview');
 assert.equal(previewCustomGameScore(preview,row,10).gameScore,119,
  'selecting the MVP immediately includes the ten-point award in preview');
+const otherPlayer={player:'Rival',position:'C',label:'B',chosen:1,hits:30,runs:0,itemscore:0};
+const forMvp={...preview,labels:['A','B'],rows:[row,otherPlayer]};
+assert.equal(automaticReportMvp(forMvp,'A'),10,
+ 'Only the highest scoring player on the winning team can be automatic MVP, even when an opponent scores more');
+assert.equal(automaticReportMvp({...forMvp,rows:[{...row,runs:0},otherPlayer]},'A'),null,
+ 'Tied scores cannot produce an automatic MVP');
+assert.equal(automaticReportMvp({...forMvp,rows:[{...row,chosen:0},otherPlayer]},'A'),null,
+ 'All players must be mapped before choosing MVP');
+
 const season={id:'s1',name:'Season 1',number:1,rosters:{a:[10],b:[1]},games:[]};
 const game={id:'g1',away:'a',home:'b',phase:'regular',
   stage:'final',startsAt:'2026-11-01T17:00:00Z'};
