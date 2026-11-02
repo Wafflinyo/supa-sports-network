@@ -47,6 +47,7 @@ import {
   readRio,
   buildReport,
   previewCustomGameScore,
+  automaticReportMvp,
 } from "./season-data.js";
 import "./season.css";
 const byPlayer = new Map(pool.map((p) => [p.id, p]));
@@ -1563,9 +1564,11 @@ function Schedule({ league: l, commissioner = false }) {
 function ReportImport({ league: l, game, onDone }) {
   const [preview, setPreview] = useState(null),
     [awayLabel, setAwayLabel] = useState(""),
-    [mvp, setMvp] = useState(""),
     [error, setError] = useState(""),
     [loading, setLoading] = useState(false);
+  const autoMvp = useMemo(()=>{
+    try{return preview&&automaticReportMvp(preview,awayLabel)}catch{return null}
+  },[preview,awayLabel]);
   return (
     <div className="report-import">
       <h3>PROJECT RIO RESULT REVIEW</h3>
@@ -1573,7 +1576,7 @@ function ReportImport({ league: l, game, onDone }) {
         Map team labels and any ambiguous Mii/name rows. Add an "Item Score"
         column at the end of the Project Rio Stats worksheet. The site
         automatically scores batting, defense and pitching, adds Item Score
-        (blank means 0), awards +10 for the selected match MVP, and grants
+        (blank means 0), automatically awards +10 MVP points to the highest-scoring player on the winning team, and grants
         Heating Up at {HEATING_UP_THRESHOLD}+. Pitching receives +2 per
         inning pitched (including partial innings), +0.5 per strike, -3 per
         earned run, -10 per HR allowed and +8 for a complete game. Rio
@@ -1597,7 +1600,6 @@ function ReportImport({ league: l, game, onDone }) {
               pool,
             );
             setPreview(p);
-            setMvp("");
             setAwayLabel(p.labels[0]);
           } catch (e) {
             setError(e.message);
@@ -1639,7 +1641,7 @@ function ReportImport({ league: l, game, onDone }) {
                       <td>{r.player}</td>
                       <td>{r.label}</td>
                       <td>{r.itemscore === '' ? 0 : r.itemscore ?? 0}</td>
-                      <td>{(() => {try{const score=previewCustomGameScore(preview,r,mvp);
+                      <td>{(() => {try{const score=previewCustomGameScore(preview,r,autoMvp);
                         return <><strong>{score.gameScore}</strong>{score.heatingUp?' ★':''}</>;
                       }catch(e){return <span title={e.message}>Check stats</span>}})()}</td>
                       <td>
@@ -1762,25 +1764,13 @@ function ReportImport({ league: l, game, onDone }) {
               hits
             </p>
           ))}
-          <label>
-            Game MVP (optional)
-            <select value={mvp} onChange={(e) => setMvp(e.target.value)}>
-              <option value="">None / not recorded</option>
-              {preview.rows
-                .filter((r) => r.chosen)
-                .map((r) => (
-                  <option key={r.row} value={r.chosen}>
-                    {name(r.chosen)}
-                  </option>
-                ))}
-            </select>
-          </label>
+          <p><strong>Automatic Match MVP:</strong> {autoMvp ? name(autoMvp) : 'Map both teams to determine MVP (no tied game)'}</p>
           <button
             className="red-btn"
             disabled={
               l.busy ||
               preview.rows.some((r) => !r.chosen) ||
-              preview.pitch.some((r) => !r.chosen)
+              preview.pitch.some((r) => !r.chosen) || !autoMvp
             }
             onClick={async () => {
               try {
@@ -1793,7 +1783,7 @@ function ReportImport({ league: l, game, onDone }) {
                   },
                   game,
                   pool,
-                  mvp,
+                  autoMvp,
                 );
                 if (await l.act("result", { game: game.id, report })) onDone();
               } catch (e) {
