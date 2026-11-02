@@ -12,7 +12,6 @@ const statGroups = {
   'Game Score': [
     ['gamesPlayed','Games Played'],['gameScore','Game Score'],
     ['ogp','OGP'],['dgp','DGP'],['pgp','PGP'],['tgp','TGP'],['agp','AGP'],['itemScore','Item Score'],
-    ['heatingUpCount','Hot Games'],['longestHotStreak','Longest Hot Streak'],
   ],
   'Offensive Stats': [
     ['ogp','Offensive Game Points (OGP)'],
