@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {visibleGamePointFields} from '../src/game-point-columns.js';
+
+const gameScore=[['gamesPlayed','Games Played'],['ogp','OGP'],['tgp','TGP'],['agp','AGP'],['itemScore','Item Score']];
+const total=visibleGamePointFields(gameScore,'Totals').map(([key])=>key);
+const averages=visibleGamePointFields(gameScore,'Averages per Game').map(([key])=>key);
+assert.deepEqual(total,['gamesPlayed','ogp','tgp','itemScore']);
+assert.deepEqual(averages,['gamesPlayed','ogp','agp','itemScore']);
+assert.equal(total.includes('agp'),false);
+assert.equal(averages.includes('tgp'),false);
+assert.deepEqual(visibleGamePointFields(['ogp','dgp','pgp','tgp','agp'],'Totals'),['ogp','dgp','pgp','tgp']);
+assert.deepEqual(visibleGamePointFields(['ogp','dgp','pgp','tgp','agp'],'Averages per Game'),['ogp','dgp','pgp','agp']);
+assert.deepEqual(visibleGamePointFields([['hits','Hits']],'Totals'),[['hits','Hits']]);
+const preseason=readFileSync(new URL('../src/PreseasonStats.jsx',import.meta.url),'utf8');
+const main=readFileSync(new URL('../src/main.jsx',import.meta.url),'utf8');
+const season=readFileSync(new URL('../src/SeasonLeague.jsx',import.meta.url),'utf8');
+assert.match(preseason,/const columns=visibleGamePointFields\(statGroups\[category\],view\)/);
+assert.match(main,/const visibleStatColumns=visibleGamePointFields\(statGroups\[statTab\],statView\)/);
+assert.match(main,/visibleStatColumns\.map/);
+assert.match(season,/const keys=visibleGamePointFields\(allKeys,view\)/);
+assert.match(season,/allKeys\.filter\(k=>k!=='agp'\)/);
+console.log('TGP and AGP show exclusively in their corresponding views in all SSL stats tables.');
