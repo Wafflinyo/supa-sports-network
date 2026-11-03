@@ -109,6 +109,6 @@ assert.match(home,/seasonOneChampionship\(/);
 assert.match(home,/<ChampionshipHero/);
 assert.match(home,/teamLogo\(supabase,champion\.logoPath\)/);
 assert.match(home,/VIEW PRESEASON RESULTS/);
-assert.match(home,/onResults=>go\('Playoff Bracket','Pre-season'\)/);
+assert.match(home,/onResults=\{\(\)=>go\('Playoff Bracket','Pre-season'\)\}/);
 assert.match(home,/item\.category==='preseason-champion'/);
 console.log('PASS: championship hero locked behind published final, real team logo, dynamic preseason AGP top three, persistent S1 feature, news release and non-preseason Recent Results');
