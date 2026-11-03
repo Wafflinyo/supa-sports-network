@@ -1167,9 +1167,9 @@ function MyTeam({league:l}){
   return <RosterManager league={l}/>;
 }
 
-function Teams({ league: l }) {
+function Teams({ league: l, initialTab='Franchises' }) {
   const s = l.season;
-  const [tab,setTab]=useState('Franchises');
+  const [tab,setTab]=useState(initialTab==='Power Rankings'?'Power Rankings':'Franchises');
   const rankingsVisible=preseasonReady(s);
   const records = new Map(standings(s).map(t=>[t.id,t]));
   return (<>
@@ -2691,7 +2691,7 @@ export function SeasonPage({ page, league: l, section=null }) {
       ) : page === "Standings" ? (
         <Standings league={l} />
       ) : page === "Teams" ? (
-        <Teams league={l} />
+        <Teams league={l} initialTab={section}/>
       ) : page === "Preseason Tournament" ? (
         <PreseasonTournament league={l} />
       ) : page === "Team Stats" ? (
