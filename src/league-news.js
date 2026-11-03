@@ -1,4 +1,5 @@
 import {HEATING_UP_THRESHOLD} from './heating-up.js';
+import {preseasonChampionshipFeature} from './preseason-champion-feature.js';
 // Derived newsroom: headlines refresh when official reports are corrected.
 // Recorded games remain commissioner-only until their results are released.
 
@@ -200,6 +201,24 @@ export function leagueNews(seasons, players, {includeRecorded = false} = {}) {
             `${reached}-for-${pa} reaching base against ${opponent}: ${plural(hits, 'hit')}, ${plural(walks, 'walk')} and ${plural(hitByPitch, 'hit by pitch', 'hit by pitches')}.`);
         }
       }
+    }
+    // Announce the championship from public released finals, never from a
+    // commissioner-only staged spreadsheet. Rebuilt deterministically on reload.
+    const championship=preseasonChampionshipFeature(season,players);
+    if(championship){
+      const leaders=championship.topPlayers.map(row=>
+        `${row.name} (${row.agp.toFixed(2)} AGP)`).join(', ');
+      items.push({
+        id:`preseason-champion:${season.id}`,
+        category:'preseason-champion',tier:'champion',
+        label:'PRESEASON CHAMPIONS',season:season.name,
+        title:`${championship.champion.name} win the ${championship.seasonName} preseason championship!`,
+        summary:leaders
+          ?`${championship.champion.name} are the ${championship.seasonName} preseason champions! Top players by average Game Points: ${leaders}. Explore the full tournament results and statistics.`
+          :`${championship.champion.name} are the ${championship.seasonName} preseason champions! Explore the full tournament results and statistics.`,
+        at:championship.at||'',
+        seasonId:season.id,
+      });
     }
     for (const trade of season.transactions || []) {
       const moves = trade.body?.moves || [];
