@@ -34,9 +34,12 @@ export function homeWeekBoard(season){
 }
 export function homeRecentResults(season,limit=6){
   const released=(season?.games||[]).map((game,index)=>({game,index}))
-    .filter(({game})=>game.stage==='final'&&game.result?.scores);
+    .filter(({game})=>['regular','postseason','playoffs'].includes(game.phase) &&
+      game.stage==='final'&&game.result?.scores);
   if(!released.length)return [];
 
+  // Preseason exhibitions never enter this box: their results live in the
+  // Pre-season Bracket / Preseason Stats area, and the champion feature.
   // While the regular season is active, show the latest week with released
   // scores; its scores stay in Recent Results until the first result from a
   // newer week is released. No timer, and never show private uploads.
