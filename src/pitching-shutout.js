@@ -27,3 +27,11 @@ export function pitchingShutoutBonuses({away,home,awayScore,homeScore,pitchers=[
   for(let i=0;i<remainder;i++)ranked[i%ranked.length].cents+=1;
   return new Map(entries.map(row=>[row.player,row.cents/100]));
 }
+
+export function pitcherShutoutStats(bonus,pitcherCount){
+  const credited=Number(bonus)>0;
+  return {
+    shutouts:Number(credited&&pitcherCount===1),
+    combinedShutouts:Number(credited&&pitcherCount>1),
+  };
+}
