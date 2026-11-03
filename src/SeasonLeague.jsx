@@ -5,6 +5,7 @@ import {seasonBoxScore} from './game-box-score-data.js';
 import GameBoxScore from './GameBoxScore.jsx';
 import RioReportDialog from './RioReportDialog.jsx';
 import PreseasonStats from './PreseasonStats.jsx';
+import HistoryArchive from './HistoryArchive.jsx';
 import {preseasonReady} from './preseason.js';
 import {lotteryProgress,lotteryReplayProgress,lotteryDuration,lotteryCountdownClock} from './lottery-timing.js';
 import {orderedDraftPickTeams,lotteryOrderReady,teamsInLotteryOrder} from './draft-pick-stats-order.js';
@@ -2638,32 +2639,7 @@ function History({ league: l }) {
         ))}
       </div>
       {tab === "Past Seasons" ? (
-        l.seasons.map((s) => (
-          <details className="panel season-box" key={s.id}>
-            <summary>
-              {s.name} · {s.status} ·{" "}
-              {s.games.filter((g) => g.stage === "final").length} completed
-              games
-            </summary>
-            <p>
-              Champion:{" "}
-              {s.teams.find((t) => t.id === s.champion)?.name || "Not decided"}
-            </p>
-            <p>{teamsInLotteryOrder(s,s?.serverNow).map((t) => t.name).join(" · ")}</p>
-            <button className="outline-btn" onClick={() => l.setSelected(s.id)}>
-              VIEW THIS SEASON IN LEAGUE TABS
-            </button>
-            <details>
-              <summary>DRAFT SUMMARY</summary>
-              {s.picks.map((p) => (
-                <p key={p.number}>
-                  #{p.number} · {s.teams.find((t) => t.id === p.team)?.name} ·{" "}
-                  {p.kind === "stage" ? `STADIUM · ${p.stage}` : name(p.player)}
-                </p>
-              ))}
-            </details>
-          </details>
-        ))
+        <HistoryArchive seasons={l.seasons} supabase={l.supabase}/>
       ) : (
         <Box title="CAREER LEAGUE RECORDS">
           {["gamesPlayed", "hits", "homeRuns", "rbi", "pitchStrikeouts", "gameScore"].map(
