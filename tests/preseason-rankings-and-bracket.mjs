@@ -269,10 +269,10 @@ for(const person of allGood)
 
 const pitchRaw=(s)=>{
  const clamp100=x=>Math.max(0,Math.min(100,x));
- return .60*clamp100(Number(s['pitching stamina'])||0)+
-   .18*clamp100(((Number(s['charge pitch speed'])||90)-90)/80*100)+
-   .14*clamp100(((Number(s['curveball speed'])||90)-90)/65*100)+
-   .08*clamp100(Number(s.curve)||0);
+ return .55*clamp100(Number(s['pitching stamina'])||0)+
+   .10*clamp100(((Number(s['charge pitch speed'])||90)-90)/80*100)+
+   .15*clamp100(((Number(s['curveball speed'])||90)-90)/65*100)+
+   .20*clamp100(Number(s.curve)||0);
 };
 for(const names of [powerNames,balancedNames]){
  const ids=names.map(n=>byName.get(n).id);
