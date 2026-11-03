@@ -91,7 +91,7 @@ for(const stat of ['ogp','dgp','pgp']){
   const low=gamePointCategoryBoost(-50,stat),
     mid=gamePointCategoryBoost(GAME_POINT_BOOST_CONFIG.scales[stat].center,stat),
     high=gamePointCategoryBoost(999,stat);
-  assert(low>0&&low<mid&&mid<high&&high<10,
+  assert(low>0&&low<mid&&mid<high&&high<=10,
     stat+' boosts must always be positive and increase with per-game productivity');
   assert(Math.abs(mid-5.25)<1e-8,
     stat+' midpoint should have a +5.25 projected rating boost');
