@@ -1635,8 +1635,9 @@ function ReportImport({ league: l, game, onDone }) {
     <div className="report-import">
       <h3>PROJECT RIO RESULT REVIEW</h3>
       <p>
-        Map team labels and any ambiguous Mii/name rows. Add an "Item Score"
-        column at the end of the Project Rio Stats worksheet. The site
+        Upload an ODS or XLSX Project Rio file. The 12 generic in-game logos/team names
+        automatically identify their SSL franchises. Review ambiguous player/Mii rows.
+        Add an "Item Score" column to the Stats worksheet. The site
         automatically scores batting, defense and pitching, adds Item Score
         (blank means 0), automatically awards +10 MVP points to the highest-scoring player on the winning team, and grants
         Heating Up at {HEATING_UP_THRESHOLD}+. Pitching receives +2 per
@@ -1650,8 +1651,8 @@ function ReportImport({ league: l, game, onDone }) {
       </p>
       <input
         type="file"
-        accept=".xlsx"
-        aria-label="Project Rio XLSX"
+        accept=".ods,.xlsx"
+        aria-label="Project Rio ODS or XLSX"
         disabled={loading}
         onChange={async (e) => {
           if (!e.target.files[0]) return;
