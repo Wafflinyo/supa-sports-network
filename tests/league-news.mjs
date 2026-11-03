@@ -129,3 +129,48 @@ assert.equal(find({hits: 2, atBats: 2, sacFlys: 1, plateAppearances: 3},
   'perfect-batting'), undefined);
 
 console.log('PASS: tiered Rio news highlights, home run categories, perfect on-base, zero-K pitching, Buddy Jumps, embargo, trades, correction and stable copy');
+
+
+// Approved seven-player swap: news must group incoming players by destination,
+// regardless of the underlying transaction move order. No repeated arrows.
+const newsTeams=[
+  {id:'void',name:'Starborn Voidstriders'},
+  {id:'knights',name:'New Donk City Knights'},
+];
+const swapPlayers=[
+  {id:101,name:'Rosalina'}, {id:102,name:'Light Blue Yoshi'},
+  {id:103,name:'Green Toad'}, {id:104,name:'Green Luma'},
+  {id:105,name:'William'}, {id:106,name:'Purple Kritter'},
+  {id:107,name:'Purple Toad'},
+];
+const swapMoves=[
+  ...[101,102,103,104].map(id=>({kind:'player',id,from:'void',to:'knights'})),
+  ...[105,106,107].map(id=>({kind:'player',id,from:'knights',to:'void'})),
+];
+const swapSeason={name:'Season 1',number:1,teams:newsTeams,games:[],
+  transactions:[{id:'approved-swap',createdAt:'2026-11-03T14:00:00Z',
+    body:{teams:['void','knights'],moves:swapMoves}}]};
+const [swapNews]=leagueNews([swapSeason],swapPlayers);
+assert.equal(swapNews.category,'trade');
+assert.equal(swapNews.tradeGroups.length,2);
+const incoming=new Map(swapNews.tradeGroups.map(g=>[g.teamName,g.assets.map(a=>a.label)]));
+assert.deepEqual(incoming.get('Starborn Voidstriders'),['William','Purple Kritter','Purple Toad']);
+assert.deepEqual(incoming.get('New Donk City Knights'),['Rosalina','Light Blue Yoshi','Green Toad','Green Luma']);
+assert.match(swapNews.title,/complete a trade/i);
+assert(!swapNews.summary.includes('→'),'notification copy should remain concise, without long arrows');
+assert(swapNews.summary.includes('4 assets to New Donk City Knights'));
+
+// Uneven / draft-pick trade should list the pick accurately with source franchise.
+const pickSeason={...swapSeason,pickAssets:[{id:'next-pick',round:3,originalTeam:'knights'}],
+  tradePickSeason:2,transactions:[{id:'approved-pick',createdAt:'2026-11-03T14:02:00Z',
+    body:{teams:['void','knights'],moves:[
+      {kind:'pick',id:'next-pick',from:'knights',to:'void'},
+      {kind:'player',id:101,from:'void',to:'knights'},
+    ]}}]};
+const pickNews=leagueNews([pickSeason],swapPlayers)[0];
+assert.equal(pickNews.tradeGroups.length,2);
+assert(pickNews.tradeGroups.find(g=>g.teamId==='void').assets[0].label.includes('Season 2 · Round 3'));
+assert(pickNews.tradeGroups.find(g=>g.teamId==='void').assets[0].label.includes('New Donk City Knights'));
+assert.equal(pickNews.tradeGroups.find(g=>g.teamId==='knights').assets[0].label,'Rosalina');
+assert.deepEqual(leagueNews([swapSeason],swapPlayers),[swapNews],'news trade formatting must be deterministic');
+console.log('PASS: clear receiving-team trade breakdowns, large swaps and next-season draft picks');

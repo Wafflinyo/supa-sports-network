@@ -35,6 +35,21 @@ function ScoreLine({season,game,onClick}){
     <b>{game.result.scores[game.away]} – {game.result.scores[game.home]}</b>
   </button>;
 }
+function TradeNewsBreakdown({groups}){
+  return <div className="ssl-trade-breakdown" role="group" aria-label="Approved trade assets received by team">
+    {groups.map(group=><section key={group.teamId} className="ssl-trade-side">
+      <div className="ssl-trade-side-heading">
+        <small>RECEIVES</small><strong>{group.teamName}</strong>
+      </div>
+      <ul className="ssl-trade-assets">
+        {group.assets.map((asset,index)=><li key={group.teamId+':'+index}>
+          <span className="ssl-trade-asset-name">{asset.label}</span>
+          {groups.length>2&&<small>From {asset.from}</small>}
+        </li>)}
+      </ul>
+    </section>)}
+  </div>;
+}
 export default function HomeDashboard({league,go,newsItems=[],players=[],onPlayerSelect}){
   const season=league?.season;
   const [showAllNews,setShowAllNews]=useState(false);
@@ -63,7 +78,9 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
             <span className="news-mark" aria-hidden="true">{item.category==='heating'?<HeatFlame/>:item.category==='trade'?<Shield size={27}/>:item.category==='pitching'?<Trophy size={27}/>:<Megaphone size={27}/>}</span>
             <div className="news-copy">
               <small>{item.label}{item.private?' · PRIVATE PREVIEW':''}{item.at?' · '+new Date(item.at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):''}</small>
-              <h3>{item.title}</h3><p>{item.summary}</p>
+              <h3>{item.title}</h3>{item.category==='trade'&&item.tradeGroups?.length
+                ?<TradeNewsBreakdown groups={item.tradeGroups}/>
+                :<p>{item.summary}</p>}
             </div>
             <button type="button" aria-label={item.playerId?'View player profile':'View transactions'}
               onClick={()=>{if(item.playerId){const p=players.find(x=>x.id===item.playerId);if(p)onPlayerSelect(p);}else go('Transactions');}}>›</button>

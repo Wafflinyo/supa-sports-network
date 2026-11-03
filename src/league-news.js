@@ -203,22 +203,51 @@ export function leagueNews(seasons, players, {includeRecorded = false} = {}) {
     }
     for (const trade of season.transactions || []) {
       const moves = trade.body?.moves || [];
-      // Already-approved transactions only are included in season.transactions.
+      // season.transactions contains approved trades only.
       if (!moves.length) continue;
-      const playersMoved = moves.filter(m => m.kind === 'player');
-      const first = playersMoved[0];
-      const from = first?.from || moves[0]?.from, to = first?.to || moves[0]?.to;
-      const headline = first && from && to
+      const playerMoves = moves.filter(move => move.kind === 'player');
+      const first = playerMoves[0];
+      const from = first?.from || moves[0]?.from;
+      const to = first?.to || moves[0]?.to;
+      const teamIds = [...new Set([
+        ...(trade.body?.teams || []),
+        ...moves.flatMap(move => [move.from, move.to]),
+      ].filter(Boolean))];
+
+      // The structured breakdown is shared by the news feed, and works for
+      // uneven exchanges, draft picks, and even three-way trades.
+      const received = new Map();
+      for (const move of moves) {
+        if (!move.to) continue;
+        const items = received.get(move.to) || [];
+        let label = 'Legacy asset';
+        if (move.kind === 'player') {
+          label = pool.get(Number(move.id)) || 'Unknown player';
+        } else if (move.kind === 'pick') {
+          const asset = (season.pickAssets || []).find(p => String(p.id) === String(move.id));
+          const seasonNumber = season.tradePickSeason || (Number(season.number || 0) + 1);
+          label = `Season ${seasonNumber} · Round ${asset?.round || '?'} draft pick`;
+          if (asset?.originalTeam) label += ` (originally ${teamName(asset.originalTeam)})`;
+        }
+        items.push({kind: move.kind, label, from: teamName(move.from)});
+        received.set(move.to, items);
+      }
+      const tradeGroups = [...received].map(([teamId, assets]) => ({
+        teamId, teamName: teamName(teamId), assets,
+      }));
+      const headline = moves.length === 1 && first && from && to
         ? `${teamName(from)} trades ${pool.get(Number(first.id)) || 'a player'} to ${teamName(to)}!`
-        : `${teamName(from)} and ${teamName(to)} complete a trade!`;
-      const detail = moves.map(m => {
-        const direction = `${teamName(m.from)} → ${teamName(m.to)}`;
-        if (m.kind === 'player') return `${pool.get(Number(m.id)) || 'Player'} (${direction})`;
-        if (m.kind === 'pick') return `Draft pick (${direction})`;
-        return `Legacy asset (${direction})`;
-      }).join(' · ');
-      items.push({id: `trade:${trade.id}`, category: 'trade', label: 'TRADE APPROVED',
-        title: headline, summary: detail, at: trade.createdAt || '', season: season.name, tradeId: trade.id});
+        : teamIds.length === 2
+          ? `${teamName(teamIds[0])} & ${teamName(teamIds[1])} complete a trade!`
+          : `${teamIds.length} SSL teams complete a trade!`;
+      const description = tradeGroups.map(group =>
+        `${group.assets.length} ${group.assets.length === 1 ? 'asset' : 'assets'} to ${group.teamName}`
+      ).join(' · ');
+      items.push({
+        id: `trade:${trade.id}`, category: 'trade', label: 'TRADE APPROVED',
+        title: headline, summary: description, tradeGroups, at: trade.createdAt || '',
+        season: season.name, tradeId: trade.id,
+      });
     }
   }
   const validDate = time => Number.isFinite(Date.parse(time || '')) ? Date.parse(time) : 0;
