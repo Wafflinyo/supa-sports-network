@@ -54,7 +54,7 @@ export function makePreseasonReport(preview,season,match,players){
     mvp:Number(mvp),fields,players:compactPlayers,
   };
   return {
-    schema:1,matchKey:match.key,teamA:ids[0],teamB:ids[1],
+    schema:1,seasonId:String(season.id),matchKey:match.key,teamA:ids[0],teamB:ids[1],
     scoreA:scores[ids[0]],scoreB:scores[ids[1]],
     filename:raw.filename,fingerprint:raw.fingerprint,
     players:raw.players,compact,
