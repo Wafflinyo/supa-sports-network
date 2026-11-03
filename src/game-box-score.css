@@ -1,0 +1,44 @@
+.ssl-box-backdrop{position:fixed;inset:0;z-index:100100;background:rgba(10,24,49,.72);display:flex;justify-content:center;align-items:center;padding:14px;overscroll-behavior:contain}
+.ssl-box-dialog{width:min(100%,1100px);max-height:calc(100dvh - 28px);overflow-y:auto;overscroll-behavior:contain;border-radius:12px;background:#fff;box-shadow:0 22px 70px rgba(0,0,0,.35);color:#162946}
+.ssl-box-header{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:18px 22px;background:#12284d;color:#fff}
+.ssl-box-header small{display:block;color:#abc4eb;text-transform:uppercase;font-size:11px;font-weight:750;letter-spacing:.09em;margin-bottom:3px}
+.ssl-box-header h2{font-size:22px;font-weight:900;margin:0;color:#fff}
+.ssl-box-close{width:44px;height:44px;border:1px solid #8197b6;border-radius:7px;color:#fff;background:#223f68;cursor:pointer;font-size:32px;line-height:1;flex:none}
+.ssl-box-close:hover,.ssl-box-close:focus-visible{background:#325688;outline:2px solid white;outline-offset:2px}
+.ssl-box-scoreboard{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:20px 22px 12px;background:#f3f6fa}
+.ssl-box-scoreboard>div{min-width:0;background:#fff;border:1px solid #dce4ef;border-radius:8px;padding:12px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:7px}
+.ssl-box-scoreboard span{display:block;grid-column:1/-1;font-size:10px;font-weight:900;letter-spacing:.12em;color:#687b96}
+.ssl-box-scoreboard strong{min-width:0;overflow-wrap:anywhere;font-size:16px;line-height:1.35}
+.ssl-box-scoreboard b{font-size:30px;font-variant-numeric:tabular-nums;color:#14335c}
+.ssl-box-score-summary{display:flex;gap:13px;align-items:center;flex-wrap:wrap;padding:10px 22px;background:#f3f6fa;border-bottom:1px solid #dae3ef;font-size:12px;color:#536582;font-weight:800}
+.ssl-box-score-summary strong{color:#ca2736;letter-spacing:.06em}
+.ssl-box-tabs{display:flex;gap:3px;padding:12px 16px 0;border-bottom:2px solid #dbe2ed;overflow-x:auto;scrollbar-width:thin}
+.ssl-box-tabs button{background:transparent;color:#55637c;border:0;border-bottom:3px solid transparent;padding:11px 15px;font-size:13px;font-weight:850;white-space:nowrap;cursor:pointer}
+.ssl-box-tabs button.active{border-color:#df2838;color:#c41f31}
+.ssl-box-tabs button:focus-visible{outline:2px solid #193e78;outline-offset:-2px}
+.ssl-box-instructions{font-size:12px;color:#5b6c86;margin:12px 20px 4px;line-height:1.5}
+.ssl-box-team{padding:10px 20px 18px}
+.ssl-box-team+.ssl-box-team{border-top:1px solid #dce3ee}
+.ssl-box-team-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.ssl-box-team h3{margin:0;font-size:18px;color:#152b52}
+.ssl-box-team-head span{font-size:12px;color:#60718a;font-weight:700}
+.ssl-box-table-scroll{max-width:100%;overflow-x:auto;border:1px solid #cbd7e7;border-radius:7px;-webkit-overflow-scrolling:touch}
+.ssl-box-table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;font-size:12px;font-variant-numeric:tabular-nums}
+.ssl-box-table th,.ssl-box-table td{text-align:right;padding:10px 12px;border-right:1px solid #dae2ef;border-bottom:1px solid #dae2ef;white-space:nowrap}
+.ssl-box-table thead th{color:#fff;background:#142a50;font-weight:850;font-size:11px;letter-spacing:.015em}
+.ssl-box-table tbody tr:nth-child(even){background:#f4f7fb}
+.ssl-box-table tbody tr:last-child>*{border-bottom:0}
+.ssl-box-table tr>*:last-child{border-right:0}
+.ssl-box-table .ssl-box-player{text-align:left;min-width:165px;max-width:220px;position:sticky;left:0;z-index:2;background:#fff;box-shadow:2px 0 3px #142a5010}
+.ssl-box-table thead .ssl-box-player{background:#142a50;z-index:3}
+.ssl-box-table tbody tr:nth-child(even) .ssl-box-player{background:#f4f7fb}
+.ssl-box-name{display:flex;gap:5px;align-items:center;font-size:12px;font-weight:800}
+.ssl-box-player small{display:block;color:#64758b;font-size:10px;font-weight:500;margin-top:3px}
+.ssl-box-mvp{color:#9b5f08;background:#fff0c1;border-radius:4px;padding:2px 4px;font-size:9px;font-weight:900}
+.ssl-box-table .ssl-box-highlight{font-weight:900;color:#bf2738}
+.ssl-box-team-total{margin:10px 0 0;text-align:right;font-size:13px;font-weight:650;color:#405577}
+.ssl-box-team-total strong{font-variant-numeric:tabular-nums;color:#17325a}
+.ssl-box-empty,.ssl-box-no-report{font-size:13px;color:#5a6e8a;line-height:1.7}
+.ssl-box-no-report{padding:25px}
+.ssl-box-no-report strong{color:#162e56}
+@media(max-width:650px){.ssl-box-backdrop{padding:5px;align-items:center}.ssl-box-dialog{max-height:calc(100dvh - 10px);border-radius:8px}.ssl-box-header{padding:14px}.ssl-box-header h2{font-size:19px}.ssl-box-scoreboard{padding:12px;gap:6px}.ssl-box-scoreboard>div{padding:9px;grid-template-columns:minmax(0,1fr) auto}.ssl-box-scoreboard strong{font-size:12px}.ssl-box-scoreboard b{font-size:24px}.ssl-box-score-summary{padding:9px 12px;font-size:11px}.ssl-box-tabs{padding-left:5px;padding-right:5px}.ssl-box-tabs button{padding:11px 12px}.ssl-box-team{padding:12px 10px}.ssl-box-team h3{font-size:15px}.ssl-box-table .ssl-box-player{min-width:128px;max-width:150px}.ssl-box-table th,.ssl-box-table td{padding:10px 8px}.ssl-box-instructions{margin:11px 12px 0}}
