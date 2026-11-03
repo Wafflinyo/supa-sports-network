@@ -12,7 +12,10 @@ export const SSL_GAME_SCORE_WEIGHTS=Object.freeze({
 });
 export const SSL_HEATING_THRESHOLD=120;
 const round2=n=>Math.round((n+Number.EPSILON)*100)/100;
-export function customGameScore(stats,itemScore=0){
+export function customGameScore(stats,itemScore=0,shutoutBonus=0){
+  const bonus=Number(shutoutBonus);
+  if(!Number.isFinite(bonus)||bonus<0||bonus>30||Math.abs(bonus*100-Math.round(bonus*100))>0.00001)
+    throw Error('Shutout bonus must be 0–30 points with no more than two decimal places.');
   const item=Number(itemScore);
   if(!Number.isFinite(item)||item<0)throw Error('Item Score must be a nonnegative number.');
   let raw=0;
@@ -23,7 +26,8 @@ export function customGameScore(stats,itemScore=0){
     detail[key]=n*weight;
     raw+=detail[key];
   }
-  raw=round2(raw+item);
+  detail.shutoutBonus=bonus;
+  raw=round2(raw+item+bonus);
   return {gameScore:raw,baseGameScore:round2(raw-item),
     itemScore:round2(item),rawScore:raw,detail,
     heatingUp:raw>=SSL_HEATING_THRESHOLD};
