@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {preseasonReady,preseasonSeeds,preseasonBracket,preseasonHasLeagueOpener} from '../src/preseason.js';
-import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,offenseRating,rosterPowerComponents,rankingParticipants,PITCHER_PRIORITY_ORDER,POWER_PITCHER_COUNT,POWER_SUPPORT_PITCHER_COUNT,FIELDING_ABILITY_BONUSES,BASERUNNING_ABILITY_BONUS,BATTING_CHEMISTRY_BONUSES,DEFENSIVE_CHEMISTRY_LINKS,MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT,UNLISTED_FIELDING_CHEMISTRY_BONUS,lineupChemistryAdjustments,fieldingAbilityBonus,lineupFieldingAbilityBonuses,POSITIONAL_FIELDING_ABILITY_BONUSES,SPECIAL_CATCH_ABILITY_IDS,MISSING_MIDDLE_INFIELD_CATCH_PENALTY,OFFENSE_SPEED_WEIGHT,DEFENSE_SPEED_WEIGHT} from '../src/power-rankings.js';
+import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,offenseRating,rosterPowerComponents,rankingParticipants,PITCHER_PRIORITY_ORDER,POWER_PITCHER_COUNT,POWER_SUPPORT_PITCHER_COUNT,FIELDING_ABILITY_BONUSES,BASERUNNING_ABILITY_BONUS,BATTING_CHEMISTRY_BONUSES,DEFENSIVE_CHEMISTRY_LINKS,MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT,UNLISTED_FIELDING_CHEMISTRY_BONUS,lineupChemistryAdjustments,fieldingAbilityBonus,lineupFieldingAbilityBonuses,POSITIONAL_FIELDING_ABILITY_BONUSES,SPECIAL_CATCH_ABILITY_IDS,MISSING_MIDDLE_INFIELD_CATCH_PENALTY,OFFENSE_SPEED_WEIGHT,DEFENSE_SPEED_WEIGHT,DEFENSE_STAT_WEIGHTS,defenseRating} from '../src/power-rankings.js';
 import {pitcherPriorityFor} from '../src/player-roles.js';
 import {earnedAchievements,GM_ACHIEVEMENTS} from '../src/gm-achievements.js';
 
@@ -9,7 +9,15 @@ import {earnedAchievements,GM_ACHIEVEMENTS} from '../src/gm-achievements.js';
 // Running and chemistry are no longer standalone composite categories.
 assert.deepEqual(POWER_WEIGHTS,{offense:.60,pitching:.20,defense:.20});
 assert.equal(OFFENSE_SPEED_WEIGHT,.05);
-assert.equal(DEFENSE_SPEED_WEIGHT,.08);
+assert.equal(DEFENSE_SPEED_WEIGHT,.15);
+assert.deepEqual(DEFENSE_STAT_WEIGHTS,{fielding:.55,throwingSpeed:.30,runningSpeed:.15});
+assert.equal(Object.values(DEFENSE_STAT_WEIGHTS).reduce((a,b)=>a+b,0),1);
+assert(Object.isFrozen(DEFENSE_STAT_WEIGHTS));
+assert.equal(defenseRating({'fielding':100,'outfield throwing speed':0,'speed':0}),55);
+assert.equal(defenseRating({'fielding':0,'outfield throwing speed':100,'speed':0}),30);
+assert.equal(defenseRating({'fielding':0,'outfield throwing speed':0,'speed':100}),15);
+assert.equal(defenseRating({'fielding':100,'outfield throwing speed':100,'speed':100}),100);
+assert.equal(defenseRating({'fielding':1000,'outfield throwing speed':-30,'speed':-100}),55);
 assert.equal(POWER_WEIGHTS.running,undefined);
 assert.equal(POWER_WEIGHTS.chemistry,undefined);
 assert(POWER_WEIGHTS.offense>POWER_WEIGHTS.defense+POWER_WEIGHTS.pitching,
@@ -145,12 +153,12 @@ assert.equal([...missingBothBonuses.values()].reduce((sum,x)=>sum+x,0),-24,
   'both missing special catches combine to minus twenty-four total rating points');
 assert.equal(DEFENSIVE_CHEMISTRY_LINKS.length,14);
 const expectedDefensiveLinks={
- 'LF-CF':[8,-6,-6],'RF-CF':[8,-6,-6],
- 'SS-1B':[6,-4,0],'2B-3B':[5,-4,0],
- '1B-3B':[4,0,0],
+ 'LF-CF':[10,-6,-6],'RF-CF':[10,-6,-6],
+ 'SS-1B':[7,-4,0],'2B-3B':[6,-4,0],
+ '1B-3B':[5,0,0],
  'LF-1B':[2,-3,0],'CF-1B':[2,-3,0],'RF-1B':[2,-3,0],
  'LF-3B':[2,-3,0],'CF-3B':[2,-3,0],'RF-3B':[2,-3,0],
- 'LF-C':[2,-1,0],'CF-C':[2,-1,0],'RF-C':[2,-1,0]
+ 'LF-C':[4,-1,0],'CF-C':[4,-1,0],'RF-C':[4,-1,0]
 };
 assert.deepEqual(Object.fromEntries(DEFENSIVE_CHEMISTRY_LINKS.map(x=>[
   x.a+'-'+x.b,[x.good,x.bad,x.neutral]])),expectedDefensiveLinks,
@@ -172,17 +180,17 @@ assert.equal(bonus(neutralNine,'C').defense,0,'neutral home connection must not 
 const joined=fakePeople();
 at(joined,'LF').good.add(at(joined,'CF').id);
 at(joined,'CF').conditional.add(at(joined,'RF').id);
-assert.equal(bonus(joined,'LF').defense,8);
-assert.equal(bonus(joined,'RF').defense,8);
-assert.equal(bonus(joined,'CF').defense,16,'two buddy jump links benefit the center fielder');
+assert.equal(bonus(joined,'LF').defense,10);
+assert.equal(bonus(joined,'RF').defense,10);
+assert.equal(bonus(joined,'CF').defense,20,'two +10 buddy jump links benefit center fielder up to +20 cap');
 assert.equal(bonus(joined,'CF').offense,6,'batting neighbors on both sides add six offense');
 const firstThird=fakePeople();
 at(firstThird,'1B').good.add(at(firstThird,'3B').id);
 at(firstThird,'3B').good.add(at(firstThird,'1B').id);
-assert.equal(bonus(firstThird,'1B').defense,4,
-  '1B receives +4 once from 3B despite reciprocal chemistry data');
-assert.equal(bonus(firstThird,'3B').defense,4,
-  '3B receives +4 once from 1B despite reciprocal chemistry data');
+assert.equal(bonus(firstThird,'1B').defense,5,
+  '1B receives +5 once from 3B despite reciprocal chemistry data');
+assert.equal(bonus(firstThird,'3B').defense,5,
+  '3B receives +5 once from 1B despite reciprocal chemistry data');
 assert.equal(bonus(firstThird,'2B').defense,0,
   'adding the first-to-third link does not affect an unrelated fielder');
 const firstThirdAnti=fakePeople();
@@ -257,9 +265,9 @@ for(const link of DEFENSIVE_CHEMISTRY_LINKS){
 }
 const catcherPair=fakePeople();
 at(catcherPair,'CF').good.add(at(catcherPair,'C').id);
-assert.equal(bonus(catcherPair,'C').defense,2,'outfielder-to-catcher good gives +2');
-assert.equal(bonus(catcherPair,'CF').defense,-10,
-  'CF gains exactly +2 for catcher; two neutral buddy-jump penalties remain');
+assert.equal(bonus(catcherPair,'C').defense,4,'outfielder-to-catcher good gives +4');
+assert.equal(bonus(catcherPair,'CF').defense,-8,
+  'CF gains exactly +4 for catcher; two neutral buddy-jump penalties remain');
 const allGood=fakePeople();
 for(let i=0;i<allGood.length;i++)
  for(let j=i+1;j<allGood.length;j++)allGood[i].good.add(allGood[j].id);
@@ -282,12 +290,13 @@ for(const names of [powerNames,balancedNames]){
  const members=ids.map(id=>{
    const s=stats[id].stats,player=gamePlayers.find(p=>p.id===id);
    const running=Math.max(0,Math.min(100,Number(s.speed)||0));
-   const defenseSkills=.60*Math.max(0,Math.min(100,Number(s.fielding)||0))+
-     .40*Math.max(0,Math.min(100,Number(s['outfield throwing speed'])||0));
+   const defenseSkills=.55*Math.max(0,Math.min(100,Number(s.fielding)||0))+
+     .30*Math.max(0,Math.min(100,Number(s['outfield throwing speed'])||0))+
+     .15*running;
    return {
      id,offense:Math.min(100,.95*offenseRating(s)+.05*running+
        (Number(s['baserunning ability'])>0?BASERUNNING_ABILITY_BONUS:0)),pitch:pitchRaw(s),
-     defense:Math.min(100,.92*defenseSkills+.08*running+
+     defense:Math.min(100,defenseSkills+
        fieldingAbilityBonus(Number(s['fielding ability']))),
      running,
      role:pitcherPriorityFor(player,stats[id])?.code||'other'
@@ -298,7 +307,7 @@ for(const names of [powerNames,balancedNames]){
    PITCHER_PRIORITY_ORDER[a.role]-PITCHER_PRIORITY_ORDER[b.role]||
    b.pitch-a.pitch||a.id-b.id).slice(0,3)];
  assert.equal(ranked.offense,round1(avg('offense')),'all nine hitters include 5% speed');
- assert.equal(ranked.defense,round1(avg('defense')),'all nine defenders include 8% speed');
+ assert.equal(ranked.defense,round1(avg('defense')),'all nine defenders include 15% speed');
  assert.equal(ranked.running,undefined,'there is no separate running category');
  assert.equal(ranked.chemistry,undefined,'there is no separate chemistry category');
  // The composite uses exactly three categories and is calculated from the
