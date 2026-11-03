@@ -305,6 +305,24 @@ export function reportRowStats(row,pitchRow=null){
     stats.outs=Math.round(ip*3);
     stats.completeGames=/^(1|yes|true)$/i.test(String(pitchRow.completegames??'').trim())?1:0;
   } else {stats.outs=0;stats.completeGames=0;}
+  // Preserve per-game IP and rates in both the public regular-season and
+  // separately released preseason box scores; avoid inventing undefined rates.
+  const ratio=(numerator,denominator)=>denominator>0?numerator/denominator:null;
+  stats.inningsPitched=stats.outs/3;
+  stats.battingAverage=ratio(stats.hits,stats.atBats);
+  stats.onBase=ratio(stats.hits+stats.batWalks+stats.hitByPitch,stats.plateAppearances);
+  stats.slug=ratio(stats.totalBases,stats.atBats);
+  stats.onBasePlusSlug=stats.onBase==null||stats.slug==null?null:stats.onBase+stats.slug;
+  stats.starBases=Number(row.starbaseshelper||0);
+  stats.starSlug=ratio(stats.starBases,stats.starSwings);
+  stats.era7=ratio(stats.earnedRuns*21,stats.outs);
+  stats.era9=ratio(stats.earnedRuns*27,stats.outs);
+  stats.whip=ratio((stats.hitsAllowed+stats.pitchWalks)*3,stats.outs);
+  const officialAb=stats.battersFaced-stats.pitchWalks-stats.beanBalls;
+  stats.baAgainst=ratio(stats.hitsAllowed,officialAb);
+  stats.obAgainst=ratio(stats.hitsAllowed+stats.pitchWalks+stats.beanBalls,stats.battersFaced);
+  stats.slgAgainst=ratio(stats.singlesAllowed+2*stats.doublesAllowed+3*stats.triplesAllowed+4*stats.hrAllowed,officialAb);
+  stats.opsAgainst=stats.obAgainst==null||stats.slgAgainst==null?null:stats.obAgainst+stats.slgAgainst;
   return stats;
 }
 // Report team totals are derived from Project Rio batting runs, exactly as
