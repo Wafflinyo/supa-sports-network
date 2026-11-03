@@ -115,7 +115,7 @@ function ImportedPreseasonResults(){
             <div className="ssl-pre-scroll"><table className="ssl-pre-table">
               <thead><tr><th>Player</th><th>OGP</th><th>DGP</th><th>PGP</th><th>Item</th><th>TGP</th></tr></thead>
               <tbody>{scorers.filter(p=>p.teamName===team).sort((a,b)=>b.stats.tgp-a.stats.tgp).map(p=>
-                <tr key={p.playerId}><td>{p.playerName||names.get(p.playerId)||p.playerId}{p.playerId===game.mvp?' (MVP)':''}</td>
+                <tr key={p.playerId}><td>{names.get(p.playerId)||p.playerName||p.playerId}{p.playerId===game.mvp?' (MVP)':''}</td>
                 <td>{shown(p.stats.ogp)}</td><td>{shown(p.stats.dgp)}</td><td>{shown(p.stats.pgp)}</td>
                 <td>{shown(p.stats.itemScore||0)}</td><td>{shown(p.stats.tgp)}</td></tr>
               )}</tbody>
