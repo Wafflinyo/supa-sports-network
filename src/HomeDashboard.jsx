@@ -6,6 +6,9 @@ import {ConferenceMark} from './ConferenceMark.jsx';
 import {matchupDisplay} from './matchup-display.js';
 import {homeWeekBoard,homeRecentResults} from './home-dashboard-data.js';
 import {HeatFlame} from './HeatingUpBadge.jsx';
+import {teamLogo} from './TeamIdentity.jsx';
+import {PlayerPortrait} from './PlayerPortrait.jsx';
+import {seasonOneChampionship} from './preseason-champion-feature.js';
 import './home-dashboard.css';
 
 function CardTitle({kicker,children,action}){
@@ -49,6 +52,40 @@ function TradeNewsBreakdown({groups}){
     </section>)}
   </div>;
 }
+function ChampionshipHero({feature,supabase,players,onResults}){
+  const {champion,topPlayers,seasonName}=feature;
+  const logo=champion.logoPath&&supabase?teamLogo(supabase,champion.logoPath):null;
+  const roster=new Map(players.map(player=>[String(player.id),player]));
+  return <section className="hero ssl-home-hero ssl-home-champion" aria-label={seasonName+' preseason champions: '+champion.name}>
+    <div className="ssl-champion-copy">
+      <span className="eyebrow">{seasonName.toUpperCase()} · PRESEASON CHAMPIONS</span>
+      <h1>{champion.name}</h1>
+      <div className="ssl-champion-title"><Trophy size={25} aria-hidden="true"/> PRESEASON CHAMPIONS</div>
+      <p>Crowned champions of the {seasonName} preseason tournament.</p>
+      <button type="button" className="yellow-btn ssl-champion-action" onClick={onResults}>
+        VIEW PRESEASON RESULTS <span>›</span>
+      </button>
+    </div>
+    <div className="ssl-champion-crest">
+      {logo?<img src={logo} alt={champion.name+' official team logo'}/>:
+        <div className="ssl-champion-crest-fallback"><Trophy size={68} aria-hidden="true"/>
+          <span>{champion.name}</span></div>}
+    </div>
+    <div className="ssl-champion-leaders">
+      <div className="ssl-champion-leaders-heading"><Trophy size={17} aria-hidden="true"/>
+        <strong>TOP 3 PLAYERS</strong><small>AVERAGE PRESEASON GAME POINTS</small></div>
+      {topPlayers.length?<ol className="ssl-champion-leaderboard">
+        {topPlayers.map((player,index)=><li key={player.playerId}>
+          <span className="ssl-champion-leader-rank">{index+1}</span>
+          <PlayerPortrait player={roster.get(String(player.playerId))||{id:player.playerId,name:player.name}} size={38}/>
+          <span className="ssl-champion-leader-name">{player.name}
+            <small>{player.gamesPlayed} {player.gamesPlayed===1?'game':'games'}</small></span>
+          <span className="ssl-champion-leader-agp"><strong>{player.agp.toFixed(2)}</strong><small>AGP</small></span>
+        </li>)}
+      </ol>:<p className="ssl-champion-leaders-empty">Player averages will appear when released game reports contain player statistics.</p>}
+    </div>
+  </section>;
+}
 export default function HomeDashboard({league,go,newsItems=[],players=[],onPlayerSelect}){
   const season=league?.season;
   const [showAllNews,setShowAllNews]=useState(false);
@@ -56,9 +93,12 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
   const finals=useMemo(()=>homeRecentResults(season,6),[season]);
   const ranks=useMemo(()=>powerRankings(season),[season]);
   const table=useMemo(()=>standings(season),[season]);
+  const championship=useMemo(()=>seasonOneChampionship(league?.seasons||[],players),[league?.seasons,players]);
   const openGame=game=>go('Schedule',null,{focus:'game',gameId:game.id});
   return <div className="ssl-home-layout">
     <div className="ssl-home-main">
+      {championship?<ChampionshipHero feature={championship} supabase={league?.supabase}
+        players={players} onResults={()=>go('Playoff Bracket','Pre-season')}/>:
       <section className="hero ssl-home-hero" aria-label="Sluggers Supa League">
         <div className="hero-content">
           <span className="eyebrow">WELCOME TO THE LEAGUE</span>
@@ -67,20 +107,20 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
           <button type="button" className="yellow-btn" onClick={()=>go('Player Stats')}>EXPLORE PLAYERS <span>›</span></button>
         </div>
         <div className="hero-number" aria-hidden="true">SSL</div>
-      </section>
+      </section>}
       <section className="panel ssl-home-news" id="ssl-league-news" style={{scrollMarginTop:125}}>
         <CardTitle kicker="FROM AROUND THE LEAGUE">LEAGUE NEWS FEED</CardTitle>
         {newsItems.length?<div className="league-news-scroll" aria-label="Official league news">
           {(showAllNews?newsItems:newsItems.slice(0,8)).map(item=><article key={item.id} className={`news-item news-item-live news-${item.category}`}>
-            <span className="news-mark" aria-hidden="true">{item.category==='heating'?<HeatFlame/>:item.category==='trade'?<Shield size={27}/>:item.category==='pitching'?<Trophy size={27}/>:<Megaphone size={27}/>}</span>
+            <span className="news-mark" aria-hidden="true">{item.category==='heating'?<HeatFlame/>:item.category==='trade'?<Shield size={27}/>:item.category==='preseason-champion'?<Trophy size={27}/>:item.category==='pitching'?<Trophy size={27}/>:<Megaphone size={27}/>}</span>
             <div className="news-copy">
               <small>{item.label}{item.private?' · PRIVATE PREVIEW':''}{item.at?' · '+new Date(item.at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):''}</small>
               <h3>{item.title}</h3>{item.category==='trade'&&item.tradeGroups?.length
                 ?<TradeNewsBreakdown groups={item.tradeGroups}/>
                 :<p>{item.summary}</p>}
             </div>
-            <button type="button" aria-label={item.playerId?'View player profile':'View transactions'}
-              onClick={()=>{if(item.playerId){const p=players.find(x=>x.id===item.playerId);if(p)onPlayerSelect(p);}else go('Transactions');}}>›</button>
+            <button type="button" aria-label={item.category==='preseason-champion'?'View preseason results':item.playerId?'View player profile':'View transactions'}
+              onClick={()=>{if(item.category==='preseason-champion'){go('Playoff Bracket','Pre-season');}else if(item.playerId){const p=players.find(x=>x.id===item.playerId);if(p)onPlayerSelect(p);}else go('Transactions');}}>›</button>
           </article>)}
         </div>:<div className="news-item"><span className="news-mark"><Trophy size={26}/></span>
           <div><small>LEAGUE UPDATE</small><h3>Latest league news will appear here</h3><p>Official game highlights, transactions and Heating Up notices appear as they happen.</p></div>
