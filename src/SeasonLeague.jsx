@@ -1593,8 +1593,11 @@ function ReportImport({ league: l, game, onDone }) {
         (blank means 0), automatically awards +10 MVP points to the highest-scoring player on the winning team, and grants
         Heating Up at {HEATING_UP_THRESHOLD}+. Pitching receives +2 per
         inning pitched (including partial innings), +0.5 per strike, -3 per
-        earned run, -10 per HR allowed and +8 for a complete game. Rio
-        provides innings and strikes automatically. Corrected reports
+        earned run, -10 per HR allowed and +8 for a complete game.
+        A solo-pitcher shutout earns +30 pitching Game Points; a combined
+        shutout shares the same 30 points proportionally by innings pitched.
+        Solo and combined shutouts are recorded separately under Pitching Stats.
+        Rio provides innings and strikes automatically. Corrected reports
         replace prior totals and hot streak results.
       </p>
       <input
