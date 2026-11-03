@@ -153,3 +153,9 @@
   .ssl-pre-rio-import{padding:10px}
   .ssl-pre-commissioner-tools{padding:10px 5px}
 }
+
+/* Bracket cards stay compact; long commissioner buttons wrap rather than clip. */
+.ssl-pre-commissioner-tools{min-width:0}
+.ssl-pre-commissioner-tools>.outline-btn,
+.ssl-pre-rio-actions button{white-space:normal;overflow-wrap:anywhere;line-height:1.25;min-width:0}
+.ssl-pre-rio-saved{min-width:0}
