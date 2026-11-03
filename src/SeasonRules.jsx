@@ -226,6 +226,7 @@ export function PublicBallots({ league: l }) {
 export function BroadcastControls({ league: l, game: g }) {
   const [end, setEnd] = useState("");
   return (
+    <>
     <details>
       <summary>PREMIERE / POSTPONEMENT / RESULT RELEASE</summary>
       <p>
@@ -294,23 +295,20 @@ export function BroadcastControls({ league: l, game: g }) {
         </button>
       </form>
       {["scheduled","live","recorded"].includes(g.stage) && <button type="button" className="outline-btn" disabled={l.busy} onClick={()=>{if(confirm("Cancel this unreleased game?")) l.act("cancel_game",{game:g.id});}}>CANCEL GAME</button>}
-      {g.stage === "recorded" && (
-        <button
-          className="red-btn"
-          disabled={l.busy}
-          onClick={() => {
-            if (
-              confirm(
-                "Confirm the YouTube premiere has finished? This makes results and stats public.",
-              )
-            )
-              l.act("release_result", { game: g.id });
-          }}
-        >
-          PREMIERE ENDED · RELEASE RESULTS
-        </button>
-      )}
     </details>
+    {g.stage === "recorded" && (
+      <div className="season-inline">
+        <button type="button" className="red-btn" disabled={l.busy}
+          onClick={()=>{
+            if(confirm("Release this approved SSL game publicly? Its final score, box scores and all player/team statistics will become visible."))
+              l.act("release_result",{game:g.id});
+          }}>
+          RELEASE GAME · PUBLISH RESULTS & STATS
+        </button>
+        {g.releaseAt&&<p role="alert">An automatic release time is also configured: {time(g.releaseAt)}. Clear it in Broadcast Settings to require manual release only.</p>}
+      </div>
+    )}
+    </>
   );
 }
 export function PlayoffPanel({ league: l }) {
