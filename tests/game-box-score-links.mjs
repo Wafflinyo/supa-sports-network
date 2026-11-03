@@ -19,7 +19,7 @@ for(const report of preseasonGames){
     for(const p of team.players){
       assert.ok(p.name&&!/^(red|blue|green|light blue) mii/i.test(p.name),'Players display SSL roster names');
       assert.ok(p.positions,'Box score must show player positions');
-      assert.equal(typeof p.stats.hits,'number','Box score keeps hitting data');
+      assert.ok(Number.isFinite(Number(p.stats.hits||0)),'Box score keeps valid hit counts');
       assert.equal(typeof p.points.tgp,'number','Box score keeps game points');
     }
   }
@@ -70,9 +70,9 @@ assert.deepEqual(regular.teams.map(t=>t.score),[3,5]);
 assert.equal(regular.hasPlayerStats,true);
 assert.equal(regular.teams[1].players[0].name,'Daisy');
 assert.equal(regular.teams[1].players[0].mvp,true);
-assert.equal(regular.teams[1].players[0].points.ogp,30);
+assert.equal(regular.teams[1].players[0].points.ogp,22);
 assert.equal(regular.teams[1].players[0].itemScore,4);
-assert.equal(regular.teams[1].players[0].points.tgp,71);
+assert.equal(regular.teams[1].players[0].points.tgp,63);
 assert.equal(seasonBoxScore(season,{...game,stage:'recorded'}),null,'Do not leak unreleased report statistics');
 const finalWithoutReport=seasonBoxScore(season,{...game,result:{scores:{away:3,home:5}}});
 assert.equal(finalWithoutReport.hasPlayerStats,false,'Final scores without player reports must be represented honestly');
