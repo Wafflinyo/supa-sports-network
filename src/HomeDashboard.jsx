@@ -2,6 +2,7 @@ import React,{useMemo,useState} from 'react';
 import {CalendarDays,Trophy,Shield,BarChart3,List,ArrowRight,Megaphone} from 'lucide-react';
 import {powerRankings} from './power-rankings.js';
 import {standings} from './season-data.js';
+import {ConferenceMark} from './ConferenceMark.jsx';
 import {matchupDisplay} from './matchup-display.js';
 import {homeWeekBoard,homeRecentResults} from './home-dashboard-data.js';
 import {HeatFlame} from './HeatingUpBadge.jsx';
@@ -55,7 +56,6 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
   const finals=useMemo(()=>homeRecentResults(season,6),[season]);
   const ranks=useMemo(()=>powerRankings(season),[season]);
   const table=useMemo(()=>standings(season),[season]);
-  const hasFinal=Boolean((season?.games||[]).some(game=>game.stage==='final'&&game.phase==='regular'));
   const openGame=game=>go('Schedule',null,{focus:'game',gameId:game.id});
   return <div className="ssl-home-layout">
     <div className="ssl-home-main">
@@ -118,12 +118,20 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
       <section className="panel ssl-home-card ssl-home-standings">
         <CardTitle kicker="THE RACE" action={<button type="button" className="ssl-home-card-link" onClick={()=>go('Standings')}>
           VIEW TABLE <List size={18}/></button>}>STANDINGS</CardTitle>
-        {hasFinal?<ol className="ssl-home-ranks">
-          {table.slice(0,3).map((team,index)=><li key={team.id}>
-            <span className="ssl-home-rank-name"><b>{index+1}.</b><strong>{team.name}</strong></span>
-            <span className="ssl-home-rank-score">{team.wins}–{team.losses}</span>
-          </li>)}
-        </ol>:<p className="ssl-home-quiet">{season?.teams?.length||0} season teams · Standings start when regular-season results are released.</p>}
+        {table.length?<div className="ssl-home-overall" aria-label="Overall regular-season standings, all teams">
+          <div className="ssl-home-overall-head"><span>ALL {table.length} TEAMS · OVERALL</span><span>W–L</span></div>
+          <ol className="ssl-home-overall-list">
+            {table.map((team,index)=><li key={team.id} className="ssl-home-overall-team">
+              <span className="ssl-home-overall-rank">{index+1}.</span>
+              <ConferenceMark id={team.conference} size={26}/>
+              <span className="ssl-home-overall-info">
+                <strong>{team.name}</strong>
+                <small>GP {team.wins+team.losses} · PCT {team.pct.toFixed(3)} · RF {team.runsFor} · RA {team.runsAgainst} · DIFF {team.runsFor-team.runsAgainst}</small>
+              </span>
+              <b className="ssl-home-overall-record">{team.wins}–{team.losses}</b>
+            </li>)}
+          </ol>
+        </div>:<p className="ssl-home-quiet">Teams will appear when the league season is set up.</p>}
       </section>
     </aside>
   </div>;
