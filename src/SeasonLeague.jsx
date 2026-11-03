@@ -14,7 +14,7 @@ import {supportsStadiumVariant,matchupStadiumVariant} from './stadium-lighting.j
 import DraftChat from './DraftChat.jsx';
 import {heatingUpForSeason,HEATING_UP_THRESHOLD} from './heating-up.js';
 import {gamePointsForReport} from './game-points.js';
-import {effectiveGameLineup,gameLineupIsEditable,teamGameLineups,savedLineupLabel} from './roster-lineups.js';
+import {effectiveGameLineup,gameLineupIsEditable,teamGameLineups,savedLineupLabel,gameLineupSubmissionStatus} from './roster-lineups.js';
 import {
   SeasonRuleControls,
   PublicBallots,
@@ -1150,7 +1150,7 @@ export function RosterManager({ league: l, focus=null }) {
             return <section className="roster-fixture ssl-roster-notification-focus" id={'ssl-game-lineup-'+g.id} key={g.id}>
               <div className="roster-fixture-heading">
                 <div><h3>{g.away===team?'VS':'AT'} {opponent?.name||'Opponent'}</h3>
-                <p>{time(g.startsAt)} · {g.stage.toUpperCase()} · <strong>{savedLineupLabel(s,team,g)}</strong></p></div>
+                <p>{time(g.startsAt)} · {g.stage.toUpperCase()} · <strong>{gameLineupSubmissionStatus(s,team,g).label}</strong></p></div>
                 {editable&&<button type="button" className="outline-btn" aria-expanded={active} onClick={()=>setEditingGame(active?null:g.id)}>{active?'CLOSE EDITOR':g.lineups?.[team]?'EDIT GAME LINEUP':'SUBMIT GAME LINEUP'}</button>}
               </div>
               {!active&&existing?.starters?.length>0&&<details><summary>VIEW LINEUP ON SCHEDULE</summary>{existing.starters.map((p,i)=><p key={i}>{i+1}. {name(p.player)} · {p.position}</p>)}<p><strong>Bench:</strong> {existing.bench?.map(name).join(' · ')||'None'}</p></details>}
@@ -1532,26 +1532,22 @@ function Schedule({ league: l, commissioner = false }) {
                   </details>
                 )}
                 <details>
-                  <summary>VIEW SUBMITTED / DEFAULT LINEUPS</summary>
-                  {[g.away, g.home].map((id) => (
-                    <div key={id}>
+                  <summary>VIEW LINEUPS & SUBMISSION STATUS</summary>
+                  {[g.away, g.home].map((id) => {
+                    const status=gameLineupSubmissionStatus(s,id,g);
+                    const lineup=effectiveGameLineup(s,id,g);
+                    return <section key={id} className="ssl-commissioner-lineup-team">
                       <h4>{s.teams.find((t) => t.id === id)?.name}</h4>
+                      <div className={'ssl-lineup-submission-status ssl-lineup-status-'+status.kind} role="status">
+                        <strong>{status.label}</strong>
+                        <p>{status.detail}</p>
+                        {status.at&&<small>Recorded: {time(status.at)}</small>}
+                      </div>
                       <HeatingStatus season={s} game={g} team={id} includeRecorded={l.access.role==='commissioner'}/>
-                      {(g.lineups[id] || s.defaults[id])?.starters.map(
-                        (p, i) => (
-                          <p key={i}>
-                            {i + 1}. {name(p.player)} · {p.position}
-                          </p>
-                        ),
-                      )}
-                      <p>
-                        <strong>Bench:</strong>{" "}
-                        {(g.lineups[id] || s.defaults[id])?.bench
-                          .map(name)
-                          .join(" · ") || "Not submitted"}
-                      </p>
-                    </div>
-                  ))}
+                      {lineup?.starters?.map((p,i)=><p key={i}>{i+1}. {name(p.player)} · {p.position}</p>)}
+                      <p><strong>Bench:</strong> {lineup?.bench?.map(name).join(' · ')||'No bench players'}</p>
+                    </section>;
+                  })}
                 </details>
               </div>
             )}

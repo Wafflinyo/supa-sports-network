@@ -45,6 +45,7 @@ jobs:
       - run: node tests/gm-achievement-notifications.mjs
       - run: node tests/badge-art-design.mjs
       - run: node tests/roster-lineups.mjs
+      - run: node tests/lineup-status-and-heat-120.mjs
       - run: node tests/schedule-matchup-records.mjs
       - run: node tests/stadium-lighting.mjs
       - run: node tests/public-tbd-schedule.mjs
