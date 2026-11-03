@@ -100,6 +100,7 @@ export function useSeasonLeague(supabase, access) {
     [busy, setBusy] = useState(false),
     [ballotVoters, setBallotVoters] = useState(null),
     [ballotVotersError, setBallotVotersError] = useState(""),
+    [preseasonPrivateReports,setPreseasonPrivateReports] = useState([]),
     [now, setNow] = useState(Date.now());
   const serverOffsetMs = useRef(0);
   const season = seasons.find((s) => s.id === selected) || seasons[0] || null;
@@ -132,12 +133,33 @@ export function useSeasonLeague(supabase, access) {
         }
       }
     }
-    setSeasons(rawSeasons.map(s=>({...s,preseasonResults:bySeason.get(s.id)||[]})));
+    // Publicly released preseason box-score payloads are independent of
+    // regular-season results. The RPC never exposes private staged uploads.
+    let published=[];
+    if(ids.length){
+      const reports=await supabase.rpc('ssl_preseason_published_reports',{target_season:null});
+      if(!reports.error&&Array.isArray(reports.data))published=reports.data;
+    }
+    const releasedBySeason=new Map();
+    for(const report of published){
+      const key=String(report.seasonId||'');
+      if(!ids.some(id=>String(id)===key))continue;
+      const a=releasedBySeason.get(key)||[];
+      if(report.compact?.players)a.push(report.compact);
+      releasedBySeason.set(key,a);
+    }
+    setSeasons(rawSeasons.map(s=>({...s,
+      preseasonResults:bySeason.get(s.id)||[],
+      preseasonReports:releasedBySeason.get(String(s.id))||[],
+    })));
     setError("");
     // Secure, commissioner-only roster. No account identities enter the public
     // season response; the server verifies current commissioner access.
     const targetSeason = selected || (r.data || [])[0]?.id;
     if (access.role === "commissioner" && targetSeason) {
+      const staged=await supabase.rpc('ssl_preseason_report_action',{
+        target_season:targetSeason,target_match:null,operation:'list'});
+      setPreseasonPrivateReports(!staged.error&&Array.isArray(staged.data)?staged.data:[]);
       const v = await supabase.rpc("ssl_commissioner_ballot_voters", {target_season: targetSeason});
       if (v.error) {
         setBallotVoters(null);
@@ -147,6 +169,7 @@ export function useSeasonLeague(supabase, access) {
         setBallotVotersError("");
       }
     } else {
+      setPreseasonPrivateReports([]);
       setBallotVoters(null);
       setBallotVotersError("");
     }
@@ -199,6 +222,28 @@ export function useSeasonLeague(supabase, access) {
       setBusy(false);
     }
   }
+  async function savePreseasonReport(matchKey,report){
+    if(busy||!season||access.role!=='commissioner')return false;
+    setBusy(true);setError('');setNotice('');
+    try{
+      const r=await supabase.rpc('ssl_preseason_report_action',{
+        target_season:season.id,target_match:matchKey,operation:'save',game_report:report});
+      if(r.error)throw r.error;
+      await refresh();setNotice('Preseason Project Rio report saved privately. The bracket and public statistics have NOT changed.');
+      return true;
+    }catch(e){setError(e.message);return false;}finally{setBusy(false);}
+  }
+  async function releasePreseasonReport(matchKey){
+    if(busy||!season||access.role!=='commissioner')return false;
+    setBusy(true);setError('');setNotice('');
+    try{
+      const r=await supabase.rpc('ssl_preseason_report_action',{
+        target_season:season.id,target_match:matchKey,operation:'release'});
+      if(r.error)throw r.error;
+      await refresh();setNotice('Preseason game RELEASED. The bracket and player/team preseason stats are now public.');
+      return true;
+    }catch(e){setError(e.message);return false;}finally{setBusy(false);}
+  }
   async function recordPreseasonResult(matchKey,scoreA,scoreB){
     if(busy||!season||access.role!=='commissioner')return false;
     setBusy(true);setError('');setNotice('');
@@ -238,6 +283,9 @@ export function useSeasonLeague(supabase, access) {
     refresh,
     recordPreseasonResult,
     clearPreseasonResult,
+    preseasonPrivateReports,
+    savePreseasonReport,
+    releasePreseasonReport,
     access,
     myTeam,
     supabase,
