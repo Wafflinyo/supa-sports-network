@@ -8,7 +8,7 @@ import {homeWeekBoard,homeRecentResults} from './home-dashboard-data.js';
 import {HeatFlame} from './HeatingUpBadge.jsx';
 import {teamLogo} from './TeamIdentity.jsx';
 import {PlayerPortrait} from './PlayerPortrait.jsx';
-import {seasonOneChampionship} from './preseason-champion-feature.js';
+import {latestPreseasonChampionship} from './preseason-champion-feature.js';
 import './home-dashboard.css';
 
 function CardTitle({kicker,children,action}){
@@ -93,12 +93,17 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
   const finals=useMemo(()=>homeRecentResults(season,6),[season]);
   const ranks=useMemo(()=>powerRankings(season),[season]);
   const table=useMemo(()=>standings(season),[season]);
-  const championship=useMemo(()=>seasonOneChampionship(league?.seasons||[],players),[league?.seasons,players]);
+  const championship=useMemo(()=>latestPreseasonChampionship(league?.seasons||[],players),[league?.seasons,players]);
   const openGame=game=>go('Schedule',null,{focus:'game',gameId:game.id});
+  const openPreseason=seasonId=>{
+    if(seasonId!=null && String(seasonId)!==String(league?.season?.id))
+      league?.setSelected?.(seasonId);
+    go('Playoff Bracket','Pre-season');
+  };
   return <div className="ssl-home-layout">
     <div className="ssl-home-main">
       {championship?<ChampionshipHero feature={championship} supabase={league?.supabase}
-        players={players} onResults={()=>go('Playoff Bracket','Pre-season')}/>:
+        players={players} onResults={()=>openPreseason(championship.seasonId)}/>:
       <section className="hero ssl-home-hero" aria-label="Sluggers Supa League">
         <div className="hero-content">
           <span className="eyebrow">WELCOME TO THE LEAGUE</span>
@@ -120,7 +125,7 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
                 :<p>{item.summary}</p>}
             </div>
             <button type="button" aria-label={item.category==='preseason-champion'?'View preseason results':item.playerId?'View player profile':'View transactions'}
-              onClick={()=>{if(item.category==='preseason-champion'){go('Playoff Bracket','Pre-season');}else if(item.playerId){const p=players.find(x=>x.id===item.playerId);if(p)onPlayerSelect(p);}else go('Transactions');}}>›</button>
+              onClick={()=>{if(item.category==='preseason-champion'){openPreseason(item.seasonId);}else if(item.playerId){const p=players.find(x=>x.id===item.playerId);if(p)onPlayerSelect(p);}else go('Transactions');}}>›</button>
           </article>)}
         </div>:<div className="news-item"><span className="news-mark"><Trophy size={26}/></span>
           <div><small>LEAGUE UPDATE</small><h3>Latest league news will appear here</h3><p>Official game highlights, transactions and Heating Up notices appear as they happen.</p></div>
