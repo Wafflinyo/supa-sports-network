@@ -1493,7 +1493,7 @@ function Schedule({ league: l, commissioner = false }) {
                 >
                   {["recorded", "final"].includes(g.stage)
                     ? "REPLACE / CORRECT REPORT"
-                    : "UPLOAD PROJECT RIO XLSX & LOCK LINEUPS"}
+                    : "UPLOAD PROJECT RIO ODS / XLSX"}
                 </button>
                 {!["final", "cancelled"].includes(g.stage) && (
                   <BroadcastControls league={l} game={g} />
@@ -1576,6 +1576,7 @@ function Schedule({ league: l, commissioner = false }) {
   );
 }
 function ReportImport({ league: l, game, onDone }) {
+  const [showBoxPreview,setShowBoxPreview]=useState(false);
   const [preview, setPreview] = useState(null),
     [awayLabel, setAwayLabel] = useState(""),
     [error, setError] = useState(""),
@@ -1583,11 +1584,26 @@ function ReportImport({ league: l, game, onDone }) {
   const autoMvp = useMemo(()=>{
     try{return preview&&automaticReportMvp(preview,awayLabel)}catch{return null}
   },[preview,awayLabel]);
+  const boxPreview=useMemo(()=>{
+    if(!preview||!autoMvp||preview.rows.some(r=>!r.chosen)||preview.pitch.some(r=>!r.chosen))return null;
+    try{
+      const report=buildReport(preview,awayLabel,
+        {...l.season,rosters:game.frozenRosters||l.season.rosters},game,pool,autoMvp);
+      const scores={
+        [game.away]:preview.rows.filter(r=>r.label===awayLabel).reduce((n,r)=>n+Number(r.runs||0),0),
+        [game.home]:preview.rows.filter(r=>r.label!==awayLabel).reduce((n,r)=>n+Number(r.runs||0),0),
+      };
+      return seasonBoxScore(l.season,{...game,stage:'final',label:'COMMISSIONER PREVIEW · UNRELEASED',
+        result:{scores,players:report.players}});
+    }catch{return null}
+  },[preview,autoMvp,awayLabel,l.season,game]);
   return (
     <div className="report-import">
       <h3>PROJECT RIO RESULT REVIEW</h3>
       <p>
-        Map team labels and any ambiguous Mii/name rows. Add an "Item Score"
+        Upload an ODS or XLSX report. Generic in-game team names are mapped automatically
+        to the 12 SSL franchises; players and pitchers are checked against the scheduled matchup.
+        Review any ambiguous player rows. Add an "Item Score"
         column at the end of the Project Rio Stats worksheet. The site
         automatically scores batting, defense and pitching, adds Item Score
         (blank means 0), automatically awards +10 MVP points to the highest-scoring player on the winning team, and grants
@@ -1602,8 +1618,8 @@ function ReportImport({ league: l, game, onDone }) {
       </p>
       <input
         type="file"
-        accept=".xlsx"
-        aria-label="Project Rio XLSX"
+        accept=".ods,.xlsx"
+        aria-label="Project Rio ODS or XLSX"
         disabled={loading}
         onChange={async (e) => {
           if (!e.target.files[0]) return;
@@ -1617,7 +1633,8 @@ function ReportImport({ league: l, game, onDone }) {
               pool,
             );
             setPreview(p);
-            setAwayLabel(p.labels[0]);
+            setAwayLabel(l.season.teams.find(t=>String(t.id)===String(game.away))?.name||p.labels[0]);
+            setShowBoxPreview(false);
           } catch (e) {
             setError(e.message);
           } finally {
@@ -1629,6 +1646,7 @@ function ReportImport({ league: l, game, onDone }) {
       {error && <p role="alert">{error}</p>}
       {preview && (
         <>
+          <p><strong>In-game team mapping:</strong> {preview.gameInfo?.join(" · ")}</p>
           <label>
             Away team’s label in the report
             <select
@@ -1782,6 +1800,11 @@ function ReportImport({ league: l, game, onDone }) {
             </p>
           ))}
           <p><strong>Automatic Match MVP:</strong> {autoMvp ? name(autoMvp) : 'Map both teams to determine MVP (no tied game)'}</p>
+          <button type="button" className="outline-btn" disabled={!boxPreview}
+            onClick={()=>setShowBoxPreview(true)}>
+            VIEW FULL BOX SCORE PREVIEW · BATTING / FIELDING / PITCHING / GAME POINTS
+          </button>
+          {boxPreview&&<p>Preview shows every player's box score, team total, Item Score, OGP, DGP, PGP and TGP. Nothing is public until you approve the release.</p>}
           <button
             className="red-btn"
             disabled={
@@ -1808,10 +1831,11 @@ function ReportImport({ league: l, game, onDone }) {
               }
             }}
           >
-            SAVE PRIVATE REPORT & LOCK LINEUPS
+            SAVE PRIVATE REPORT · DO NOT RELEASE
           </button>
         </>
       )}
+      {showBoxPreview&&boxPreview&&<GameBoxScore game={boxPreview} onClose={()=>setShowBoxPreview(false)}/>}
     </div>
   );
 }
