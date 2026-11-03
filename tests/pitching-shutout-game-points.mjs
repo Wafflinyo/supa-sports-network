@@ -108,11 +108,14 @@ for(const game of preseasonGames){
     game.awayScore>0&&game.homeScore===0||game.homeScore>0&&game.awayScore===0?30:0,
     'A qualifying shutout must grant exactly 30 points per game, never 30 per pitcher');
 }
-for(const path of ['src/PreseasonStats.jsx','src/main.jsx','src/GameBoxScore.jsx']){
+for(const path of ['src/PreseasonStats.jsx','src/main.jsx','src/temporary-stat-columns.json']){
   const contents=readFileSync(new URL('../'+path,import.meta.url),'utf8');
   assert.match(contents,/combinedShutouts/,'Pitching stats must show combined shutout appearances: '+path);
   assert.match(contents,/shutoutBonus/,'Pitching stats must show shutout points: '+path);
 }
+const viewer=readFileSync(new URL('../src/GameBoxScore.jsx',import.meta.url),'utf8');
+assert.match(viewer,/columns\['Pitching Stats'\]/);
+assert.match(viewer,/shutoutBonus/);
 const migration=readFileSync(new URL('../supabase/migrations/20261103024000_ssl_pitching_shutout_points.sql',import.meta.url),'utf8');
 assert.match(migration,/shutout_expected/);
 assert.match(migration,/team_runs/);
