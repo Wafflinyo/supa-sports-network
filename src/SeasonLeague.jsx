@@ -3,6 +3,7 @@ import {PowerRankings,PreseasonTournament} from './SeasonPreseason.jsx';
 import {visibleGamePointFields} from './game-point-columns.js';
 import {seasonBoxScore} from './game-box-score-data.js';
 import GameBoxScore from './GameBoxScore.jsx';
+import RioReportDialog from './RioReportDialog.jsx';
 import PreseasonStats from './PreseasonStats.jsx';
 import {preseasonReady} from './preseason.js';
 import {lotteryProgress,lotteryReplayProgress,lotteryDuration,lotteryCountdownClock} from './lottery-timing.js';
@@ -1345,6 +1346,7 @@ function Schedule({ league: l, commissioner = false }) {
     );
   const selectedBoxGame=boxGameId==null?null:s.games.find(g=>String(g.id)===String(boxGameId));
   const currentBoxScore=selectedBoxGame?seasonBoxScore(s,selectedBoxGame):null;
+  const selectedReportGame=reportGame==null?null:s.games.find(g=>String(g.id)===String(reportGame));
   return (
     <>
       <SeasonCalendar league={l} />
@@ -1608,17 +1610,16 @@ function Schedule({ league: l, commissioner = false }) {
                 onDone={() => setEditing(null)}
               />
             )}
-            {reportGame === g.id && admin && (
-              <ReportImport
-                league={l}
-                game={g}
-                onDone={() => setReportGame(null)}
-              />
-            )}
           </section>
           </React.Fragment>
         ))
       )}
+      {admin&&selectedReportGame&&<RioReportDialog title="PROJECT RIO · GAME FILE REVIEW"
+        subtitle={(s.teams.find(t=>t.id===selectedReportGame.away)?.name||'Away')+' @ '+(s.teams.find(t=>t.id===selectedReportGame.home)?.name||'Home')}
+        onClose={()=>setReportGame(null)}>
+        <ReportImport key={selectedReportGame.id} league={l} game={selectedReportGame}
+          onDone={()=>setReportGame(null)}/>
+      </RioReportDialog>}
       {currentBoxScore&&<GameBoxScore key={currentBoxScore.id} game={currentBoxScore} onClose={closeBox}/>}
     </>
   );
