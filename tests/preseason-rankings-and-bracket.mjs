@@ -13,11 +13,11 @@ assert.equal(DEFENSE_SPEED_WEIGHT,.15);
 assert.deepEqual(DEFENSE_STAT_WEIGHTS,{fielding:.55,throwingSpeed:.30,runningSpeed:.15});
 assert.equal(Object.values(DEFENSE_STAT_WEIGHTS).reduce((a,b)=>a+b,0),1);
 assert(Object.isFrozen(DEFENSE_STAT_WEIGHTS));
-assert.equal(defenseRating({'fielding':100,'outfield throwing speed':0,'speed':0}),55);
-assert.equal(defenseRating({'fielding':0,'outfield throwing speed':100,'speed':0}),30);
-assert.equal(defenseRating({'fielding':0,'outfield throwing speed':0,'speed':100}),15);
-assert.equal(defenseRating({'fielding':100,'outfield throwing speed':100,'speed':100}),100);
-assert.equal(defenseRating({'fielding':1000,'outfield throwing speed':-30,'speed':-100}),55);
+assert(Math.abs(defenseRating({'fielding':100,'outfield throwing speed':0,'speed':0})-55)<1e-9);
+assert(Math.abs(defenseRating({'fielding':0,'outfield throwing speed':100,'speed':0})-30)<1e-9);
+assert(Math.abs(defenseRating({'fielding':0,'outfield throwing speed':0,'speed':100})-15)<1e-9);
+assert(Math.abs(defenseRating({'fielding':100,'outfield throwing speed':100,'speed':100})-100)<1e-9);
+assert(Math.abs(defenseRating({'fielding':1000,'outfield throwing speed':-30,'speed':-100})-55)<1e-9);
 assert.equal(POWER_WEIGHTS.running,undefined);
 assert.equal(POWER_WEIGHTS.chemistry,undefined);
 assert(POWER_WEIGHTS.offense>POWER_WEIGHTS.defense+POWER_WEIGHTS.pitching,
