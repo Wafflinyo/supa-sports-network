@@ -36,10 +36,14 @@ function parseOds(xml){
         const count=repeat(cell,"number-columns-repeated",MAX_COLS-cells.length);
         for(let j=0;j<count&&cells.length<MAX_COLS;j++)cells.push(value);
       }
-      const rowRepeat=repeat(node,"number-rows-repeated",MAX_ROWS-output.length);
-      if(cells.every(v=>v===""||v==null)&&output.length>40)continue;
-      for(let i=0;i<rowRepeat&&output.length<MAX_ROWS;i++)output.push(cells);
-      if(output.length>=MAX_ROWS)throw Error("ODS worksheet exceeds 1000 rows.");
+      // LibreOffice often encodes a million styled but EMPTY rows as one
+      // repeated ODS node. Empty rows must not count as report data at all.
+      if(cells.every(v=>v===""||v==null))continue;
+      const rawRepeat=Number(get(node,TABLE,"number-rows-repeated")||1);
+      if(!Number.isSafeInteger(rawRepeat)||rawRepeat<1||
+         output.length+rawRepeat>MAX_ROWS)
+        throw Error("Project Rio worksheet has more than 1000 non-empty rows.");
+      for(let i=0;i<rawRepeat;i++)output.push(cells);
     }
     sheets[name]=output;
   }
@@ -67,12 +71,24 @@ export async function loadRioSheets(file){
   for(const name of ["Stats","Pitching","Game Info"]){
     const sheet=workbook.getWorksheet(name);
     if(!sheet)continue;
-    if(sheet.rowCount>MAX_ROWS||sheet.columnCount>MAX_COLS)throw Error("Unexpected report dimensions.");
+    // XLSX files can have thousands of style-only rows/columns too. Iterate
+    // populated cells instead of sheet.rowCount (which includes formatting).
     const rows=[];
-    for(let i=1;i<=sheet.rowCount;i++){
-      const row=sheet.getRow(i);
-      rows.push(Array.from({length:sheet.columnCount},(_,j)=>unwrap(row.getCell(j+1).value)??""));
-    }
+    sheet.eachRow({includeEmpty:false},row=>{
+      const cells=[];
+      let tooWide=false;
+      row.eachCell({includeEmpty:false},(cell,column)=>{
+        const value=unwrap(cell.value);
+        if(value==null||value==="")return;
+        if(column>MAX_COLS){tooWide=true;return;}
+        cells[column-1]=value;
+      });
+      if(tooWide)throw Error("Project Rio worksheet has data beyond column 150.");
+      if(!cells.some(v=>v!=null&&v!==""))return;
+      if(rows.length>=MAX_ROWS)
+        throw Error("Project Rio worksheet has more than 1000 non-empty rows.");
+      rows.push(cells);
+    });
     sheets[name]=rows;
   }
   return sheets;
