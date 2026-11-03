@@ -51,8 +51,8 @@ const total=current.selectedPitchers.reduce((sum,p)=>sum+pitchingRating(gameData
 assert.equal(current.pitching,Math.round((total/POWER_PITCHER_COUNT)*10)/10,
   'Team pitching rating must average the selected four pitchers equally');
 
-assert.deepEqual({...POWER_WEIGHTS},{offense:.65,pitching:.15,defense:.20},
-  'Changing pitching skill weights must not alter the total power-ranking category weights');
+assert.deepEqual({...POWER_WEIGHTS},{offense:.60,pitching:.20,defense:.20},
+  'Commissioner-approved composite is 60% offense, 20% pitching, 20% defense');
 assert.equal(OFFENSE_SPEED_WEIGHT,.05,'Offense speed contribution is unchanged');
 assert.equal(BASERUNNING_ABILITY_BONUS,4,'Every hitter with a baserunning ability earns four offensive rating points');
 const baseHitter={'charge hit power':0,'hit trajectory':'Low',
@@ -74,4 +74,4 @@ assert.equal(offenseRating({
   'slap contact size':100,'charge contact size':100,
 }),100,'Approved offensive skill weights must total 100%');
 assert.equal(fieldingAbilityBonus(9,'SS'),-12,'Fielding ability rules must be retained');
-console.log('PASS: pitching 55/10/15/20, offense 40/25/25/5/5, +4 baserunning, speed and defense unchanged');
+console.log('PASS: overall 60/20/20, pitching 55/10/15/20, offense 40/25/25/5/5, +4 baserunning, speed and defense unchanged');
