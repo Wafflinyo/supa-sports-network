@@ -1,5 +1,7 @@
 import {buildReport,automaticReportMvp,readRio} from './season-data.js';
 import {gamePointComponents} from './game-points.js';
+import roster from './players.json' with {type:'json'};
+const playerNames=new Map(roster.map(p=>[Number(p.id),p.name]));
 
 // Draft selections preserve the preseason roster even after later trades.
 // Fall back to current rosters if a historical season lacks saved draft picks.
@@ -62,26 +64,30 @@ export function makePreseasonReport(preview,season,match,players){
 }
 export function preseasonPreviewBox(season,match,report){
   if(!report)return null;
-  // Use the same official player-by-player box score renderer as regular games.
-  const players=report.players.map(p=>({...p,
-    gameScore:round2(p.gameScore),
-    points:gamePointComponents(p.stats,p.shutoutBonus)}));
-  return {id:'private:'+match.key,stage:'Preseason · UNRELEASED',label:'COMMISSIONER-ONLY PREVIEW',
-    teams:[{
-      key:String(match.high.id),name:match.high.name,score:report.scoreA,
-      players:players.filter(p=>String(p.team)===String(match.high.id))
-        .map(p=>({playerId:p.player,name:p.playerName||String(p.player),positions:p.positions,
-          stats:p.stats,points:{...p.points,tgp:p.gameScore}})),
-      totalGamePoints:round2(players.filter(p=>String(p.team)===String(match.high.id))
-        .reduce((s,p)=>s+Number(p.gameScore||0),0)),
-    },{
-      key:String(match.low.id),name:match.low.name,score:report.scoreB,
-      players:players.filter(p=>String(p.team)===String(match.low.id))
-        .map(p=>({playerId:p.player,name:p.playerName||String(p.player),positions:p.positions,
-          stats:p.stats,points:{...p.points,tgp:p.gameScore}})),
-      totalGamePoints:round2(players.filter(p=>String(p.team)===String(match.low.id))
-        .reduce((s,p)=>s+Number(p.gameScore||0),0)),
-    }],
+  const players=report.players.map(p=>{
+    const stats={...p.stats,shutoutBonus:Number(p.shutoutBonus||0)};
+    const parts=gamePointComponents(stats,p.shutoutBonus);
+    return {
+      playerId:Number(p.player),name:playerNames.get(Number(p.player))||String(p.player),
+      teamKey:String(p.team),positions:(p.positions||[]).join(', '),
+      stats,points:{...parts,tgp:round2(p.gameScore)},
+      itemScore:Number(p.itemScore||0),mvp:Number(stats.mvps||0)>0,
+    };
+  });
+  const teams=[match.high,match.low];
+  const scores=[report.scoreA,report.scoreB];
+  return {
+    id:'private:'+match.key,
+    stage:'Preseason · PRIVATE PREVIEW',
+    label:'COMMISSIONER ONLY · UNRELEASED',
+    teams:teams.map((team,index)=>{
+      const people=players.filter(p=>p.teamKey===String(team.id));
+      return {
+        key:String(team.id),name:team.name,score:scores[index],
+        players:people,hits:people.reduce((s,p)=>s+Number(p.stats.hits||0),0),
+        totalGamePoints:round2(people.reduce((s,p)=>s+Number(p.points.tgp||0),0)),
+      };
+    }),
     hasPlayerStats:true,
   };
 }
