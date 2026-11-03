@@ -4,7 +4,7 @@ import gameData from '../src/player-data.json' with {type:'json'};
 import {
   PITCHING_STAT_WEIGHTS,pitchingRating,rosterPowerComponents,
   POWER_WEIGHTS,POWER_PITCHER_COUNT,POWER_SUPPORT_PITCHER_COUNT,
-  OFFENSE_SPEED_WEIGHT,DEFENSE_SPEED_WEIGHT,offenseRating,
+  OFFENSE_SPEED_WEIGHT,DEFENSE_SPEED_WEIGHT,DEFENSE_STAT_WEIGHTS,defenseRating,offenseRating,
   fieldingAbilityBonus,BASERUNNING_ABILITY_BONUS
 } from '../src/power-rankings.js';
 
@@ -68,10 +68,14 @@ for(const [stat,points] of [
 }
 assert.equal(offenseRating({...baseHitter,'hit trajectory':'High'})-baseline,20,
   'High trajectory must remain 20 points above Low at a 25% weight');
-assert.equal(DEFENSE_SPEED_WEIGHT,.08,'Defense speed contribution is unchanged');
+assert.equal(DEFENSE_SPEED_WEIGHT,.15,'Defense running speed contributes 15%');
+assert.deepEqual({...DEFENSE_STAT_WEIGHTS},{fielding:.55,throwingSpeed:.30,runningSpeed:.15},
+  'Approved defense is 55% fielding, 30% throwing, 15% speed');
+assert.equal(defenseRating({'fielding':80,'outfield throwing speed':60,'speed':40}),68,
+  'defense skill ratings must be directly weighted before chemistry and ability bonuses');
 assert.equal(offenseRating({
   'charge hit power':100,'hit trajectory':'High','slap hit power':100,
   'slap contact size':100,'charge contact size':100,
 }),100,'Approved offensive skill weights must total 100%');
 assert.equal(fieldingAbilityBonus(9,'SS'),-12,'Fielding ability rules must be retained');
-console.log('PASS: overall 60/20/20, pitching 55/10/15/20, offense 40/25/25/5/5, +4 baserunning, speed and defense unchanged');
+console.log('PASS: overall 60/20/20, pitching 55/10/15/20, offense 40/25/25/5/5, defense 55/30/15, +4 baserunning');
