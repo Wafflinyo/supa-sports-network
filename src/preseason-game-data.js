@@ -1,4 +1,5 @@
 import gameRecords from './preseason-game-records.json' with {type:'json'};
+import {isSeasonOne} from './preseason-season-identity.js';
 import {gamePointsForReport} from './game-points.js';
 import {pitchingShutoutBonuses,pitcherShutoutStats} from './pitching-shutout.js';
 
@@ -11,7 +12,9 @@ export const preseasonGames=gameRecords;
 const normal=x=>String(x||'').toLowerCase().replace(/[^a-z0-9]/g,'');
 export function allPreseasonGames(season){
   const published=(season?.preseasonReports||[]).filter(g=>g?.gameId&&Array.isArray(g.players));
-  const legacy=gameRecords.filter(game=>!published.some(other=>{
+  // Original Round 1 game-sheet fixtures are historical Season 1 records.
+  // A future season must not inherit those reports or their player averages.
+  const legacy=(isSeasonOne(season)?gameRecords:[]).filter(game=>!published.some(other=>{
     if(other.round!==game.round)return false;
     const samePair=[normal(other.away),normal(other.home)].sort().join('|')===
       [normal(game.away),normal(game.home)].sort().join('|');
