@@ -1,10 +1,10 @@
-import React,{useEffect,useMemo,useState} from 'react';
+import React,{useCallback,useEffect,useMemo,useState} from 'react';
 import {Trophy,Clock,Medal} from 'lucide-react';
 import {teamLogo} from './TeamIdentity.jsx';
 import {powerRankings} from './power-rankings.js';
 import {preseasonBracket,preseasonReady,pickTimeLabel} from './preseason.js';
-import {preseasonGames,preseasonPlayerStatsForGame} from './preseason-game-data.js';
-import preseasonPlayers from './players.json';
+import {preseasonBoxScore,bracketScoreOnly,reportForBracketMatch,unmatchedPreseasonReports} from './game-box-score-data.js';
+import GameBoxScore from './GameBoxScore.jsx';
 import './preseason.css';
 
 function Identity({team,supabase}){
@@ -99,127 +99,158 @@ function ScoreEntry({game,league}){
       }}>CLEAR</button>}
   </form>;
 }
-function ImportedPreseasonResults(){
-  const names=new Map(preseasonPlayers.map(p=>[p.id,p.name]));
-  return <section className="panel ssl-pre-panel" aria-label="Imported preseason results">
-    <h3>RECORDED PRESEASON RESULTS</h3>
-    {preseasonGames.map(game=>{
-      const scorers=preseasonPlayerStatsForGame(game);
-      const shown=n=>Math.round((n+Number.EPSILON)*100)/100;
-      return <article key={game.gameId}>
-        <p><strong>ROUND {game.round}: {game.away} @ {game.home}</strong></p>
-        <p><strong>FINAL: {game.away} {game.awayScore} — {game.home} {game.homeScore}</strong></p>
-        <details><summary>View player Game Points (OGP / DGP / PGP / TGP)</summary>
-          {[[game.away,'Away'],[game.home,'Home']].map(([team,side])=><div key={team}>
-            <h4>{team}</h4>
-            <div className="ssl-pre-scroll"><table className="ssl-pre-table">
-              <thead><tr><th>Player</th><th>OGP</th><th>DGP</th><th>PGP</th><th>Item</th><th>TGP</th></tr></thead>
-              <tbody>{scorers.filter(p=>p.teamName===team).sort((a,b)=>b.stats.tgp-a.stats.tgp).map(p=>
-                <tr key={p.playerId}><td>{names.get(p.playerId)||p.playerName||p.playerId}{p.playerId===game.mvp?' (MVP)':''}</td>
-                <td>{shown(p.stats.ogp)}</td><td>{shown(p.stats.dgp)}</td><td>{shown(p.stats.pgp)}</td>
-                <td>{shown(p.stats.itemScore||0)}</td><td>{shown(p.stats.tgp)}</td></tr>
-              )}</tbody>
-            </table></div>
-            <p><strong>Team Total Game Points: {shown(scorers.filter(p=>p.teamName===team).reduce((n,p)=>n+p.stats.tgp,0))}</strong></p>
-          </div>)}
-        </details>
-      </article>
-    })}
-  </section>
+// The game itself is the entrance to its box score. Commissioner controls
+// remain outside the clickable matchup surface to prevent nested buttons.
+function BracketGameCard({game,league,compact=false,onOpen}){
+  const report=reportForBracketMatch(game);
+  const details=<>
+    <small>{game.key}{!compact?' · HIGH SEED VS LOW SEED':''}</small>
+    <div className={'ssl-pre-side'+(game.winner?.id===game.high.id?' winner':'')}>
+      <span className="ssl-pre-seed">#{game.high.seed}</span>
+      <Identity team={game.high} supabase={league.supabase}/>
+      <b>{game.scoreA??'—'}</b>
+    </div>
+    <div className={'ssl-pre-side'+(game.winner?.id===game.low.id?' winner':'')}>
+      <span className="ssl-pre-seed">#{game.low.seed}</span>
+      <Identity team={game.low} supabase={league.supabase}/>
+      <b>{game.scoreB??'—'}</b>
+    </div>
+    {game.winner&&<p className="ssl-pre-winner">ADVANCES · {game.winner.name}</p>}
+    {game.winner&&<span className="ssl-pre-box-hint">VIEW FULL BOX SCORE ›</span>}
+  </>;
+  return <article className="ssl-pre-game" key={game.key}>
+    {game.winner?<button type="button" className="ssl-pre-card-button"
+      aria-label={'Open box score for '+game.high.name+' versus '+game.low.name}
+      onClick={()=>onOpen(report?preseasonBoxScore(report):bracketScoreOnly(game))}>
+      {details}
+    </button>:<div className="ssl-pre-card-static">{details}</div>}
+    {!compact&&<ScoreEntry game={game} league={league}/>}
+  </article>;
+}
+function RecordedMatchCard({report,onOpen}){
+  return <article className="ssl-pre-game ssl-pre-imported-game">
+    <button type="button" className="ssl-pre-card-button"
+      aria-label={'Open box score for '+report.away+' at '+report.home}
+      onClick={()=>onOpen(preseasonBoxScore(report))}>
+      <small>ROUND {report.round} · FINAL</small>
+      <div className={'ssl-pre-side'+(report.awayScore>report.homeScore?' winner':'')}>
+        <span className="ssl-pre-seed">AWAY</span>
+        <span className="ssl-pre-imported-name">{report.away}</span>
+        <b>{report.awayScore}</b>
+      </div>
+      <div className={'ssl-pre-side'+(report.homeScore>report.awayScore?' winner':'')}>
+        <span className="ssl-pre-seed">HOME</span>
+        <span className="ssl-pre-imported-name">{report.home}</span>
+        <b>{report.homeScore}</b>
+      </div>
+      <span className="ssl-pre-box-hint">VIEW FULL BOX SCORE ›</span>
+    </button>
+  </article>;
+}
+function UnlinkedReportCards({reports,onOpen,compact=false}){
+  if(!reports.length)return null;
+  return <section className="panel ssl-pre-panel ssl-pre-round ssl-pre-imported-round"
+    aria-label="Preseason games awaiting official seed assignment">
+    <div className="ssl-pre-round-title">
+      <h3>ROUND 1 · COMPLETED GAMES</h3>
+      <small>OFFICIAL SEEDS PENDING</small>
+    </div>
+    <p className="ssl-pre-help">These completed games will connect to their seeded bracket matchups once the teams and official pairings match.</p>
+    <div className="ssl-pre-games">
+      {reports.map(report=><RecordedMatchCard key={report.gameId} report={report} onOpen={onOpen}/>)}
+    </div>
+  </section>;
 }
 
 export function PreseasonTournament({league,compact=false}){
   const season=league.season;
   const bracket=useMemo(()=>preseasonBracket(season),[season]);
   const ready=preseasonReady(season);
-  if(!ready)return <><section className="panel ssl-pre-panel">
-    <h2>PRESEASON TOURNAMENT</h2>
-    <p>The automatic 12-team bracket and draft-speed seeds appear once the official draft is finished. No seed is assigned while picks are still in progress.</p>
-  </section><ImportedPreseasonResults/></>;
-  if(compact)return <section className="panel ssl-pre-panel ssl-pre-home-bracket" aria-label="Pre-season tournament bracket">
-    <div className="ssl-pre-head">
-      <div><small>SSL PRE-SEASON · SINGLE ELIMINATION</small>
-        <h2>PRE-SEASON BRACKET</h2>
-        <p><strong>{bracket.completedGames} of {bracket.totalGames} matches completed</strong>
-          {' '}· Round-by-round results update as the tournament progresses.</p>
-      </div>
-      <Trophy size={32} aria-hidden="true"/>
-    </div>
-    {bracket.champion&&<div className="ssl-pre-champion" role="status">
-      <Trophy size={26}/><div><small>PRE-SEASON CHAMPION</small>
-        <strong>{bracket.champion.name}</strong></div></div>}
-    <div className="ssl-pre-home-rounds">
-      {bracket.rounds.map(round=><section className="ssl-pre-home-round" key={round.number}
-        aria-label={round.title}>
-        <div className="ssl-pre-round-title">
-          <h3>{round.title}</h3><small>{round.complete?'COMPLETE':round.pending?'UPCOMING':'IN PROGRESS'}</small>
+  const [boxScore,setBoxScore]=useState(null);
+  const closeBox=useCallback(()=>setBoxScore(null),[]);
+  const unmatched=useMemo(()=>unmatchedPreseasonReports(bracket),[bracket]);
+  const modal=boxScore&&<GameBoxScore key={boxScore.id} game={boxScore} onClose={closeBox}/>;
+  if(!ready)return <>
+    <section className="panel ssl-pre-panel">
+      <h2>PRESEASON BRACKET</h2>
+      <p>The official 12-team seeded bracket appears once the draft finishes. Tap a completed game below to view its full box score.</p>
+    </section>
+    <UnlinkedReportCards reports={unmatched} onOpen={setBoxScore}/>
+    {modal}
+  </>;
+  if(compact)return <>
+    <section className="panel ssl-pre-panel ssl-pre-home-bracket" aria-label="Pre-season tournament bracket">
+      <div className="ssl-pre-head">
+        <div><small>SSL PRE-SEASON · SINGLE ELIMINATION</small>
+          <h2>PRE-SEASON BRACKET</h2>
+          <p><strong>{bracket.completedGames} of {bracket.totalGames} matches completed</strong>
+            {' '}· Tap a final game to see its full box score.</p>
         </div>
-        {round.pending?<p className="ssl-pre-home-pending">Awaiting the previous round</p>:<>
-          {round.bye&&<div className="ssl-pre-bye"><b>BYE</b> · #{round.bye.seed} {round.bye.name}</div>}
-          <div className="ssl-pre-games">
-            {round.games.map(game=><article className="ssl-pre-game" key={game.key}>
-              <small>{game.key}</small>
-              <div className={'ssl-pre-side'+(game.winner?.id===game.high.id?' winner':'')}>
-                <span className="ssl-pre-seed">#{game.high.seed}</span>
-                <Identity team={game.high} supabase={league.supabase}/>
-                <b>{game.scoreA??'—'}</b></div>
-              <div className={'ssl-pre-side'+(game.winner?.id===game.low.id?' winner':'')}>
-                <span className="ssl-pre-seed">#{game.low.seed}</span>
-                <Identity team={game.low} supabase={league.supabase}/>
-                <b>{game.scoreB??'—'}</b></div>
-            </article>)}
-          </div>
-        </>}
-      </section>)}
-    </div>
-  </section>;
-  return <div className="ssl-pre-tournament">
-    <ImportedPreseasonResults/>
-    <section className="panel ssl-pre-panel">
-      <div className="ssl-pre-head"><div><small>SSL PRESEASON · SINGLE ELIMINATION</small>
-        <h2>PRESEASON TOURNAMENT</h2>
-        <p><b>Fastest average draft pick = #1 seed; slowest = #12 seed.</b>
-          Every round reseeds the remaining teams: highest against lowest.
-          With three teams left, the highest surviving seed receives a semifinal bye.
-        </p></div><Trophy size={34} aria-hidden="true"/></div>
+        <Trophy size={32} aria-hidden="true"/>
+      </div>
       {bracket.champion&&<div className="ssl-pre-champion" role="status">
-        <Trophy size={29}/><div><small>PRESEASON TOURNAMENT CHAMPION</small>
-          <strong>{bracket.champion.name}</strong>
-          <p>Championship badge unlocked for this franchise's GM.</p></div></div>}
-      <p className="ssl-pre-help"><b>{bracket.completedGames} of 11 games final.</b> Tournament scores are independent from regular-season standings, career stats, Heating Up, and fantasy.</p>
-      {league.error&&<p className="ssl-pre-error" role="alert">{league.error}</p>}
+        <Trophy size={26}/><div><small>PRE-SEASON CHAMPION</small>
+          <strong>{bracket.champion.name}</strong></div></div>}
+      <div className="ssl-pre-home-rounds">
+        {bracket.rounds.map(round=><section className="ssl-pre-home-round" key={round.number} aria-label={round.title}>
+          <div className="ssl-pre-round-title">
+            <h3>{round.title}</h3><small>{round.complete?'COMPLETE':round.pending?'UPCOMING':'IN PROGRESS'}</small>
+          </div>
+          {round.pending?<p className="ssl-pre-home-pending">Awaiting the previous round</p>:<>
+            {round.bye&&<div className="ssl-pre-bye"><b>BYE</b> · #{round.bye.seed} {round.bye.name}</div>}
+            <div className="ssl-pre-games">
+              {round.games.map(game=><BracketGameCard key={game.key} game={game} league={league} compact onOpen={setBoxScore}/>)}
+            </div>
+          </>}
+        </section>)}
+      </div>
+      {!!unmatched.length&&<UnlinkedReportCards reports={unmatched} onOpen={setBoxScore} compact/>}
     </section>
-    <section className="panel ssl-pre-panel">
-      <h3><Clock size={18} aria-hidden="true"/> DRAFT SPEED SEEDING</h3>
-      <div className="ssl-pre-scroll"><table className="ssl-pre-table">
-        <thead><tr><th>Seed</th><th>Team</th><th>Average pick time</th><th>Picks</th></tr></thead>
-        <tbody>{bracket.seeds.map(t=><tr key={t.id}>
-          <td className="ssl-pre-rank">#{t.seed}</td><td><Identity team={t} supabase={league.supabase}/></td>
-          <td>{pickTimeLabel(t.avgSeconds)}</td><td>{t.selectedPicks}</td>
-        </tr>)}</tbody>
-      </table></div>
-      <p className="ssl-pre-help">Includes each franchise's drafted player and Stadium selections, plus supplemental picks, where applicable. Ties are broken by official lottery-order position. Paused clock intervals are excluded from saved pick times.</p>
-    </section>
-    <div className="ssl-pre-rounds">
-      {bracket.rounds.map(round=><section className="panel ssl-pre-panel ssl-pre-round" key={round.number}>
-        <div className="ssl-pre-round-title"><h3>{round.title}</h3><small>{round.pending?'AWAITING PRIOR ROUND':round.complete?'ROUND COMPLETE':'SINGLE ELIMINATION'}</small></div>
-        {round.pending?<p>Matchups will be reseeded automatically after all games in the previous round are entered.</p>:<>
-          {round.bye&&<div className="ssl-pre-bye"><strong>ADVANCES BYE</strong> · #{round.bye.seed} {round.bye.name}</div>}
-          <div className="ssl-pre-games">{round.games.map(game=><article className="ssl-pre-game" key={game.key}>
-            <small>{game.key} · HIGH SEED VS LOW SEED</small>
-            <div className={'ssl-pre-side'+(game.winner?.id===game.high.id?' winner':'')}>
-              <span className="ssl-pre-seed">#{game.high.seed}</span>
-              <Identity team={game.high} supabase={league.supabase}/>
-              <b>{game.scoreA==null?'—':game.scoreA}</b></div>
-            <div className={'ssl-pre-side'+(game.winner?.id===game.low.id?' winner':'')}>
-              <span className="ssl-pre-seed">#{game.low.seed}</span>
-              <Identity team={game.low} supabase={league.supabase}/>
-              <b>{game.scoreB==null?'—':game.scoreB}</b></div>
-            {game.winner&&<p className="ssl-pre-winner">ADVANCES · {game.winner.name}</p>}
-            <ScoreEntry game={game} league={league}/>
-          </article>)}</div>
-        </>}
-      </section>)}
+    {modal}
+  </>;
+  return <>
+    <div className="ssl-pre-tournament">
+      <section className="panel ssl-pre-panel">
+        <div className="ssl-pre-head"><div><small>SSL PRESEASON · SINGLE ELIMINATION</small>
+          <h2>PRESEASON TOURNAMENT</h2>
+          <p><b>Fastest average draft pick = #1 seed; slowest = #12 seed.</b>
+            Every round reseeds the remaining teams: highest against lowest.
+            With three teams left, the highest surviving seed receives a semifinal bye.
+          </p></div><Trophy size={34} aria-hidden="true"/></div>
+        {bracket.champion&&<div className="ssl-pre-champion" role="status">
+          <Trophy size={29}/><div><small>PRESEASON TOURNAMENT CHAMPION</small>
+            <strong>{bracket.champion.name}</strong>
+            <p>Championship badge unlocked for this franchise's GM.</p></div></div>}
+        <p className="ssl-pre-help"><b>{bracket.completedGames} of 11 games final.</b> Tap any finished matchup for its full box score. Preseason stats stay independent from regular-season standings, career stats, Heating Up, and fantasy.</p>
+        {league.error&&<p className="ssl-pre-error" role="alert">{league.error}</p>}
+      </section>
+      <section className="panel ssl-pre-panel">
+        <h3><Clock size={18} aria-hidden="true"/> DRAFT SPEED SEEDING</h3>
+        <div className="ssl-pre-scroll"><table className="ssl-pre-table">
+          <thead><tr><th>Seed</th><th>Team</th><th>Average pick time</th><th>Picks</th></tr></thead>
+          <tbody>{bracket.seeds.map(t=><tr key={t.id}>
+            <td className="ssl-pre-rank">#{t.seed}</td><td><Identity team={t} supabase={league.supabase}/></td>
+            <td>{pickTimeLabel(t.avgSeconds)}</td><td>{t.selectedPicks}</td>
+          </tr>)}</tbody>
+        </table></div>
+        <p className="ssl-pre-help">Includes each franchise's drafted player and Stadium selections, plus supplemental picks, where applicable. Ties are broken by official lottery-order position. Paused clock intervals are excluded from saved pick times.</p>
+      </section>
+      <div className="ssl-pre-rounds">
+        {bracket.rounds.map(round=><section className="panel ssl-pre-panel ssl-pre-round" key={round.number}>
+          <div className="ssl-pre-round-title">
+            <h3>{round.title}</h3>
+            <small>{round.pending?'AWAITING PRIOR ROUND':round.complete?'ROUND COMPLETE':'SINGLE ELIMINATION'}</small>
+          </div>
+          {round.pending?<p>Matchups will be reseeded automatically after all games in the previous round are entered.</p>:<>
+            {round.bye&&<div className="ssl-pre-bye"><strong>ADVANCES BYE</strong> · #{round.bye.seed} {round.bye.name}</div>}
+            <div className="ssl-pre-games">
+              {round.games.map(game=><BracketGameCard key={game.key} game={game} league={league} onOpen={setBoxScore}/>)}
+            </div>
+          </>}
+          {round.number===1&&!!unmatched.length&&<UnlinkedReportCards reports={unmatched} onOpen={setBoxScore}/>}
+        </section>)}
+      </div>
     </div>
-  </div>;
+    {modal}
+  </>;
 }

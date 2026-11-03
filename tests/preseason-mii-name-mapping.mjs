@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import playerPool from '../src/players.json' with {type:'json'};
 import {preseasonGames,preseasonPlayerStats,preseasonPlayerStatsForGame,preseasonTeamStats} from '../src/preseason-game-data.js';
+import {preseasonBoxScore} from '../src/game-box-score-data.js';
 
 const roster=new Map(playerPool.map(p=>[p.id,p]));
 assert.equal(roster.get(118)?.name,'Ada Wong');
@@ -41,5 +42,8 @@ assert.equal(pangolins.stats.tgp,495.5,'Correcting player identity must not chan
 const preseasonUI=readFileSync(new URL('../src/PreseasonStats.jsx',import.meta.url),'utf8');
 const bracketUI=readFileSync(new URL('../src/SeasonPreseason.jsx',import.meta.url),'utf8');
 assert.match(preseasonUI,/byId\.get\(String\(row\.playerId\)\)\?\.name\|\|row\.playerName/);
-assert.match(bracketUI,/names\.get\(p\.playerId\)\|\|p\.playerName/);
+assert.match(bracketUI,/onOpen\(preseasonBoxScore\(report\)\)/);
+const box=preseasonBoxScore(game);
+const adaInBox=box.teams.flatMap(team=>team.players).find(p=>p.playerId===118);
+assert.equal(adaInBox.name,'Ada Wong','Preseason bracket game box scores use official named Mii records');
 console.log('All imported preseason participants resolve to SSL player names; Ada Wong points and team stats preserved.');

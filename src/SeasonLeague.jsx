@@ -1,6 +1,8 @@
 import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
 import {PowerRankings,PreseasonTournament} from './SeasonPreseason.jsx';
 import {visibleGamePointFields} from './game-point-columns.js';
+import {seasonBoxScore} from './game-box-score-data.js';
+import GameBoxScore from './GameBoxScore.jsx';
 import PreseasonStats from './PreseasonStats.jsx';
 import {preseasonReady} from './preseason.js';
 import {lotteryProgress,lotteryReplayProgress,lotteryDuration,lotteryCountdownClock} from './lottery-timing.js';
@@ -25,7 +27,7 @@ import {
   SeasonCalendar,
   ScheduleGenerator,
 } from "./SeasonCalendar.jsx";
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import pool from "./players.json";
 import { teamLogo } from "./TeamIdentity.jsx";
 import { ConferenceMark } from './ConferenceMark.jsx';
@@ -1277,7 +1279,9 @@ function Schedule({ league: l, commissioner = false }) {
     [form, setForm] = useState({ away: "", home: "", startsAt: "", label: "" }),
     [editing, setEditing] = useState(null),
     [reportGame, setReportGame] = useState(null),
+    [boxGameId, setBoxGameId] = useState(null),
     [team, setTeam] = useActingTeam(l);
+  const closeBox=useCallback(()=>setBoxGameId(null),[]);
   if (!s)
     return (
       <Box title="SCHEDULE">
@@ -1291,6 +1295,8 @@ function Schedule({ league: l, commissioner = false }) {
       (a.startsAt?new Date(a.startsAt).getTime():0)-(b.startsAt?new Date(b.startsAt).getTime():0)||
       String(a.id).localeCompare(String(b.id))
     );
+  const selectedBoxGame=boxGameId==null?null:s.games.find(g=>String(g.id)===String(boxGameId));
+  const currentBoxScore=selectedBoxGame?seasonBoxScore(s,selectedBoxGame):null;
   return (
     <>
       <SeasonCalendar league={l} />
@@ -1437,21 +1443,30 @@ function Schedule({ league: l, commissioner = false }) {
                 {g.postponed ? "POSTPONED · " : ""}
                 {g.label || g.phase}
               </small>
-              <ScheduleMatchupHeading season={s} game={g} />
-              <p className="matchup-conference"><ConferenceMark id={s.teams.find(t=>t.id===g.home)?.conference} size={19}/> {matchupType(s,g)}</p>
+              {g.stage === "final" ? (
+                <button type="button" className="ssl-schedule-box-trigger"
+                  aria-label={'Open full box score for '+(s.teams.find(t=>t.id===g.away)?.name||'away')+' at '+(s.teams.find(t=>t.id===g.home)?.name||'home')}
+                  onClick={()=>setBoxGameId(g.id)}>
+                  <ScheduleMatchupHeading season={s} game={g}/>
+                  <p className="matchup-conference"><ConferenceMark id={s.teams.find(t=>t.id===g.home)?.conference} size={19}/> {matchupType(s,g)}</p>
+                  <strong className="ssl-schedule-final-score">FINAL · {g.result.scores[g.away]} – {g.result.scores[g.home]}</strong>
+                  <span className="ssl-schedule-box-hint">VIEW FULL BOX SCORE ›</span>
+                </button>
+              ):(
+                <>
+                  <ScheduleMatchupHeading season={s} game={g} />
+                  <p className="matchup-conference"><ConferenceMark id={s.teams.find(t=>t.id===g.home)?.conference} size={19}/> {matchupType(s,g)}</p>
+                  <strong>{g.stage === "recorded"
+                    ? "AWAITING PREMIERE RESULT RELEASE · LINEUPS LOCKED"
+                    : g.stage.toUpperCase()}</strong>
+                </>
+              )}
               {g.announcement && <p>{g.announcement}</p>}
               {g.youtubeUrl && (
                 <a href={g.youtubeUrl} target="_blank" rel="noreferrer">
                   Watch on Supa League TV
                 </a>
               )}
-              <strong>
-                {g.stage === "final"
-                  ? `${g.result.scores[g.away]} – ${g.result.scores[g.home]}`
-                  : g.stage === "recorded"
-                    ? "AWAITING PREMIERE RESULT RELEASE · LINEUPS LOCKED"
-                    : g.stage.toUpperCase()}
-              </strong>
             </div>
             {team &&
               [g.away, g.home].includes(team) &&
@@ -1560,6 +1575,7 @@ function Schedule({ league: l, commissioner = false }) {
           </React.Fragment>
         ))
       )}
+      {currentBoxScore&&<GameBoxScore key={currentBoxScore.id} game={currentBoxScore} onClose={closeBox}/>}
     </>
   );
 }
