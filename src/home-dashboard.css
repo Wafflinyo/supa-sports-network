@@ -69,3 +69,17 @@
   .ssl-home-match-line strong{font-size:18px}
 }
 @media(prefers-reduced-motion:reduce){.ssl-home-layout *{scroll-behavior:auto}}
+
+/* Trade newsroom: show only what each club receives, never repeat long arrows. */
+.ssl-home-news .news-trade .news-copy{min-width:0}
+.ssl-trade-breakdown{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:11px;margin-top:11px}
+.ssl-trade-side{min-width:0;border:1px solid #dce4f0;border-top:3px solid #d9232e;border-radius:4px;background:#f7f9fc;overflow:hidden}
+.ssl-trade-side-heading{padding:10px 13px 8px;border-bottom:1px solid #e0e6ef}
+.ssl-trade-side-heading small{display:block!important;color:#cb2030;font-size:10px;letter-spacing:.1em;line-height:1.1;margin-bottom:4px}
+.ssl-trade-side-heading strong{display:block;font:900 19px/1.15 'Barlow Condensed',Impact,sans-serif;color:#142d55;overflow-wrap:anywhere}
+.ssl-trade-assets{list-style:none;margin:0;padding:8px 13px 12px;display:grid;gap:6px}
+.ssl-trade-assets li{position:relative;padding-left:15px;line-height:1.35;min-width:0}
+.ssl-trade-assets li:before{content:'✓';position:absolute;top:0;left:0;font-weight:900;color:#168046}
+.ssl-trade-asset-name{font-size:13px;font-weight:750;color:#203958;overflow-wrap:anywhere}
+.ssl-trade-assets li small{display:block;margin:2px 0 0;color:#6d7e95;font-weight:500;font-size:10px;letter-spacing:0}
+@media(max-width:660px){.ssl-trade-breakdown{grid-template-columns:1fr}.ssl-trade-side-heading strong{font-size:18px}}
