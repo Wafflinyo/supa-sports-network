@@ -77,8 +77,8 @@ export default function PreseasonStats({season}){
   const visible=useMemo(()=>{
     const q=query.trim().toLowerCase()
     const filtered=rows.filter(row=>(!q||row.teamName.toLowerCase().includes(q)||
-      (row.playerId&&(row.playerName||byId.get(String(row.playerId))?.name||'').toLowerCase().includes(q))))
-    const cell=(row,key)=>key==='name'?row.playerName||byId.get(String(row.playerId))?.name||'':key==='team'?row.teamName:row.stats[key]??0
+      (row.playerId&&(byId.get(String(row.playerId))?.name||row.playerName||'').toLowerCase().includes(q))))
+    const cell=(row,key)=>key==='name'?byId.get(String(row.playerId))?.name||row.playerName||'':key==='team'?row.teamName:row.stats[key]??0
     if(sort)filtered.sort((a,b)=>{
       const aa=view==='Averages per Game'&&sort.key!=='name'&&sort.key!=='team'?a.perGame?.[sort.key]??0:cell(a,sort.key)
       const bb=view==='Averages per Game'&&sort.key!=='name'&&sort.key!=='team'?b.perGame?.[sort.key]??0:cell(b,sort.key)
@@ -126,7 +126,7 @@ export default function PreseasonStats({season}){
           <tbody>{visible.map(row=><tr key={String(row.playerId||'team')+'-'+row.teamName}>
             {scope==='Players'&&<td className="ssl-pre-stats-text"><span className="ssl-pre-stats-player">
               {byId.has(String(row.playerId))&&<PlayerPortrait player={byId.get(String(row.playerId))} size={32}/>}
-              {row.playerName||byId.get(String(row.playerId))?.name||'Unknown player'}</span></td>}
+              {byId.get(String(row.playerId))?.name||row.playerName||'Unknown player'}</span></td>}
             <td className="ssl-pre-stats-text">{row.teamName}</td>
             {scope==='Teams'&&<>
               <td className="ssl-pre-stats-number">{view==='Totals'?row.stats.runsScored:row.perGame.runsScored.toFixed(2)}</td>
