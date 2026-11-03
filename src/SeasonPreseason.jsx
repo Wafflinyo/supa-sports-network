@@ -6,6 +6,7 @@ import {preseasonBracket,preseasonReady,pickTimeLabel} from './preseason.js';
 import {allPreseasonGames} from './preseason-game-data.js';
 import {preseasonPreviewBox} from './preseason-rio-report.js';
 import PreseasonRioImport from './PreseasonRioImport.jsx';
+import RioReportDialog from './RioReportDialog.jsx';
 import {preseasonBoxScore,bracketScoreOnly,reportForBracketMatch,unmatchedPreseasonReports} from './game-box-score-data.js';
 import GameBoxScore from './GameBoxScore.jsx';
 import './preseason.css';
@@ -127,8 +128,12 @@ function BracketGameCard({game,league,compact=false,onOpen,reports}) {
         onClick={()=>setShowUploader(v=>!v)}>
         {staged?'REPLACE PRIVATE REPORT':'UPLOAD PROJECT RIO GAME FILE'}
       </button>
-      {showUploader&&<PreseasonRioImport key={game.key} league={league} game={game}
-        onClose={()=>setShowUploader(false)}/>}
+      {showUploader&&<RioReportDialog title="PRESEASON · PROJECT RIO GAME FILE"
+        subtitle={game.high.name+' vs '+game.low.name}
+        onClose={()=>setShowUploader(false)}>
+        <PreseasonRioImport key={game.key} league={league} game={game}
+          onClose={()=>setShowUploader(false)}/>
+      </RioReportDialog>}
     </div>}
   </article>;
 }

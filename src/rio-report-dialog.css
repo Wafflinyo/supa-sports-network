@@ -1,0 +1,35 @@
+/* Shared commissioner Project Rio upload / review workspace.
+   Portaled to the document root so bracket and schedule cards never constrain it. */
+.ssl-rio-dialog-backdrop{position:fixed;inset:0;z-index:100050;display:flex;align-items:center;justify-content:center;padding:clamp(8px,2vw,24px);background:rgba(8,19,39,.79);overscroll-behavior:contain}
+.ssl-rio-report-dialog{box-sizing:border-box;display:flex;flex-direction:column;width:min(1200px,100%);max-width:100%;max-height:calc(100dvh - clamp(16px,4vw,48px));min-height:0;overflow:hidden;border-radius:12px;background:#fff;color:#182c4f;box-shadow:0 24px 85px #0007}
+.ssl-rio-dialog-header{position:relative;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-shrink:0;padding:17px 23px;background:#11294f;color:#fff;border-bottom:4px solid #e8b83a}
+.ssl-rio-dialog-header>div{min-width:0;flex:1}
+.ssl-rio-dialog-header small{display:block;color:#ffe2a0;font-weight:900;font-size:11px;letter-spacing:.11em}
+.ssl-rio-dialog-header h2{margin:4px 0;font:900 clamp(21px,3vw,31px)/1.1 'Barlow Condensed',Impact,sans-serif;color:#fff;overflow-wrap:anywhere}
+.ssl-rio-dialog-header p{margin:4px 0 0;color:#c5d8f2;font-size:12px;line-height:1.4;overflow-wrap:anywhere}
+.ssl-rio-dialog-close{flex:none;width:46px;height:46px;border-radius:7px;border:1px solid #9fb2d2;background:#213e67;color:#fff;font-size:31px;line-height:1;cursor:pointer}
+.ssl-rio-dialog-close:hover,.ssl-rio-dialog-close:focus-visible{background:#345887;outline:2px solid #fff;outline-offset:2px}
+.ssl-rio-dialog-content{min-height:0;min-width:0;flex:1;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.ssl-rio-dialog-content .ssl-pre-rio-import{border:0;min-width:0;padding:22px 24px 28px;background:#fff}
+.ssl-rio-dialog-content .report-import{min-width:0;width:100%;max-width:none;box-sizing:border-box;margin:0;padding:22px 24px 28px;background:#fff}
+.ssl-rio-dialog-content .ssl-pre-rio-import p,.ssl-rio-dialog-content .report-import p{overflow-wrap:anywhere;max-width:100%}
+.ssl-rio-dialog-content .report-import>.season-table{display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.ssl-rio-dialog-content .report-import>.season-table table{min-width:780px}
+.ssl-rio-dialog-content .ssl-pre-scroll{max-width:100%;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.ssl-rio-dialog-content .ssl-pre-rio-table{min-width:760px}
+.ssl-rio-dialog-content .report-import input[type="file"],
+.ssl-rio-dialog-content .ssl-pre-rio-import input[type="file"]{max-width:100%;box-sizing:border-box}
+.ssl-rio-dialog-content .report-import select,.ssl-rio-dialog-content .ssl-pre-rio-table select{max-width:100%}
+.ssl-rio-dialog-content .ssl-pre-rio-actions{display:flex;gap:10px;flex-wrap:wrap}
+.ssl-rio-dialog-content .ssl-pre-rio-actions button{flex:1 1 230px;white-space:normal;line-height:1.25}
+@media(max-width:640px){
+  .ssl-rio-dialog-backdrop{padding:5px}
+  .ssl-rio-report-dialog{max-height:calc(100dvh - 10px);border-radius:8px}
+  .ssl-rio-dialog-header{padding:12px 14px;gap:8px}
+  .ssl-rio-dialog-header small{font-size:9px}
+  .ssl-rio-dialog-header h2{font-size:22px}
+  .ssl-rio-dialog-close{width:40px;height:40px}
+  .ssl-rio-dialog-content .ssl-pre-rio-import,
+  .ssl-rio-dialog-content .report-import{padding:14px 12px 22px}
+  .ssl-rio-dialog-content .ssl-pre-rio-actions button{flex:1 1 100%}
+}
