@@ -83,7 +83,7 @@ const scheduleUI=readFileSync(new URL('../src/SeasonLeague.jsx',import.meta.url)
 const boxUI=readFileSync(new URL('../src/GameBoxScore.jsx',import.meta.url),'utf8');
 assert.equal(bracketUI.includes('RECORDED PRESEASON RESULTS'),false);
 assert.equal(bracketUI.includes('ImportedPreseasonResults'),false);
-assert.match(bracketUI,/reportForBracketMatch\(game\)/);
+assert.match(bracketUI,/reportForBracketMatch\(game(?:,reports)?\)/);
 assert.match(bracketUI,/onClick=\{\(\)=>onOpen\(report\?preseasonBoxScore\(report\):bracketScoreOnly\(game\)\)\}/);
 assert.match(bracketUI,/UnlinkedReportCards/);
 assert.match(scheduleUI,/g\.stage === "final" \? \(/);
