@@ -6,7 +6,7 @@ import {validLineup} from './season-data.js';
 // Transparent roster-only preseason projection. No in-game menu/display bars.
 // Overall: 65% offense, 20% defense, 15% pitching.
 // Offense: 95% of hitter skills (charge power 40%, trajectory 25%, slap power
-// 20%, slap contact 7%, charge contact 8%) plus 5% speed.
+// 25%, slap contact 5%, charge contact 5%) plus 5% speed.
 // Defense: 92% of defensive skills (fielding 60%, throw speed 40%) plus 8% speed.
 // Pitching: stamina 55%, charge pitch speed 10%, curveball speed 15%, curve 20%.
 // High trajectory > Medium > Low. The display-stat rating bars are not used.
@@ -107,7 +107,7 @@ export function lineupFieldingAbilityBonuses(people,starters){
   }
   return bonuses;
 }
-export const BASERUNNING_ABILITY_BONUS=2;
+export const BASERUNNING_ABILITY_BONUS=4;
 export const BATTING_CHEMISTRY_BONUSES=Object.freeze({one:3,both:6});
 export const MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT=20;
 export const UNLISTED_FIELDING_CHEMISTRY_BONUS=1;
@@ -189,9 +189,9 @@ export function offenseRating(stats){
   const trajectoryPoints=TRAJECTORY_SCORES[trajectory]??TRAJECTORY_SCORES.Medium;
   return .40*numeric(stats,'charge hit power')+
     TRAJECTORY_OFFENSE_WEIGHT*trajectoryPoints+
-    .20*numeric(stats,'slap hit power')+
-    .07*numeric(stats,'slap contact size')+
-    .08*numeric(stats,'charge contact size');
+    .25*numeric(stats,'slap hit power')+
+    .05*numeric(stats,'slap contact size')+
+    .05*numeric(stats,'charge contact size');
 }
 function scouting(id){
   const record=gameData.players[id];
