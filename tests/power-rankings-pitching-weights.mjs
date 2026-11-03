@@ -5,7 +5,7 @@ import {
   PITCHING_STAT_WEIGHTS,pitchingRating,rosterPowerComponents,
   POWER_WEIGHTS,POWER_PITCHER_COUNT,POWER_SUPPORT_PITCHER_COUNT,
   OFFENSE_SPEED_WEIGHT,DEFENSE_SPEED_WEIGHT,offenseRating,
-  fieldingAbilityBonus
+  fieldingAbilityBonus,BASERUNNING_ABILITY_BONUS
 } from '../src/power-rankings.js';
 
 assert.deepEqual({...PITCHING_STAT_WEIGHTS},{
@@ -51,13 +51,27 @@ const total=current.selectedPitchers.reduce((sum,p)=>sum+pitchingRating(gameData
 assert.equal(current.pitching,Math.round((total/POWER_PITCHER_COUNT)*10)/10,
   'Team pitching rating must average the selected four pitchers equally');
 
-assert.deepEqual({...POWER_WEIGHTS},{offense:.65,pitching:.15,defense:.20},
-  'Changing pitching skill weights must not alter the total power-ranking category weights');
+assert.deepEqual({...POWER_WEIGHTS},{offense:.60,pitching:.20,defense:.20},
+  'Commissioner-approved composite is 60% offense, 20% pitching, 20% defense');
 assert.equal(OFFENSE_SPEED_WEIGHT,.05,'Offense speed contribution is unchanged');
+assert.equal(BASERUNNING_ABILITY_BONUS,4,'Every hitter with a baserunning ability earns four offensive rating points');
+const baseHitter={'charge hit power':0,'hit trajectory':'Low',
+  'slap hit power':0,'slap contact size':0,'charge contact size':0};
+const baseline=offenseRating(baseHitter);
+assert.equal(baseline,5,'Low trajectory retains its 25%-weighted value of five');
+for(const [stat,points] of [
+  ['charge hit power',40],['slap hit power',25],
+  ['slap contact size',5],['charge contact size',5],
+]){
+  assert.equal(offenseRating({...baseHitter,[stat]:100})-baseline,points,
+    `${stat} must contribute exactly ${points} points at a 100 stat rating`);
+}
+assert.equal(offenseRating({...baseHitter,'hit trajectory':'High'})-baseline,20,
+  'High trajectory must remain 20 points above Low at a 25% weight');
 assert.equal(DEFENSE_SPEED_WEIGHT,.08,'Defense speed contribution is unchanged');
 assert.equal(offenseRating({
   'charge hit power':100,'hit trajectory':'High','slap hit power':100,
   'slap contact size':100,'charge contact size':100,
-}),100,'Offense hitting attributes have not been changed');
+}),100,'Approved offensive skill weights must total 100%');
 assert.equal(fieldingAbilityBonus(9,'SS'),-12,'Fielding ability rules must be retained');
-console.log('PASS: new 55/10/15/20 pitching weights applied to real league pitchers; four-pitcher averaging and offense/defense rules preserved');
+console.log('PASS: overall 60/20/20, pitching 55/10/15/20, offense 40/25/25/5/5, +4 baserunning, speed and defense unchanged');

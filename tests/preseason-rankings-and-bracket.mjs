@@ -5,9 +5,9 @@ import {powerRankings,POWER_WEIGHTS,TRAJECTORY_OFFENSE_WEIGHT,TRAJECTORY_SCORES,
 import {pitcherPriorityFor} from '../src/player-roles.js';
 import {earnedAchievements,GM_ACHIEVEMENTS} from '../src/gm-achievements.js';
 
-// Offense dominates at 65%, defense remains 20%, pitching stays 15%.
+// Offense dominates at 60%, defense and pitching each receive 20%.
 // Running and chemistry are no longer standalone composite categories.
-assert.deepEqual(POWER_WEIGHTS,{offense:.65,pitching:.15,defense:.20});
+assert.deepEqual(POWER_WEIGHTS,{offense:.60,pitching:.20,defense:.20});
 assert.equal(OFFENSE_SPEED_WEIGHT,.05);
 assert.equal(DEFENSE_SPEED_WEIGHT,.08);
 assert.equal(POWER_WEIGHTS.running,undefined);
@@ -55,7 +55,7 @@ const balancedIds=balancedNames.map(n=>byName.get(n).id);
 const round1=x=>Math.round(x*10)/10;
 
 const positions=['P','C','1B','2B','3B','SS','LF','CF','RF'];
-assert.equal(BASERUNNING_ABILITY_BONUS,2);
+assert.equal(BASERUNNING_ABILITY_BONUS,4);
 assert.deepEqual(BATTING_CHEMISTRY_BONUSES,{one:3,both:6});
 assert.equal(MAX_POSITIONAL_CHEMISTRY_ADJUSTMENT,20);
 assert.equal(UNLISTED_FIELDING_CHEMISTRY_BONUS,1);
@@ -303,10 +303,10 @@ for(const names of [powerNames,balancedNames]){
  assert.equal(ranked.chemistry,undefined,'there is no separate chemistry category');
  // The composite uses exactly three categories and is calculated from the
  // unrounded components, leaving pitching priority and chemistry bonuses intact.
- const expectedScore=.65*avg('offense')+.20*avg('defense')+
-   .15*selected.reduce((sum,p)=>sum+p.pitch,0)/4;
+ const expectedScore=.60*avg('offense')+.20*avg('defense')+
+   .20*selected.reduce((sum,p)=>sum+p.pitch,0)/4;
  assert(Math.abs(ranked.rosterScore-expectedScore)<.001,
-   'overall score must be 65% offense, 20% defense, 15% pitching');
+   'overall score must be 60% offense, 20% defense, 20% pitching');
  assert.equal(ranked.pitching,round1(selected.reduce((sum,p)=>sum+p.pitch,0)/4),
    'GM-selected starter and three backups determine pitching rating equally');
  assert.deepEqual(ranked.selectedPitchers.map(p=>p.id),selected.map(p=>p.id),
