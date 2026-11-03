@@ -7,7 +7,7 @@ import {validLineup} from './season-data.js';
 // Overall: 60% offense, 20% defense, 20% pitching.
 // Offense: 95% of hitter skills (charge power 40%, trajectory 25%, slap power
 // 25%, slap contact 5%, charge contact 5%) plus 5% speed.
-// Defense: 92% of defensive skills (fielding 60%, throw speed 40%) plus 8% speed.
+// Defense: 55% fielding, 30% throwing speed, 15% running speed.
 // Pitching: stamina 55%, charge pitch speed 10%, curveball speed 15%, curve 20%.
 // High trajectory > Medium > Low. The display-stat rating bars are not used.
 // Evaluate all nine starters for offense and defense; speed enters both.
@@ -37,10 +37,18 @@ export const POWER_SUPPORT_PITCHER_COUNT=3;
 export const POWER_WEIGHTS=Object.freeze({
   offense:.60,pitching:.20,defense:.20
 });
-// Blend speed into the base skill score before applying the existing
-// situational chemistry and special-ability bonuses.
+// Apply speed within the respective skill ratings, then add situational
+// chemistry and special-ability bonuses to each starting player.
 export const OFFENSE_SPEED_WEIGHT=.05;
-export const DEFENSE_SPEED_WEIGHT=.08;
+export const DEFENSE_STAT_WEIGHTS=Object.freeze({
+  fielding:.55,throwingSpeed:.30,runningSpeed:.15
+});
+export const DEFENSE_SPEED_WEIGHT=DEFENSE_STAT_WEIGHTS.runningSpeed;
+export function defenseRating(stats){
+  return DEFENSE_STAT_WEIGHTS.fielding*numeric(stats,'fielding')+
+    DEFENSE_STAT_WEIGHTS.throwingSpeed*numeric(stats,'outfield throwing speed')+
+    DEFENSE_STAT_WEIGHTS.runningSpeed*numeric(stats,'speed');
+}
 // Each pitcher's skill score uses the raw 0–100 stamina and curve ratings,
 // and speed values normalized into 0–100. These weights apply immediately to
 // all recalculated Power Rankings, not just rankings for newly drafted teams.
@@ -116,15 +124,15 @@ export const UNLISTED_FIELDING_CHEMISTRY_BONUS=1;
 // Unlisted positive links give +1 to each player; neutral and anti give zero.
 // Each pair scores exactly once: priority links never also gain the generic +1.
 export const DEFENSIVE_CHEMISTRY_LINKS=Object.freeze([
-  {a:'LF',b:'CF',good:8,bad:-6,neutral:-6},
-  {a:'RF',b:'CF',good:8,bad:-6,neutral:-6},
-  {a:'SS',b:'1B',good:6,bad:-4,neutral:0},
-  {a:'2B',b:'3B',good:5,bad:-4,neutral:0},
-  // First and third base form ONE symmetric link: +4 per defender, not +8.
-  {a:'1B',b:'3B',good:4,bad:0,neutral:0},
+  {a:'LF',b:'CF',good:10,bad:-6,neutral:-6},
+  {a:'RF',b:'CF',good:10,bad:-6,neutral:-6},
+  {a:'SS',b:'1B',good:7,bad:-4,neutral:0},
+  {a:'2B',b:'3B',good:6,bad:-4,neutral:0},
+  // First and third base form ONE symmetric link: +5 per defender.
+  {a:'1B',b:'3B',good:5,bad:0,neutral:0},
   ...['LF','CF','RF'].map(a=>({a,b:'1B',good:2,bad:-3,neutral:0})),
   ...['LF','CF','RF'].map(a=>({a,b:'3B',good:2,bad:-3,neutral:0})),
-  ...['LF','CF','RF'].map(a=>({a,b:'C',good:2,bad:-1,neutral:0}))
+  ...['LF','CF','RF'].map(a=>({a,b:'C',good:4,bad:-1,neutral:0}))
 ]);
 function chemistryRelation(a,b){
   // An anti-chemistry link wins when data lists conflicting relationships.
@@ -204,7 +212,7 @@ function scouting(id){
     offenseAbilityBonus:Number(s['baserunning ability'])>0?BASERUNNING_ABILITY_BONUS:0,
     fieldingAbilityId:Number(s['fielding ability']),
     pitching:pitchingRating(s),
-    defense:.60*numeric(s,'fielding')+.40*numeric(s,'outfield throwing speed'),
+    defense:defenseRating(s),
     running:numeric(s,'speed'),
     good:new Set(record.goodChemistryIds||[]),
     bad:new Set(record.badChemistryIds||[]),
@@ -233,8 +241,7 @@ export function rosterPowerComponents(roster,startingPitcherId=null,starters=nul
     p.offenseAbilityBonus+(linked.get(p.id)?.offense||0))));
   const pitching=average(pitchers.map(p=>p.pitching));
   const defense=average(people.map(p=>clamp(
-    (1-DEFENSE_SPEED_WEIGHT)*p.defense+DEFENSE_SPEED_WEIGHT*p.running+
-    (abilityBonuses.get(p.id)||0)+(linked.get(p.id)?.defense||0))));
+    p.defense+(abilityBonuses.get(p.id)||0)+(linked.get(p.id)?.defense||0))));
   const rosterScore=POWER_WEIGHTS.offense*offense+
     POWER_WEIGHTS.pitching*pitching+POWER_WEIGHTS.defense*defense;
   return {offense:round(offense),pitching:round(pitching),defense:round(defense),
