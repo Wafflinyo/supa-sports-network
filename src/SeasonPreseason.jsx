@@ -3,6 +3,9 @@ import {Trophy,Clock,Medal} from 'lucide-react';
 import {teamLogo} from './TeamIdentity.jsx';
 import {powerRankings} from './power-rankings.js';
 import {preseasonBracket,preseasonReady,pickTimeLabel} from './preseason.js';
+import {allPreseasonGames} from './preseason-game-data.js';
+import {preseasonPreviewBox} from './preseason-rio-report.js';
+import PreseasonRioImport from './PreseasonRioImport.jsx';
 import {preseasonBoxScore,bracketScoreOnly,reportForBracketMatch,unmatchedPreseasonReports} from './game-box-score-data.js';
 import GameBoxScore from './GameBoxScore.jsx';
 import './preseason.css';
@@ -75,36 +78,15 @@ export function PowerRankings({season,supabase,compact=false}){
   </section>;
 }
 
-function ScoreEntry({game,league}){
-  const [a,setA]=useState(game.scoreA!=null?String(game.scoreA):'');
-  const [b,setB]=useState(game.scoreB!=null?String(game.scoreB):'');
-  useEffect(()=>{setA(game.scoreA==null?'':String(game.scoreA));setB(game.scoreB==null?'':String(game.scoreB));},
-    [game.key,game.scoreA,game.scoreB]);
-  const canSubmit=a!==''&&b!==''&&Number.isInteger(Number(a))&&Number.isInteger(Number(b))&&
-    Number(a)>=0&&Number(b)>=0&&Number(a)<=999&&Number(b)<=999&&Number(a)!==Number(b);
-  if(league.access.role!=='commissioner')return null;
-  return <form className="ssl-pre-score-form" onSubmit={async e=>{
-    e.preventDefault();
-    if(!canSubmit||league.busy)return;
-    await league.recordPreseasonResult(game.key,Number(a),Number(b));
-  }}>
-    <label>High seed<input type="number" min="0" max="999" step="1" aria-label={game.key+' higher-seed score'} value={a} onChange={e=>setA(e.target.value)}/></label>
-    <label>Low seed<input type="number" min="0" max="999" step="1" aria-label={game.key+' lower-seed score'} value={b} onChange={e=>setB(e.target.value)}/></label>
-    <button className="red-btn" type="submit" disabled={!canSubmit||league.busy}>
-      {game.winner?'CORRECT RESULT':'RECORD FINAL'}</button>
-    {game.winner&&<button className="outline-btn" type="button" disabled={league.busy}
-      onClick={async()=>{
-        if(window.confirm('Clear this preseason result? Later rounds must be cleared first.'))
-          await league.clearPreseasonResult(game.key);
-      }}>CLEAR</button>}
-  </form>;
-}
 // The game itself is the entrance to its box score. Commissioner controls
 // remain outside the clickable matchup surface to prevent nested buttons.
-function BracketGameCard({game,league,compact=false,onOpen}){
-  const report=reportForBracketMatch(game);
+function BracketGameCard({game,league,compact=false,onOpen,reports}) {
+  const report=reportForBracketMatch(game,reports);
+  const isCommissioner=league.access?.role==='commissioner';
+  const staged=isCommissioner?(league.preseasonPrivateReports||[]).find(row=>row.matchKey===game.key):null;
+  const [showUploader,setShowUploader]=useState(false);
   const details=<>
-    <small>{game.key}{!compact?' · HIGH SEED VS LOW SEED':''}</small>
+    <small>{game.key}</small>
     <div className={'ssl-pre-side'+(game.winner?.id===game.high.id?' winner':'')}>
       <span className="ssl-pre-seed">#{game.high.seed}</span>
       <Identity team={game.high} supabase={league.supabase}/>
@@ -124,7 +106,30 @@ function BracketGameCard({game,league,compact=false,onOpen}){
       onClick={()=>onOpen(report?preseasonBoxScore(report):bracketScoreOnly(game))}>
       {details}
     </button>:<div className="ssl-pre-card-static">{details}</div>}
-    {!compact&&<ScoreEntry game={game} league={league}/>}
+    {!compact&&isCommissioner&&!game.winner&&<div className="ssl-pre-commissioner-tools"
+      aria-label={game.key+' commissioner game report controls'}>
+      {staged&&!staged.releasedAt&&<div className="ssl-pre-rio-saved" role="status">
+        <p><strong>PRIVATE · NOT RELEASED</strong> · {staged.filename}</p>
+        <p>Final score staged: {game.high.name} {staged.report?.scoreA} – {staged.report?.scoreB} {game.low.name}</p>
+        <div className="ssl-pre-rio-actions">
+          <button type="button" className="outline-btn" onClick={()=>
+            onOpen(preseasonPreviewBox(league.season,game,staged.report))}>
+            REVIEW PRIVATE BOX SCORE
+          </button>
+          <button type="button" className="red-btn" disabled={league.busy}
+            onClick={async()=>{
+              if(window.confirm('RELEASE '+game.high.name+' vs '+game.low.name+'? The bracket, box scores and preseason player/team stats will become PUBLIC.'))
+                await league.releasePreseasonReport(game.key);
+            }}>RELEASE GAME · MAKE RESULTS PUBLIC</button>
+        </div>
+      </div>}
+      <button type="button" className="outline-btn" aria-expanded={showUploader}
+        onClick={()=>setShowUploader(v=>!v)}>
+        {staged?'REPLACE PRIVATE REPORT':'UPLOAD PROJECT RIO GAME FILE'}
+      </button>
+      {showUploader&&<PreseasonRioImport key={game.key} league={league} game={game}
+        onClose={()=>setShowUploader(false)}/>}
+    </div>}
   </article>;
 }
 function RecordedMatchCard({report,onOpen}){
@@ -165,10 +170,11 @@ function UnlinkedReportCards({reports,onOpen,compact=false}){
 export function PreseasonTournament({league,compact=false}){
   const season=league.season;
   const bracket=useMemo(()=>preseasonBracket(season),[season]);
+  const reports=useMemo(()=>allPreseasonGames(season),[season]);
   const ready=preseasonReady(season);
   const [boxScore,setBoxScore]=useState(null);
   const closeBox=useCallback(()=>setBoxScore(null),[]);
-  const unmatched=useMemo(()=>unmatchedPreseasonReports(bracket),[bracket]);
+  const unmatched=useMemo(()=>unmatchedPreseasonReports(bracket,reports),[bracket,reports]);
   const modal=boxScore&&<GameBoxScore key={boxScore.id} game={boxScore} onClose={closeBox}/>;
   if(!ready)return <>
     <section className="panel ssl-pre-panel">
@@ -199,7 +205,7 @@ export function PreseasonTournament({league,compact=false}){
           {round.pending?<p className="ssl-pre-home-pending">Awaiting the previous round</p>:<>
             {round.bye&&<div className="ssl-pre-bye"><b>BYE</b> · #{round.bye.seed} {round.bye.name}</div>}
             <div className="ssl-pre-games">
-              {round.games.map(game=><BracketGameCard key={game.key} game={game} league={league} compact onOpen={setBoxScore}/>)}
+              {round.games.map(game=><BracketGameCard key={game.key} game={game} league={league} compact onOpen={setBoxScore} reports={reports}/>)}
             </div>
           </>}
         </section>)}
@@ -221,7 +227,7 @@ export function PreseasonTournament({league,compact=false}){
           <Trophy size={29}/><div><small>PRESEASON TOURNAMENT CHAMPION</small>
             <strong>{bracket.champion.name}</strong>
             <p>Championship badge unlocked for this franchise's GM.</p></div></div>}
-        <p className="ssl-pre-help"><b>{bracket.completedGames} of 11 games final.</b> Tap any finished matchup for its full box score. Preseason stats stay independent from regular-season standings, career stats, Heating Up, and fantasy.</p>
+        <p className="ssl-pre-help"><b>{bracket.completedGames} of 11 games final.</b> Tap a released game for its full box score. Commissioner-only uploads are reviewed privately before release. Preseason stats stay independent from regular-season standings, career stats, Heating Up, and fantasy.</p>
         {league.error&&<p className="ssl-pre-error" role="alert">{league.error}</p>}
       </section>
       <section className="panel ssl-pre-panel">
@@ -241,10 +247,10 @@ export function PreseasonTournament({league,compact=false}){
             <h3>{round.title}</h3>
             <small>{round.pending?'AWAITING PRIOR ROUND':round.complete?'ROUND COMPLETE':'SINGLE ELIMINATION'}</small>
           </div>
-          {round.pending?<p>Matchups will be reseeded automatically after all games in the previous round are entered.</p>:<>
+          {round.pending?<p>Matchups reseed automatically after the previous round's game reports are publicly released.</p>:<>
             {round.bye&&<div className="ssl-pre-bye"><strong>ADVANCES BYE</strong> · #{round.bye.seed} {round.bye.name}</div>}
             <div className="ssl-pre-games">
-              {round.games.map(game=><BracketGameCard key={game.key} game={game} league={league} onOpen={setBoxScore}/>)}
+              {round.games.map(game=><BracketGameCard key={game.key} game={game} league={league} onOpen={setBoxScore} reports={reports}/>)}
             </div>
           </>}
           {round.number===1&&!!unmatched.length&&<UnlinkedReportCards reports={unmatched} onOpen={setBoxScore}/>}
