@@ -822,3 +822,12 @@ details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
 .trade-message-form label{display:grid;gap:.35rem}
 .trade-message-form textarea{width:100%;max-width:100%;box-sizing:border-box}
 .trade-message-form button{justify-self:start}
+
+
+/* A finalized game card opens the full stat report when tapped or clicked. */
+.ssl-schedule-box-trigger{display:block;width:100%;padding:10px 12px;text-align:left;background:#f5f8fc;border:1px solid #dae3f0;border-radius:8px;color:inherit;font:inherit;cursor:pointer}
+.ssl-schedule-box-trigger:hover,.ssl-schedule-box-trigger:focus-visible{background:#ecf4ff;border-color:#31558a;outline:2px solid #31558a;outline-offset:2px}
+.ssl-schedule-box-trigger .ssl-matchup-heading{margin-top:0}
+.ssl-schedule-final-score{display:block;margin-top:7px;font-size:17px;color:#172e56}
+.ssl-schedule-box-hint{display:block;margin-top:10px;font-size:12px;font-weight:900;color:#c52a3e}
+.ssl-schedule-box-trigger .matchup-conference{margin:6px 0}
