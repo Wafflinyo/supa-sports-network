@@ -201,6 +201,18 @@
       "Complete Games"
     ],
     [
+      "shutouts",
+      "Solo Shutouts"
+    ],
+    [
+      "combinedShutouts",
+      "Combined Shutouts (Pitcher)"
+    ],
+    [
+      "shutoutBonus",
+      "Shutout Game Points"
+    ],
+    [
       "pitches",
       "Pitches"
     ],
