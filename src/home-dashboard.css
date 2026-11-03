@@ -83,3 +83,8 @@
 .ssl-trade-asset-name{font-size:13px;font-weight:750;color:#203958;overflow-wrap:anywhere}
 .ssl-trade-assets li small{display:block;margin:2px 0 0;color:#6d7e95;font-weight:500;font-size:10px;letter-spacing:0}
 @media(max-width:660px){.ssl-trade-breakdown{grid-template-columns:1fr}.ssl-trade-side-heading strong{font-size:18px}}
+
+/* Latest released week remains visible until the next week's first result. */
+.ssl-home-results-wrap{min-width:0}
+.ssl-home-results-label{padding:11px 21px 4px;color:#d9232e;font:900 12px/1.2 'Barlow Condensed',Impact,sans-serif;letter-spacing:.08em}
+.ssl-home-results{max-height:400px;overflow-y:auto;overscroll-behavior:contain}
