@@ -5,7 +5,9 @@ import {
   PITCHING_STAT_WEIGHTS,pitchingRating,rosterPowerComponents,
   POWER_WEIGHTS,POWER_PITCHER_COUNT,POWER_SUPPORT_PITCHER_COUNT,
   OFFENSE_SPEED_WEIGHT,DEFENSE_SPEED_WEIGHT,DEFENSE_STAT_WEIGHTS,defenseRating,offenseRating,
-  fieldingAbilityBonus,BASERUNNING_ABILITY_BONUS
+  fieldingAbilityBonus,BASERUNNING_ABILITY_BONUS,
+  gamePointCategoryBoost,GAME_POINT_BOOST_CONFIG,
+  teamRegularGamePointAverages,powerRankings
 } from '../src/power-rankings.js';
 
 assert.deepEqual({...PITCHING_STAT_WEIGHTS},{
@@ -78,4 +80,101 @@ assert.equal(offenseRating({
   'slap contact size':100,'charge contact size':100,
 }),100,'Approved offensive skill weights must total 100%');
 assert.equal(fieldingAbilityBonus(9,'SS'),-12,'Fielding ability rules must be retained');
-console.log('PASS: overall 60/20/20, pitching 55/10/15/20, offense 40/25/25/5/5, defense 55/30/15, +4 baserunning');
+
+assert.deepEqual({...GAME_POINT_BOOST_CONFIG.scales},{
+  ogp:{center:250,spread:100},
+  dgp:{center:208,spread:90},
+  pgp:{center:20,spread:15}
+},'Three independently calibrated production curves must remain available');
+assert.equal(gamePointCategoryBoost(null,'ogp'),0,'Unreported scores should never award free game point bonuses');
+for(const stat of ['ogp','dgp','pgp']){
+  const low=gamePointCategoryBoost(-50,stat),
+    mid=gamePointCategoryBoost(GAME_POINT_BOOST_CONFIG.scales[stat].center,stat),
+    high=gamePointCategoryBoost(999,stat);
+  assert(low>0&&low<mid&&mid<high&&high<10,
+    stat+' boosts must always be positive and increase with per-game productivity');
+  assert(Math.abs(mid-5.25)<1e-8,
+    stat+' midpoint should have a +5.25 projected rating boost');
+}
+assert(gamePointCategoryBoost(-50,'pgp')<gamePointCategoryBoost(0,'pgp'));
+assert(gamePointCategoryBoost(0,'pgp')<gamePointCategoryBoost(50,'pgp'));
+assert(gamePointCategoryBoost(250,'ogp')>gamePointCategoryBoost(100,'ogp'));
+assert(gamePointCategoryBoost(250,'dgp')>gamePointCategoryBoost(100,'dgp'));
+
+// Published team-box-score game points should affect only the right category,
+// and only for regular-season games, never preseason or postseason.
+const testTeam='test-franchise-a',second='test-franchise-b';
+const regular={
+  phase:'regular',stage:'final',home:testTeam,away:second,
+  result:{scores:{[testTeam]:5,[second]:3},
+    players:[
+      {team:testTeam,player:eligible[0],stats:{
+        hits:2,runs:1,putouts:3,pitchStrikeouts:2,earnedRuns:1
+      }},
+      {team:second,player:eligible[1],stats:{hits:1}}
+    ]
+  }
+};
+const fakePreseason={...regular,phase:'preseason',
+  result:{...regular.result,players:[{team:testTeam,player:eligible[0],
+    stats:{hits:900,putouts:900,pitchStrikeouts:900}}]}};
+const fakePlayoffs={...fakePreseason,phase:'postseason'};
+const gp=teamRegularGamePointAverages({games:[regular,fakePreseason,fakePlayoffs]},testTeam);
+assert.equal(gp.games,1);
+assert.equal(gp.gamesWithReports,1);
+assert.equal(gp.ogp,14,'Two hits and one run earn 14 OGP');
+assert.equal(gp.dgp,15,'Three putouts earn 15 DGP');
+assert.equal(gp.pgp,27,'Two pitching Ks and one earned run allowed earn 27 PGP');
+assert.deepEqual(teamRegularGamePointAverages({games:[fakePreseason,fakePlayoffs]},testTeam),{
+  games:0,gamesWithReports:0,ogp:null,dgp:null,pgp:null
+});
+const originalBlank={...regular,result:{...regular.result,players:[]}};
+assert.deepEqual(teamRegularGamePointAverages({games:[originalBlank]},testTeam),{
+  games:1,gamesWithReports:0,ogp:null,dgp:null,pgp:null
+},'Score-only games must not invent category production');
+const orderedIds=roster.map(p=>p.id).filter(id=>gameData.players[id]?.stats).slice(0,11);
+const lineup=orderedIds.slice(0,9).map((player,i)=>({
+  player,position:['P','C','1B','2B','3B','SS','LF','CF','RF'][i],
+}));
+const teams=Array.from({length:12},(_,i)=>({
+  id:i===0?testTeam:i===1?second:'team-'+i,name:'Team '+i
+}));
+const synthetic={
+  status:'regular',teams,
+  games:[],
+  rosters:Object.fromEntries(teams.map(t=>[t.id,orderedIds])),
+  defaults:Object.fromEntries(teams.map(t=>[t.id,{
+    starters:lineup,bench:orderedIds.slice(9)
+  }]))
+};
+const before=powerRankings(synthetic).find(t=>t.id===testTeam);
+const after=powerRankings({...synthetic,games:[regular]}).find(t=>t.id===testTeam);
+assert(after.offense>before.offense,'OGP improves offensive category');
+assert(after.defense>before.defense,'DGP improves defensive category');
+assert(after.pitching>before.pitching,'PGP improves pitching category');
+assert.equal(after.gamePointAverages.pgp,27);
+assert(after.rosterScore>before.rosterScore,'Category boosts must flow into the overall roster component');
+assert.equal(after.formWeight,7.5,'First regular game retains 7.5% team-form influence');
+const adjusted=powerRankings({...synthetic,games:[fakePreseason,fakePlayoffs]})
+  .find(t=>t.id===testTeam);
+assert.deepEqual([adjusted.score,adjusted.offense,adjusted.defense,adjusted.pitching],
+  [before.score,before.offense,before.defense,before.pitching],
+  'Preseason and postseason results cannot change regular-season ranking categories');
+const highDefense={...regular,result:{...regular.result,
+  players:[{team:testTeam,player:eligible[0],stats:{
+    hits:2,runs:1,putouts:20,pitchStrikeouts:2,earnedRuns:1
+  }}]}};
+const betterDefense=powerRankings({...synthetic,games:[highDefense]}).find(t=>t.id===testTeam);
+assert(betterDefense.gamePointBoosts.dgp>after.gamePointBoosts.dgp);
+assert(betterDefense.defense>=after.defense);
+const lowPitching={...regular,result:{...regular.result,
+  players:[{team:testTeam,player:eligible[0],stats:{
+    hits:2,runs:1,putouts:3,earnedRuns:7
+  }}]}};
+const worsePitching=powerRankings({...synthetic,games:[lowPitching]}).find(t=>t.id===testTeam);
+assert(worsePitching.gamePointBoosts.pgp>0,
+  'Even negative PGP must contribute a small positive boost');
+assert(worsePitching.gamePointBoosts.pgp<after.gamePointBoosts.pgp,
+  'Worse PGP must yield a smaller pitching boost');
+
+console.log('PASS: approved roster weights, plus independent positive OGP/DGP/PGP category boosts from published regular-season reports only');
