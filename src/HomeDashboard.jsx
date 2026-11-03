@@ -3,28 +3,26 @@ import {CalendarDays,Trophy,Shield,BarChart3,List,ArrowRight,Megaphone} from 'lu
 import {powerRankings} from './power-rankings.js';
 import {standings} from './season-data.js';
 import {matchupDisplay} from './matchup-display.js';
-import {homeWeekBoard,homeRecentResults,newlyReleased} from './home-dashboard-data.js';
+import {homeWeekBoard,homeRecentResults} from './home-dashboard-data.js';
 import {HeatFlame} from './HeatingUpBadge.jsx';
 import './home-dashboard.css';
 
 function CardTitle({kicker,children,action}){
   return <div className="ssl-home-card-title"><div><small>{kicker}</small><h2>{children}</h2></div>{action}</div>;
 }
-function Matchup({season,game,now,onClick}){
+function Matchup({season,game,onClick}){
   const {awayName,homeName}=matchupDisplay(season,game);
-  const released=game.stage==='final'&&newlyReleased(game,now)&&game.result?.scores;
   const start=Date.parse(game.startsAt||'');
   const date=Number.isFinite(start)
     ?new Date(start).toLocaleString('en-US',{timeZone:'America/New_York',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})+' ET'
     :'Date TBD';
-  return <button type="button" className={'ssl-home-match'+(released?' ssl-home-match-final':'')} onClick={onClick}
-    aria-label={awayName+' at '+homeName+(released?' final score '+game.result.scores[game.away]+' to '+game.result.scores[game.home]:'')}>
+  return <button type="button" className="ssl-home-match" onClick={onClick}
+    aria-label={awayName+' at '+homeName}>
     <span className="ssl-home-match-line">
       <strong>{awayName}</strong><span className="ssl-home-at">@</span><strong>{homeName}</strong>
     </span>
     <span className="ssl-home-match-detail">
-      {released?<><b>FINAL · {game.result.scores[game.away]} – {game.result.scores[game.home]}</b><span>Released result</span></>:
-        <span>{date}</span>}
+      <span>{date}</span>
     </span>
   </button>;
 }
@@ -53,9 +51,8 @@ function TradeNewsBreakdown({groups}){
 export default function HomeDashboard({league,go,newsItems=[],players=[],onPlayerSelect}){
   const season=league?.season;
   const [showAllNews,setShowAllNews]=useState(false);
-  const now=Number(league?.now)||Date.now();
-  const board=useMemo(()=>homeWeekBoard(season,now),[season,now]);
-  const finals=useMemo(()=>homeRecentResults(season,3),[season]);
+  const board=useMemo(()=>homeWeekBoard(season),[season]);
+  const finals=useMemo(()=>homeRecentResults(season,6),[season]);
   const ranks=useMemo(()=>powerRankings(season),[season]);
   const table=useMemo(()=>standings(season),[season]);
   const hasFinal=Boolean((season?.games||[]).some(game=>game.stage==='final'&&game.phase==='regular'));
@@ -97,13 +94,16 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
         <CardTitle kicker="ON DECK" action={<button type="button" className="ssl-home-card-link" onClick={()=>go('Schedule')}>
           <span>{board.week!=null?`WEEK ${board.week}`:'FULL SCHEDULE'}</span><CalendarDays size={18}/></button>}>UPCOMING MATCHES</CardTitle>
         {board.games.length?<div className="ssl-home-matchups">
-          {board.games.map(game=><Matchup key={game.id} season={season} game={game} now={now} onClick={()=>openGame(game)}/>)}
+          {board.games.map(game=><Matchup key={game.id} season={season} game={game} onClick={()=>openGame(game)}/>)}
         </div>:<p className="ssl-home-quiet">{season?.schedulePublished?'No upcoming regular-season matchups.':'Matchups appear here when the schedule is published.'}</p>}
       </section>
       <section className="panel ssl-home-card">
         <CardTitle kicker="FINAL SCORES" action={<button type="button" className="ssl-home-card-link" onClick={()=>go('Schedule')}>VIEW RESULTS <Trophy size={18}/></button>}>RECENT RESULTS</CardTitle>
-        {finals.length?<div className="ssl-home-results">{finals.map(game=><ScoreLine key={game.id} season={season} game={game} onClick={()=>openGame(game)}/>)}</div>:
-          <p className="ssl-home-quiet">0 completed games</p>}
+        {finals.length?<div className="ssl-home-results-wrap">
+          <div className="ssl-home-results-label">{finals[0].phase==='regular'&&Number(finals[0].week)>0
+            ?`WEEK ${finals[0].week} RESULTS`:'LATEST RELEASED RESULTS'}</div>
+          <div className="ssl-home-results">{finals.map(game=><ScoreLine key={game.id} season={season} game={game} onClick={()=>openGame(game)}/>)}</div>
+        </div>:<p className="ssl-home-quiet">0 completed games</p>}
       </section>
       <section className="panel ssl-home-card ssl-home-power">
         <CardTitle kicker="LEAGUE OUTLOOK" action={<button type="button" className="ssl-home-card-link" onClick={()=>go('Teams',null,{section:'Power Rankings'})}>
