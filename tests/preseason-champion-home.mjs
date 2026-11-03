@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {preseasonBracket} from '../src/preseason.js';
 import {allPreseasonGames,preseasonPlayerStats} from '../src/preseason-game-data.js';
-import {preseasonChampionshipFeature,seasonOneChampionship} from '../src/preseason-champion-feature.js';
+import {preseasonChampionshipFeature,latestPreseasonChampionship} from '../src/preseason-champion-feature.js';
 import {leagueNews} from '../src/league-news.js';
 import {homeRecentResults} from '../src/home-dashboard-data.js';
 
@@ -85,13 +85,50 @@ assert(headline,'Champion headline must automatically appear once final sheet is
 assert.match(headline.title,/Petalburg Petilils.*Season 1/i);
 assert.match(headline.summary,/average Game Points/i);
 assert.equal(headline.at,stamp);
-assert.equal(seasonOneChampionship([season],players)?.champion.name,'Petalburg Petilils');
+assert.equal(latestPreseasonChampionship([season],players)?.champion.name,'Petalburg Petilils');
 
-const future={...season,id:'season-2',name:'Season 2',number:2};
-assert.equal(seasonOneChampionship([future,season],players)?.seasonName,'Season 1',
-  'Future season updates must not replace S1 hero without owner instruction');
-assert.equal(seasonOneChampionship([future],players),null,
-  'Do not silently change the permanent feature to a later season');
+const future={...season,id:'season-2',name:'Season 2',number:2,
+  preseasonResults:[],preseasonReports:[],games:[]};
+assert.equal(latestPreseasonChampionship([future,season],players)?.seasonName,'Season 1',
+  'Previous season champion must stay featured until the NEXT final has been publicly released');
+assert.equal(latestPreseasonChampionship([future],players),null,
+  'A fresh season without released finals should not have a champion hero');
+assert.equal(allPreseasonGames(future).length,0,
+  'Season 1 legacy preseason player reports may not contaminate a future season');
+assert.equal(preseasonBracket(future).completedGames,0,
+  'A new preseason bracket must not inherit Season 1 Round 1 final scores');
+
+// Season 2: automatic seeding, commissioner releases rounds, and only the
+// published championship finals sheet switches the public homepage feature.
+for(let r=1;r<=3;r++){
+  const round=preseasonBracket(future).rounds[r-1];
+  assert(!round.pending,'New season should advance after prior released rounds');
+  for(const game of round.games){
+    future.preseasonResults.push({season_id:future.id,match_key:game.key,
+      team_a:game.high.id,team_b:game.low.id,score_a:7,score_b:5,
+      recorded_at:'2027-11-03T21:00:00Z'});
+  }
+}
+const nextFinal=preseasonBracket(future).rounds[3].games[0];
+assert(nextFinal.high&&nextFinal.low,'Next season should have a championship final');
+future.preseasonResults.push({season_id:future.id,match_key:nextFinal.key,
+  team_a:nextFinal.high.id,team_b:nextFinal.low.id,score_a:5,score_b:7,
+  recorded_at:'2027-11-03T21:00:00Z'});
+assert.equal(latestPreseasonChampionship([future,season],players)?.seasonName,'Season 1',
+  'Even with a released bracket final score, do not publish until the final report is released');
+future.preseasonReports.push({...compact,gameId:'rio:season-2:R4-1',
+  away:nextFinal.high.name,home:nextFinal.low.name,awayScore:5,homeScore:7});
+const secondChampion=latestPreseasonChampionship([season,future],players);
+assert.equal(secondChampion?.seasonId,future.id,
+  'Season 2 published final must replace the Season 1 banner immediately');
+assert.equal(secondChampion?.seasonName,'Season 2');
+assert.equal(secondChampion?.champion.name,nextFinal.low.name,
+  'Never hardcode the Petilils as winners of later tournaments');
+assert.equal(latestPreseasonChampionship([future,season],players)?.seasonId,future.id,
+  'Hero selection should not depend on raw seasons array order');
+assert.equal(leagueNews([season,future],players).filter(n=>
+  n.category==='preseason-champion').length,2,
+  'Every season must receive its own championship news post');
 
 // No unrelated game stages may contaminate Recent Results.
 const fake={result:{scores:{'t1':7,'t2':5}},stage:'final',week:1,away:'t1',home:'t2'};
@@ -105,10 +142,10 @@ assert.deepEqual(homeRecentResults({...season,games:[pre]}),[],
   'Preseason finals must not be mixed into regular-season homepage Recent Results');
 
 const home=fs.readFileSync('src/HomeDashboard.jsx','utf8');
-assert.match(home,/seasonOneChampionship\(/);
+assert.match(home,/latestPreseasonChampionship\(/);
 assert.match(home,/<ChampionshipHero/);
 assert.match(home,/teamLogo\(supabase,champion\.logoPath\)/);
 assert.match(home,/VIEW PRESEASON RESULTS/);
-assert.match(home,/onResults=\{\(\)=>go\('Playoff Bracket','Pre-season'\)\}/);
+assert.match(home,/onResults=\{\(\)=>openPreseason\(championship\.seasonId\)\}/);
 assert.match(home,/item\.category==='preseason-champion'/);
-console.log('PASS: championship hero locked behind published final, real team logo, dynamic preseason AGP top three, persistent S1 feature, news release and non-preseason Recent Results');
+console.log('PASS: championship hero locked behind published final, real team logo, dynamic preseason AGP top three, latest champion across all seasons, news release and non-preseason Recent Results');

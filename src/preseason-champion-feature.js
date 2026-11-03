@@ -1,5 +1,6 @@
 import {preseasonBracket} from './preseason.js';
 import {allPreseasonGames,preseasonPlayerStats} from './preseason-game-data.js';
+import {sslSeasonNumber} from './preseason-season-identity.js';
 
 // This feature is derived ONLY from publicly released preseason data.
 // Private staged uploads never appear in preseasonReports or preseasonResults.
@@ -47,16 +48,32 @@ export function preseasonChampionshipFeature(season,players=[]){
   const releasedResult=(season.preseasonResults||[]).find(row=>
     String(row.match_key)===String(final.key));
   return {
-    seasonId:season.id,seasonName:season.name||'Season 1',
+    seasonId:season.id,seasonName:season.name||(`Season ${sslSeasonNumber(season)??'?'}`),
     champion,final,topPlayers:leaders,
     at:releasedResult?.recorded_at||null,
   };
 }
 
-// The owner has designated this S1 championship as a permanent homepage
-// feature. Future tournament winners will not automatically replace it.
-export function seasonOneChampionship(seasons,players=[]){
-  const season=(seasons||[]).find(s=>Number(s?.number)===1||
-    /^season\s*1(?:\b|$)/i.test(String(s?.name||'')));
-  return preseasonChampionshipFeature(season,players);
+// Each completed season gets one championship feature. Show the newest
+// released champion, but retain the previous one throughout the next draft
+// and tournament until the new FINAL REPORT has actually been released.
+// Season number wins over update timestamps; correcting an older report must
+// never unexpectedly replace the current champion banner.
+export function latestPreseasonChampionship(seasons,players=[]){
+  const completed=(seasons||[]).map((season,index)=>{
+    const feature=preseasonChampionshipFeature(season,players);
+    return feature?{feature,number:sslSeasonNumber(season),index}:null;
+  }).filter(Boolean);
+  if(!completed.length)return null;
+  completed.sort((a,b)=>{
+    if(a.number!==null&&b.number!==null&&a.number!==b.number)
+      return b.number-a.number;
+    if(a.number!==null&&b.number===null)return -1;
+    if(b.number!==null&&a.number===null)return 1;
+    const at=Date.parse(a.feature.at||''),bt=Date.parse(b.feature.at||'');
+    if(Number.isFinite(at)&&Number.isFinite(bt)&&at!==bt)return bt-at;
+    if(Number.isFinite(at)!==Number.isFinite(bt))return Number.isFinite(bt)?1:-1;
+    return b.index-a.index;
+  });
+  return completed[0].feature;
 }
