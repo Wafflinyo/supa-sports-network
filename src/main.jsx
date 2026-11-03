@@ -45,7 +45,7 @@ function PlayerAvatar({ player, size = 38 }) {
 const statGroups = {
   'Game Score': [
     ['gamesPlayed','Games Played'],['gameScore','Game Score'],
-    ['ogp','OGP'],['dgp','DGP'],['pgp','PGP'],['tgp','TGP'],['agp','AGP'],['itemScore','Item Score'],
+    ['ogp','OGP'],['dgp','DGP'],['pgp','PGP'],['tgp','TGP'],['agp','AGP'],['itemScore','Item Score'],['shutoutBonus','Shutout Bonus'],
     ['heatingUpCount','Hot Games'],['longestHotStreak','Longest Hot Streak'],
   ],
   'Offensive Stats': [
@@ -73,6 +73,7 @@ const statGroups = {
   'Pitching Stats': [
     ['pgp','Pitching Game Points (PGP)'],
     ['positionsPlayed', 'Position(s) Played'], ['gamesPlayed', 'Games Played'], ['mvps', 'MVPs'], ['battersFaced', 'Batters Faced'], ['inningsPitched', 'Innings Pitched'],
+    ['shutouts', 'Solo Shutouts'], ['combinedShutouts','Combined Shutouts'], ['shutoutBonus','Shutout Game Points'],
     ['pitches', 'Pitches'], ['strikes', 'Strikes'], ['balls', 'Balls'],
     ['pitchStrikeouts', 'Strikeouts'], ['pitchWalks', 'Walks'], ['beanBalls', 'Bean Balls'],
     ['hitsAllowed', 'Hits Allowed'], ['runsAllowed', 'Runs Allowed'],
