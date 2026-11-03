@@ -7,7 +7,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test:season": "SSL_TIMELINE_TEST=1 SSL_RULES_TEST=1 node tests/season-workflow.mjs && node tests/rio-import.mjs",
+    "test:season": "SSL_TIMELINE_TEST=1 SSL_RULES_TEST=1 node tests/season-workflow.mjs && node tests/rio-import.mjs && node tests/rio-team-mapping.mjs",
     "test:pwa": "node tests/pwa.mjs",
     "test:access": "node tests/access-codes.mjs"
   },
@@ -16,7 +16,8 @@
     "exceljs": "4.4.0",
     "lucide-react": "^0.468.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "jszip": "3.10.2"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.10",
