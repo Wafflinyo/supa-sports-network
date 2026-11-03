@@ -113,3 +113,18 @@
  .ssl-pre-home-bracket{padding:13px}
  .ssl-pre-home-rounds{grid-template-columns:repeat(4,minmax(225px,1fr))}
 }
+
+
+/* Completed tournament matchups are the box-score links, not a second results list. */
+.ssl-pre-card-button,.ssl-pre-card-static{display:block;width:100%;text-align:left;padding:0;margin:0;background:transparent;border:0;color:inherit;font:inherit}
+.ssl-pre-card-button{cursor:pointer;border-radius:6px}
+.ssl-pre-card-button:hover,.ssl-pre-card-button:focus-visible{background:#edf3fb;outline:2px solid #29518b;outline-offset:5px}
+.ssl-pre-card-button>small,.ssl-pre-card-static>small{display:block;font-size:10px;font-weight:800;letter-spacing:.04em;color:#65748c}
+.ssl-pre-box-hint{display:block;margin-top:10px;color:#c72b3d;font-weight:900;font-size:11px;letter-spacing:.02em}
+.ssl-pre-imported-name{min-width:0;flex:1;line-height:1.35;font-size:12px;font-weight:750}
+.ssl-pre-imported-round{padding-top:14px}
+.ssl-pre-round .ssl-pre-imported-round{margin-top:16px;background:#f8fbff;border:1px dashed #a8bdd9}
+.ssl-pre-imported-round .ssl-pre-help{margin-top:0}
+.ssl-pre-imported-round .ssl-pre-games{margin-top:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.ssl-pre-home-bracket .ssl-pre-imported-round{margin:16px 0 0}
+@media(max-width:650px){.ssl-pre-imported-round .ssl-pre-games{grid-template-columns:1fr}}
