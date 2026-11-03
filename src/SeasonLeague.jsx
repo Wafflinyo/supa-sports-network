@@ -1296,7 +1296,7 @@ function Schedule({ league: l, commissioner = false }) {
       String(a.id).localeCompare(String(b.id))
     );
   const selectedBoxGame=boxGameId==null?null:s.games.find(g=>String(g.id)===String(boxGameId));
-  const currentBoxScore=selectedBoxGame?seasonBoxScore(s,selectedBoxGame):null;
+  const currentBoxScore=selectedBoxGame?seasonBoxScore(s,admin&&selectedBoxGame.stage==='recorded'?{...selectedBoxGame,stage:'final'}:selectedBoxGame):null;
   return (
     <>
       <SeasonCalendar league={l} />
@@ -1479,6 +1479,11 @@ function Schedule({ league: l, commissioner = false }) {
                   {g.lineups[team] ? "EDIT SUBMITTED" : "SUBMIT"} LINEUP
                 </button>
               )}
+            {admin && g.stage==='recorded' && (
+              <button type="button" className="outline-btn" onClick={()=>setBoxGameId(g.id)}>
+                REVIEW SAVED PRIVATE BOX SCORE
+              </button>
+            )}
             {admin && <GameDateEditor league={l} game={g}/>}
             {admin && (
               <div className="season-inline">
