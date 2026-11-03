@@ -93,3 +93,17 @@ export function unmatchedPreseasonReports(bracket){
   );
   return preseasonGames.filter(report=>!attached.has(report.gameId));
 }
+
+export function bracketScoreOnly(match){
+  if(!match?.winner)return null;
+  return {
+    id:match.key,
+    stage:'Preseason',
+    label:'ROUND '+match.round,
+    teams:[
+      {...summarizeTeam(String(match.high.id),match.high.name,match.scoreA,[]),sideLabel:'HIGH SEED'},
+      {...summarizeTeam(String(match.low.id),match.low.name,match.scoreB,[]),sideLabel:'LOW SEED'},
+    ],
+    hasPlayerStats:false,
+  };
+}
