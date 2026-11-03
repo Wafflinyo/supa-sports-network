@@ -24,7 +24,7 @@ function Matchup({season,game,now,onClick}){
     </span>
     <span className="ssl-home-match-detail">
       {released?<><b>FINAL · {game.result.scores[game.away]} – {game.result.scores[game.home]}</b><span>Released result</span></>:
-        <><span>{date}</span>{game.stage==='recorded'&&<b>AWAITING RELEASE</b>}</>}
+        <span>{date}</span>}
     </span>
   </button>;
 }
