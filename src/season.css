@@ -844,3 +844,43 @@ details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
 .ssl-lineup-status-custom,.ssl-lineup-status-default{border-left-color:#28724b;background:#eff8f2}
 .ssl-lineup-status-fallback{border-left-color:#bb8534;background:#fcf8ee}
 .ssl-lineup-status-missing,.ssl-lineup-status-unknown{border-left-color:#ad5360}
+
+/* Read-only next-season pick holdings, directly between Team Roster and Default Lineup. */
+.ssl-future-picks{display:grid;gap:15px;min-width:0}
+.ssl-future-picks-intro{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap}
+.ssl-future-picks-intro>div{flex:1;min-width:min(260px,100%)}
+.ssl-future-picks-intro>div>strong{display:block;font:900 22px/1.1 'Barlow Condensed',Impact,sans-serif;color:#153661}
+.ssl-future-picks-intro p{margin:8px 0 0;font-size:12px;line-height:1.5;color:#63758e;max-width:650px}
+.ssl-future-picks-intro label{display:grid;gap:5px;min-width:min(250px,100%);max-width:100%;font-size:11px;font-weight:850;color:#365174}
+.ssl-future-picks-intro select{padding:10px;border:1px solid #bdcde1;background:#fff;color:#1e395f;max-width:100%;min-width:0}
+.ssl-future-picks-current{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;padding:12px 15px;background:#edf3fb;border:1px solid #ccdaed}
+.ssl-future-picks-owner{display:flex;align-items:center;gap:11px;min-width:0;flex:1}
+.ssl-future-picks-owner img{width:48px;height:48px;object-fit:contain;flex:none}
+.ssl-future-picks-owner>div{min-width:0}
+.ssl-future-picks-owner small{display:block;font-size:10px;font-weight:900;letter-spacing:.08em;color:#a82e41}
+.ssl-future-picks-owner h3{font:900 22px/1.15 'Barlow Condensed',Impact,sans-serif;color:#14345e;margin:4px 0 0;overflow-wrap:anywhere}
+.ssl-future-picks-count{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+.ssl-future-picks-count strong{font:900 34px/.95 'Barlow Condensed',Impact,sans-serif;color:#123762;font-variant-numeric:tabular-nums}
+.ssl-future-picks-count span{font-size:10px;text-transform:uppercase;font-weight:900;color:#5d7190}
+.ssl-future-picks-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(155px,100%),1fr));gap:9px}
+.ssl-future-pick{display:grid;gap:4px;align-content:start;padding:13px;border-radius:6px;background:#f7f9fc;border:1px solid #d7e1ee;border-top:4px solid #355c88;min-width:0}
+.ssl-future-pick.acquired{background:#f3faf6;border-color:#bcdac8;border-top-color:#218656}
+.ssl-future-pick>strong{font:900 20px/1.1 'Barlow Condensed',Impact,sans-serif;color:#1c3b67}
+.ssl-future-pick>span{font-size:10px;font-weight:900;color:#5d6d87;letter-spacing:.07em}
+.ssl-future-pick.acquired>span{color:#19734a}
+.ssl-future-pick>small{font-size:11px;line-height:1.4;color:#52657e;overflow-wrap:anywhere}
+.ssl-future-picks-sent{padding:11px 13px;border:1px solid #dce4ef;background:#fbfcfe}
+.ssl-future-picks-sent summary{display:flex;align-items:center;gap:9px;font-weight:900;font-size:12px;letter-spacing:.035em;color:#ba2f42;cursor:pointer}
+.ssl-future-picks-sent summary svg{flex:none}
+.ssl-future-picks-sent ul{list-style:none;display:grid;gap:6px;margin:12px 0 0;padding:0}
+.ssl-future-picks-sent li{display:flex;flex-wrap:wrap;justify-content:space-between;gap:7px;padding:9px 0;border-top:1px solid #e3eaf3;font-size:12px;color:#50647e}
+.ssl-future-picks-sent li strong{color:#1e3e68}
+.ssl-future-picks-empty{padding:13px;border:1px dashed #d0dbe7;background:#f9fbfe;color:#61748c;font-size:12px;line-height:1.5;margin:0}
+.ssl-future-picks-footnote{font-size:11px;color:#6b7890;line-height:1.55;margin:0}
+@media(max-width:560px){
+  .ssl-future-picks-intro{gap:12px}
+  .ssl-future-picks-intro label{flex:1 1 100%;width:100%}
+  .ssl-future-picks-owner h3{font-size:19px}
+  .ssl-future-picks-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:380px){.ssl-future-picks-grid{grid-template-columns:1fr}}

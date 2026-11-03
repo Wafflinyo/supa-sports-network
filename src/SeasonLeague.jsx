@@ -5,6 +5,7 @@ import {seasonBoxScore} from './game-box-score-data.js';
 import GameBoxScore from './GameBoxScore.jsx';
 import RioReportDialog from './RioReportDialog.jsx';
 import PreseasonStats from './PreseasonStats.jsx';
+import NextSeasonDraftPicks from './NextSeasonDraftPicks.jsx';
 import HistoryArchive from './HistoryArchive.jsx';
 import {preseasonReady} from './preseason.js';
 import {lotteryProgress,lotteryReplayProgress,lotteryDuration,lotteryCountdownClock} from './lottery-timing.js';
@@ -1174,6 +1175,9 @@ export function RosterManager({ league: l, focus=null }) {
         <p><strong>{roster.length} players</strong> · {hasDefault?'Default lineup saved':'Default lineup not saved yet'} · {s.status.toUpperCase()}</p>
         {roster.length===0?<p>Players will appear as they are drafted.</p>:<div className="roster-manager-players">{roster.map(id=><div key={id} className="roster-manager-player"><Player id={id} seasons={l.seasons}/><HeatMark playerId={id} inline/></div>)}</div>}
       </Box></div>
+      <Box title="NEXT SEASON DRAFT PICKS">
+        <NextSeasonDraftPicks season={s} teamId={team} supabase={l.supabase}/>
+      </Box>
       <div id="ssl-default-lineup" className="ssl-roster-notification-focus"><Box title="DEFAULT LINEUP">
         <p>This lineup is the fallback for every game until you submit a specific game lineup. Changes here do not overwrite a game lineup already submitted.</p>
         {roster.length<11?<p><strong>Draft or acquire at least 11 players before saving a default lineup.</strong></p>:<>
