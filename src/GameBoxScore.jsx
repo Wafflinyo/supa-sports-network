@@ -79,8 +79,8 @@ export default function GameBoxScore({game,onClose}){
         <button ref={closeRef} type="button" className="ssl-box-close" onClick={onClose} aria-label="Close box score">×</button>
       </div>
       <div className="ssl-box-scoreboard">
-        <div><span className="ssl-box-away">AWAY</span><strong>{away.name}</strong><b>{away.score}</b></div>
-        <div><span className="ssl-box-home">HOME</span><strong>{home.name}</strong><b>{home.score}</b></div>
+        <div><span className="ssl-box-away">{away.sideLabel||"AWAY"}</span><strong>{away.name}</strong><b>{away.score}</b></div>
+        <div><span className="ssl-box-home">{home.sideLabel||"HOME"}</span><strong>{home.name}</strong><b>{home.score}</b></div>
       </div>
       <div className="ssl-box-score-summary">
         <strong>FINAL</strong><span>HITS: {away.hits} – {home.hits}</span>
