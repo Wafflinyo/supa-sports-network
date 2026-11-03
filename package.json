@@ -16,7 +16,8 @@
     "exceljs": "4.4.0",
     "lucide-react": "^0.468.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "jszip": "3.10.2"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.10",
