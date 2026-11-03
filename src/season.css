@@ -831,3 +831,16 @@ details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
 .ssl-schedule-final-score{display:block;margin-top:7px;font-size:17px;color:#172e56}
 .ssl-schedule-box-hint{display:block;margin-top:10px;font-size:12px;font-weight:900;color:#c52a3e}
 .ssl-schedule-box-trigger .matchup-conference{margin:6px 0}
+
+
+/* Commissioner schedule: distinguish a GM's explicit submission from a fallback. */
+.ssl-commissioner-lineup-team{padding:15px 0;border-bottom:1px solid #d8e2ef}
+.ssl-commissioner-lineup-team:last-child{border-bottom:0}
+.ssl-commissioner-lineup-team h4{margin:0 0 10px;color:#132b51}
+.ssl-lineup-submission-status{border-left:4px solid #8898af;background:#f2f5f9;padding:11px 13px;margin:8px 0 14px;line-height:1.5}
+.ssl-lineup-submission-status strong{display:block;color:#1b3355;font-size:13px;letter-spacing:.015em}
+.ssl-lineup-submission-status p{font-size:12px;margin:4px 0;color:#53627c}
+.ssl-lineup-submission-status small{font-size:11px;color:#53627c}
+.ssl-lineup-status-custom,.ssl-lineup-status-default{border-left-color:#28724b;background:#eff8f2}
+.ssl-lineup-status-fallback{border-left-color:#bb8534;background:#fcf8ee}
+.ssl-lineup-status-missing,.ssl-lineup-status-unknown{border-left-color:#ad5360}
