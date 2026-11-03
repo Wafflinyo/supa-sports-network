@@ -1,6 +1,6 @@
 import React,{useMemo,useState} from 'react'
 import playerPool from './players.json'
-import {preseasonGames,preseasonPlayerStats,preseasonTeamStats} from './preseason-game-data.js'
+import {allPreseasonGames,preseasonPlayerStats,preseasonTeamStats} from './preseason-game-data.js'
 import {PlayerPortrait} from './PlayerPortrait.jsx'
 import {visibleGamePointFields} from './game-point-columns.js'
 import './preseason-stats.css'
@@ -71,8 +71,9 @@ export default function PreseasonStats({season}){
   const [view,setView]=useState('Totals')
   const [query,setQuery]=useState('')
   const [sort,setSort]=useState(null)
-  const playerRows=useMemo(()=>preseasonPlayerStats(),[])
-  const teamRows=useMemo(()=>preseasonTeamStats(),[])
+  const games=useMemo(()=>allPreseasonGames(season),[season])
+  const playerRows=useMemo(()=>preseasonPlayerStats(games),[games])
+  const teamRows=useMemo(()=>preseasonTeamStats(games),[games])
   const rows=scope==='Teams'?teamRows:playerRows
   const byId=useMemo(()=>new Map(playerPool.map(p=>[String(p.id),p])),[])
   const visible=useMemo(()=>{
@@ -93,7 +94,7 @@ export default function PreseasonStats({season}){
   return <section className="panel" aria-label="Preseason statistics">
     <h3>Preseason Stats</h3>
     <p>Separate preseason-only statistics, calculated from imported Project Rio reports. Only players who took part appear here; these stats do not affect regular-season or career totals.</p>
-    <p><strong>{preseasonGames.length} game{preseasonGames.length===1?'':'s'} recorded · {playerRows.length} players</strong></p>
+    <p><strong>{games.length} game{games.length===1?'':'s'} recorded · {playerRows.length} players</strong></p>
     <div className="subnav" role="tablist" aria-label="Preseason stats scope">
       {['Players','Teams'].map(name=><button key={name} type="button" role="tab" aria-selected={scope===name} className={scope===name?'active':''} onClick={()=>{setScope(name);setSort(null);setQuery('')}}>{name}</button>)}
     </div>

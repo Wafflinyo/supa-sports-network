@@ -1,4 +1,6 @@
 import columns from "./temporary-stat-columns.json" with { type: "json" };
+import {loadRioSheets} from './rio-spreadsheet.js';
+import {resolveRioTeam,validateRioMatchup} from './rio-team-mapping.js';
 import {customGameScore} from './ssl-game-score.js';
 import {gamePointsForReport} from './game-points.js';
 import {pitchingShutoutBonuses,pitcherShutoutStats} from './pitching-shutout.js';
@@ -205,107 +207,79 @@ const aliases = {
   hrAllowed: ["HR Allowed"],
   rbi: ["RBI", "RBIs"],
 };
-export async function readRio(file, season, game, players) {
-  if (
-    file.size > 10 * 1024 * 1024 ||
-    !file.name.toLowerCase().endsWith(".xlsx")
-  )
-    throw Error("Choose a Project Rio XLSX under 10 MB.");
-  const bytes = await file.arrayBuffer(),
-    ExcelJS = (await import("exceljs")).default,
-    wb = new ExcelJS.Workbook();
-  await wb.xlsx.load(bytes);
-  const text = (v) =>
-    v && typeof v === "object"
-      ? (v.result ?? v.text ?? v.richText?.map((x) => x.text).join("") ?? "")
-      : v;
-  function rows(sheetName) {
-    const sheet = wb.getWorksheet(sheetName);
-    if (!sheet) throw Error(`Missing ${sheetName} sheet.`);
-    if (sheet.rowCount > 1000 || sheet.columnCount > 150)
-      throw Error("Unexpected report dimensions.");
-    const heading = sheet
-      .getRow(1)
-      .values.slice(1)
-      .map((v) => normalize(text(v)));
-    const out = [];
-    sheet.eachRow((row, i) => {
-      if (i === 1) return;
-      const d = Object.fromEntries(
-        heading.map((h, j) => [h, text(row.getCell(j + 1).value)]),
-      );
-      d.row = i;
-      out.push(d);
+export async function readRio(file,season,game,players){
+  const sheets=await loadRioSheets(file);
+  for(const name of ['Game Info','Stats','Pitching'])
+    if(!sheets[name]?.length)throw Error('Missing Project Rio '+name+' worksheet.');
+  // Game Info identifies the *in-game logo/team slot*, never a draft captain.
+  // It must correspond to the two teams in the selected SSL matchup.
+  const resolved=validateRioMatchup(sheets['Game Info'],season.teams||[],game);
+  const expectedIds=new Set([String(game.away),String(game.home)]);
+  function rows(name){
+    const raw=sheets[name];
+    const headers=raw[0].map(x=>normalize(x));
+    // Some older ODS exports contain Item Score values at column AS without
+    // the header; only this known Project Rio extension column is recognized.
+    if(name==='Stats'&&!headers.includes('itemscore')&&headers[44]===''&&
+      raw.slice(1).some(r=>r[44]!==''&&r[44]!=null))headers[44]='itemscore';
+    return raw.slice(1).map((cells,i)=>{
+      const row=Object.fromEntries(headers.map((h,j)=>[h,cells[j]??'']).filter(([key])=>key));
+      return {...row,row:i+2};
     });
-    return out;
   }
-  const rawBat = rows("Stats");
-  if(!rawBat.some(r=>Object.hasOwn(r,'itemscore')))
-    throw Error('Add an "Item Score" column to the Project Rio Stats worksheet. Enter points there; blank cells count as zero. The website calculates Game Score automatically.');
-  const bat = rawBat.filter(
-      (r) =>
-        r.player &&
-        r.position &&
-        String(r.position).toUpperCase() !== "N/A" &&
-        !String(r.player).includes("Totals"),
-    ),
-    pitch = rows("Pitching").filter(
-      (r) => r.player && !String(r.player).includes("Totals"),
-    );
-  if (bat.length < 18 || bat.length > 50)
-    throw Error("Expected 18–50 participating player rows.");
-  const labels = [...new Set(bat.map((r) => String(r.team || "")))];
-  if (labels.length !== 2 || labels.includes(""))
-    throw Error("Report must identify two teams.");
-  const eligible = players.filter((p) =>
-    [...rosterOf(season, game.away), ...rosterOf(season, game.home)].includes(
-      p.id,
-    ),
-  );
-  const targetRows = bat.map((r) => {
-    let candidates = eligible.filter((p) =>
-      [p.name, ...(p.rioAliases || [])].some(
-        (n) => normalize(n) === normalize(r.player),
-      ),
-    );
-    if (!candidates.length && String(r.player).includes("Mii"))
-      candidates = eligible.filter(
-        (p) =>
-          p.kind === "mii" &&
-          normalize(r.player).startsWith(normalize(p.color)),
-      );
-    return {
-      ...r,
-      chosen: candidates.length === 1 ? candidates[0].id : "",
-      label: String(r.team),
-    };
+  let group='';
+  const rawBat=rows('Stats').map(row=>{
+    if(String(row.team??'').trim())group=String(row.team).trim();
+    return {...row,team:group};
   });
-  return {
-    file,
-    filename: file.name,
-    fingerprint: Array.from(
-      new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)),
-      (b) => b.toString(16).padStart(2, "0"),
-    ).join(""),
-    labels,
-    rows: targetRows,
-    pitch: pitch.map((r) => {
-      // Project Rio supplies recorded strikes and IP. Convert IP to outs
-      // during reporting to score partial innings accurately.
-      const complete=/^(1|yes|true)$/i.test(String(r.completegames??'').trim())?1:0;
-      const matches = targetRows.filter(
-        (b) =>
-          normalize(b.player) === normalize(r.player) &&
-          (!r.team || String(r.team) === b.label),
-      );
-      return {
-        ...r,
-        completegames:complete,
-        label: String(r.team || matches[0]?.label || ""),
-        chosen: matches.length === 1 ? matches[0].chosen : "",
-      };
-    }),
+  if(!rawBat.some(r=>Object.hasOwn(r,'itemscore')))
+    throw Error('Add an Item Score column to Stats. A blank Item Score cell counts as zero.');
+  const bat=rawBat.filter(r=>r.player&&r.position&&String(r.position).toUpperCase()!=='N/A'&&!String(r.player).includes('Totals'));
+  const pitch=rows('Pitching').filter(r=>r.player&&!String(r.player).includes('Totals'));
+  if(bat.length<18||bat.length>50)throw Error('Expected 18–50 participating player rows.');
+  const rosters=game.frozenRosters||season.rosters||{};
+  const eligible=players.filter(p=>(rosters[game.away]||[]).includes(p.id)||(rosters[game.home]||[]).includes(p.id));
+  const matchingPlayers=raw=>{
+    let matches=eligible.filter(p=>[p.name,...(p.rioAliases||[])].some(n=>normalize(n)===normalize(raw)));
+    if(!matches.length&&String(raw).includes('Mii'))
+      matches=eligible.filter(p=>p.kind==='mii'&&normalize(raw).startsWith(normalize(p.color)));
+    return matches;
   };
+  const teamForPlayer=p=>{
+    const teams=[game.away,game.home].filter(id=>(rosters[id]||[]).includes(p.id));
+    return teams.length===1?String(teams[0]):null;
+  };
+  const teamName=id=>(season.teams||[]).find(t=>String(t.id)===String(id))?.name||'Unknown SSL team';
+  const targetRows=bat.map(row=>{
+    const candidates=matchingPlayers(row.player);
+    const explicit=resolveRioTeam(row.team,season.teams||[]);
+    if(explicit&&!expectedIds.has(String(explicit.id)))
+      throw Error('Stats sheet team '+row.team+' is not in this matchup.');
+    let chosenTeam=explicit?String(explicit.id):null;
+    const candidateTeams=[...new Set(candidates.map(teamForPlayer).filter(Boolean))];
+    if(!chosenTeam&&candidateTeams.length===1)chosenTeam=candidateTeams[0];
+    if(chosenTeam&&candidateTeams.length===1&&chosenTeam!==candidateTeams[0])
+      throw Error(row.player+': the Stats team label conflicts with the SSL roster.');
+    if(!chosenTeam)throw Error('Unable to determine the SSL team for '+row.player+'. Verify Game Info and the current team rosters.');
+    const onTeam=candidates.filter(p=>teamForPlayer(p)===chosenTeam);
+    return {...row,chosen:onTeam.length===1?onTeam[0].id:'',label:teamName(chosenTeam)};
+  });
+  const labels=[teamName(game.away),teamName(game.home)];
+  const pitchRows=pitch.map(row=>{
+    const matches=targetRows.filter(b=>normalize(b.player)===normalize(row.player));
+    const explicit=resolveRioTeam(row.team,season.teams||[]);
+    const selected=explicit?matches.filter(x=>x.label===explicit.name):matches;
+    if(selected.length!==1)
+      throw Error('Cannot identify pitcher '+row.player+' from its Stats player row. Check pitcher names or team labels.');
+    return {...row,
+      completegames:/^(1|yes|true)$/i.test(String(row.completegames??'').trim())?1:0,
+      chosen:selected[0].chosen,label:selected[0].label};
+  });
+  const bytes=await file.arrayBuffer();
+  const fingerprint=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),
+    b=>b.toString(16).padStart(2,'0')).join('');
+  return {file,filename:file.name,fingerprint,labels,rows:targetRows,
+    pitch:pitchRows,gameInfo:resolved.map(x=>x.canonical+' → '+x.team.name)};
 }
 export function reportStatCount(r,key) {
   const label = Object.values(columns).flat().find(([k]) => k === key)?.[1];
@@ -331,6 +305,24 @@ export function reportRowStats(row,pitchRow=null){
     stats.outs=Math.round(ip*3);
     stats.completeGames=/^(1|yes|true)$/i.test(String(pitchRow.completegames??'').trim())?1:0;
   } else {stats.outs=0;stats.completeGames=0;}
+  // Preserve per-game IP and rates in both the public regular-season and
+  // separately released preseason box scores; avoid inventing undefined rates.
+  const ratio=(numerator,denominator)=>denominator>0?numerator/denominator:null;
+  stats.inningsPitched=stats.outs/3;
+  stats.battingAverage=ratio(stats.hits,stats.atBats);
+  stats.onBase=ratio(stats.hits+stats.batWalks+stats.hitByPitch,stats.plateAppearances);
+  stats.slug=ratio(stats.totalBases,stats.atBats);
+  stats.onBasePlusSlug=stats.onBase==null||stats.slug==null?null:stats.onBase+stats.slug;
+  stats.starBases=Number(row.starbaseshelper||0);
+  stats.starSlug=ratio(stats.starBases,stats.starSwings);
+  stats.era7=ratio(stats.earnedRuns*21,stats.outs);
+  stats.era9=ratio(stats.earnedRuns*27,stats.outs);
+  stats.whip=ratio((stats.hitsAllowed+stats.pitchWalks)*3,stats.outs);
+  const officialAb=stats.battersFaced-stats.pitchWalks-stats.beanBalls;
+  stats.baAgainst=ratio(stats.hitsAllowed,officialAb);
+  stats.obAgainst=ratio(stats.hitsAllowed+stats.pitchWalks+stats.beanBalls,stats.battersFaced);
+  stats.slgAgainst=ratio(stats.singlesAllowed+2*stats.doublesAllowed+3*stats.triplesAllowed+4*stats.hrAllowed,officialAb);
+  stats.opsAgainst=stats.obAgainst==null||stats.slgAgainst==null?null:stats.obAgainst+stats.slgAgainst;
   return stats;
 }
 // Report team totals are derived from Project Rio batting runs, exactly as

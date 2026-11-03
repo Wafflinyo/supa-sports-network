@@ -76,10 +76,11 @@ export function seasonBoxScore(season,game){
 
 // The preseason seeding is generated from the draft. Never connect a report
 // to a different opponent or conflicting score simply because its round matches.
-export function reportForBracketMatch(match){
+export function reportForBracketMatch(match,reports=preseasonGames){
   if(!match?.winner||!match.high||!match.low)return null;
-  return preseasonGames.find(report=>{
+  return reports.find(report=>{
     if(report.round!==match.round)return false;
+    if(report.matchKey&&report.matchKey!==match.key)return false;
     const highAway=sameName(match.high.name,report.away);
     const highHome=sameName(match.high.name,report.home);
     const lowAway=sameName(match.low.name,report.away);
@@ -90,12 +91,12 @@ export function reportForBracketMatch(match){
     return Number(match.scoreA)===scoreA&&Number(match.scoreB)===scoreB;
   })||null;
 }
-export function unmatchedPreseasonReports(bracket){
+export function unmatchedPreseasonReports(bracket,reports=preseasonGames){
   const attached=new Set(
     (bracket?.rounds||[]).flatMap(round=>round.games||[])
-      .map(reportForBracketMatch).filter(Boolean).map(report=>report.gameId),
+      .map(match=>reportForBracketMatch(match,reports)).filter(Boolean).map(report=>report.gameId),
   );
-  return preseasonGames.filter(report=>!attached.has(report.gameId));
+  return reports.filter(report=>!attached.has(report.gameId));
 }
 
 export function bracketScoreOnly(match){

@@ -128,3 +128,28 @@
 .ssl-pre-imported-round .ssl-pre-games{margin-top:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
 .ssl-pre-home-bracket .ssl-pre-imported-round{margin:16px 0 0}
 @media(max-width:650px){.ssl-pre-imported-round .ssl-pre-games{grid-template-columns:1fr}}
+
+/* Commissioner-only Project Rio preseason sheet review and release controls. */
+.ssl-pre-commissioner-tools{border-top:2px solid #e1e7f1;padding:13px 11px;display:grid;gap:10px}
+.ssl-pre-commissioner-tools>.outline-btn{font-size:15px;max-width:100%}
+.ssl-pre-rio-saved{border:1px solid #aabbd0;border-left:4px solid #274d7f;border-radius:4px;padding:11px;background:#f2f6fc;color:#213c60}
+.ssl-pre-rio-saved p{font-size:12px;line-height:1.4;margin:0 0 8px;overflow-wrap:anywhere}
+.ssl-pre-rio-saved p:last-child{margin-bottom:0}
+.ssl-pre-rio-actions{display:flex;gap:9px;align-items:flex-start;flex-wrap:wrap}
+.ssl-pre-rio-actions button{font-size:15px;line-height:1.1;flex:1 1 170px;max-width:100%}
+.ssl-pre-rio-import{display:grid;gap:10px;padding:16px;border:1px solid #cdd8ea;background:#f8faff;min-width:0}
+.ssl-pre-rio-import>h4{font:900 21px 'Barlow Condensed',Impact,sans-serif;margin:0;color:#13294e}
+.ssl-pre-rio-import>h5{font:900 17px 'Barlow Condensed',Impact,sans-serif;margin:6px 0 0;color:#13294e}
+.ssl-pre-rio-import p{font-size:12px;line-height:1.5;margin:0;color:#42526d}
+.ssl-pre-rio-import input[type=file]{max-width:100%;font-size:12px;padding:9px;background:#fff;border:1px solid #bbc9db}
+.ssl-pre-rio-table{width:100%;border-collapse:collapse;background:#fff;min-width:660px}
+.ssl-pre-rio-table th{font-size:12px;text-align:left;background:#18345e;color:white;padding:8px}
+.ssl-pre-rio-table td{font-size:12px;padding:7px;border-bottom:1px solid #e0e5ec;color:#203757}
+.ssl-pre-rio-table select{max-width:185px;min-width:125px;padding:5px;font-size:12px}
+.ssl-pre-rio-table input[type=checkbox]{width:17px;height:17px}
+.ssl-pre-rio-summary{padding:12px;border:1px solid #d7e3f2;background:#fff;display:grid;gap:5px}
+.ssl-pre-rio-summary strong{color:#142e59}
+@media(max-width:580px){
+  .ssl-pre-rio-import{padding:10px}
+  .ssl-pre-commissioner-tools{padding:10px 5px}
+}

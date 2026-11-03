@@ -6,6 +6,23 @@ import {pitchingShutoutBonuses,pitcherShutoutStats} from './pitching-shutout.js'
 // One report contributes one GP per participating player, even with no at-bats.
 // Preseason never modifies the official season statistics or standings.
 export const preseasonGames=gameRecords;
+// Published RPC game reports are merged with the existing public Round 1 sheets.
+// Unreleased commissioner uploads are never passed into this public aggregator.
+const normal=x=>String(x||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+export function allPreseasonGames(season){
+  const published=(season?.preseasonReports||[]).filter(g=>g?.gameId&&Array.isArray(g.players));
+  const legacy=gameRecords.filter(game=>!published.some(other=>{
+    if(other.round!==game.round)return false;
+    const samePair=[normal(other.away),normal(other.home)].sort().join('|')===
+      [normal(game.away),normal(game.home)].sort().join('|');
+    return samePair&&(
+      normal(other.away)===normal(game.away)?
+        other.awayScore===game.awayScore&&other.homeScore===game.homeScore:
+        other.awayScore===game.homeScore&&other.homeScore===game.awayScore
+    );
+  }));
+  return [...legacy,...published];
+}
 const rates=new Set(['battingAverage','onBase','slug','onBasePlusSlug','starSlug','era7','era9','whip','baAgainst','obAgainst','slgAgainst','opsAgainst']);
 const round2=n=>Math.round((n+Number.EPSILON)*100)/100;
 export function preseasonShutoutBonuses(game){
@@ -33,9 +50,9 @@ function setRates(record,rows){
     if(values.length)record.stats[field]=values.reduce((a,b)=>a+b,0)/values.length;
   }
 }
-export function preseasonPlayerStats(){
+export function preseasonPlayerStats(games=gameRecords){
   const byPlayer=new Map();
-  for(const game of gameRecords){
+  for(const game of games){
     const bonusMap=preseasonShutoutBonuses(game);
     for(const [playerId,homeFlag,positions,values] of game.players){
       const teamName=homeFlag?game.home:game.away;
@@ -68,9 +85,9 @@ export function preseasonPlayerStats(){
     delete row._games;return row;
   });
 }
-export function preseasonTeamStats(){
+export function preseasonTeamStats(games=gameRecords){
   const teams=new Map();
-  for(const game of gameRecords)for(const side of ['away','home']){
+  for(const game of games)for(const side of ['away','home']){
     const name=game[side], score=game[side+'Score'];
     let row=teams.get(name);
     if(!row){row={teamName:name,stats:{gamesPlayed:0,runsScored:0,runsAllowed:0},_games:[]};teams.set(name,row)}
