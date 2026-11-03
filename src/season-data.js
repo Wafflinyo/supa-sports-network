@@ -1,6 +1,7 @@
 import columns from "./temporary-stat-columns.json" with { type: "json" };
 import {customGameScore} from './ssl-game-score.js';
 import {gamePointsForReport} from './game-points.js';
+import {pitchingShutoutBonuses} from './pitching-shutout.js';
 export const positions = ["P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
 export const rosterOf = (s, t) => s?.rosters?.[t] || [];
 export const validLineup = (s, t, l) => {
@@ -57,6 +58,8 @@ export function aggregate(season) {
         st.gameScore=(st.gameScore||0)+p.gameScore;
       if(typeof p.itemScore==='number'&&Number.isFinite(p.itemScore))
         st.itemScore=(st.itemScore||0)+p.itemScore;
+      if(typeof p.shutoutBonus==='number'&&Number.isFinite(p.shutoutBonus))
+        st.shutoutBonus=Math.round(((st.shutoutBonus||0)+p.shutoutBonus+Number.EPSILON)*100)/100;
       const gp=gamePointsForReport(p);
       for(const key of ['ogp','dgp','pgp','tgp'])st[key]=Math.round(((st[key]||0)+gp[key]+Number.EPSILON)*100)/100;
       st.positionsPlayed = [
@@ -321,13 +324,28 @@ export function reportRowStats(row,pitchRow=null){
   } else {stats.outs=0;stats.completeGames=0;}
   return stats;
 }
+// Report team totals are derived from Project Rio batting runs, exactly as
+// the result importer does. Bonuses are determined before automatic MVP scoring.
+export function previewShutoutBonuses(preview){
+  const labels=preview?.labels||[...new Set((preview?.rows||[]).map(row=>row.label))];
+  if(labels.length!==2||labels[0]===labels[1])return new Map();
+  const runs=labels.map(label=>(preview.rows||[]).filter(r=>r.label===label)
+    .reduce((n,r)=>n+Number(r.runs||0),0));
+  const pitchers=(preview.pitch||[]).map(p=>({
+    player:p.chosen,team:p.label,outs:Math.round(Number(p.inningspitched||0)*3),
+  })).filter(p=>p.player&&p.team&&Number.isFinite(p.outs));
+  return pitchingShutoutBonuses({
+    away:labels[0],home:labels[1],awayScore:runs[0],homeScore:runs[1],pitchers,
+  });
+}
 export function previewCustomGameScore(preview,row,mvp=null){
   const pitching=preview.pitch.filter(p=>Number(p.chosen)&&Number(p.chosen)===Number(row.chosen)
     || (normalize(p.player)===normalize(row.player)&&(!p.team||String(p.team)===row.label)));
   if(pitching.length>1)throw Error(`Ambiguous pitching row for ${row.player}.`);
   const stats=reportRowStats(row,pitching[0]);
   stats.mvps=mvp!=null&&Number(row.chosen)===Number(mvp)?1:0;
-  return customGameScore(stats,row.itemscore===''?0:row.itemscore);
+  const bonus=previewShutoutBonuses(preview).get(String(row.chosen))||0;
+  return customGameScore(stats,row.itemscore===''?0:row.itemscore,bonus);
 }
 // Determine the MVP before adding any MVP points; only the winning team's
 // highest-scoring mapped player is eligible. A tied or incomplete match gets no award.
@@ -345,6 +363,7 @@ export function automaticReportMvp(preview,awayLabel){
   return candidates[0]?.player??null;
 }
 export function buildReport(preview, awayLabel, season, game, players, mvp) {
+  const shutoutBonuses=previewShutoutBonuses(preview);
   const pickTeam = (r) => (r.label === awayLabel ? game.away : game.home),
     result = [];
   for (const r of preview.rows) {
@@ -358,13 +377,15 @@ export function buildReport(preview, awayLabel, season, game, players, mvp) {
     const stats=reportRowStats(r,pitching[0]);
     stats.mvps=player===Number(mvp)?1:0;
     stats.starBases=Number(r.starbaseshelper||0);
-    const calculated=customGameScore(stats,r.itemscore===''?0:r.itemscore);
+    const shutoutBonus=shutoutBonuses.get(String(player))||0;
+    const calculated=customGameScore(stats,r.itemscore===''?0:r.itemscore,shutoutBonus);
     result.push({
       player,
       team,
       gameScore:calculated.gameScore,
       baseGameScore:calculated.baseGameScore,
       itemScore:calculated.itemScore,
+      shutoutBonus,
       positions: String(r.position)
         .split(/[\/,;→\-]+/)
         .map((x) => x.trim())
