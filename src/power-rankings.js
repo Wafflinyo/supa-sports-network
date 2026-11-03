@@ -8,6 +8,7 @@ import {validLineup} from './season-data.js';
 // Offense: 95% of hitter skills (charge power 40%, trajectory 25%, slap power
 // 20%, slap contact 7%, charge contact 8%) plus 5% speed.
 // Defense: 92% of defensive skills (fielding 60%, throw speed 40%) plus 8% speed.
+// Pitching: stamina 55%, charge pitch speed 10%, curveball speed 15%, curve 20%.
 // High trajectory > Medium > Low. The display-stat rating bars are not used.
 // Evaluate all nine starters for offense and defense; speed enters both.
 // Chemistry applies through the saved batting order and defensive positions,
@@ -40,6 +41,19 @@ export const POWER_WEIGHTS=Object.freeze({
 // situational chemistry and special-ability bonuses.
 export const OFFENSE_SPEED_WEIGHT=.05;
 export const DEFENSE_SPEED_WEIGHT=.08;
+// Each pitcher's skill score uses the raw 0–100 stamina and curve ratings,
+// and speed values normalized into 0–100. These weights apply immediately to
+// all recalculated Power Rankings, not just rankings for newly drafted teams.
+export const PITCHING_STAT_WEIGHTS=Object.freeze({
+  stamina:.55,chargePitchSpeed:.10,curveballSpeed:.15,curve:.20
+});
+export function pitchingRating(stats){
+  return PITCHING_STAT_WEIGHTS.stamina*numeric(stats,'pitching stamina')+
+    PITCHING_STAT_WEIGHTS.chargePitchSpeed*pitchVelocity(stats?.['charge pitch speed'],90,170)+
+    PITCHING_STAT_WEIGHTS.curveballSpeed*pitchVelocity(stats?.['curveball speed'],90,155)+
+    PITCHING_STAT_WEIGHTS.curve*numeric(stats,'curve');
+}
+
 // Maximum skill tiers for the standard fielding abilities.
 // Special catches and Super Jump are position-dependent (see below).
 // Clamber remains ineffective in CPU-vs-CPU play and ALWAYS scores zero.
@@ -189,9 +203,7 @@ function scouting(id){
     offense:offenseRating(s),
     offenseAbilityBonus:Number(s['baserunning ability'])>0?BASERUNNING_ABILITY_BONUS:0,
     fieldingAbilityId:Number(s['fielding ability']),
-    pitching:.60*numeric(s,'pitching stamina')+
-      .18*pitchVelocity(s['charge pitch speed'],90,170)+
-      .14*pitchVelocity(s['curveball speed'],90,155)+.08*numeric(s,'curve'),
+    pitching:pitchingRating(s),
     defense:.60*numeric(s,'fielding')+.40*numeric(s,'outfield throwing speed'),
     running:numeric(s,'speed'),
     good:new Set(record.goodChemistryIds||[]),
