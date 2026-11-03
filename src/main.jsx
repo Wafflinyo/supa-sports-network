@@ -1,10 +1,11 @@
 import PwaInstall from './PwaInstall.jsx'
 import {fantasySeasonReady} from './fantasy-scoring.js'
-import {useSeasonLeague,SeasonWorkspace,SeasonPage,SeasonPrompts,SeasonTeamTools,SeasonHome,SeasonSelector,seasonPages} from './SeasonLeague.jsx'
+import {useSeasonLeague,SeasonWorkspace,SeasonPage,SeasonPrompts,SeasonTeamTools,SeasonSelector,seasonPages} from './SeasonLeague.jsx'
 import {aggregate,fantasyGames} from './season-data.js'
 import {heatingUpForSeason} from './heating-up.js'
 import {HeatingUpProvider,HeatFlame} from './HeatingUpBadge.jsx'
 import {leagueNews} from './league-news.js'
+import HomeDashboard from './HomeDashboard.jsx'
 import GmAchievements from './GmAchievements.jsx'
 import GmStadiumMatchups from './GmStadiumMatchups.jsx'
 import LeagueNotifications from './LeagueNotifications.jsx'
@@ -157,7 +158,6 @@ function App() {
   const seasonHeating=useMemo(()=>heatingUpForSeason(seasonLeague.season,{includeRecorded:access.role==='commissioner'}),[seasonLeague.season,access.role])
   const hotIds=useMemo(()=>new Set(Object.entries(seasonHeating.players).filter(([,r])=>r.currentHotStreak>0).map(([id])=>Number(id))),[seasonHeating])
   const newsItems=useMemo(()=>leagueNews(seasonLeague.seasons,playerPool,{includeRecorded:access.role==='commissioner'}),[seasonLeague.seasons,access.role])
-  const [showAllNews,setShowAllNews]=useState(false)
   const players=useMemo(()=>basePlayers.map(p=>{const base=seasonStats[p.id],heat=seasonHeating.players[p.id];const stats=base?{...base,...(heat||{})}:heat;return {...p,...stats,stats,team:seasonLeague.season?.teams.find(t=>seasonLeague.season.rosters[t.id]?.includes(p.id))?.name,perGame:base?Object.fromEntries(Object.entries(base).filter(([,v])=>typeof v==='number').map(([k,v])=>[k,perGameOnly.has(k)&&k!=='inningsPitched'?v:v/base.gamesPlayed])):null}}),[seasonStats,seasonLeague.season,seasonHeating])
   const careerSeasons=useMemo(()=>seasonLeague.seasons.map(s=>({id:s.id,playerStats:aggregate(s)})),[seasonLeague.seasons])
   const liveGames=useMemo(()=>fantasyGames(seasonLeague.seasons),[seasonLeague.seasons])
@@ -274,20 +274,8 @@ function App() {
         {gmToolsTab==='Team Setup'&&<details id="gm-team-identity" className="panel season-box" open={teamSetupExpanded} onToggle={e=>setTeamSetupExpanded(e.currentTarget.open)}><summary>TEAM NAME, HOME LOCATION & LOGO</summary><TeamSetup key={access.slot} supabase={supabase} access={access} teams={officialTeams} onChange={loadOfficialTeams} onAccess={setAccess}/></details>}
         {gmToolsTab==='My Team'?<MyDraftTeam league={seasonLeague}/>:gmToolsTab==='Home Games'?<GmStadiumMatchups league={seasonLeague}/>:gmToolsTab==='Achievements'?<GmAchievements seasons={seasonLeague.seasons} teams={officialTeams} slot={access.slot}/>:gmToolsTab!=='Team Setup'&&<SeasonTeamTools league={seasonLeague} section={gmToolsTab} focus={notificationTarget}/>}
         </>}
-      {page === 'Home' && <><SeasonHome league={seasonLeague} go={go}/>
-        <div className="home-grid"><div className="hero"><div className="hero-content"><span className="eyebrow">WELCOME TO THE LEAGUE</span><h1>THE GAME<br/><span>STARTS HERE.</span></h1><p>Follow every game, explore the player pool, and manage your fantasy league in one place.</p><button className="yellow-btn" onClick={() => go('Player Stats')}>EXPLORE PLAYERS <span>›</span></button></div><div className="hero-number">01</div></div>
-          <div className="side-stack"><div className="panel compact"><SectionTitle kicker="ON DECK" right={<CalendarDays size={19}/>}>UPCOMING MATCHES</SectionTitle>{seasonLeague.season?<p className="season-box">{seasonLeague.season.games.filter(g=>g.stage!=='final').length} upcoming games · <button className="text-link" onClick={()=>go('Schedule')}>VIEW SCHEDULE ›</button></p>:<Empty title="Schedule coming soon">Matchups will appear when the season schedule is set.</Empty>}</div><div className="panel compact"><SectionTitle kicker="FINAL SCORES" right={<Trophy size={19}/>}>RECENT RESULTS</SectionTitle>{seasonLeague.season?<p className="season-box">{seasonLeague.season.games.filter(g=>g.stage==='final').length} completed games · <button className="text-link" onClick={()=>go('Schedule')}>VIEW RESULTS ›</button></p>:<Empty icon={Trophy} title="No games yet">Results will appear after the first game is uploaded.</Empty>}</div></div></div>
-        <div className="home-bottom"><div id="ssl-league-news" className="panel news-panel" style={{scrollMarginTop:'125px'}}><SectionTitle kicker="FROM AROUND THE LEAGUE">LEAGUE NEWS FEED</SectionTitle>
-          {newsItems.length ? <><div className="league-news-scroll" aria-label="Official league news">
-            {(showAllNews?newsItems:newsItems.slice(0,8)).map(item=><article key={item.id} className={`news-item news-item-live news-${item.category}`}>
-              <span className="news-mark" aria-hidden="true">{item.category==='heating'?<HeatFlame/>:item.category==='trade'?<Shield size={27}/>:item.category==='pitching'?<Trophy size={27}/>:<Trophy size={27}/>}</span>
-              <div className="news-copy"><small>{item.label}{item.private?' · PRIVATE PREVIEW':''}{item.at?' · '+new Date(item.at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):''}</small><h3>{item.title}</h3><p>{item.summary}</p></div>
-              <button aria-label={item.playerId?'View player profile':'View trades'} title={item.playerId?'Player profile':'Transactions'} onClick={()=>{if(item.playerId){const p=players.find(x=>x.id===item.playerId);if(p)setSelectedPlayer(p)}else go('Transactions')}}>›</button>
-            </article>)}
-            </div>{newsItems.length>8&&<button className="outline-btn news-more" onClick={()=>setShowAllNews(v=>!v)}>{showAllNews?'SHOW RECENT NEWS':`VIEW ALL ${newsItems.length} HEADLINES`}</button>}</>
-          : <div className="news-item"><span className="news-mark"><Trophy size={26}/></span><div><small>LEAGUE UPDATE</small><h3>The player pool is ready</h3><p>Game highlights, Heating Up alerts and completed trades will appear here when official results are released.</p></div><button aria-label="Browse players" onClick={()=>go('Player Stats')}>›</button></div>}
-          </div><div className="panel standings-panel"><SectionTitle kicker="THE RACE" right={<button className="text-link" onClick={() => go('Standings')}>FULL STANDINGS ›</button>}>STANDINGS</SectionTitle>{seasonLeague.season?<p className="season-box">{seasonLeague.season.teams.length} season teams · <button className="text-link" onClick={()=>go('Standings')}>VIEW TABLE ›</button></p>:<Empty icon={Shield} title="Teams coming soon">Standings begin when teams and results are added.</Empty>}</div></div>
-      </>}
+      {page === 'Home' && <HomeDashboard league={seasonLeague} go={go}
+        newsItems={newsItems} players={players} onPlayerSelect={setSelectedPlayer}/>}
       {page === 'League Rules' && <LeagueRules/>}
       {page === 'Player Data' && <><button className="outline-btn" onClick={()=>go('Player Stats')}>BACK TO PLAYER STATS</button><PlayerData seasons={seasonLeague.seasons}/></>}
       {page === 'Player Stats' && <>
