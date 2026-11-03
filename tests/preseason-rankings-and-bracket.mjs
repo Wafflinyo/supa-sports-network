@@ -520,10 +520,10 @@ assert(s.includes("page === \"Playoff Bracket\" ? (")&&
   'Playoff Bracket page must render the accessible dual-tab view');
 assert(home.includes("onClick={()=>go('Playoff Bracket')}"),
   'Home bracket link must open the Playoff Bracket section');
-const compactBracket=powerUi.slice(powerUi.indexOf('if(compact)return'),powerUi.indexOf('return <div className="ssl-pre-tournament">'));
-assert(compactBracket.includes('bracket.rounds.map')&&compactBracket.includes('game.winner')&&
-  compactBracket.includes('game.scoreA')&&compactBracket.includes('game.scoreB'),
-  'Home bracket preview must show live real matchups, scores and advancement');
+const compactBracket=powerUi.slice(powerUi.indexOf('if(compact)return'),powerUi.indexOf('return <>\n    <div className="ssl-pre-tournament">'));
+assert(compactBracket.includes('bracket.rounds.map')&&compactBracket.includes('<BracketGameCard')&&
+  powerUi.includes('game.winner')&&powerUi.includes('game.scoreA')&&powerUi.includes('game.scoreB'),
+  'Home bracket preview must show live real matchups, scores and advancement through the shared card');
 assert(!compactBracket.includes('<ScoreEntry'),
   'Home preview is read-only: result editing must stay in the full bracket tab');
 const nav=readFileSync(new URL('../src/navigation.js',import.meta.url),'utf8');
