@@ -1,7 +1,7 @@
 import columns from "./temporary-stat-columns.json" with { type: "json" };
 import {customGameScore} from './ssl-game-score.js';
 import {gamePointsForReport} from './game-points.js';
-import {pitchingShutoutBonuses} from './pitching-shutout.js';
+import {pitchingShutoutBonuses,pitcherShutoutStats} from './pitching-shutout.js';
 export const positions = ["P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
 export const rosterOf = (s, t) => s?.rosters?.[t] || [];
 export const validLineup = (s, t, l) => {
@@ -60,6 +60,12 @@ export function aggregate(season) {
         st.itemScore=(st.itemScore||0)+p.itemScore;
       if(typeof p.shutoutBonus==='number'&&Number.isFinite(p.shutoutBonus))
         st.shutoutBonus=Math.round(((st.shutoutBonus||0)+p.shutoutBonus+Number.EPSILON)*100)/100;
+      if(Number(p.shutoutBonus||0)>0){
+        const teamPitcherCount=game.result.players.filter(q=>q.team===p.team&&Number(q.shutoutBonus||0)>0).length;
+        const counts=pitcherShutoutStats(p.shutoutBonus,teamPitcherCount);
+        st.shutouts=(st.shutouts||0)+counts.shutouts;
+        st.combinedShutouts=(st.combinedShutouts||0)+counts.combinedShutouts;
+      }
       const gp=gamePointsForReport(p);
       for(const key of ['ogp','dgp','pgp','tgp'])st[key]=Math.round(((st[key]||0)+gp[key]+Number.EPSILON)*100)/100;
       st.positionsPlayed = [
@@ -163,6 +169,9 @@ const counts = new Set(
           "gamesPlayed",
           "inningsPitched",
           "completeGames",
+          "shutouts",
+          "combinedShutouts",
+          "shutoutBonus",
           "battingAverage",
           "onBase",
           "slug",
