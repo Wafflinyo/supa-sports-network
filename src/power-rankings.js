@@ -4,7 +4,7 @@ import {pitcherPriorityFor} from './player-roles.js';
 import {validLineup} from './season-data.js';
 
 // Transparent roster-only preseason projection. No in-game menu/display bars.
-// Overall: 65% offense, 20% defense, 15% pitching.
+// Overall: 60% offense, 20% defense, 20% pitching.
 // Offense: 95% of hitter skills (charge power 40%, trajectory 25%, slap power
 // 25%, slap contact 5%, charge contact 5%) plus 5% speed.
 // Defense: 92% of defensive skills (fielding 60%, throw speed 40%) plus 8% speed.
@@ -35,7 +35,7 @@ export const PITCHER_PRIORITY_ORDER=Object.freeze({P1P:1,P2P:2,other:3});
 export const POWER_PITCHER_COUNT=4;
 export const POWER_SUPPORT_PITCHER_COUNT=3;
 export const POWER_WEIGHTS=Object.freeze({
-  offense:.65,pitching:.15,defense:.20
+  offense:.60,pitching:.20,defense:.20
 });
 // Blend speed into the base skill score before applying the existing
 // situational chemistry and special-ability bonuses.
