@@ -10,7 +10,7 @@
     "test:season": "SSL_TIMELINE_TEST=1 SSL_RULES_TEST=1 node tests/season-workflow.mjs && node tests/rio-import.mjs && node tests/home-dashboard.mjs",
     "test:pwa": "node tests/pwa.mjs",
     "test:access": "node tests/access-codes.mjs",
-    "prebuild": "node tests/home-dashboard.mjs"
+    "prebuild": "node tests/home-dashboard.mjs && node tests/home-standings.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.117.2",
