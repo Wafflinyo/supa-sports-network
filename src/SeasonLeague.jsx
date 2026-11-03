@@ -1593,8 +1593,11 @@ function ReportImport({ league: l, game, onDone }) {
         (blank means 0), automatically awards +10 MVP points to the highest-scoring player on the winning team, and grants
         Heating Up at {HEATING_UP_THRESHOLD}+. Pitching receives +2 per
         inning pitched (including partial innings), +0.5 per strike, -3 per
-        earned run, -10 per HR allowed and +8 for a complete game. Rio
-        provides innings and strikes automatically. Corrected reports
+        earned run, -10 per HR allowed and +8 for a complete game.
+        A solo-pitcher shutout earns +30 pitching Game Points; a combined
+        shutout shares the same 30 points proportionally by innings pitched.
+        Solo and combined shutouts are recorded separately under Pitching Stats.
+        Rio provides innings and strikes automatically. Corrected reports
         replace prior totals and hot streak results.
       </p>
       <input
@@ -2467,13 +2470,14 @@ function TeamStats({ league: l }) {
     "bobbles",
     "pitchStrikeouts",
     "earnedRuns",
+    "shutouts", "combinedShutouts", "shutoutBonus",
     "gameScore",
     "ogp", "dgp", "pgp", "tgp", "agp",
   ];
   const keys=visibleGamePointFields(allKeys,view);
   const s = l.season;
   const records = new Map(standings(s).map(t => [t.id, t]));
-  const statLabel = k => ({gameScore:'Game Score',ogp:'OGP',dgp:'DGP',pgp:'PGP',tgp:'TGP',agp:'AGP'})[k] || k.replace(/([A-Z])/g, " $1");
+  const statLabel = k => ({gameScore:'Game Score',ogp:'OGP',dgp:'DGP',pgp:'PGP',tgp:'TGP',agp:'AGP',shutouts:'Shutouts',combinedShutouts:'Combined Shutouts',shutoutBonus:'Shutout Game Points'})[k] || k.replace(/([A-Z])/g, " $1");
   return (
     <Box title={isAverage ? "TEAM STAT AVERAGES" : "TEAM STAT TOTALS"}>
       <div className="stat-view-switch" role="group" aria-label="Team stat display">
@@ -2511,6 +2515,15 @@ function TeamStats({ league: l }) {
               const totals = Object.fromEntries(
                 allKeys.filter(k=>k!=='agp').map(k => [k, all.reduce((sum, p) => sum + (Number(['ogp','dgp','pgp','tgp'].includes(k) ? gamePointsForReport(p)[k] : k === 'gameScore' ? p.gameScore : p.stats?.[k]) || 0), 0)])
               );
+              // One team shutout per scoreless win; player-level combined
+              // appearances must never inflate the team's shutout count.
+              const shutoutGames=games.filter(g=>
+                Number(g.result?.scores?.[t.id]??-1)>0&&
+                Number(g.result?.scores?.[g.away===t.id?g.home:g.away]??-1)===0);
+              totals.shutouts=shutoutGames.length;
+              totals.combinedShutouts=shutoutGames.filter(g=>
+                (g.result?.players||[]).filter(p=>p.team===t.id&&Number(p.shutoutBonus||0)>0).length>1).length;
+              totals.shutoutBonus=all.reduce((sum,p)=>sum+Number(p.shutoutBonus||0),0);
               totals.agp=games.length?totals.tgp/games.length:null;
               const record = records.get(t.id);
               return (
@@ -2524,7 +2537,7 @@ function TeamStats({ league: l }) {
                     <td key={k} className="team-stats-number">
                       {k==='agp' ? (totals.agp?.toFixed(2)??'—') : isAverage
                         ? games.length ? (totals[k] / games.length).toFixed(2) : "—"
-                        : ['ogp','dgp','pgp','tgp'].includes(k) ? totals[k].toFixed(2) : totals[k]}
+                        : ['ogp','dgp','pgp','tgp','shutoutBonus'].includes(k) ? totals[k].toFixed(2) : totals[k]}
                     </td>
                   ))}
                 </tr>
@@ -2536,7 +2549,7 @@ function TeamStats({ league: l }) {
       <p className="team-stats-explainer">
         {isAverage
           ? "Team averages are the sum of all players' stats divided by the team's completed games. AGP is the team's total Game Points per completed game. GP and all W–L records remain totals; teams without completed games show a dash."
-          : "Team totals combine every player's stats from completed games. OGP, DGP and PGP are weighted components. TGP also includes Item Score and MVP points; AGP is always per game."}
+          : "Team totals combine every player's stats from completed games. Shutouts count once per team shutout, including combined shutouts; the 30 pitching Game Point bonus is shared by contributing pitchers. OGP, DGP and PGP are weighted components. TGP includes Item Score and MVP points; AGP is always per game."}
         {" "}Overall, Home and Away Records count released regular-season games only.
       </p>
     </Box>

@@ -1,6 +1,7 @@
 import roster from './players.json' with {type:'json'};
 import {preseasonGames,preseasonPlayerStatsForGame} from './preseason-game-data.js';
 import {gamePointsForReport} from './game-points.js';
+import {pitcherShutoutStats} from './pitching-shutout.js';
 
 const playerNames=new Map(roster.map(player=>[Number(player.id),player.name]));
 const round2=n=>Math.round((Number(n||0)+Number.EPSILON)*100)/100;
@@ -46,7 +47,10 @@ export function seasonBoxScore(season,game){
   const names=new Map((season.teams||[]).map(t=>[String(t.id),t.name]));
   const resultPlayers=Array.isArray(game.result.players)?game.result.players:[];
   const entries=resultPlayers.map(row=>{
-    const stats=row.stats||{};
+    const shutoutBonus=Number(row.shutoutBonus||0);
+    const participatingPitchers=resultPlayers.filter(p=>
+      p.team===row.team&&Number(p.shutoutBonus||0)>0).length;
+    const stats={...row.stats,...pitcherShutoutStats(shutoutBonus,participatingPitchers),shutoutBonus};
     const points=gamePointsForReport(row);
     return {
       playerId:Number(row.player),

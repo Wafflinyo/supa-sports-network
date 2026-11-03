@@ -11,7 +11,7 @@ import './preseason-stats.css'
 const statGroups = {
   'Game Score': [
     ['gamesPlayed','Games Played'],['gameScore','Game Score'],
-    ['ogp','OGP'],['dgp','DGP'],['pgp','PGP'],['tgp','TGP'],['agp','AGP'],['itemScore','Item Score'],
+    ['ogp','OGP'],['dgp','DGP'],['pgp','PGP'],['tgp','TGP'],['agp','AGP'],['itemScore','Item Score'],['shutoutBonus','Shutout Bonus'],
   ],
   'Offensive Stats': [
     ['ogp','Offensive Game Points (OGP)'],
@@ -38,6 +38,7 @@ const statGroups = {
   'Pitching Stats': [
     ['pgp','Pitching Game Points (PGP)'],
     ['positionsPlayed', 'Position(s) Played'], ['gamesPlayed', 'Games Played'], ['mvps', 'MVPs'], ['battersFaced', 'Batters Faced'], ['inningsPitched', 'Innings Pitched'],
+    ['shutouts', 'Solo Shutouts'], ['combinedShutouts','Combined Shutouts'], ['shutoutBonus','Shutout Game Points'],
     ['pitches', 'Pitches'], ['strikes', 'Strikes'], ['balls', 'Balls'],
     ['pitchStrikeouts', 'Strikeouts'], ['pitchWalks', 'Walks'], ['beanBalls', 'Bean Balls'],
     ['hitsAllowed', 'Hits Allowed'], ['runsAllowed', 'Runs Allowed'],

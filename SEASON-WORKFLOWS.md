@@ -58,6 +58,8 @@ Every season has twelve main snake rounds (eleven tradable player picks and one 
 
 Heating Up replaces Star Coins entirely. After each game, the commissioner uploads the Project Rio Stats and Pitching worksheets with the custom SSL Game Score calculated from batting, fielding, pitching and Item Score. A player earning **120 or more Game Points** earns a Heating Up star for their next team game. Scores below 120 do not qualify. Corrected reports recalculate streaks and next-game eligibility automatically.
 
+Pitching shutout award: a team winning while allowing zero runs earns exactly +30 Pitching Game Points. A sole pitcher receives all +30; if multiple pitchers contributed recorded outs, they share the 30 proportional to innings pitched. Solo shutouts and combined shutout appearances are separate player pitching stats; the team is credited with one shutout, never one per pitcher. Bonus contributes to PGP/TGP, and Heating Up still requires 120+ Game Points.
+
 Extensions open only after the championship and close one calendar month later, or immediately when all franchises use/void their balances. Rejected offers can be retried with another contract at unchanged odds; acceptance alone advances history. The server stores each attempt separately. The latest extension migration supersedes older timeline fixtures describing early extensions, a two-week deadline or a carryover cap.
 
 Validation: `npm run test:season` includes returning lottery boundaries/idempotency, historical star system checks (in older migration fixtures), role isolation, repeated extension attempts and automatic/early window closure. Earlier migration fixtures intentionally run against their historical rules before loading the latest migrations.

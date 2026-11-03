@@ -5,7 +5,7 @@ import './game-box-score.css';
 const categories={
   'Game Points':[
     ['ogp','OGP'],['dgp','DGP'],['pgp','PGP'],['itemScore','Item Score'],
-    ['mvpBonus','MVP Bonus'],['tgp','TGP'],
+    ['shutoutBonus','Shutout Bonus'],['mvpBonus','MVP Bonus'],['tgp','TGP'],
   ],
   'Batting':[
     ...columns['Offensive Stats'].filter(([k])=>!['gamesPlayed','mvps'].includes(k))
@@ -20,7 +20,7 @@ const fmt=(value,key)=>{
   if(value==null)return rateKeys.has(key)?'—':'0';
   if(!Number.isFinite(Number(value)))return '—';
   if(rateKeys.has(key))return Number(value).toFixed(3);
-  if(key==='inningsPitched'||['ogp','dgp','pgp','tgp','itemScore','mvpBonus'].includes(key))
+  if(key==='inningsPitched'||['ogp','dgp','pgp','tgp','itemScore','mvpBonus','shutoutBonus'].includes(key))
     return Number(value).toFixed(2);
   return String(value);
 };
