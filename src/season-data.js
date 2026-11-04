@@ -225,6 +225,14 @@ export async function readRio(file,season,game,players){
   // Game Info identifies the *in-game logo/team slot*, never a draft captain.
   // It must correspond to the two teams in the selected SSL matchup.
   const resolved=validateRioMatchup(sheets['Game Info'],season.teams||[],game);
+  // Never silently discard the Rio Scorecard. The saved report must carry the
+  // line score so the commissioner preview and public release match exactly.
+  const inningScores=extractRioInningScores(sheets['Game Info'],season.teams||[],game);
+  if(!inningScores)throw Error(
+    'Game Info contains no readable inning-by-inning Scorecard. '+
+    'The Scorecard needs numbered inning columns and one row for each team. '+
+    'Re-export the full Project Rio ODS/XLSX and upload again.'
+  );
   const expectedIds=new Set([String(game.away),String(game.home)]);
   function rows(name){
     const raw=sheets[name];
@@ -290,7 +298,7 @@ export async function readRio(file,season,game,players){
   const fingerprint=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),
     b=>b.toString(16).padStart(2,'0')).join('');
   return {file,filename:file.name,fingerprint,labels,rows:targetRows,
-    pitch:pitchRows,inningScores:extractRioInningScores(sheets['Game Info'],season.teams||[],game),
+    pitch:pitchRows,inningScores,
     gameInfo:resolved.map(x=>x.canonical+' → '+x.team.name)};
 }
 export function reportStatCount(r,key) {
