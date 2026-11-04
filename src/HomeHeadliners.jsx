@@ -1,4 +1,4 @@
-import React,{useEffect,useRef,useState} from 'react';
+import React,{useEffect,useState} from 'react';
 import {ChevronLeft,ChevronRight,Newspaper,Trophy} from 'lucide-react';
 import {teamLogo} from './TeamIdentity.jsx';
 import {PlayerPortrait} from './PlayerPortrait.jsx';
@@ -72,29 +72,18 @@ function MatchStorySlide({story,seasons,supabase,players,onOpenGame}){
 }
 export default function HomeHeadliners({slides,championContent,seasons,supabase,players,onOpenGame}){
  const [active,setActive]=useState(0);
- const swipeX=useRef(null);
  const count=Math.min(5,slides?.length||0);
  useEffect(()=>setActive(index=>Math.min(index,Math.max(0,count-1))),[count]);
  if(!count)return null;
  const index=Math.min(active,count-1),slide=slides[index];
  const next=()=>setActive(i=>(i+1)%count);
  const prev=()=>setActive(i=>(i-1+count)%count);
- const swipeEnd=event=>{
-   if(swipeX.current==null)return;
-   const diff=event.changedTouches[0].clientX-swipeX.current;
-   swipeX.current=null;
-   if(Math.abs(diff)<45||count<=1)return;
-   if(diff<0)next();else prev();
- };
  return <section className="ssl-headliners" aria-label="SSL top headlines" aria-roledescription="carousel"
     onKeyDown={event=>{
       if(event.target instanceof HTMLButtonElement)return;
       if(event.key==='ArrowRight'){event.preventDefault();next();}
       if(event.key==='ArrowLeft'){event.preventDefault();prev();}
-    }}
-    onTouchStart={event=>{swipeX.current=event.touches[0]?.clientX??null;}}
-    onTouchEnd={swipeEnd}
-    onTouchCancel={()=>{swipeX.current=null;}}>
+    }}>
    <div className="ssl-headliners-stage" role="group" aria-roledescription="slide"
      aria-label={'Headline '+(index+1)+' of '+count} key={slide.id}>
      {slide.kind==='champion'?championContent:
@@ -104,13 +93,6 @@ export default function HomeHeadliners({slides,championContent,seasons,supabase,
    {count>1&&<nav className="ssl-headliners-controls" aria-label="Headline carousel controls">
      <button type="button" className="ssl-headliners-arrow" aria-label="Previous headline"
        onClick={prev}><ChevronLeft size={20}/></button>
-     <div className="ssl-headliners-dots" role="group" aria-label="Select headline">
-       {slides.slice(0,count).map((item,i)=><button key={item.id} type="button"
-         className={index===i?'active':''} aria-label={'Show headline '+(i+1)+' of '+count}
-         aria-current={index===i?'true':undefined} onClick={()=>setActive(i)}>
-         <span aria-hidden="true"/>
-       </button>)}
-     </div>
      <span className="ssl-headliners-count">{index+1} / {count}</span>
      <button type="button" className="ssl-headliners-arrow" aria-label="Next headline"
        onClick={next}><ChevronRight size={20}/></button>
