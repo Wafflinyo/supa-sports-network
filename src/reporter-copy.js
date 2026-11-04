@@ -167,15 +167,15 @@ export function reporterParagraph(person,id,categories,game,teamId,opponent,team
       ],
       masterclass:[
         prefix+' put on a pitching masterclass, finishing with '+line+'.',
-        prefix+' dominated on the mound with '+line+'.',
+        prefix+' baffled hitters with '+line+'.',
         prefix+' was brilliant on the hill, compiling '+line+'.',
         prefix+' turned in an outstanding pitching performance with '+line+'.',
         prefix+' took command of the mound, delivering '+line+'.',
       ],
       strong:[
         prefix+' turned in an impressive pitching outing with '+line+'.',
-        prefix+' showed command on the mound, logging '+line+'.',
-        prefix+' had a strong day on the hill, finishing with '+line+'.',
+        prefix+' showed sharp command, logging '+line+'.',
+        prefix+' handled the opposition well, finishing with '+line+'.',
         prefix+' delivered a quality pitching performance with '+line+'.',
         prefix+' gave the team a strong outing on the mound, recording '+line+'.',
       ],
@@ -190,7 +190,7 @@ export function reporterParagraph(person,id,categories,game,teamId,opponent,team
         prefix+' kept opposing hitters in check, finishing with '+line+'.',
         prefix+' limited the damage from the mound with '+line+'.',
         prefix+' logged a steady pitching outing with '+line+'.',
-        prefix+' held things together from the pitching rubber with '+line+'.',
+        prefix+' kept the outing under control with '+line+'.',
         prefix+' provided reliable innings with '+line+'.',
       ],
     };
