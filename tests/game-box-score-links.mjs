@@ -26,7 +26,7 @@ for(const report of preseasonGames){
 }
 const hopedogo=preseasonGames.find(g=>g.gameId==='PSR1 Hopedogo @ Voidstriders');
 const hopedogoBox=preseasonBoxScore(hopedogo);
-assert.equal(hopedogoBox.teams[0].totalGamePoints,648);
+assert.equal(hopedogoBox.teams[0].totalGamePoints,658);
 assert.equal(hopedogoBox.teams[1].totalGamePoints,409);
 assert.equal(hopedogoBox.teams[0].players.find(p=>p.playerId===57).mvp,true);
 const tanks=preseasonBoxScore(preseasonGames.find(g=>g.gameId==='PSR1 Fuggetaboudits @ Tanks'));

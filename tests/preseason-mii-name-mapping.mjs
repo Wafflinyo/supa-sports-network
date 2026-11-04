@@ -38,7 +38,7 @@ assert.equal(agg.stats.gamesPlayed,1);
 assert.equal(agg.stats.tgp,59.5);
 const pangolins=preseasonTeamStats().find(t=>t.teamName==='Petalburg Pangolins');
 assert.ok(pangolins);
-assert.equal(pangolins.stats.tgp,506.5,'Correcting player identity must not change team points');
+assert.equal(pangolins.stats.tgp,516.5,'Correcting player identity must not change team points');
 const preseasonUI=readFileSync(new URL('../src/PreseasonStats.jsx',import.meta.url),'utf8');
 const bracketUI=readFileSync(new URL('../src/SeasonPreseason.jsx',import.meta.url),'utf8');
 assert.match(preseasonUI,/byId\.get\(String\(row\.playerId\)\)\?\.name\|\|row\.playerName/);

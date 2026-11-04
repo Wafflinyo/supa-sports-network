@@ -11,6 +11,15 @@ export const SSL_GAME_SCORE_WEIGHTS=Object.freeze({
   completeGames:20,hrAllowed:-8,mvps:10,
   bobbles:-6,doublePlaysHitInto:-8,triplePlaysHitInto:-12
 });
+// One earned-run performance tier per pitcher who records at least 9 outs
+// (three full innings), independent of complete-game and shutout awards.
+export const SSL_THREE_INNING_EARNED_RUN_BONUSES=Object.freeze([12,10,8,6]);
+export function pitchingOutingBonus(stats={}){
+  const outs=Number(stats?.outs??0);
+  const earnedRuns=Number(stats?.earnedRuns??0);
+  if(!Number.isInteger(outs)||outs<9||!Number.isInteger(earnedRuns)||earnedRuns<0||earnedRuns>3)return 0;
+  return SSL_THREE_INNING_EARNED_RUN_BONUSES[earnedRuns];
+}
 export const SSL_HEATING_THRESHOLD=120;
 const round2=n=>Math.round((n+Number.EPSILON)*100)/100;
 export function customGameScore(stats,itemScore=0,shutoutBonus=0){
@@ -30,7 +39,8 @@ export function customGameScore(stats,itemScore=0,shutoutBonus=0){
     raw+=detail[key];
   }
   detail.shutoutBonus=bonus;
-  raw=round2(raw+item+bonus);
+  detail.pitchingOutingBonus=pitchingOutingBonus(stats);
+  raw=round2(raw+item+bonus+detail.pitchingOutingBonus);
   return {gameScore:raw,baseGameScore:round2(raw-item),
     itemScore:round2(item),rawScore:raw,detail,
     heatingUp:raw>=SSL_HEATING_THRESHOLD};
