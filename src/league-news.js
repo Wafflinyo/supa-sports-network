@@ -135,8 +135,7 @@ function reporterParagraph(person,id,categories,game,teamId,opponent,teamName,po
       walks?plural(walks,'walk'):null,
       hbp?plural(hbp,'hit by pitch','hit by pitches'):null,
     ].filter(Boolean));
-    if(pa>0)sentences.push((sentences.length?'They also':'')+
-      (sentences.length?' reached':' '+person+' reached').trimStart()+
+    if(pa>0)sentences.push((sentences.length?'The performance also included reaching':person+' reached')+
       ' base in all '+pa+' plate appearances'+(details?', with '+details:'')+'.');
   }
   if(!sentences.length)return null;
