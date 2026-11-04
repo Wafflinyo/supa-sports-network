@@ -15,18 +15,14 @@ function CardTitle({kicker,children,action}){
   return <div className="ssl-home-card-title"><div><small>{kicker}</small><h2>{children}</h2></div>{action}</div>;
 }
 function Matchup({season,game,onClick}){
-  const {awayName,homeName}=matchupDisplay(season,game);
-  const start=Date.parse(game.startsAt||'');
-  const date=Number.isFinite(start)
-    ?new Date(start).toLocaleString('en-US',{timeZone:'America/New_York',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})+' ET'
-    :'Date TBD';
+  const {awayName,homeName,stadium}=matchupDisplay(season,game);
   return <button type="button" className="ssl-home-match" onClick={onClick}
     aria-label={awayName+' at '+homeName}>
     <span className="ssl-home-match-line">
       <strong>{awayName}</strong><span className="ssl-home-at">@</span><strong>{homeName}</strong>
     </span>
     <span className="ssl-home-match-detail">
-      <span>{date}</span>
+      <span>{game.week?'WEEK '+game.week:''}{stadium?' · '+stadium:''}</span>
     </span>
   </button>;
 }
