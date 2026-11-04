@@ -1,4 +1,5 @@
 import {validLineup} from './season-data.js';
+import {homeWeekBoard} from './home-dashboard-data.js';
 // All lineup editors use the SAME official defaults and scheduled-game storage.
 // No separate GM roster cache: changes saved here appear on the Schedule page.
 export function effectiveGameLineup(season,team,game){
@@ -6,27 +7,27 @@ export function effectiveGameLineup(season,team,game){
 }
 export function gameLineupIsEditable(season,team,game){
   return Boolean(season?.schedulePublished &&
-    ['regular','postseason'].includes(season.status) &&
+    ['postdraft','regular','postseason'].includes(season.status) &&
     game && ['scheduled','live'].includes(game.stage) &&
     !game.lockedAt && [game.away,game.home].includes(team));
 }
-// Notify only for genuinely upcoming, dated fixtures in an active season.
-// Published schedules can contain months of TBD games; those are NOT lineup
-// deadlines and must never trigger the persistent GM action banner.
-export const GAME_LINEUP_REMINDER_WINDOW_MS=7*24*60*60*1000;
-export function upcomingLineupReminderGames(season,team,now=Date.now()){
-  if(!season?.schedulePublished||!['regular','postseason'].includes(season.status))return [];
-  return (season.games||[]).filter(game=>{
-    const kickoff=Date.parse(game?.startsAt||'');
-    return game.stage==='scheduled' &&
-      gameLineupIsEditable(season,team,game) &&
-      Number.isFinite(kickoff) && kickoff>now && kickoff<=now+GAME_LINEUP_REMINDER_WINDOW_MS &&
-      !validLineup(season,team,game.lineups?.[team]);
-  }).sort((a,b)=>Date.parse(a.startsAt)-Date.parse(b.startsAt));
+// The current notification matchup is EXACTLY the one displayed in the
+// homepage's Upcoming Matches board. No calendar date, clock or seven-day
+// deadline is involved. The board advances after the last public result of a
+// week, and unreleased reports never advance it.
+export function currentWeekLineupMatchup(season,team){
+  if(!season?.schedulePublished||!team)return null;
+  const board=homeWeekBoard(season);
+  if(board.week==null)return null;
+  const game=board.games.find(g=>
+    g.stage==='scheduled' &&
+    (String(g.away)===String(team)||String(g.home)===String(team)));
+  return game?{week:board.week,game}:null;
 }
 export function teamGameLineups(season,team){
   return [...(season?.games||[])].filter(g=>[g.away,g.home].includes(team))
-    .sort((a,b)=>new Date(a.startsAt).getTime()-new Date(b.startsAt).getTime());
+    .sort((a,b)=>Number(a.week||999)-Number(b.week||999)||
+      String(a.id).localeCompare(String(b.id)));
 }
 export function savedLineupLabel(season,team,game){
   if(game?.lineups?.[team] && validLineup(season,team,game.lineups[team]))return 'Game lineup submitted';
