@@ -85,3 +85,16 @@
  .ssl-headliner-scoreboard>div>span{font-size:11px}
 }
 @media(prefers-reduced-motion:reduce){.ssl-headliners-dots button>span{transition:none}}
+
+/* Collective game narratives expand in place instead of overflowing a slide. */
+.ssl-headline-story{min-width:0}
+.ssl-headline-story p{margin:0;color:inherit;line-height:1.5;overflow-wrap:anywhere}
+.ssl-headline-expand{display:inline;padding:1px 3px;border:0;background:transparent;color:#e4a900;
+ cursor:pointer;text-decoration:underline;font:inherit;font-weight:900;white-space:nowrap}
+.ssl-headline-expand:hover,.ssl-headline-expand:focus-visible{color:#ffd53b;outline:2px solid currentColor;outline-offset:2px}
+.ssl-home-news .ssl-headline-expand{color:#b81d31}
+.ssl-home-news .ssl-headline-expand:hover{color:#87122a}
+.ssl-headliner-expanded-story{max-height:225px;overflow-y:auto;overscroll-behavior:contain;padding-right:2px}
+.ssl-headliner-expanded-story p{font-size:12px;line-height:1.55;color:#ecf4ff}
+.ssl-home-news .ssl-headline-story{max-width:100%}
+@media(max-width:600px){.ssl-headliner-expanded-story{max-height:170px}}
