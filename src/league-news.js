@@ -154,7 +154,7 @@ export function leagueNews(seasons, players, {includeRecorded = false} = {}) {
       if (!(game.stage === 'final' || (includeRecorded && game.stage === 'recorded'))) continue;
       // Only released, score-verified matches qualify for the public headline
       // newsroom. Private staged reports are NEVER carousel candidates.
-      const story=matchHeadline(season,game,players);
+      const story=matchHeadline(season,game,players,{includeRecorded});
       if(story)items.push(story);
       if (!Array.isArray(game.result?.players))continue;
       const at = game.releasedAt || game.result.postedAt || game.startsAt;
