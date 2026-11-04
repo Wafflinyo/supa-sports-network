@@ -132,6 +132,8 @@
 .ssl-headliner-hot{display:inline-flex;align-items:center;justify-content:center;
  width:19px;min-width:19px;height:23px}
 .ssl-headliner-hot svg{width:100%;height:100%}
+@media(max-width:1220px){.ssl-headliner-side{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:800px){.ssl-home-layout .ssl-home-hero.ssl-headliner-match{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:600px){
  .ssl-headliner-logo-stage.matchup .ssl-headliner-crest.featured{height:72px;max-width:110px}
  .ssl-headliner-logo-stage.matchup .ssl-headliner-crest.featured img{height:72px}
