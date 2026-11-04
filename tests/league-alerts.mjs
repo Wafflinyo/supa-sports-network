@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {unseenLeagueAlertIds,acknowledgedLeagueAlertIds,displayedLeagueAlerts} from '../src/league-notification-state.js';
 import {buildLeagueAlerts,opponentScouting} from '../src/league-alerts.js';
 import {HEATING_UP_THRESHOLD} from '../src/heating-up.js';
 import {snapshotTeamSchedule,reconcileScheduleHistory} from '../src/schedule-change-alerts.js';
@@ -24,6 +26,11 @@ let alerts=buildLeagueAlerts({...args,season:post});
 assert(find(alerts,':default-lineup'), 'prompt for required default lineup');
 assert(find(alerts,':preseason-bracket'), 'announce completed draft bracket');
 assert.equal(find(alerts,':default-lineup').target.page,'GM Tools');
+const postDraftWithSavedDefault={...post,defaults:{a:lineupFor(roster)}};
+assert(!find(buildLeagueAlerts({...args,season:postDraftWithSavedDefault}),':default-lineup'),
+  'A saved valid default lineup suppresses the reminder even if needsDefault is stale');
+assert(find(buildLeagueAlerts({...args,season:{...post,needsDefault:[]}}),':default-lineup'),
+  'An invalid or missing default must still trigger the reminder even if the old flag is cleared');
 
 const previous={id:'previous',home:'a',away:'b',stage:'final',phase:'regular',
   startsAt:'2026-10-30T17:00:00Z',
@@ -52,6 +59,33 @@ assert.equal(noHistory.lineup,null,'do not use a changed default as last played 
 const submitted={...regular,games:[previous,{...upcoming,lineups:{...upcoming.lineups,a:lineupFor(roster)}}]};
 alerts=buildLeagueAlerts({...args,season:submitted});
 assert(!find(alerts,':game-lineup:upcoming'),'submission resolves the task automatically');
+const staleFlags={...submitted,needsDefault:['a']};
+const completed=buildLeagueAlerts({...args,season:staleFlags});
+assert(!find(completed,':default-lineup'),'Stale post-draft flag cannot keep a completed default-lineup task alive');
+assert(!find(completed,':game-lineup:upcoming'),'The GM-submitted matchup lineup no longer creates a task');
+// A bell opening must acknowledge all unread IDs at once, not require the
+// user to click an individual alert. Items are visible during that opening,
+// but do not return the next time the bell is opened.
+const priorRead=[];
+const atOpen=unseenLeagueAlertIds(completed,priorRead);
+assert(atOpen.length>0,'GM has at least one announcement to see after draft');
+const acknowledged=acknowledgedLeagueAlertIds(priorRead,atOpen);
+assert.deepEqual(unseenLeagueAlertIds(completed,acknowledged),[],
+  'Simply opening the bell immediately clears its unread badge');
+assert.equal(displayedLeagueAlerts(completed,atOpen).length,atOpen.length,
+  'Opening the panel still shows new messages so GMs can read them');
+assert.deepEqual(displayedLeagueAlerts(completed,unseenLeagueAlertIds(completed,acknowledged)),[],
+  'Closing and reopening the bell does not repeat acknowledged notifications');
+assert.deepEqual(acknowledgedLeagueAlertIds(acknowledged,atOpen),acknowledged,
+  'Reacknowledging a notification cannot produce duplicates');
+const newUpdate=[...completed,{id:'new-update',type:'announcement'}];
+assert.deepEqual(unseenLeagueAlertIds(newUpdate,acknowledged),['new-update'],
+  'A future new alert is still delivered after the user has viewed old ones');
+const bellSource=readFileSync(new URL('../src/LeagueNotifications.jsx',import.meta.url),'utf8');
+assert(bellSource.includes('aria-haspopup="true" onClick={toggleBell}'),
+  'Bell button must call the acknowledge-on-open handler, not just toggle visibility');
+assert.match(bellSource,/setVisibleIds\(unseen\);\s*markRead\(unseen\);\s*setOpen\(true\);/,
+  'The bell acknowledges all current alerts as soon as it is opened');
 const play={...regular,status:'postseason'};
 assert(find(buildLeagueAlerts({...args,season:play}),':playoff-bracket'),'announce playoff bracket');
 

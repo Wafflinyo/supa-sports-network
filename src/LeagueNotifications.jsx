@@ -1,6 +1,7 @@
 import React,{useEffect,useMemo,useRef,useState} from 'react';
-import {Bell,BellRing,CheckCheck,ChevronRight,Flame,Trophy,CalendarDays,ClipboardList,Newspaper,Handshake,Vote,Clock3,CheckCircle2} from 'lucide-react';
+import {Bell,BellRing,ChevronRight,Flame,Trophy,CalendarDays,ClipboardList,Newspaper,Handshake,Vote,Clock3,CheckCircle2} from 'lucide-react';
 import {buildLeagueAlerts} from './league-alerts.js';
+import {unseenLeagueAlertIds,acknowledgedLeagueAlertIds,displayedLeagueAlerts} from './league-notification-state.js';
 import {reconcileScheduleHistory} from './schedule-change-alerts.js';
 import {gameLineupIsEditable} from './roster-lineups.js';
 import {validLineup} from './season-data.js';
@@ -31,6 +32,9 @@ function AlertIcon({alert}){
 export default function LeagueNotifications({userId,league,newsItems=[],players=[],onNavigate}){
   const [open,setOpen]=useState(false);
   const [read,setRead]=useState([]);
+  // Preserve newly viewed alerts for this one open panel, but don't show
+  // already acknowledged alerts again after the bell is closed.
+  const [visibleIds,setVisibleIds]=useState([]);
   const [saving,setSaving]=useState('');
   const [scheduleChanges,setScheduleChanges]=useState([]);
   const ref=useRef(null);
@@ -41,7 +45,7 @@ export default function LeagueNotifications({userId,league,newsItems=[],players=
     season,myTeam:league.myTeam,role:league.access.role,now:league.now,
     inbox:league.inbox,newsItems,players,scheduleChanges,
   }),[season,league.myTeam,league.access.role,league.now,league.inbox,newsItems,players,scheduleChanges]);
-  useEffect(()=>{setRead(readStored(key));setOpen(false);setScheduleChanges(getStoredObject(scheduleKey)?.history||[])},[key,scheduleKey]);
+  useEffect(()=>{setRead(readStored(key));setOpen(false);setVisibleIds([]);setScheduleChanges(getStoredObject(scheduleKey)?.history||[])},[key,scheduleKey]);
   useEffect(()=>{
     if(!scheduleKey||!season?.schedulePublished||!league.myTeam?.id||league.access.role!=='gm')return;
     const stored=getStoredObject(scheduleKey);
@@ -61,18 +65,35 @@ export default function LeagueNotifications({userId,league,newsItems=[],players=
     document.addEventListener('keydown',escape);
     return ()=>{document.removeEventListener('pointerdown',outside);document.removeEventListener('keydown',escape)};
   },[open]);
-  if(!userId || !['gm','commissioner'].includes(league.access.role))return null;
   const seen=new Set(read);
-  const unread=alerts.filter(a=>!seen.has(a.id)).length;
+  const unseen=unseenLeagueAlertIds(alerts,read);
+  const unread=unseen.length;
+  const visible=displayedLeagueAlerts(alerts,visibleIds);
   const markRead=(ids)=>{
-    if(!key)return;
+    if(!key||!ids.length)return;
     setRead(previous=>{
-      const next=[...new Set([...previous,...ids])].slice(-300);
+      const next=acknowledgedLeagueAlertIds(previous,ids);
       try{window.localStorage.setItem(key,JSON.stringify(next))}catch{}
       return next;
     });
   };
-  const visit=alert=>{markRead([alert.id]);setOpen(false);onNavigate(alert.target)};
+  const toggleBell=()=>{
+    if(open){setOpen(false);return;}
+    // Opening the bell itself acknowledges every currently unread alert.
+    // Keep those alerts visible for this opening so the GM can read them.
+    setVisibleIds(unseen);
+    markRead(unseen);
+    setOpen(true);
+  };
+  // Any new league alert received while the panel is already open is also
+  // visible and acknowledged; it must not leave a phantom unread badge.
+  useEffect(()=>{
+    if(!open||!unseen.length)return;
+    setVisibleIds(previous=>[...new Set([...previous,...unseen])]);
+    markRead(unseen);
+  },[open,key,alerts,read]);
+  if(!userId || !['gm','commissioner'].includes(league.access.role))return null;
+  const visit=alert=>{setOpen(false);onNavigate(alert.target)};
   const useDefault=async alert=>{
     const game=season?.games?.find(g=>String(g.id)===String(alert.gameId));
     const team=league.myTeam?.id;
@@ -88,18 +109,17 @@ export default function LeagueNotifications({userId,league,newsItems=[],players=
   };
   return <div className="ssl-alert-root" ref={ref}>
     <button type="button" className="ssl-alert-bell" aria-label={unread?'Notifications, '+unread+' unread':'Notifications'}
-      aria-expanded={open} aria-haspopup="true" onClick={()=>setOpen(v=>!v)}>
+      aria-expanded={open} aria-haspopup="true" onClick={toggleBell}>
       {unread?<BellRing size={25}/>:<Bell size={25}/>}
       {unread>0&&<span className="ssl-alert-badge" aria-hidden="true">{unread>99?'99+':unread}</span>}
     </button>
     {open&&<div className="ssl-alert-popover" role="region" aria-label="League notifications">
       <div className="ssl-alert-head">
-        <div><small>SLUGGERS SUPA LEAGUE</small><h2>NOTIFICATIONS</h2><p>{unread?unread+' unread alert'+(unread===1?'':'s'):'You are caught up!'}</p></div>
-        {unread>0&&<button type="button" onClick={()=>markRead(alerts.map(a=>a.id))} className="ssl-alert-read"><CheckCheck size={16}/> MARK ALL READ</button>}
+        <div><small>SLUGGERS SUPA LEAGUE</small><h2>NOTIFICATIONS</h2><p>{visible.length?visible.length+' new alert'+(visible.length===1?'':'s')+' viewed':'You are caught up!'}</p></div>
       </div>
       <div className="ssl-alert-list">
-        {alerts.length===0?<p className="ssl-alert-empty">No active alerts. New draft, schedule, lineup and league news updates will appear here.</p>:
-        alerts.map(alert=><div className={'ssl-alert-entry '+(!seen.has(alert.id)?'is-unread ':'')+alert.type} key={alert.id}>
+        {visible.length===0?<p className="ssl-alert-empty">No new notifications. Draft, schedule, lineup and league updates will appear here when they arrive.</p>:
+        visible.map(alert=><div className={'ssl-alert-entry '+(!seen.has(alert.id)?'is-unread ':'')+alert.type} key={alert.id}>
           <button type="button" className="ssl-alert-target" onClick={()=>visit(alert)}>
             <span className="ssl-alert-icon"><AlertIcon alert={alert}/></span>
             <span className="ssl-alert-info">
@@ -117,7 +137,7 @@ export default function LeagueNotifications({userId,league,newsItems=[],players=
           </div>}
         </div>)}
       </div>
-      <div className="ssl-alert-foot">Alerts update with the league. Read status is saved on this device.</div>
+      <div className="ssl-alert-foot">Opening the bell acknowledges new alerts. Viewed alerts disappear after you close it. Read status is saved on this device.</div>
     </div>}
   </div>;
 }
