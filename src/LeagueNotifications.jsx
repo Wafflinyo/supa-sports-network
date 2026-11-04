@@ -1,6 +1,7 @@
 import React,{useEffect,useMemo,useRef,useState} from 'react';
 import {Bell,BellRing,ChevronRight,Flame,Trophy,CalendarDays,ClipboardList,Newspaper,Handshake,Vote,Clock3,CheckCircle2} from 'lucide-react';
 import {buildLeagueAlerts} from './league-alerts.js';
+import {unseenLeagueAlertIds,acknowledgedLeagueAlertIds,displayedLeagueAlerts} from './league-notification-state.js';
 import {reconcileScheduleHistory} from './schedule-change-alerts.js';
 import {gameLineupIsEditable} from './roster-lineups.js';
 import {validLineup} from './season-data.js';
@@ -65,13 +66,13 @@ export default function LeagueNotifications({userId,league,newsItems=[],players=
     return ()=>{document.removeEventListener('pointerdown',outside);document.removeEventListener('keydown',escape)};
   },[open]);
   const seen=new Set(read);
-  const unseen=alerts.filter(a=>!seen.has(a.id)).map(a=>a.id);
+  const unseen=unseenLeagueAlertIds(alerts,read);
   const unread=unseen.length;
-  const visible=alerts.filter(a=>visibleIds.includes(a.id));
+  const visible=displayedLeagueAlerts(alerts,visibleIds);
   const markRead=(ids)=>{
     if(!key||!ids.length)return;
     setRead(previous=>{
-      const next=[...new Set([...previous,...ids])].slice(-300);
+      const next=acknowledgedLeagueAlertIds(previous,ids);
       try{window.localStorage.setItem(key,JSON.stringify(next))}catch{}
       return next;
     });
