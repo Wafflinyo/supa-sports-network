@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {leagueNews} from '../src/league-news.js';
+import {reporterParagraph} from '../src/reporter-copy.js';
 
 const players=[
   {id:1,name:'Blue Kritter'},
@@ -54,4 +55,17 @@ assert.doesNotMatch(defeat.summary,/close win/i);
 const published=groupOf(leagueNews([makeSeason('final')],players));
 assert.equal(published.private,false,'Only finalized posts become public');
 assert.equal(published.summary,grouped.summary,'Private and published copy must match');
-console.log('PASS: natural home-run/fielding reporting, loss context, private previews and grouped paragraphs');
+// Same-category writeups must rotate naturally instead of all saying
+// "made their presence felt"; different games also get stable variation.
+const repeated=(position,gameId)=>reporterParagraph('Red Yoshi',2,['defense'],{
+ ...makeSeason().games[0],id:gameId
+},'away',home,away,position);
+const teammateStyles=Array.from({length:6},(_,i)=>repeated(i,'variation-test'));
+assert(teammateStyles.every(Boolean));
+assert(new Set(teammateStyles.map(v=>v.split('.')[0])).size>=5,
+  'Same-game defensive standouts should have distinct opening sentences');
+const acrossGames=Array.from({length:10},(_,i)=>repeated(0,'different-game-'+i));
+assert(new Set(acrossGames.map(v=>v.split('.')[0])).size>=3,
+  'Different games should rotate defensive headlines');
+assert(teammateStyles.every(v=>!v.includes('made their presence felt')));
+console.log('PASS: natural copy, varied fielding and loss narratives, private news and separate player paragraphs');
