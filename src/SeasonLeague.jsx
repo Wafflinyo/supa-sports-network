@@ -17,7 +17,7 @@ import {supportsStadiumVariant,matchupStadiumVariant} from './stadium-lighting.j
 import DraftChat from './DraftChat.jsx';
 import {heatingUpForSeason,HEATING_UP_THRESHOLD} from './heating-up.js';
 import {gamePointsForReport} from './game-points.js';
-import {effectiveGameLineup,gameLineupIsEditable,teamGameLineups,savedLineupLabel,gameLineupSubmissionStatus,upcomingLineupReminderGames} from './roster-lineups.js';
+import {effectiveGameLineup,gameLineupIsEditable,teamGameLineups,savedLineupLabel,gameLineupSubmissionStatus} from './roster-lineups.js';
 import {
   SeasonRuleControls,
   PublicBallots,
@@ -331,69 +331,6 @@ export function SeasonFeedback({ league }) {
     </>
   );
 }
-export function SeasonPrompts({ league, go }) {
-  const { s: unused, ...l } = league,
-    s = l.season,
-    t = l.myTeam;
-  if (!s || !t || !["gm", "commissioner"].includes(l.access.role)) return null;
-  const under =
-      rosterOf(s, t.id).length < 11 &&
-      ["postdraft", "regular", "postseason", "retention"].includes(s.status),
-    needs =
-      ["postdraft", "regular", "postseason", "retention"].includes(s.status) &&
-      !validLineup(s, t.id, s.defaults?.[t.id]),
-    upcoming = upcomingLineupReminderGames(s, t.id, l.now)[0] || null;
-  const pending = l.inbox.filter(
-    (o) =>
-      ["pending", "ready"].includes(o.status) && !o.accepted.includes(t.id),
-  ).length;
-  if (!under && !needs && !upcoming && !pending) return null;
-  return (
-    <aside className="season-prompt" aria-label="Team actions required">
-      <strong>{t.name}: ACTIONS NEEDED</strong>
-      {under ? (
-        <>
-          <p>
-            Your roster has {rosterOf(s, t.id).length} players. Add free agents
-            or randomly fill to 11 before updating your lineup.
-          </p>
-          <button className="red-btn" onClick={() => go("Free Agency")}>
-            PICK UP PLAYERS
-          </button>
-          <button
-            className="outline-btn"
-            disabled={l.busy}
-            onClick={() => l.act("random_fill", { team: t.id })}
-          >
-            RANDOM FILL TO 11
-          </button>
-        </>
-      ) : needs ? (
-        <>
-          <p>Update your default lineup after the draft or roster change.</p>
-          <button className="red-btn" onClick={() => go(l.access.role === "commissioner" ? "Commissioner Tools" : "GM Tools", "Roster")}>
-            SET DEFAULT LINEUP
-          </button>
-        </>
-      ) : upcoming ? (
-        <>
-          <p>
-            Submit a lineup for your upcoming game on {time(upcoming.startsAt)},
-            or choose your default.
-          </p>
-          <button className="red-btn" onClick={() => go(l.access.role === "commissioner" ? "Schedule" : "GM Tools", "Roster")}>
-            GAME LINEUP
-          </button>
-        </>
-      ) : null}
-      {pending > 0 && (
-        <button className="outline-btn" onClick={() => go("Messages")}>
-          {pending} TRADE OFFER{pending === 1 ? "" : "S"} NEED A RESPONSE
-        </button>
-      )}
-    </aside>
-  );
-}
 export function SeasonWorkspace({ league, registeredTeams }) {
   const l = league,
     s = l.season,
@@ -559,35 +496,14 @@ export function SeasonWorkspace({ league, registeredTeams }) {
                   </form>
                 </Box>
               )}
-              {s.status === "postdraft" && (
-                <Box title="OPENING DAY">
-                  <p>
-                    Finish all default lineups, enter and publish the schedule,
-                    then start the regular season.
-                  </p>
-                  <button
-                    className="red-btn"
-                    disabled={l.busy}
-                    onClick={() => l.act("start_season")}
-                  >
-                    START REGULAR SEASON
-                  </button>
+              {s.status === "preseason" && (
+                <Box title="PRESEASON">
+                  <p>Complete the preseason tournament and publish the regular-season schedule. When all 11 preseason results are officially released and every team has a saved default lineup, SSL automatically begins the regular season. No dates or times are needed.</p>
                 </Box>
               )}
               {s.status === "regular" && (
-                <Box title="POSTSEASON">
-                  <p>
-                    All regular-season games must have results first. Enter
-                    playoff games in Schedule & Results after opening the
-                    postseason.
-                  </p>
-                  <button
-                    className="red-btn"
-                    disabled={l.busy}
-                    onClick={() => l.act("postseason")}
-                  >
-                    OPEN POSTSEASON
-                  </button>
+                <Box title="REGULAR SEASON">
+                  <p>Upload Project Rio reports privately in Schedule &amp; Results, preview them, then release them when ready. After all 132 regular-season results are public, SSL moves to the postseason automatically.</p>
                 </Box>
               )}
               {s.status === "postseason" && (
@@ -702,7 +618,7 @@ function DraftRoomEntrance({season,now,open,entered,onEnter,onLeave}){
   const lotterySoon=['countdown','curtain-opening','final-countdown'].includes(lotteryStatus.phase);
   const lotteryDate=season?.lotteryAt;
   const hasDate=Boolean(season?.draftAt && remaining);
-  const finished=Boolean(season && ['postdraft','regular','postseason','retention','offseason','archived'].includes(season.status));
+  const finished=Boolean(season && ['preseason','regular','postseason','retention','offseason','archived'].includes(season.status));
   const started=hasDate&&remaining.remaining===0;
   const status=!hasDate?'DATE NOT SCHEDULED':finished?'DRAFT COMPLETED':started?'DRAFT IN PROGRESS':'COUNTDOWN TO THE DRAFT';
   return <section className={'ssl-draft-room-gateway'+(entered?' ssl-gateway-inside':'')} aria-label="Official draft date and entry">
@@ -816,7 +732,7 @@ function Draft({ league: l }) {
       <h2>DRAFT DATE TO BE ANNOUNCED</h2>
       <p>The commissioner will set the season and official draft date in Commissioner Tools.</p>
     </section>;
-  const open = ['drafting','postdraft','regular','postseason','retention','offseason','archived'].includes(s.status) ||
+  const open = ['drafting','preseason','regular','postseason','retention','offseason','archived'].includes(s.status) ||
     (s.draftAt && l.now >= new Date(s.draftAt).getTime() - 3600000),
     next = s.picks.length,
     owner = s.nextPick?.team,
@@ -842,7 +758,7 @@ function Draft({ league: l }) {
           s.status === "drafting"
             ? `ON THE CLOCK: ${t?.name || ""}`
             : [
-                  "postdraft",
+                  "preseason",
                   "regular",
                   "postseason",
                   "retention",
@@ -926,7 +842,7 @@ function Draft({ league: l }) {
         {l.access.role === "commissioner" &&
           s.picks.length > 0 &&
           !s.tradingOpen &&
-          ["drafting", "postdraft"].includes(s.status) && (
+          ["drafting", "preseason"].includes(s.status) && (
             <button
               className="outline-btn"
               disabled={l.busy}
@@ -939,7 +855,7 @@ function Draft({ league: l }) {
             </button>
           )}
         {[
-          "postdraft",
+          "preseason",
           "regular",
           "postseason",
           "retention",
@@ -1123,7 +1039,7 @@ function OpponentScout({season,team,game}){
   return <aside className="ssl-scouting-panel" aria-label={'Matchup scouting for '+opponentName}>
     <h4>YOUR UPCOMING MATCHUP</h4>
     <p className="ssl-scouting-context">{match.awayName} @ {match.homeName}</p>
-    <p><strong>{String(game.home)===String(team)?'HOME':'AWAY'} GAME</strong> · {match.stadium || 'Stadium TBD'} · {game.startsAt ? time(game.startsAt) : 'Date TBD'}</p>
+    <p><strong>{String(game.home)===String(team)?'HOME':'AWAY'} GAME</strong> · {match.stadium || 'Stadium TBD'}{game.week?' · WEEK '+game.week:''}</p>
     <p>Your opponent is <strong>{opponentName}</strong>. Their planned lineup for this upcoming game stays private.</p>
     <h4>{opponentName.toUpperCase()} · CURRENT ROSTER ({roster.length})</h4>
     <div className="ssl-scouting-roster">{roster.map(id=><span key={id}>{name(id)}</span>)}</div>
@@ -1152,7 +1068,7 @@ export function RosterManager({ league: l, focus=null }) {
   if(!s)return <Box title="ROSTER"><p>No season has been created yet. Team rosters will appear after the draft starts.</p></Box>;
   const chosen=s.teams.find(t=>t.id===team);
   const roster=team?rosterOf(s,team):[];
-  const playable=['postdraft','regular','postseason','retention'].includes(s.status)&&!s.offseasonTrading;
+  const playable=['preseason','regular','postseason','retention'].includes(s.status)&&!s.offseasonTrading;
   const canEditDefault=playable && roster.length>=11;
   const hasDefault=team&&validLineup(s,team,s.defaults?.[team]);
   const fixtures=team?teamGameLineups(s,team):[];
@@ -1197,7 +1113,7 @@ export function RosterManager({ league: l, focus=null }) {
             return <section className="roster-fixture ssl-roster-notification-focus" id={'ssl-game-lineup-'+g.id} key={g.id}>
               <div className="roster-fixture-heading">
                 <div><h3>{g.away===team?'VS':'AT'} {opponent?.name||'Opponent'}</h3>
-                <p>{time(g.startsAt)} · {g.stage.toUpperCase()} · <strong>{gameLineupSubmissionStatus(s,team,g).label}</strong></p></div>
+                <p>{g.week?'WEEK '+g.week+' · ':''}{g.stage.toUpperCase()} · <strong>{gameLineupSubmissionStatus(s,team,g).label}</strong></p></div>
                 {editable&&<button type="button" className="outline-btn" aria-expanded={active} onClick={()=>setEditingGame(active?null:g.id)}>{active?'CLOSE EDITOR':g.lineups?.[team]?'EDIT GAME LINEUP':'SUBMIT GAME LINEUP'}</button>}
               </div>
               {!active&&existing?.starters?.length>0&&<details><summary>VIEW LINEUP ON SCHEDULE</summary>{existing.starters.map((p,i)=><p key={i}>{i+1}. {name(p.player)} · {p.position}</p>)}<p><strong>Bench:</strong> {existing.bench?.map(name).join(' · ')||'None'}</p></details>}
@@ -1301,29 +1217,13 @@ function ScheduleMatchupHeading({season,game}){
           {matchupStadiumVariant(season,game)?.toUpperCase()||'DAY/NIGHT TBD'}
         </span>
       </>}
-      <span className="ssl-matchup-separator" aria-hidden="true">•</span>
-      <time dateTime={game.startsAt||undefined} className="ssl-matchup-game-time">{game.startsAt?time(game.startsAt):"DATE & TIME TBD"}</time>
+
     </p>
-  </div>;
-}
-function GameDateEditor({league:l,game:g}){
-  const s=l.season;
-  const [date,setDate]=useState('');
-  const [open,setOpen]=useState(false);
-  const canSet=['postdraft','regular'].includes(s.status)&&g.phase==='regular'&&g.stage==='scheduled'&&!g.lockedAt;
-  if(!canSet)return null;
-  return <div className="game-date-editor">
-    <button type="button" className={g.startsAt?'outline-btn':'red-btn'} onClick={()=>setOpen(v=>!v)} aria-expanded={open}>{open?'CLOSE DATE EDITOR':g.startsAt?'CHANGE GAME DATE & TIME':'SET GAME DATE & TIME'}</button>
-    {open&&<form className="season-form" onSubmit={async e=>{e.preventDefault();if(!date)return;const start=new Date(date);if(!Number.isFinite(start.getTime()))return;const ok=await l.act('set_matchup_time',{game:g.id,startsAt:start.toISOString()});if(ok){setOpen(false);setDate('')}}}>
-      <p><strong>Week {g.week}</strong> · Enter the actual matchup date and time in your device's timezone. It will display in Eastern Time.</p>
-      <label>Matchup date and time<input type="datetime-local" required value={date} onChange={e=>setDate(e.target.value)}/></label>
-      <button className="red-btn" disabled={!date||l.busy}>SAVE MATCHUP DATE</button>
-    </form>}
   </div>;
 }
 function Schedule({ league: l, commissioner = false }) {
   const s = l.season,
-    [form, setForm] = useState({ away: "", home: "", startsAt: "", label: "" }),
+    [form, setForm] = useState({ away: "", home: "", label: "" }),
     [editing, setEditing] = useState(null),
     [reportGame, setReportGame] = useState(null),
     [boxGameId, setBoxGameId] = useState(null),
@@ -1343,7 +1243,9 @@ function Schedule({ league: l, commissioner = false }) {
       String(a.id).localeCompare(String(b.id))
     );
   const selectedBoxGame=boxGameId==null?null:s.games.find(g=>String(g.id)===String(boxGameId));
-  const currentBoxScore=selectedBoxGame?seasonBoxScore(s,selectedBoxGame):null;
+  const currentBoxScore=selectedBoxGame?seasonBoxScore(s,selectedBoxGame.stage==='recorded'&&admin
+    ?{...selectedBoxGame,stage:'final',label:'COMMISSIONER PRIVATE PREVIEW · '+(selectedBoxGame.label||'GAME REPORT')}
+    :selectedBoxGame):null;
   const selectedReportGame=reportGame==null?null:s.games.find(g=>String(g.id)===String(reportGame));
   return (
     <>
@@ -1359,10 +1261,10 @@ function Schedule({ league: l, commissioner = false }) {
               if (
                 await l.act("schedule", {
                   ...form,
-                  startsAt: iso(form.startsAt),
+                  startsAt: null,
                 })
               )
-                setForm({ ...form, startsAt: "", label: "" });
+                setForm({ ...form, label: "" });
             }}
           >
             {s.status === "postseason" && (
@@ -1413,15 +1315,7 @@ function Schedule({ league: l, commissioner = false }) {
                 label="Home team"
               />
             </div>
-            <label>
-              Game time (your device timezone)
-              <input
-                required
-                type="datetime-local"
-                value={form.startsAt}
-                onChange={(e) => setForm({ ...form, startsAt: e.target.value })}
-              />
-            </label>
+
             {s.status === "postseason" && (
               <label>
                 Playoff round
@@ -1464,8 +1358,8 @@ function Schedule({ league: l, commissioner = false }) {
           </form>
           <p>
             {s.schedulePublished
-              ? "The schedule is public, including Date TBD matchups. Date edits appear automatically."
-              : "Publish generated matchups publicly now, even if every date is TBD."}
+              ? "The weekly matchups are public. Uploaded game reports stay private until officially released."
+              : "Publish the weekly matchups without any dates or times."}
           </p>
         </Box>
       )}
@@ -1527,7 +1421,7 @@ function Schedule({ league: l, commissioner = false }) {
                   {g.lineups[team] ? "EDIT SUBMITTED" : "SUBMIT"} LINEUP
                 </button>
               )}
-            {admin && <GameDateEditor league={l} game={g}/>}
+
             {admin && (
               <div className="season-inline">
                 <button
@@ -1543,41 +1437,12 @@ function Schedule({ league: l, commissioner = false }) {
                     ? "REPLACE / CORRECT REPORT"
                     : "UPLOAD PROJECT RIO XLSX & LOCK LINEUPS"}
                 </button>
+                {g.stage==='recorded'&&g.result?.scores&&
+                  <button type="button" className="outline-btn" onClick={()=>setBoxGameId(g.id)}>
+                    PREVIEW PRIVATE GAME REPORT
+                  </button>}
                 {!["final", "cancelled"].includes(g.stage) && (
                   <BroadcastControls league={l} game={g} />
-                )}
-                {g.stage === "scheduled" && (
-                  <details>
-                    <summary>RESCHEDULE GAME</summary>
-                    <form
-                      className="season-form"
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        const f = new FormData(e.currentTarget);
-                        l.act("reschedule", {
-                          game: g.id,
-                          startsAt: iso(f.get("time")),
-                          label: f.get("label"),
-                        });
-                      }}
-                    >
-                      <label>
-                        New game time
-                        <input name="time" required type="datetime-local" />
-                      </label>
-                      <label>
-                        Game label
-                        <input
-                          name="label"
-                          defaultValue={g.label}
-                          maxLength={80}
-                        />
-                      </label>
-                      <button className="outline-btn" disabled={l.busy}>
-                        SAVE NEW GAME TIME
-                      </button>
-                    </form>
-                  </details>
                 )}
                 <details>
                   <summary>VIEW LINEUPS & SUBMISSION STATUS</summary>
@@ -2331,7 +2196,7 @@ function FreeAgency({ league: l }) {
       ["gm", "commissioner"].includes(l.access.role) &&
       team &&
       s &&
-      ["postdraft", "regular", "postseason", "retention"].includes(s.status);
+      ["preseason", "regular", "postseason", "retention"].includes(s.status);
   return (
     <>
       <Box title="FREE AGENCY">
@@ -2781,7 +2646,7 @@ export function SeasonHome({ league: l, go }) {
         {upcoming.map((g) => (
           <p key={g.id}>
             {s.teams.find((t) => t.id === g.away)?.name} at{" "}
-            {s.teams.find((t) => t.id === g.home)?.name} · {time(g.startsAt)}
+            {s.teams.find((t) => t.id === g.home)?.name}{g.week?' · Week '+g.week:''}
           </p>
         ))}
         {finals.map((g) => (
