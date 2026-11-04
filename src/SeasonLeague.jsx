@@ -1534,7 +1534,8 @@ function ReportImport({ league: l, game, onDone }) {
         Heating Up at {HEATING_UP_THRESHOLD}+. Pitching receives +3 per
         inning pitched (including partial innings), +15 per strikeout,
         +0.5 per strike, +0.25 per pitch, -3 per earned run, -8 per
-        HR allowed and +20 for a complete game without a solo shutout.
+        HR allowed, -0.5 per hit allowed, -2 per walk allowed, -2 per
+        bean ball, and +20 for a complete game without a solo shutout.
         Pitchers with 3+ innings earn a nonstacking bonus for earned
         runs allowed: 0 = +12, 1 = +10, 2 = +8, 3 = +6.
         A solo-pitcher shutout earns +30 pitching Game Points instead
