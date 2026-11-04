@@ -81,7 +81,7 @@ assert(badge.includes('if(!draftPedigreeVisible(seasons))return null;'),
 assert.equal(draftPedigreeVisible([season1]),false,'drafting season hides pedigree');
 assert.equal(draftPedigreeVisible([{...season1,status:'scheduled'}]),false,
   'scheduled draft never exposes draft badges');
-assert.equal(draftPedigreeVisible([{...season1,status:'postdraft'}]),true,
+assert.equal(draftPedigreeVisible([{...season1,status:'preseason'}]),true,
   'pedigree appears immediately when the draft concludes');
 assert.equal(draftPedigreeVisible([season2,{...season1,status:'archived'}]),true,
   'completed seasons keep original draft pedigree');

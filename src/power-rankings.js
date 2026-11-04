@@ -319,7 +319,7 @@ function playedRecord(season,teamId){
   return {wins,losses,games,form};
 }
 export function powerRankings(season){
-  if(!season || !['postdraft','regular','postseason','retention','offseason','archived'].includes(season.status) ||
+  if(!season || !['preseason','regular','postseason','retention','archived'].includes(season.status) ||
     season.teams?.length!==12)return [];
   return season.teams.filter(team=>
     rankingParticipants(season,team.id).length===9).map(team=>{

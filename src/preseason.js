@@ -4,7 +4,7 @@ import {isSeasonOne} from './preseason-season-identity.js';
 // Times are already ACTIVE elapsed seconds from the SSL draft server; periods
 // when the commissioner paused the pick timer are excluded by that server.
 const roundNames=['ROUND OF 12','ROUND OF 6','SEMIFINAL','CHAMPIONSHIP'];
-const finishedStates=new Set(['postdraft','regular','postseason','retention','offseason','archived']);
+const finishedStates=new Set(['preseason','regular','postseason','retention','offseason','archived']);
 
 export function preseasonReady(season){
   return !!season && finishedStates.has(season.status) && season.teams?.length===12 &&

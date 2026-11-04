@@ -1,76 +1,72 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {upcomingLineupReminderGames,GAME_LINEUP_REMINDER_WINDOW_MS} from '../src/roster-lineups.js';
+import {homeWeekBoard} from '../src/home-dashboard-data.js';
+import {currentWeekLineupMatchup} from '../src/roster-lineups.js';
 import {buildLeagueAlerts} from '../src/league-alerts.js';
+import {unseenLeagueAlertIds,acknowledgedLeagueAlertIds} from '../src/league-notification-state.js';
 
-// Regression for Diamond City Checkers: 14 players, saved default, 22 public
-// regular-season matchups with TBD dates and some explicitly submitted lineups.
-const now=Date.parse('2026-11-04T03:00:00Z');
-const date=delta=>new Date(now+delta).toISOString();
 const positions=['P','C','1B','2B','3B','SS','LF','CF','RF'];
 const roster=Array.from({length:14},(_,i)=>i+1);
 const valid={starters:roster.slice(0,9).map((player,i)=>({player,position:positions[i]})),bench:roster.slice(9)};
 const team={id:'checkers',name:'Diamond City Checkers'};
-const games=Array.from({length:22},(_,i)=>({
-  id:'g'+(i+1),phase:'regular',stage:'scheduled',away:'checkers',home:'other',
+const opponents=Array.from({length:6},(_,i)=>({id:'o'+i,name:'Opponent '+i}));
+const games=Array.from({length:22},(_,week)=>Array.from({length:6},(_,i)=>({
+  id:'w'+(week+1)+'-'+i,phase:'regular',week:week+1,
+  stage:'scheduled',away:i===0?'checkers':'o'+i,home:'o0',
   startsAt:null,lineups:{},lineupSubmission:{},
-}));
-games[0].lineups.checkers=structuredClone(valid);
-games[0].lineupSubmission.checkers={source:'default',by:'gm'};
-games[1].lineups.checkers=structuredClone(valid);
-const postdraft={
-  id:'season-1',status:'postdraft',schedulePublished:true,
-  teams:[team,{id:'other',name:'Opponent'}],
-  rosters:{checkers:roster},defaults:{checkers:valid},
-  games,needsDefault:['checkers'],picks:[],order:[],
+}))).flat();
+const season={
+  id:'season-1',status:'regular',schedulePublished:true,
+  teams:[team,...opponents],rosters:{checkers:roster},
+  defaults:{checkers:valid},games,needsDefault:[],
 };
-const args={season:postdraft,myTeam:team,role:'gm',now};
-const noGameAlert=season=>buildLeagueAlerts({...args,season}).filter(a=>a.id.includes(':game-lineup:'));
-assert.deepEqual(upcomingLineupReminderGames(postdraft,team.id,now),[],
-  'Published season with 22 TBD games must not show action banner');
-assert.deepEqual(noGameAlert(postdraft),[],
-  'TBD games must not raise lineup bell tasks');
-const regular={...postdraft,status:'regular'};
-assert.deepEqual(upcomingLineupReminderGames(regular,team.id,now),[],
-  'The active season still cannot prompt for undated fixtures');
-assert.deepEqual(noGameAlert(regular),[],'No reminders for active-season TBD games');
-assert(!buildLeagueAlerts(args).some(a=>a.id.includes(':default-lineup')),
-  'Valid saved default resolves postdraft default-lineup reminder despite stale needsDefault');
+const args={season,myTeam:team,role:'gm',now:Date.now()};
+const alerts=s=>buildLeagueAlerts({...args,season:s}).filter(a=>a.id.includes(':game-lineup-week:'));
 
-const imminent={...games[2],startsAt:date(2*24*60*60*1000)};
-const withGame={...regular,games:[...games.slice(0,2),imminent,...games.slice(3)]};
-assert.deepEqual(upcomingLineupReminderGames(withGame,team.id,now).map(g=>g.id),['g3'],
-  'Only a dated, imminently upcoming, unsubmitted game is actionable');
-assert.equal(noGameAlert(withGame).length,1);
-const submitted={...withGame,games:withGame.games.map(g=>g.id==='g3'
-  ?{...g,lineups:{checkers:valid},lineupSubmission:{checkers:{source:'custom',by:'gm'}}}
+assert.equal(homeWeekBoard(season).week,1);
+assert.equal(currentWeekLineupMatchup(season,team.id).week,1);
+const first=alerts(season);
+assert.equal(first.length,1,'exactly one weekly bell alert, not one for each of the 22 scheduled dates');
+assert.equal(first[0].id,'season-1:game-lineup-week:1:checkers');
+assert.equal(first[0].canUseDefault,true,'GM can submit saved default from bell on an undated matchup');
+assert(first[0].detail.includes('Week 1'));
+assert(!first[0].detail.includes('TBD'),'no dates or TBD deadlines in bell');
+const acknowledged=acknowledgedLeagueAlertIds([],first.map(a=>a.id));
+assert.deepEqual(unseenLeagueAlertIds(first,acknowledged),[],'opening bell hides the weekly alert');
+
+const saved={...season,games:season.games.map(g=>g.id==='w1-0'
+  ?{...g,lineups:{checkers:valid},lineupSubmission:{checkers:{source:'default',by:'gm'}}}
   :g)};
-assert.deepEqual(upcomingLineupReminderGames(submitted,team.id,now),[],
-  'Saving that game lineup removes the action banner');
-assert.deepEqual(noGameAlert(submitted),[],
-  'Saving that game lineup clears the reminder notification');
+assert.equal(alerts(saved)[0].id,first[0].id,'saving game lineup must not issue a second weekly notification');
+assert.equal(alerts(saved)[0].type,'announcement');
+assert.deepEqual(unseenLeagueAlertIds(alerts(saved),acknowledged),[]);
+const partly={...season,games:season.games.map(g=>g.id==='w1-2'?{...g,stage:'recorded'}:g)};
+assert.equal(homeWeekBoard(partly).week,1,'private upload cannot advance upcoming week');
+assert.equal(alerts(partly)[0].id,first[0].id);
+const ended={...season,games:season.games.map(g=>g.week===1?{...g,stage:'final'}:g)};
+assert.equal(homeWeekBoard(ended).week,2,'all six released Week 1 finals automatically reveal Week 2');
+const second=alerts(ended);
+assert.equal(second.length,1);
+assert.equal(second[0].id,'season-1:game-lineup-week:2:checkers');
+assert.deepEqual(unseenLeagueAlertIds(second,acknowledged),[second[0].id],
+  'new week creates a fresh notification after Week 1 was already viewed');
+const afterW2={...ended,games:ended.games.map(g=>g.week===2?{...g,stage:'final'}:g)};
+assert.equal(homeWeekBoard(afterW2).week,3);
+assert.equal(alerts(afterW2)[0].id,'season-1:game-lineup-week:3:checkers');
+const postseason={...season,status:'postseason'};
+assert.equal(currentWeekLineupMatchup(postseason,team.id).week,1);
+const beforeSchedule={...season,schedulePublished:false};
+assert.equal(currentWeekLineupMatchup(beforeSchedule,team.id),null);
+assert.equal(alerts(beforeSchedule).length,0);
 
-for(const [label,change] of [
-  ['no date',{startsAt:null}],
-  ['invalid date',{startsAt:'Not set'}],
-  ['past game',{startsAt:date(-1000)}],
-  ['beyond week',{startsAt:date(GAME_LINEUP_REMINDER_WINDOW_MS+1000)}],
-  ['completed game',{stage:'final'}],
-  ['locked game',{lockedAt:date(-3600000)}],
-]){
-  const changed={...withGame,games:withGame.games.map(g=>g.id==='g3'?{...g,...change}:g)};
-  assert.deepEqual(upcomingLineupReminderGames(changed,team.id,now),[],label+' cannot make an ACTIONS NEEDED prompt');
-}
-assert.deepEqual(upcomingLineupReminderGames({...withGame,schedulePublished:false},team.id,now),[],
-  'Unpublished schedules cannot trigger reminders');
-assert.deepEqual(upcomingLineupReminderGames({...withGame,status:'postdraft'},team.id,now),[],
-  'Postdraft phase has no editable regular season game lineups');
-assert.deepEqual(upcomingLineupReminderGames(withGame,'another-team',now),[],
-  'Do not show other teams personal lineup tasks');
-const seasonUI=readFileSync(new URL('../src/SeasonLeague.jsx',import.meta.url),'utf8');
-assert.match(seasonUI,/upcoming = upcomingLineupReminderGames\(s, t\.id, l\.now\)\[0\] \|\| null/,
-  'ACTIONS NEEDED must use the filtered scheduled upcoming fixtures, not scan all TBD games');
-const bellUI=readFileSync(new URL('../src/league-alerts.js',import.meta.url),'utf8');
-assert.match(bellUI,/upcomingLineupReminderGames\(season,teamId,now\)/,
-  'Bell and action banner must use the same exact eligibility rules');
-console.log('PASS: 22 TBD games cannot trigger banners; saved/submitted lineups resolve tasks; only upcoming dated editable games within 7 days create reminders.');
+const main=readFileSync(new URL('../src/main.jsx',import.meta.url),'utf8');
+assert(!main.includes('<SeasonPrompts'),'No persistent ACTIONS NEEDED banner appears on website');
+const bell=readFileSync(new URL('../src/LeagueNotifications.jsx',import.meta.url),'utf8');
+assert.match(bell,/setVisibleIds\(unseen\);\s*markRead\(unseen\);\s*setOpen\(true\);/,
+  'bell opening acknowledges new week immediately');
+assert(!bell.includes('Date.parse(game.startsAt)'),'one-tap default ignores nonexistent dates');
+const schedule=readFileSync(new URL('../src/SeasonLeague.jsx',import.meta.url),'utf8');
+assert(!schedule.includes('DATE & TIME TBD'),'no date placeholders in the game schedule');
+assert(!schedule.includes('GameDateEditor'),'there is no game-date editor');
+assert.match(schedule,/PREVIEW PRIVATE GAME REPORT/);
+console.log('PASS: undated Week 1 bell once, acknowledgment, unchanged submission, Week 2/3 turnover, no page banner or date requirement, commissioner private preview.');

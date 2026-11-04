@@ -378,7 +378,7 @@ assert.deepEqual(rankingParticipants(lineupSeason,'test'),[],
 assert(!preseasonReady(season),'live drafting must not publish ratings or a bracket');
 assert.deepEqual(preseasonSeeds(season),[]);
 assert.deepEqual(powerRankings(season),[]);
-season.status='postdraft';
+season.status='preseason';
 assert(preseasonReady(season));
 const seeds=preseasonSeeds(season);
 assert.equal(seeds.length,12);

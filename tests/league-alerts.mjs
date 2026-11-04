@@ -21,7 +21,7 @@ const args={season:base,myTeam:team,role:'gm',players:playerPool,now:Date.parse(
 const find=(rows,fragment)=>rows.find(row=>row.id.includes(fragment));
 
 assert.deepEqual(buildLeagueAlerts(args),[], 'do not notify during a live draft');
-const post={...base,status:'postdraft',picks:Array.from({length:12},(_,i)=>({team:teams[i].id,seconds:10}))};
+const post={...base,status:'preseason',picks:Array.from({length:12},(_,i)=>({team:teams[i].id,seconds:10}))};
 let alerts=buildLeagueAlerts({...args,season:post});
 assert(find(alerts,':default-lineup'), 'prompt for required default lineup');
 assert(find(alerts,':preseason-bracket'), 'announce completed draft bracket');
@@ -36,13 +36,13 @@ const previous={id:'previous',home:'a',away:'b',stage:'final',phase:'regular',
   startsAt:'2026-10-30T17:00:00Z',
   lineups:{b:lineupFor(opponentRoster)},
   result:{scores:{a:4,b:2},players:[{player:1,team:'a',gameScore:HEATING_UP_THRESHOLD}]}};
-const upcoming={id:'upcoming',home:'b',away:'a',stage:'scheduled',phase:'regular',
+const upcoming={id:'upcoming',home:'b',away:'a',stage:'scheduled',phase:'regular',week:1,
   startsAt:'2026-11-03T17:00:00Z',lineups:{b:{starters:[{player:999,position:'P'}]}}};
 const regular={...post,status:'regular',schedulePublished:true,needsDefault:[],
   defaults:{a:lineupFor(roster)},games:[previous,upcoming]};
 alerts=buildLeagueAlerts({...args,season:regular,
   newsItems:[{gameId:'previous',teamId:'a',playerId:1,title:'Player 1 is heating up!'}]});
-const upcomingAlert=find(alerts,':game-lineup:upcoming');
+const upcomingAlert=find(alerts,':game-lineup-week:1:a');
 assert(upcomingAlert?.canUseDefault,'one-click default lineup uses saved lineup');
 assert.equal(upcomingAlert.target.gameId,'upcoming');
 assert(find(alerts,':schedule-published'), 'announce newly published schedule');
@@ -58,11 +58,11 @@ assert.equal(noHistory.lineup,null,'do not use a changed default as last played 
 
 const submitted={...regular,games:[previous,{...upcoming,lineups:{...upcoming.lineups,a:lineupFor(roster)}}]};
 alerts=buildLeagueAlerts({...args,season:submitted});
-assert(!find(alerts,':game-lineup:upcoming'),'submission resolves the task automatically');
+assert.equal(find(alerts,':game-lineup-week:1:a')?.type,'announcement','a saved lineup updates the current weekly notice but does not re-notify');
 const staleFlags={...submitted,needsDefault:['a']};
 const completed=buildLeagueAlerts({...args,season:staleFlags});
 assert(!find(completed,':default-lineup'),'Stale post-draft flag cannot keep a completed default-lineup task alive');
-assert(!find(completed,':game-lineup:upcoming'),'The GM-submitted matchup lineup no longer creates a task');
+assert.equal(find(completed,':game-lineup-week:1:a')?.type,'announcement','a submitted game lineup is informational, not an outstanding task');
 // A bell opening must acknowledge all unread IDs at once, not require the
 // user to click an individual alert. Items are visible during that opening,
 // but do not return the next time the bell is opened.

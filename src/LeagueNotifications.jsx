@@ -99,8 +99,7 @@ export default function LeagueNotifications({userId,league,newsItems=[],players=
     const team=league.myTeam?.id;
     if(!game||!team||saving||league.busy||
       !gameLineupIsEditable(season,team,game)||
-      !validLineup(season,team,season.defaults?.[team])||
-      !Number.isFinite(Date.parse(game.startsAt))||Date.parse(game.startsAt)<=league.now)return;
+      !validLineup(season,team,season.defaults?.[team]))return;
     setSaving(alert.id);
     try{
       const ok=await league.act('game_lineup',{team,game:game.id,useDefault:true});
@@ -128,7 +127,7 @@ export default function LeagueNotifications({userId,league,newsItems=[],players=
             </span>
             <ChevronRight size={17} className="ssl-alert-chevron"/>
           </button>
-          {alert.gameId&&<div className="ssl-alert-action">
+          {alert.gameId&&!alert.hideDefaultAction&&<div className="ssl-alert-action">
             <button type="button" disabled={!alert.canUseDefault||league.busy||!!saving}
               onClick={()=>useDefault(alert)}>
               {saving===alert.id?'SUBMITTING…':'USE DEFAULT LINEUP'}

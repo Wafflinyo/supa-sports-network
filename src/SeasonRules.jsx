@@ -224,15 +224,10 @@ export function PublicBallots({ league: l }) {
   );
 }
 export function BroadcastControls({ league: l, game: g }) {
-  const [end, setEnd] = useState("");
   return (
     <details>
-      <summary>PREMIERE / POSTPONEMENT / RESULT RELEASE</summary>
-      <p>
-        Uploading results locks lineups immediately. Results stay private until
-        the end time below, or until you confirm the premiere ended. Update this
-        if YouTube delays the premiere.
-      </p>
+      <summary>BROADCAST / PRIVATE REPORT RELEASE</summary>
+      <p>Uploading a result locks both lineups and keeps the score, statistics, and box score private. The commissioner may preview the saved report and manually release it after the broadcast. No game date or time is required.</p>
       <form
         className="season-form"
         onSubmit={(e) => {
@@ -241,8 +236,8 @@ export function BroadcastControls({ league: l, game: g }) {
           l.act("broadcast", {
             game: g.id,
             youtubeUrl: f.get("youtubeUrl"),
-            releaseAt: iso(end),
-            startsAt: iso(f.get("startsAt")),
+            releaseAt: null,
+            startsAt: null,
             announcement: f.get("announcement"),
             postponed: f.get("postponed") === "on",
           });
@@ -256,23 +251,6 @@ export function BroadcastControls({ league: l, game: g }) {
             defaultValue={g.youtubeUrl || ""}
           />
         </label>
-        <label>
-          Change premiere start (optional, device timezone)
-          <input name="startsAt" type="datetime-local" />
-        </label>
-        <label>
-          Automatic result release: exact video end (optional, device timezone)
-          <input
-            type="datetime-local"
-            value={end}
-            onChange={(e) => setEnd(e.target.value)}
-          />
-        </label>
-        <p>
-          Saved release:{" "}
-          {g.releaseAt ? time(g.releaseAt) : "Manual confirmation only"}. Leave
-          the field blank to use manual release.
-        </p>
         <label>
           <input
             name="postponed"
@@ -307,7 +285,7 @@ export function BroadcastControls({ league: l, game: g }) {
               l.act("release_result", { game: g.id });
           }}
         >
-          PREMIERE ENDED · RELEASE RESULTS
+          RELEASE RESULTS PUBLICLY
         </button>
       )}
     </details>
