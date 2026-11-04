@@ -39,6 +39,7 @@ export function preseasonBoxScore(report){
       summarizeTeam(report.away,report.away,report.awayScore,entries.filter(p=>p.teamKey===report.away)),
       summarizeTeam(report.home,report.home,report.homeScore,entries.filter(p=>p.teamKey===report.home)),
     ],
+    innings:report.innings||null,
     hasPlayerStats:entries.length>0,
   };
 }
