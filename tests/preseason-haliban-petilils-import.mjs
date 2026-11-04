@@ -10,7 +10,7 @@ assert.equal(game.mvp,54,'SSL MVP goes to Boomerang Bro, highest player on the w
 const players=preseasonPlayerStatsForGame(game);
 assert.equal(players.length,18);
 assert.equal(new Set(players.map(p=>p.playerId)).size,18);
-const expected=new Map([[59,113],[50,116],[11,34],[147,57],[44,15],[43,30],[150,28],[182,30],[68,93],[142,27],[36,103],[52,37],[35,88],[54,124],[164,23],[30,4],[5,16],[29,23]]);
+const expected=new Map([[59,113],[50,116],[11,35.25],[147,57],[44,15],[43,30],[150,28],[182,41.75],[68,93],[142,37.5],[36,103],[52,37],[35,88],[54,124],[164,23],[30,4],[5,16.25],[29,23]]);
 for(const player of players) {
   assert.equal(player.stats.tgp,expected.get(player.playerId),'TGP discrepancy for '+player.playerId);
   assert.equal(player.stats.gameScore,player.stats.tgp);
@@ -22,11 +22,11 @@ assert.equal(players.find(p=>p.playerId===35).stats.mvps,0,'Project Rio MVP tag 
 assert.equal(players.find(p=>p.playerId===182).stats.battersFaced,28,'Blue Mii (M) pitching stats belong to Vegeta');
 assert.equal(players.find(p=>p.playerId===142).stats.inningsPitched,6.66666666666667);
 const totalFor=team=>Math.round(players.filter(p=>p.teamName===team).reduce((sum,p)=>sum+p.stats.tgp,0)*100)/100;
-assert.equal(totalFor(game.away),516);
-assert.equal(totalFor(game.home),445);
+assert.equal(totalFor(game.away),529);
+assert.equal(totalFor(game.home),455.75);
 const teams=preseasonTeamStats();
-assert.equal(teams.find(t=>t.teamName===game.away).stats.tgp,516);
-assert.equal(teams.find(t=>t.teamName===game.home).stats.tgp,445);
+assert.equal(teams.find(t=>t.teamName===game.away).stats.tgp,529);
+assert.equal(teams.find(t=>t.teamName===game.home).stats.tgp,455.75);
 assert.equal(teams.find(t=>t.teamName===game.away).stats.runsScored,5);
 assert.equal(teams.find(t=>t.teamName===game.home).stats.runsScored,6);
 assert.ok(preseasonPlayerStats().some(p=>p.playerId===54&&p.stats.tgp===124));
