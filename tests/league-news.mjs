@@ -44,7 +44,7 @@ assert(byCategory('heating')[0].summary.includes('Color Clash Crushers'));
 assert.equal(byCategory('home-run')[0].label, 'MULTI-HR PERFORMANCE');
 assert(byCategory('home-run')[0].summary.includes('three-run home run'));
 assert(byCategory('trade')[0].title.includes('Tropical Wiggler'));
-assert(byCategory('pitching')[0].summary.includes('0 strikeouts'));
+assert(byCategory('pitching')[0].summary.includes('5.0 IP'));
 assert.equal(byCategory('offense')[0].tier, 'good');
 assert.equal(byCategory('defense')[0].tier, 'good');
 
@@ -105,13 +105,13 @@ assert.equal(find({putouts: 3, assists: 1, doublePlays: 1, triplePlays: 1,
   buddyJumpPutouts: 2}, 'defense').tier, 'good');
 
 // Pitching: 5+ innings (15+ outs), at most 3 runs allowed, and zero Ks is fine.
-assert.equal(find({outs: 15, runsAllowed: 3, pitchStrikeouts: 0}, 'pitching').tier, 'solid');
-assert.equal(find({outs: 15, runsAllowed: 2}, 'pitching').tier, 'strong');
-assert.equal(find({outs: 15, runsAllowed: 1}, 'pitching').tier, 'outstanding');
-assert.equal(find({outs: 16, runsAllowed: 0, pitchStrikeouts: 4}, 'pitching').tier, 'scoreless');
+assert.equal(find({outs: 15, runsAllowed: 3, pitchStrikeouts: 0}, 'pitching').tier, 'good');
+assert.equal(find({outs: 15, runsAllowed: 2}, 'pitching').tier, 'good');
+assert.equal(find({outs: 15, runsAllowed: 1}, 'pitching').tier, 'good');
+assert.equal(find({outs: 16, runsAllowed: 0, pitchStrikeouts: 4}, 'pitching').tier, 'great');
 assert(find({outs: 16, runsAllowed: 0, pitchStrikeouts: 4}, 'pitching').summary.includes('5.1 IP'));
-assert.equal(find({outs: 14, runsAllowed: 0, pitchStrikeouts: 10}, 'pitching'), undefined);
-assert.equal(find({outs: 21, runsAllowed: 4, pitchStrikeouts: 10}, 'pitching'), undefined);
+assert.equal(find({outs: 14, runsAllowed: 0, pitchStrikeouts: 10}, 'pitching').tier, 'efficient');
+assert.equal(find({outs: 21, runsAllowed: 4, pitchStrikeouts: 10}, 'pitching').tier, 'great');
 
 // Perfect at the plate requires reaching base in every PA, not 100% batting average.
 assert.equal(find({hits: 1, atBats: 1, batWalks: 1, hitByPitch: 1,
