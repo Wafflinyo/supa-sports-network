@@ -915,7 +915,7 @@ function Draft({ league: l }) {
 
 function HeatingStatus({season,game,team,includeRecorded=false}) {
   const ids=heatingUpForSeason(season,{includeRecorded}).byGame[game.id]?.[team]||[];
-  return <p className="heating-up-status"><strong>★ HEATING UP · Next-game stars:</strong> {ids.length?ids.map(name).join(' · '):'None earned yet'} <small>Automatic from previous game scores of {HEATING_UP_THRESHOLD}+.</small></p>;
+  return <p className="heating-up-status"><strong>🔥 HEATING UP · Next-game players:</strong> {ids.length?ids.map(id=><span key={id}>{name(id)} <HeatMark playerId={id} inline/> · </span>):'None earned yet'} <small>Activated only after an officially released Game Score of {HEATING_UP_THRESHOLD}+.</small></p>;
 }
 function LineupEditor({ league: l, team, game, onDone }) {
   const s = l.season,
@@ -980,6 +980,7 @@ function LineupEditor({ league: l, team, game, onDone }) {
               </option>
             ))}
           </select>
+          <HeatMark playerId={x.player} inline/>
           <select
             aria-label={`Position ${i + 1}`}
             value={x.position}
@@ -997,11 +998,12 @@ function LineupEditor({ league: l, team, game, onDone }) {
           </select>
         </div>
       ))}
-      {game ? <HeatingStatus season={s} game={game} team={team} includeRecorded={l.access.role==='commissioner'}/> : <p className="heating-up-help">Players become starred automatically for their next team game after earning an SSL custom Game Score of {HEATING_UP_THRESHOLD} or higher. No coins, tiers, or manual star selection.</p>}
+      {game ? <HeatingStatus season={s} game={game} team={team} includeRecorded={false}/> : <p className="heating-up-help">Players become starred automatically for their next team game after earning an SSL custom Game Score of {HEATING_UP_THRESHOLD} or higher. No coins, tiers, or manual star selection.</p>}
       <h4>BENCH</h4>
       <p>
-        {lineup.bench.map(id => name(id)).join(" · ") ||
-          "Choose all nine starters first."}
+        {lineup.bench.length
+          ?lineup.bench.map((id,i)=><React.Fragment key={id}>{i>0?' · ':''}{name(id)} <HeatMark playerId={id} inline/></React.Fragment>)
+          :"Choose all nine starters first."}
       </p>
       <button className="red-btn" disabled={l.busy || !valid}>
         SAVE {game ? "GAME" : "DEFAULT"} LINEUP
@@ -1084,7 +1086,7 @@ export function RosterManager({ league: l, focus=null }) {
     {!chosen?<Box title="ROSTER"><p>{l.access.role==='commissioner'?'Choose a team above to manage its roster.':'Your franchise will appear once the commissioner adds it to Season 1.'}</p></Box>:<>
       <div id="ssl-roster-players" className="ssl-roster-notification-focus"><Box title={`${chosen.name.toUpperCase()} · ROSTER`}>
         <p><strong>{roster.length} players</strong> · {hasDefault?'Default lineup saved':'Default lineup not saved yet'} · {seasonPhaseLabel(s.status)}</p>
-        {roster.length===0?<p>Players will appear as they are drafted.</p>:<div className="roster-manager-players">{roster.map(id=><div key={id} className="roster-manager-player"><Player id={id} seasons={l.seasons}/><HeatMark playerId={id} inline/></div>)}</div>}
+        {roster.length===0?<p>Players will appear as they are drafted.</p>:<div className="roster-manager-players">{roster.map(id=><div key={id} className="roster-manager-player"><Player id={id} seasons={l.seasons}/></div>)}</div>}
       </Box></div>
       <Box title="NEXT SEASON DRAFT PICKS">
         <NextSeasonDraftPicks season={s} teamId={team} supabase={l.supabase}/>
@@ -1465,7 +1467,7 @@ function Schedule({ league: l, commissioner = false }) {
                         <p>{status.detail}</p>
                         {status.at&&<small>Recorded: {time(status.at)}</small>}
                       </div>
-                      <HeatingStatus season={s} game={g} team={id} includeRecorded={l.access.role==='commissioner'}/>
+                      <HeatingStatus season={s} game={g} team={id} includeRecorded={false}/>
                       {lineup?.starters?.map((p,i)=><p key={i}>{i+1}. {name(p.player)} · {p.position}</p>)}
                       <p><strong>Bench:</strong> {lineup?.bench?.map(name).join(' · ')||'No bench players'}</p>
                     </section>;
