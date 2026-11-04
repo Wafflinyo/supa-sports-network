@@ -341,7 +341,7 @@ export function SeasonPrompts({ league, go }) {
       ["postdraft", "regular", "postseason", "retention"].includes(s.status),
     needs =
       ["postdraft", "regular", "postseason", "retention"].includes(s.status) &&
-      s.needsDefault?.includes(t.id),
+      !validLineup(s, t.id, s.defaults?.[t.id]),
     upcoming =
       s.schedulePublished &&
       s.games
