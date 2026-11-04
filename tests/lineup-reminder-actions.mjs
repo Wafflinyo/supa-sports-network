@@ -69,4 +69,11 @@ const schedule=readFileSync(new URL('../src/SeasonLeague.jsx',import.meta.url),'
 assert(!schedule.includes('DATE & TIME TBD'),'no date placeholders in the game schedule');
 assert(!schedule.includes('GameDateEditor'),'there is no game-date editor');
 assert.match(schedule,/PREVIEW PRIVATE GAME REPORT/);
-console.log('PASS: undated Week 1 bell once, acknowledgment, unchanged submission, Week 2/3 turnover, no page banner or date requirement, commissioner private preview.');
+const homeGames=readFileSync(new URL('../src/GmStadiumMatchups.jsx',import.meta.url),'utf8');
+const archive=readFileSync(new URL('../src/HistoryArchive.jsx',import.meta.url),'utf8');
+assert(!homeGames.includes('DATE & TIME TBD')&&!homeGames.includes('dateLabel(game.startsAt)'),
+  'GM Home Games must never show missing dates');
+assert(!archive.includes('Date TBD')&&!archive.includes('when(game.startsAt)'),
+  'SSL History schedule must show week labels without any missing date placeholder');
+console.log('PASS: weekly bell, no persistent banner, commissioner-only preview, and no schedule dates in public, GM or history views.');
+
