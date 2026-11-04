@@ -32,7 +32,7 @@ export function buildLeagueAlerts({season, myTeam, role, newsItems = [], now = D
       detail:'You need at least 11 players before setting your default lineup.',
       target:{page:'Free Agency'},
     });
-    else if (season.needsDefault?.includes(teamId) || !validLineup(season,teamId,season.defaults?.[teamId])) alerts.push({
+    else if (!validLineup(season,teamId,season.defaults?.[teamId])) alerts.push({
       id:id+':default-lineup:'+String(teamId),type:'task',
       title:'Set your default lineup',detail:'Choose your starting nine, batting order, pitcher and bench.',
       target:{page:role==='gm'?'GM Tools':'Commissioner Tools',section:'Roster',focus:'default'},
