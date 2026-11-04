@@ -24,11 +24,6 @@ const phaseTabs=[['regular','Regular Season'],['playoffs','Playoffs'],['all','Co
 const n=value=>Number.isFinite(Number(value))?Number(value):0;
 const fmt=(value,decimal=0)=>Number.isFinite(Number(value))?n(value).toFixed(decimal):'—';
 const person=id=>players.get(String(id))?.name||'Player #'+id;
-const when=date=>{
-  const parsed=Date.parse(date||'');
-  return Number.isFinite(parsed)?new Date(parsed).toLocaleString('en-US',
-    {month:'short',day:'numeric',year:'numeric',timeZone:'America/New_York'}):'Date TBD';
-};
 function TeamMark({team,supabase,size=32}){
   const logo=team?.logoPath&&supabase?teamLogo(supabase,team.logoPath):null;
   return logo?<img className="ssl-history-team-mark" src={logo} alt="" style={{width:size,height:size}}/>:
@@ -266,8 +261,7 @@ function ArchiveSchedule({season,onBox}){
         const final=game.stage==='final'&&game.result?.scores;
         return <div className="ssl-history-result" key={game.id}>
           <div className="ssl-history-result-meta">
-            <span>{game.phase==='regular'?'WEEK '+(game.week||'—'):'PLAYOFFS'} · {game.label||'Matchup'}</span>
-            <span>{when(game.startsAt)}</span></div>
+            <span>{game.phase==='regular'?'WEEK '+(game.week||'—'):'PLAYOFFS'} · {game.label||'Matchup'}</span></div>
           <div className="ssl-history-result-main">
             <strong>{label(game.away)} <span>@</span> {label(game.home)}</strong>
             <b>{final?game.result.scores[game.away]+' – '+game.result.scores[game.home]:'— – —'}</b>
