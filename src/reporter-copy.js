@@ -13,7 +13,7 @@ function pick(game,teamId,position,category,variants){
   let hash=2166136261;
   for(const char of [game.id,teamId,category].join(':'))
     hash=Math.imul(hash^char.charCodeAt(0),16777619)>>>0;
-  return variants[((hash^(hash>>>16))+(position||0))%variants.length];
+  return variants[(((hash^(hash>>>16))>>>0)+Math.max(0,position||0))%variants.length];
 }
 const hrEvents=[
   ['oneHr','solo homer'],['twoHr','two-run homer'],
@@ -80,9 +80,9 @@ export function reporterParagraph(person,id,categories,game,teamId,opponent,team
       subject+' drove the offense with '+offense+', including '+homer+'.',
       subject+' launched '+homer+' while finishing with '+offense+'.',
       subject+' delivered '+offense+', highlighted by '+homer+'.',
-      subject+' energized the lineup with '+homer+' and '+offense+'.',
-      subject+' capped an impressive offensive showing with '+offense+' and '+homer+'.',
-      subject+' mixed timely production with power, totaling '+offense+' and '+homer+'.',
+      subject+' energized the lineup with '+homer+', finishing with '+offense+'.',
+      subject+' capped an impressive offensive showing with '+offense+', highlighted by '+homer+'.',
+      subject+' mixed timely production with power: '+offense+', including '+homer+'.',
     ]));
   }else if(hasHomer){
     const homer=homerCopy(s),subject=lead?'At the plate, '+person:person;
