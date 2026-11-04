@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {leagueNews} from '../src/league-news.js';
 import {reporterParagraph} from '../src/reporter-copy.js';
+import {pitchingNewsPerformance} from '../src/game-headlines.js';
 
 const players=[
   {id:1,name:'Blue Kritter'},
@@ -68,4 +69,20 @@ const acrossGames=Array.from({length:10},(_,i)=>repeated(0,'different-game-'+i))
 assert(new Set(acrossGames.map(v=>v.split('.')[0])).size>=3,
   'Different games should rotate defensive headlines');
 assert(teammateStyles.every(v=>!v.includes('made their presence felt')));
-console.log('PASS: natural copy, varied fielding and loss narratives, private news and separate player paragraphs');
+// News should show earned runs rather than duplicate runs-allowed counts.
+const pitchingGame={
+  id:'pitching-news-er',stage:'recorded',week:1,away:'away',home:'home',
+  result:{scores:{away:6,home:5},players:[{
+    player:1,team:'away',
+    stats:{outs:17,strikes:24,pitches:50,runsAllowed:3,earnedRuns:1,pitchStrikeouts:2},
+  }]},
+};
+const pitcher=pitchingGame.result.players[0];
+const pitchingDetail=pitchingNewsPerformance(pitcher,pitchingGame);
+assert(pitchingDetail,'A qualifying pitching performance must generate a news recognition');
+assert.match(pitchingDetail.detail,/1 earned run/);
+assert.doesNotMatch(pitchingDetail.detail,/runs? allowed/i);
+const pitchingProse=reporterParagraph('Blue Kritter',1,['pitching'],pitchingGame,'away',home,away);
+assert.match(pitchingProse,/1 earned run/);
+assert.doesNotMatch(pitchingProse,/runs? allowed/i);
+console.log('PASS: varied game news uses earned runs only; full pitching stats remain unchanged');
