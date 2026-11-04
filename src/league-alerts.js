@@ -1,12 +1,12 @@
 import {preseasonReady} from './preseason.js';
-import {upcomingLineupReminderGames} from './roster-lineups.js';
+import {currentWeekLineupMatchup} from './roster-lineups.js';
 import {validLineup} from './season-data.js';
 import {heatingUpForSeason} from './heating-up.js';
 
 // Alerts are derived from the public/current season and the signed-in GM's team.
 // Do not write to draft state, reveal unreleased results, or use opponents'
 // unplayed/scheduled lineup submissions.
-const activePhases = new Set(['postdraft','regular','postseason','retention']);
+const activePhases = new Set(['preseason','regular','postseason','retention']);
 const postseasonPhases = new Set(['postseason','retention','offseason','archived']);
 const twoDays = 2 * 24 * 60 * 60 * 1000;
 const matchesTeam = (game, id) => String(game?.home) === String(id) || String(game?.away) === String(id);
@@ -97,15 +97,26 @@ export function buildLeagueAlerts({season, myTeam, role, newsItems = [], now = D
   // The local matchup snapshot creates one event only when a published game
   // changed since the GM last saw it. Do not treat a new schedule as a change.
   if(teamId)alerts.push(...scheduleChanges.filter(e=>e.id?.startsWith(id+':schedule-change:') && String(e.teamId)===String(teamId)));
-  if (teamId && ['regular','postseason'].includes(season.status)) {
-    const nextGames=upcomingLineupReminderGames(season,teamId,now).slice(0,3);
-    for (const game of nextGames) {
+  // One notification for the exact week displayed in Upcoming Matches.
+  // A stable week/team ID means the bell acknowledgment lasts for the
+  // remainder of that week, even if the GM has not clicked the alert.
+  // After every result in that week is publicly released, the board rolls
+  // forward and the next week's independent notification appears.
+  if (teamId && ['preseason','regular','postseason'].includes(season.status)) {
+    const upcoming=currentWeekLineupMatchup(season,teamId);
+    if (upcoming) {
+      const {game,week}=upcoming;
       const opponent=teamName(String(game.home)===String(teamId)?game.away:game.home);
+      const saved=validLineup(season,teamId,game.lineups?.[teamId]);
       alerts.push({
-        id:id+':game-lineup:'+String(game.id),type:'task',gameId:game.id,
-        title:'Submit lineup vs '+opponent,
-        detail:'Scheduled '+dateLabel(game.startsAt)+' · '+(String(game.home)===String(teamId)?'Home':'Away')+' matchup.',
-        canUseDefault:validLineup(season,teamId,season.defaults?.[teamId]),
+        id:id+':game-lineup-week:'+String(week)+':'+String(teamId),
+        type:saved?'announcement':'task',gameId:game.id,
+        title:'Week '+week+' matchup ready · '+opponent,
+        detail:'Week '+week+' is now in Upcoming Matches. '+(saved
+          ?'Your game lineup is submitted. You can still review it.'
+          :'Review your lineup or submit your saved default before the game.'),
+        canUseDefault:!saved&&validLineup(season,teamId,season.defaults?.[teamId]),
+        hideDefaultAction:saved,
         target:{page:role==='gm'?'GM Tools':'Commissioner Tools',section:'Roster',focus:'game',gameId:game.id},
       });
     }
