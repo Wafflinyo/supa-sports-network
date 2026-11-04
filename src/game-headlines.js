@@ -1,4 +1,5 @@
 import {gamePointsForReport} from './game-points.js';
+import {inningScoringDrama} from './rio-inning-scores.js';
 // Match stories use official result totals. Inning-by-inning drama is described
 // only when the commissioner explicitly records it; Rio has no play-by-play.
 const n=value=>Number.isFinite(Number(value))&&Number(value)>0?Number(value):0;
@@ -94,8 +95,14 @@ export function matchHeadline(season,game,players=[]){
  const winner=names.get(winnerId)||'Winning team',loser=names.get(loserId)||'Opponents';
  const big=Math.max(a,h),small=Math.min(a,h),margin=big-small;
  const story=game.story||{};
- const leadChanges=Number.isInteger(story.leadChanges)&&story.leadChanges>=0?Math.min(20,story.leadChanges):0;
- const lateFinish=['walkoff','late-comeback'].includes(story.lateFinish)?story.lateFinish:'none';
+ // The uploaded Game Info line score is authoritative for inning-end lead
+ // changes, late comebacks and home walk-offs. Commissioner annotations are
+ // only a fallback for older reports that lack an inning breakdown.
+ const calculated=inningScoringDrama(game.result?.innings);
+ const leadChanges=calculated?calculated.leadChanges:
+   Number.isInteger(story.leadChanges)&&story.leadChanges>=0?Math.min(20,story.leadChanges):0;
+ const lateFinish=calculated?calculated.lateFinish:
+   ['walkoff','late-comeback'].includes(story.lateFinish)?story.lateFinish:'none';
  const note=typeof story.note==='string'?story.note.trim().slice(0,240):'';
  const kind=lateFinish==='walkoff'&&margin<=2?'walkoff':
   lateFinish==='late-comeback'&&margin<=2?'comeback':
@@ -138,19 +145,53 @@ export function matchHeadline(season,game,players=[]){
     kind==='shutout'?91:kind==='blowout'?86:kind==='close'?82:58,
    at:game.releasedAt||game.result.postedAt||null,private:false};
 }
-export function homepageHeadlineSlides(championship,items,seasonId,maximum=5){
+// At most five slides. The season's active Upcoming Matches week determines
+// when the preseason champion must disappear, even before Week 2 has a final.
+// Earlier official game stories backfill unused slots as the new week arrives.
+export function homepageHeadlineSlides(championship,items,seasonId,maximum=5,season=null){
  const limit=Math.min(Math.max(Number(maximum)||5,1),5);
- const slides=championship?[{id:'champion:'+championship.seasonId,kind:'champion',feature:championship}]:[];
- const news=(items||[]).filter(i=>i.category==='match'&&!i.private&&i.gameId);
- const timestamp=i=>{const t=Date.parse(i.at||'');return Number.isFinite(t)?t:0;};
- const ordered=[...news].sort((a,b)=>
-   Number(String(b.seasonId)===String(seasonId))-Number(String(a.seasonId)===String(seasonId))||
-   timestamp(b)-timestamp(a)||(b.importance||0)-(a.importance||0)||a.id.localeCompare(b.id));
- const seen=new Set();
- for(const item of ordered){
+ const news=(items||[]).filter(i=>i.category==='match'&&!i.private&&i.gameId&&
+   String(i.seasonId)===String(seasonId));
+ const weekOf=i=>{const n=Number(i.week);return Number.isInteger(n)&&n>0?n:null;};
+ const regular=(season?.games||[]).filter(g=>g.phase==='regular'&&Number.isInteger(Number(g.week)));
+ const pending=regular.filter(g=>!['final','cancelled'].includes(g.stage));
+ const boardWeek=pending.length
+   ?Math.min(...pending.map(g=>Number(g.week)))
+   :regular.length?Math.max(...regular.map(g=>Number(g.week))):null;
+ const releasedWeeks=news.map(weekOf).filter(n=>n!=null);
+ const releasedWeek=releasedWeeks.length?Math.max(...releasedWeeks):null;
+ const displayWeek=boardWeek??releasedWeek;
+ const startedFirstWeek=releasedWeeks.some(n=>n===1);
+ // Champion appears first before any regular-season final, or LAST while
+ // Week 1 has fewer than five released game headlines. Never after Week 2.
+ const championAllowed=!!championship&&displayWeek!==null?displayWeek<=1:!!championship;
+ const current=news.filter(i=>weekOf(i)!==null);
+ const timestamp=i=>{const n=Date.parse(i.at||'');return Number.isFinite(n)?n:0;};
+ current.sort((a,b)=>(weekOf(b)||0)-(weekOf(a)||0)||
+   (b.importance||0)-(a.importance||0)||
+   timestamp(b)-timestamp(a)||a.id.localeCompare(b.id));
+ const slides=[],used=new Set();
+ for(const item of current){
   if(slides.length>=limit)break;
-  if(seen.has(item.gameId))continue;
-  seen.add(item.gameId);slides.push({id:item.id,kind:'match',story:item});
+  if(displayWeek!=null&&weekOf(item)>displayWeek)continue;
+  if(used.has(item.gameId))continue;
+  used.add(item.gameId);
+  slides.push({id:item.id,kind:'match',story:item});
  }
+ // Postseason match headlines can also lead the carousel; keep game-specific
+ // releases ahead of old regular-season headlines once playoffs begin.
+ const playoffs=news.filter(i=>weekOf(i)===null);
+ playoffs.sort((a,b)=>timestamp(b)-timestamp(a)||a.id.localeCompare(b.id));
+ if(playoffs.length){
+   const playSlides=playoffs.slice(0,limit).map(item=>({id:item.id,kind:'match',story:item}));
+   for(const item of slides){
+     if(playSlides.length>=limit)break;
+     playSlides.push(item);
+   }
+   return playSlides;
+ }
+ if(championAllowed&&slides.length<limit)slides.push({
+   id:'champion:'+championship.seasonId,kind:'champion',feature:championship,
+ });
  return slides;
 }
