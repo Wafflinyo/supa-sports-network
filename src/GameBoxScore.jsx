@@ -60,7 +60,15 @@ function TeamBoxTable({team,tab}){
 function InningLineScore({game}){
   const innings=game.innings;
   if(!Array.isArray(innings?.away)||!Array.isArray(innings?.home)||
-    !innings.away.length||innings.away.length!==innings.home.length)return null;
+    !innings.away.length||innings.away.length!==innings.home.length)
+    return <section className="ssl-box-innings ssl-box-innings-unavailable" aria-label="Inning-by-inning score unavailable">
+      <h3>SCORING BY INNING</h3>
+      <p>The original Project Rio Game Info inning scores were not saved with this report.
+        {game.stage==='COMMISSIONER ONLY · NOT RELEASED'||String(game.label||'').includes('COMMISSIONER PRIVATE PREVIEW')
+          ?' Replace the saved private report with its original Project Rio ODS/XLSX file to restore the inning breakdown before releasing.'
+          :' The inning breakdown cannot be reconstructed from the final score alone.'}
+      </p>
+    </section>;
   const columns=Array.from({length:innings.away.length},(_,i)=>i+1);
   return <section className="ssl-box-innings" aria-label="Runs scored by inning">
     <h3>SCORING BY INNING</h3>
@@ -109,6 +117,7 @@ export default function GameBoxScore({game,onClose,inline=false}){
       </div>
       {!inline&&<button ref={closeRef} type="button" className="ssl-box-close" onClick={onClose} aria-label="Close box score">×</button>}
     </div>
+    <InningLineScore game={game}/>
     <div className="ssl-box-scoreboard">
       <div><span className="ssl-box-away">{away.sideLabel||"AWAY"}</span><strong>{away.name}</strong><b>{away.score}</b></div>
       <div><span className="ssl-box-home">{home.sideLabel||"HOME"}</span><strong>{home.name}</strong><b>{home.score}</b></div>
@@ -117,7 +126,6 @@ export default function GameBoxScore({game,onClose,inline=false}){
       <strong>{inline?'PREVIEW — NOT PUBLISHED':'FINAL'}</strong><span>HITS: {away.hits} – {home.hits}</span>
       {game.hasPlayerStats&&<span>TEAM GAME POINTS: {away.totalGamePoints.toFixed(2)} – {home.totalGamePoints.toFixed(2)}</span>}
     </div>
-    <InningLineScore game={game}/>
     {game.hasPlayerStats?<div className="ssl-box-body">
       <div className="ssl-box-tabs" role="tablist" aria-label="Box score statistic categories">
         {Object.keys(categories).map(category=><button key={category} type="button" role="tab"
