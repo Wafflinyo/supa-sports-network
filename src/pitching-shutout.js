@@ -1,8 +1,8 @@
-// Exactly forty SSL pitching Game Points for a winning team that allows
+// Exactly thirty SSL pitching Game Points for a winning team that allows
 // zero runs. Divide by actual pitching outs (not the decimal appearance of IP).
-// Largest-remainder rounding guarantees that shared bonuses total $40.00$
+// Largest-remainder rounding guarantees that shared bonuses total $30.00$
 // Game Points even when pitchers have uneven or equal innings.
-export const SSL_PITCHING_SHUTOUT_BONUS=40;
+export const SSL_PITCHING_SHUTOUT_BONUS=30;
 export function pitchingShutoutBonuses({away,home,awayScore,homeScore,pitchers=[]}={}){
   const scores=[Number(awayScore),Number(homeScore)];
   if(!away||!home||scores.some(s=>!Number.isFinite(s)||s<0))return new Map();
