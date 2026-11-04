@@ -55,7 +55,7 @@ export function sslCareerTenure(playerId,seasons=[]) {
 
 // Display pedigree only after the most recent official season has completed
 // its draft. Historical picks remain private while a new draft is underway.
-const finishedDraftStatuses=new Set(['postdraft','regular','postseason','retention','offseason','archived']);
+const finishedDraftStatuses=new Set(['preseason','regular','postseason','retention','archived']);
 export function draftPedigreeVisible(seasons=[]){
   const current=[...seasons].filter(Boolean).sort((a,b)=>Number(b.number||0)-Number(a.number||0))[0];
   return !!current && finishedDraftStatuses.has(current.status);
