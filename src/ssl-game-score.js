@@ -9,7 +9,7 @@ export const SSL_GAME_SCORE_WEIGHTS=Object.freeze({
   // Score full and partial innings proportionally; don't use rounded Rio IP.
   pitchStrikeouts:15,outs:1,strikes:.5,pitches:.25,earnedRuns:-3,
   // Pitching discipline penalties (PGP only, and consequently TGP).
-  hitsAllowed:-2,pitchWalks:-2,beanBalls:-2,
+  hitsAllowed:-.5,pitchWalks:-2,beanBalls:-2,
   completeGames:20,hrAllowed:-8,mvps:10,
   bobbles:-6,doublePlaysHitInto:-8,triplePlaysHitInto:-12
 });
