@@ -39,7 +39,7 @@ export function heatingUpForSeason(season,{includeRecorded=false}={}) {
           record.heatingUpCount++;
           if(streak===2)record.hotStreaks++;
           record.longestHotStreak=Math.max(streak,record.longestHotStreak);
-          const event={playerId:id,gameId:g.id,at:g.startsAt,team,gameScore:score,streak,starredGame:null,phase:g.phase};
+          const event={playerId:id,gameId:g.id,at:g.releasedAt||g.result?.postedAt||g.startsAt||null,team,gameScore:score,streak,starredGame:null,phase:g.phase};
           record.events.push(event);
           lastEarned[id]=event;
           next.add(id);
@@ -49,8 +49,9 @@ export function heatingUpForSeason(season,{includeRecorded=false}={}) {
       ready[team]=next;
     }
   }
+  const gameOrder=new Map(ordered.map((g,i)=>[String(g.id),i]));
   return {players,byGame,events:Object.values(players).flatMap(r=>r.events)
-    .sort((a,b)=>Date.parse(b.at||0)-Date.parse(a.at||0))};
+    .sort((a,b)=>(gameOrder.get(String(b.gameId))||0)-(gameOrder.get(String(a.gameId))||0))};
 }
 export function heatingUpCareer(id,seasons,options={}){
   let heatingUpCount=0,hotStreaks=0,longestHotStreak=0,currentHotStreak=0;
