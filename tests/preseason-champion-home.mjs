@@ -11,7 +11,7 @@ const teams=Array.from({length:12},(_,i)=>({
   name:i===0?'Petalburg Petilils':'SSL Test Team '+(i+1),
   logoPath:i===0?'1/petilils-original-logo.png':undefined,
 }));
-const season={id:'season-1',name:'Season 1',number:1,status:'postdraft',teams,
+const season={id:'season-1',name:'Season 1',number:1,status:'preseason',teams,
   picks:teams.map((team,i)=>({team:team.id,seconds:i+1,kind:'player',player:i+101})),
   order:teams.map(t=>t.id),
   preseasonResults:[],preseasonReports:[],games:[],transactions:[],
