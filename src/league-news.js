@@ -115,7 +115,7 @@ export function consolidateTeammateNews(items,seasons,players=[]){
         const person=names.get(id)||'A player';
         const accomplishments=events.map(event=>
           categoryNames[event.category]+': '+plainDetail(event.summary,opponent));
-        return person+' — '+accomplishments.join('; ')+'.';
+        return '• '+person+' — '+accomplishments.join('; ')+'.';
       });
       combined={
         ...first,id:'team-game:'+group.key,category:'team-game',tier:'teammates',
@@ -123,7 +123,7 @@ export function consolidateTeammateNews(items,seasons,players=[]){
         title:uniquePlayers.length===1
           ?rosterNames[0]+' delivers a standout performance for '+team.name+'!'
           :rosterNames.join(', ')+' shine for '+team.name+'!',
-        summary:details.join(' ')+' '+closing,
+        summary:details.join('\n')+'\n\n'+closing,
         playerId:null,collectivePlayers:uniquePlayers,
         recognitions:batch.map(({playerId,category,tier,label,title,summary})=>
           ({playerId,category,tier,label,title,summary})),
@@ -255,7 +255,7 @@ export function leagueNews(seasons, players, {includeRecorded = false} = {}) {
               : tier === 'outstanding'
               ? [`${player} puts on a defensive clinic!`, `${player} shines all game in the field!`, `${player} anchors an outstanding defensive performance!`]
               : [`${player} puts on a defensive masterclass!`, `${player} dominates defensively!`, `${player} turns in a spectacular fielding performance!`]),
-            `${defense} combined putouts, assists, double plays, triple plays and Buddy Jump putouts against ${opponent}.`);
+            `${defense} total fielding plays (${defenseKeys.filter(key=>amount(stats[key])>0).map(key=>plural(amount(stats[key]),({putouts:'putout',assists:'assist',doublePlays:'double play',triplePlays:'triple play',buddyJumpPutouts:'Buddy Jump putout'})[key])).join(', ')}) against ${opponent}.`);
         }
 
         const pitch=pitchingNewsPerformance(row,game);
