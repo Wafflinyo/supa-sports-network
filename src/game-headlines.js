@@ -50,10 +50,9 @@ export function pitchingNewsPerformance(row,game){
    tier==='good'?'good pitching outing':
    tier==='shutout'?'shutout performance':'strong run prevention';
  const detail=[ip(outs)+' IP'];
- // Keep earned runs in the detailed pitching stats and recognition logic,
- // but don't repeat a second run-allowed count in a news story.
- if(runs!=null&&Number.isFinite(runs))
-   detail.push(runs+' '+(runs===1?'run':'runs')+' allowed');
+ // News reports show earned runs only; the full box score retains runs allowed.
+ if(earned!=null&&Number.isFinite(earned))
+   detail.push(earned===0?'no earned runs':earned+' earned '+(earned===1?'run':'runs'));
  if(ks>0)detail.push(ks+' '+(ks===1?'strikeout':'strikeouts'));
  detail.push(score+' PGP');
  return {shutout,pointsEligible,lowRuns,tier,level,outs,ks,runs,earned,pgp:points,
