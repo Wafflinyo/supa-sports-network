@@ -7,7 +7,7 @@ export default function HeadlineReadMore({text,id,limit=180,className=''}) {
   useEffect(()=>setExpanded(false),[id]);
   const full=String(text||'');
   const cutoff=full.length>limit;
-  const preview=cutoff?full.slice(0,limit).replace(/\\s+\\S*$/,'').trimEnd():full;
+  const preview=cutoff?full.slice(0,limit).replace(/\s+\S*$/,'').trimEnd():full;
   return <div className={'ssl-headline-story '+className}>
     <p>{expanded||!cutoff?full:preview+'…'}
       {cutoff&&<>{' '}<button type="button" className="ssl-headline-expand"
