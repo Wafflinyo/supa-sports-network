@@ -1646,11 +1646,15 @@ function ReportImport({ league: l, game, onDone }) {
         Add an "Item Score" column to the Stats worksheet. The site
         automatically scores batting, defense and pitching, adds Item Score
         (blank means 0), automatically awards +10 MVP points to the highest-scoring player on the winning team, and grants
-        Heating Up at {HEATING_UP_THRESHOLD}+. Pitching receives +2 per
-        inning pitched (including partial innings), +0.5 per strike, -3 per
-        earned run, -10 per HR allowed and +8 for a complete game.
-        A solo-pitcher shutout earns +30 pitching Game Points; a combined
-        shutout shares the same 30 points proportionally by innings pitched.
+        Heating Up at {HEATING_UP_THRESHOLD}+. Pitching receives +3 per
+        inning pitched (including partial innings), +15 per strikeout,
+        +0.5 per strike, +0.25 per pitch, -3 per earned run, -8 per
+        HR allowed and +20 for a complete game without a solo shutout.
+        Pitchers with 3+ innings earn a nonstacking bonus for earned
+        runs allowed: 0 = +12, 1 = +10, 2 = +8, 3 = +6.
+        A solo-pitcher shutout earns +30 pitching Game Points instead
+        of the +20 complete-game points; a combined shutout shares
+        the same 30 points proportionally by innings pitched.
         Solo and combined shutouts are recorded separately under Pitching Stats.
         Rio provides innings and strikes automatically. Corrected reports
         replace prior totals and hot streak results.
@@ -2604,7 +2608,7 @@ function TeamStats({ league: l }) {
       <p className="team-stats-explainer">
         {isAverage
           ? "Team averages are the sum of all players' stats divided by the team's completed games. AGP is the team's total Game Points per completed game. GP and all W–L records remain totals; teams without completed games show a dash."
-          : "Team totals combine every player's stats from completed games. Shutouts count once per team shutout, including combined shutouts; the 40 pitching Game Point bonus is shared by contributing pitchers. OGP, DGP and PGP are weighted components. TGP includes Item Score and MVP points; AGP is always per game."}
+          : "Team totals combine every player's stats from completed games. Shutouts count once per team shutout, including combined shutouts; the 30 pitching Game Point shutout bonus is shared by contributing pitchers, and solo shutouts replace the +20 complete-game bonus. OGP, DGP and PGP are weighted components. TGP includes Item Score and MVP points; AGP is always per game."}
         {" "}Overall, Home and Away Records count released regular-season games only.
       </p>
     </Box>
