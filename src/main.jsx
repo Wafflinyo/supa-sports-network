@@ -1,4 +1,5 @@
 import PwaInstall from './PwaInstall.jsx'
+import {refreshSite} from './site-refresh.js'
 import {fantasySeasonReady} from './fantasy-scoring.js'
 import {useSeasonLeague,SeasonWorkspace,SeasonPage,SeasonPrompts,SeasonTeamTools,SeasonSelector,seasonPages} from './SeasonLeague.jsx'
 import {aggregate,fantasyGames} from './season-data.js'
@@ -19,7 +20,7 @@ import {pitcherPriorityFor} from './player-roles.js'
 import React, { useEffect, useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createClient } from '@supabase/supabase-js'
-import { ArrowDown, ArrowUp, CalendarDays, Menu, Search, Shield, Trophy, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, CalendarDays, Menu, Search, Shield, Trophy, RefreshCw, X } from 'lucide-react'
 import playerPool from './players.json'
 import gamesPlayed from './games-played.json'
 
@@ -254,7 +255,7 @@ function App() {
   const logo = `${import.meta.env.BASE_URL}sluggers-supa-league-logo.svg`
   return <PlayerProfileContext.Provider value={setSelectedPlayer}><HeatingUpProvider ids={hotIds}>
     <div className="topline"><div className="container topline-inner"><span><i className="live-dot"/> SLUGGERS SUPA LEAGUE</span><span>THE LEAGUE STARTS HERE <b>★</b></span><button onClick={() => setAuthOpen(true)}>{session ? session.user.email?.split('@')[0] : 'SIGN IN / JOIN'}</button></div></div>
-    <header className="masthead"><div className="container masthead-inner"><button className="brand" onClick={() => go('Home')}><img src={logo} alt="Sluggers Supa League logo"/><span><strong>SLUGGERS <em>SUPA</em> LEAGUE</strong><small>THE OFFICIAL LEAGUE HUB</small></span></button><LeagueNotifications userId={session?.user?.id} league={seasonLeague} newsItems={newsItems} players={playerPool} onNavigate={target=>go(target.page,target.section,target.focus?{focus:target.focus,gameId:target.gameId,ballot:target.ballot,offerId:target.offerId}:null)}/><button className="mobile-menu" aria-label={menu ? "Close menu" : "Open menu"} aria-expanded={menu} aria-controls="league-main-navigation" onClick={() => setMenu(!menu)}>{menu ? <X/> : <Menu/>}<span>MENU</span></button><div className="masthead-right"><span className="league-tag">MARIO SUPER SLUGGERS</span><span className="badge-star">★</span></div></div></header>
+    <header className="masthead"><div className="container masthead-inner"><button className="brand" onClick={() => go('Home')}><img src={logo} alt="Sluggers Supa League logo"/><span><strong>SLUGGERS <em>SUPA</em> LEAGUE</strong><small>THE OFFICIAL LEAGUE HUB</small></span></button><LeagueNotifications userId={session?.user?.id} league={seasonLeague} newsItems={newsItems} players={playerPool} onNavigate={target=>go(target.page,target.section,target.focus?{focus:target.focus,gameId:target.gameId,ballot:target.ballot,offerId:target.offerId}:null)}/><button type="button" className="ssl-refresh-site" aria-label="Refresh Site" title="Refresh Site" onClick={()=>refreshSite(window.location)}><RefreshCw size={20} aria-hidden="true"/><span>REFRESH SITE</span></button><button className="mobile-menu" aria-label={menu ? "Close menu" : "Open menu"} aria-expanded={menu} aria-controls="league-main-navigation" onClick={() => setMenu(!menu)}>{menu ? <X/> : <Menu/>}<span>MENU</span></button><div className="masthead-right"><span className="league-tag">MARIO SUPER SLUGGERS</span><span className="badge-star">★</span></div></div></header>
     <nav id="league-main-navigation" className={`nav ${menu ? 'open' : ''}`} aria-label="Main navigation"><div className="container nav-inner">{visibleNav.map(n => <button key={n} className={page === n ? 'active' : ''} aria-current={page === n ? 'page' : undefined} onClick={() => go(n)}>{n}</button>)}</div></nav>
     <main className="container page-content"><SeasonPrompts league={seasonLeague} go={go}/>
       {gmNeedsTeam && page !== 'GM Tools' && <aside className="season-prompt" aria-label="Team registration reminder"><strong>YOUR TEAM STILL NEEDS TO BE CREATED</strong><p>You can explore the site, but all 12 teams need a name, home location, logo and conference before the league can schedule its draft. Go to <strong>GM Tools → Team Name, Home Location & Logo</strong> whenever you're ready.</p><button className="red-btn" onClick={()=>{setTeamSetupExpanded(true);setGmToolsTab('Team Setup');go('GM Tools')}}>FINISH TEAM SETUP</button></aside>}{seasonPages.includes(page)&&canViewLeaguePage(page, !!session, access.role)&&(page==='Teams'&&!seasonLeague.season?<OfficialTeams teams={officialTeams} loading={teamsLoading} message={teamsMessage} supabase={supabase}/>:<SeasonPage page={page} league={seasonLeague} section={notificationTarget?.section}/>)}
