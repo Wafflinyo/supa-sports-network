@@ -20,6 +20,11 @@ export function pitchingOutingBonus(stats={}){
   if(!Number.isInteger(outs)||outs<9||!Number.isInteger(earnedRuns)||earnedRuns<0||earnedRuns>3)return 0;
   return SSL_THREE_INNING_EARNED_RUN_BONUSES[earnedRuns];
 }
+// A solo shutout replaces (rather than stacks with) complete-game points.
+// The complete game remains in pitcher statistics for career record-keeping.
+export function soloShutoutReplacesCompleteGame(stats={},shutoutBonus=0){
+  return Number(shutoutBonus)===SSL_PITCHING_SHUTOUT_BONUS&&Number(stats?.completeGames??0)>0;
+}
 export const SSL_HEATING_THRESHOLD=120;
 const round2=n=>Math.round((n+Number.EPSILON)*100)/100;
 export function customGameScore(stats,itemScore=0,shutoutBonus=0){
@@ -37,6 +42,10 @@ export function customGameScore(stats,itemScore=0,shutoutBonus=0){
     if(!Number.isInteger(n)||n<0)throw Error('Invalid Game Score count: '+key);
     detail[key]=n*weight;
     raw+=detail[key];
+  }
+  if(soloShutoutReplacesCompleteGame(stats,bonus)){
+    raw-=detail.completeGames;
+    detail.completeGames=0;
   }
   detail.shutoutBonus=bonus;
   detail.pitchingOutingBonus=pitchingOutingBonus(stats);
