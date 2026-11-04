@@ -38,7 +38,8 @@ assert.match(paragraphs[0],/3 assists/);
 assert.match(paragraphs[0],/2 double plays/);
 assert.doesNotMatch(grouped.summary,/1 home run|featuring 1|home runs:|fielding:/i);
 assert.doesNotMatch(grouped.summary,/Buddy Jump/i,'Zero-valued categories should not appear');
-assert.match(grouped.summary,/close win over the Moleville Haliban/);
+assert.match(grouped.summary,/(?:victory|win|prevailed|defeated).*Moleville Haliban/i);
+assert.doesNotMatch(grouped.summary,/made (?:their|his|her) presence felt/i);
 assert(!staged.some(item=>item.category==='team-game'&&!item.private),'No staged public news');
 assert.equal(leagueNews([makeSeason()],players).filter(item=>item.gameId==='week-1').length,0,
   'Unreleased result must not leak to public feed');
@@ -47,7 +48,7 @@ assert(single,'Single-category recognitions must still publish as their own arti
 assert.match(single.summary,/solo homer/);
 assert.doesNotMatch(single.summary,/1 home run|featuring 1/i);
 const defeat=groupOf(leagueNews([makeSeason('recorded',5,6)],players,{includeRecorded:true}));
-assert.match(defeat.summary,/despite .*defeat/i,'Celebrate accomplishments despite losses');
+assert.match(defeat.summary,/(?:despite|even as|fell short|result went|lost|loss to|scoreboard favored|losing effort|came up short|tough result)/i,'Celebrate accomplishments in losses without one repeated phrase');
 assert.doesNotMatch(defeat.summary,/Week 1.s loss/i);
 assert.doesNotMatch(defeat.summary,/close win/i);
 const published=groupOf(leagueNews([makeSeason('final')],players));
