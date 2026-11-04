@@ -38,58 +38,105 @@ function homerDetails(stats) {
   return {total, events};
 }
 
-// A team gets one collective performance post for a matchup when multiple
-// teammates qualify. Every qualifying highlight is retained, but each player
-// is introduced once rather than generating competing standalone posts.
+// Group recognition by the SAME season, team and game. Heating Up remains a
+// separate class of news and is only combined when two or more teammates
+// heat up together. One player earning multiple stat achievements also gets
+// ONE recognition article instead of duplicate home run/offense/etc posts.
+// The rule is identical for the commissioner's unreleased previews, which
+// MUST retain the private flag after grouping.
 export function consolidateTeammateNews(items,seasons,players=[]){
+  const recognized=new Set(['home-run','offense','defense','pitching','perfect-batting']);
+  const names=new Map(players.map(p=>[Number(p.id),p.name]));
   const groups=new Map();
-  const eligible=new Set(['heating','home-run','offense','defense','pitching','perfect-batting']);
   for(const item of items){
-    if(!eligible.has(item.category)||!item.gameId||!item.teamId)continue;
-    const key=String(item.seasonId||item.season)+':'+item.gameId+':'+item.teamId;
-    if(!groups.has(key))groups.set(key,[]);
-    groups.get(key).push(item);
+    const type=item.category==='heating'?'heating':recognized.has(item.category)?'stats':null;
+    if(!type||item.gameId==null||item.teamId==null)continue;
+    const key=[item.seasonId??item.season,item.gameId,item.teamId,type].join(':');
+    if(!groups.has(key))groups.set(key,{key,type,items:[]});
+    groups.get(key).items.push(item);
   }
-  const replacements=new Map(),remove=new Set();
-  const nameById=new Map(players.map(p=>[Number(p.id),p.name]));
-  for(const [key,group] of groups){
-    const distinct=[...new Set(group.map(x=>x.playerId).filter(x=>x!=null))];
-    if(distinct.length<2)continue;
-    const representative=group[0];
+  const categoryNames={
+    'home-run':'Home runs','offense':'Offense','defense':'Fielding',
+    'pitching':'Pitching','perfect-batting':'Perfect on-base',
+  };
+  const replacements=new Map(),removed=new Set();
+  const plainDetail=(summary,opponent)=>{
+    const original=String(summary||'');
+    const suffix=' against '+opponent;
+    const index=original.toLowerCase().indexOf(suffix.toLowerCase());
+    const withoutOpponent=index<0?original:
+      original.slice(0,index)+original.slice(index+suffix.length);
+    return withoutOpponent.replace(/\s+/g,' ').trim().replace(/[.\s]+$/,'');
+  };
+  for(const group of groups.values()){
+    const batch=group.items;
+    const uniquePlayers=[...new Set(batch.map(x=>Number(x.playerId)))];
+    // Stats combine when one player has two or more accomplishments OR
+    // teammates each have achievements. Heating combines ONLY for teammates.
+    if(group.type==='stats'&&batch.length<2)continue;
+    if(group.type==='heating'&&uniquePlayers.length<2)continue;
+    const first=batch[0];
     const season=(seasons||[]).find(s=>
-      String(s.id)===String(representative.seasonId)||
-      s.name===representative.season);
-    const game=season?.games?.find(g=>String(g.id)===String(representative.gameId));
-    const home=(season?.teams||[]).find(t=>String(t.id)===String(representative.teamId));
-    if(!game||!home||game.stage!=='final')continue;
-    const byPlayer=new Map();
-    for(const item of group){
-      if(!byPlayer.has(item.playerId))byPlayer.set(item.playerId,[]);
-      byPlayer.get(item.playerId).push(item);
+      (first.seasonId!=null&&String(s.id)===String(first.seasonId))||
+      (first.seasonId==null&&s.name===first.season));
+    const game=season?.games?.find(g=>String(g.id)===String(first.gameId));
+    const team=season?.teams?.find(t=>String(t.id)===String(first.teamId));
+    if(!game||!team||!['recorded','final'].includes(game.stage))continue;
+    const opponentId=String(game.away)===String(first.teamId)?game.home:game.away;
+    const opponent=season.teams.find(t=>String(t.id)===String(opponentId))?.name||
+      'the opposing team';
+    const summaryEnd=gameOutcomeContext(season,game,first.teamId);
+    const closing=summaryEnd.charAt(0).toUpperCase()+summaryEnd.slice(1);
+    const playerGroups=new Map();
+    for(const item of batch){
+      const id=Number(item.playerId);
+      if(!playerGroups.has(id))playerGroups.set(id,[]);
+      playerGroups.get(id).push(item);
     }
-    const remarks=[...byPlayer].map(([id,stories])=>{
-      const person=nameById.get(Number(id))||'A player';
-      const details=stories.map(item=>item.summary.replace(/\s+against\s+.+?(?:\.|$)/i,'.').trim())
-        .map(x=>x.replace(/[. ]+$/,'')).filter(Boolean);
-      return person+': '+details.join('; ')+'.';
-    });
-    const closing='All of it happened '+gameOutcomeContext(season,game,representative.teamId);
-    const combined={
-      ...representative,
-      id:'team-game:'+key,category:'team-game',tier:'teammates',label:'TEAM GAME STANDOUTS',
-      title:distinct.map(id=>nameById.get(Number(id))||'A player').join(', ')+
-        ' lead '+home.name+' in a standout team effort!',
-      summary:remarks.join(' ')+' '+closing,
-      seasonId:season.id,playerId:null,gameId:game.id,
-      collectivePlayers:distinct,private:false,
-    };
-    replacements.set(representative.id,combined);
-    for(const item of group)remove.add(item.id);
+    const rosterNames=uniquePlayers.map(id=>names.get(id)||'A player');
+    let combined;
+    if(group.type==='heating'){
+      const details=uniquePlayers.map(id=>{
+        const name=names.get(id)||'A player';
+        const row=game.result?.players?.find(r=>
+          Number(r.player)===id&&String(r.team)===String(first.teamId));
+        const score=Number(row?.gameScore);
+        return name+(Number.isFinite(score)?' ('+score+' Game Score)':'');
+      });
+      combined={
+        ...first,id:'team-heating:'+group.key,category:'heating',tier:'hot',
+        label:'HEATING UP',playerId:null,collectivePlayers:uniquePlayers,
+        title:rosterNames.join(' and ')+' are heating up!',
+        summary:details.join(' · ')+'. These teammates earned a fire for the next game. '+closing,
+        private:game.stage==='recorded',
+      };
+    }else{
+      const details=[...playerGroups].map(([id,events])=>{
+        const person=names.get(id)||'A player';
+        const accomplishments=events.map(event=>
+          categoryNames[event.category]+': '+plainDetail(event.summary,opponent));
+        return person+' — '+accomplishments.join('; ')+'.';
+      });
+      combined={
+        ...first,id:'team-game:'+group.key,category:'team-game',tier:'teammates',
+        label:uniquePlayers.length===1?'GAME PERFORMANCE':'TEAM GAME STANDOUTS',
+        title:uniquePlayers.length===1
+          ?rosterNames[0]+' delivers a standout performance for '+team.name+'!'
+          :rosterNames.join(', ')+' shine for '+team.name+'!',
+        summary:details.join(' ')+' '+closing,
+        playerId:null,collectivePlayers:uniquePlayers,
+        recognitions:batch.map(({playerId,category,tier,label,title,summary})=>
+          ({playerId,category,tier,label,title,summary})),
+        private:game.stage==='recorded',
+      };
+    }
+    replacements.set(first.id,combined);
+    for(const item of batch)removed.add(item.id);
   }
   const output=[];
   for(const item of items){
     if(replacements.has(item.id))output.push(replacements.get(item.id));
-    else if(!remove.has(item.id))output.push(item);
+    else if(!removed.has(item.id))output.push(item);
   }
   return output;
 }
