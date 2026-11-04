@@ -36,6 +36,7 @@ jobs:
       - run: node tests/preseason-mii-name-mapping.mjs
       - run: node tests/preseason-waluigi-plate-appearances.mjs
       - run: node tests/game-box-score-links.mjs
+      - run: node tests/box-score-tab-columns.mjs
       - run: node tests/private-game-report-save-and-heat.mjs
       - run: node tests/league-news.mjs
       - run: node tests/gm-achievements.mjs
