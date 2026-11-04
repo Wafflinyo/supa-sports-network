@@ -2604,7 +2604,7 @@ function TeamStats({ league: l }) {
       <p className="team-stats-explainer">
         {isAverage
           ? "Team averages are the sum of all players' stats divided by the team's completed games. AGP is the team's total Game Points per completed game. GP and all W–L records remain totals; teams without completed games show a dash."
-          : "Team totals combine every player's stats from completed games. Shutouts count once per team shutout, including combined shutouts; the 30 pitching Game Point bonus is shared by contributing pitchers. OGP, DGP and PGP are weighted components. TGP includes Item Score and MVP points; AGP is always per game."}
+          : "Team totals combine every player's stats from completed games. Shutouts count once per team shutout, including combined shutouts; the 40 pitching Game Point bonus is shared by contributing pitchers. OGP, DGP and PGP are weighted components. TGP includes Item Score and MVP points; AGP is always per game."}
         {" "}Overall, Home and Away Records count released regular-season games only.
       </p>
     </Box>
