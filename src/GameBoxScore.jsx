@@ -57,6 +57,35 @@ function TeamBoxTable({team,tab}){
     </>:<p className="ssl-box-empty">No {tab.toLowerCase()} player statistics were supplied for this team.</p>}
   </section>;
 }
+function InningLineScore({game}){
+  const innings=game.innings;
+  if(!Array.isArray(innings?.away)||!Array.isArray(innings?.home)||
+    !innings.away.length||innings.away.length!==innings.home.length)return null;
+  const columns=Array.from({length:innings.away.length},(_,i)=>i+1);
+  return <section className="ssl-box-innings" aria-label="Runs scored by inning">
+    <h3>SCORING BY INNING</h3>
+    <div className="ssl-box-innings-scroll" role="region" tabIndex={0}
+      aria-label="Inning-by-inning game line score">
+      <table className="ssl-box-innings-table">
+        <thead><tr><th scope="col">TEAM</th>
+          {columns.map(n=><th key={n} scope="col">{n}</th>)}
+          <th scope="col" className="ssl-box-innings-total">R</th>
+          <th scope="col">H</th>
+        </tr></thead>
+        <tbody>{game.teams.map((team,index)=>
+          <tr key={team.key}>
+            <th scope="row">{team.name}</th>
+            {innings[index===0?'away':'home'].map((runs,i)=>
+              <td key={i}>{runs==null?'X':runs}</td>)}
+            <td className="ssl-box-innings-total">{team.score}</td>
+            <td>{team.hits}</td>
+          </tr>)}
+        </tbody>
+      </table>
+    </div>
+    <p>Runs in each inning, directly from the Project Rio Game Info worksheet.</p>
+  </section>;
+}
 export default function GameBoxScore({game,onClose,inline=false}){
   const [tab,setTab]=useState(inline?'Batting':'Game Points');
   const closeRef=useRef(null);
@@ -88,6 +117,7 @@ export default function GameBoxScore({game,onClose,inline=false}){
       <strong>{inline?'PREVIEW — NOT PUBLISHED':'FINAL'}</strong><span>HITS: {away.hits} – {home.hits}</span>
       {game.hasPlayerStats&&<span>TEAM GAME POINTS: {away.totalGamePoints.toFixed(2)} – {home.totalGamePoints.toFixed(2)}</span>}
     </div>
+    <InningLineScore game={game}/>
     {game.hasPlayerStats?<div className="ssl-box-body">
       <div className="ssl-box-tabs" role="tablist" aria-label="Box score statistic categories">
         {Object.keys(categories).map(category=><button key={category} type="button" role="tab"

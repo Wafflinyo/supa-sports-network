@@ -93,6 +93,7 @@ export function seasonBoxScore(season,game){
     teams:[game.away,game.home].map(team=>
       summarizeTeam(String(team),names.get(String(team))||'Team',Number(game.result.scores[team]??0),
         entries.filter(p=>p.teamKey===String(team)))),
+    innings:game.result.innings?.away&&game.result.innings?.home?game.result.innings:null,
     hasPlayerStats:entries.length>0,
   };
 }

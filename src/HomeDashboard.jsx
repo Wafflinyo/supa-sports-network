@@ -93,7 +93,7 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
   const ranks=useMemo(()=>powerRankings(season),[season]);
   const table=useMemo(()=>standings(season),[season]);
   const championship=useMemo(()=>latestPreseasonChampionship(league?.seasons||[],players),[league?.seasons,players]);
-  const headlines=useMemo(()=>homepageHeadlineSlides(championship,newsItems,season?.id),[championship,newsItems,season?.id]);
+  const headlines=useMemo(()=>homepageHeadlineSlides(championship,newsItems,season?.id,5,season),[championship,newsItems,season]);
   const openGame=game=>go('Schedule',null,{focus:'game',gameId:game.id});
   const openStory=story=>{
     if(story.seasonId!=null&&String(story.seasonId)!==String(league?.season?.id))

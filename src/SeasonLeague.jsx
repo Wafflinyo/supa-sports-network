@@ -5,6 +5,7 @@ import {seasonPhaseLabel} from './season-phase.js';
 import {seasonBoxScore,previewPrivateGameBoxScore} from './game-box-score-data.js';
 import GameBoxScore from './GameBoxScore.jsx';
 import GameStoryEditor from './GameStoryEditor.jsx';
+import {inningScoringDrama} from './rio-inning-scores.js';
 import RioReportDialog from './RioReportDialog.jsx';
 import PreseasonStats from './PreseasonStats.jsx';
 import NextSeasonDraftPicks from './NextSeasonDraftPicks.jsx';
@@ -1711,6 +1712,17 @@ function ReportImport({ league: l, game, onDone }) {
             </table>
           </div>
           <h4>FINAL SCORE REVIEW</h4>
+          {preview.inningScores?
+            <p role="status"><strong>Game Info inning scores imported:</strong>
+              {' '}{preview.inningScores.away.length} innings ·
+              {' '}{inningScoringDrama(preview.inningScores)?.leadChanges??0} lead changes ·
+              {' '}{inningScoringDrama(preview.inningScores)?.lateFinish==='walkoff'
+                ?'Walk-off finish'
+                :inningScoringDrama(preview.inningScores)?.lateFinish==='late-comeback'
+                  ?'Late comeback':'Final score confirmed by innings'}.
+              The full inning scoreboard appears below.</p>:
+            <p className="season-info">No recognizable inning-by-inning line score was found in Game Info.
+              The stats report can still be saved, but the site will not invent inning scores or lead changes.</p>}
           {preview.labels.map((label) => (
             <p key={label}>
               {label}:{" "}
