@@ -1,5 +1,6 @@
 import columns from "./temporary-stat-columns.json" with { type: "json" };
 import {loadRioSheets} from './rio-spreadsheet.js';
+import {extractRioInningScores,validateInningScores} from './rio-inning-scores.js';
 import {resolveRioTeam,validateRioMatchup} from './rio-team-mapping.js';
 import {customGameScore} from './ssl-game-score.js';
 import {gamePointsForReport} from './game-points.js';
@@ -289,7 +290,8 @@ export async function readRio(file,season,game,players){
   const fingerprint=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),
     b=>b.toString(16).padStart(2,'0')).join('');
   return {file,filename:file.name,fingerprint,labels,rows:targetRows,
-    pitch:pitchRows,gameInfo:resolved.map(x=>x.canonical+' → '+x.team.name)};
+    pitch:pitchRows,inningScores:extractRioInningScores(sheets['Game Info'],season.teams||[],game),
+    gameInfo:resolved.map(x=>x.canonical+' → '+x.team.name)};
 }
 export function reportStatCount(r,key) {
   const label = Object.values(columns).flat().find(([k]) => k === key)?.[1];
@@ -422,9 +424,15 @@ export function buildReport(preview, awayLabel, season, game, players, mvp) {
         `Map pitching row ${pitcher.row} (${pitcher.player}) to the correct participating player.`,
       );
   }
+  // Never save a mismatched line score: it must equal the exact 18+ player
+  // run totals after mapping Rio team labels onto the SSL away/home lineup.
+  const runs=team=>result.filter(x=>String(x.team)===String(team))
+    .reduce((sum,x)=>sum+Number(x.stats.runs||0),0);
+  const innings=validateInningScores(preview.inningScores,runs(game.away),runs(game.home));
   return {
     fingerprint: preview.fingerprint,
     filename: preview.filename,
     players: result,
+    ...(innings?{innings}:{}),
   };
 }
