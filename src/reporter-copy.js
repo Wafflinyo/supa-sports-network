@@ -150,8 +150,6 @@ export function reporterParagraph(person,id,categories,game,teamId,opponent,team
     const numbers=[innings+' innings pitched'];
     if(pitching.runs===0)numbers.push('no runs allowed');
     else if(pitching.runs>0)numbers.push(plural(pitching.runs,'run')+' allowed');
-    if(pitching.earned>0&&pitching.earned!==pitching.runs)
-      numbers.push(plural(pitching.earned,'earned run'));
     if(pitching.ks>0)numbers.push(plural(pitching.ks,'strikeout'));
     if(pitching.pgp>=20)numbers.push(Number(pitching.pgp.toFixed(2))+' PGP');
     const line=naturalList(numbers),prefix=sentences.length?'On the mound, '+person:person;
