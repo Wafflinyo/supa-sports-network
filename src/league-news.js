@@ -1,5 +1,6 @@
 import {HEATING_UP_THRESHOLD} from './heating-up.js';
 import {preseasonChampionshipFeature} from './preseason-champion-feature.js';
+import {matchHeadline} from './game-headlines.js';
 // Derived newsroom: headlines refresh when official reports are corrected.
 // Recorded games remain commissioner-only until their results are released.
 
@@ -52,8 +53,12 @@ export function leagueNews(seasons, players, {includeRecorded = false} = {}) {
   for (const season of seasons || []) {
     const teamName = id => season.teams?.find(t => t.id === id)?.name || 'the opposing team';
     for (const game of season.games || []) {
-      if (!(game.stage === 'final' || (includeRecorded && game.stage === 'recorded'))
-        || !Array.isArray(game.result?.players)) continue;
+      if (!(game.stage === 'final' || (includeRecorded && game.stage === 'recorded'))) continue;
+      // Only released, score-verified matches qualify for the public headline
+      // newsroom. Private staged reports are NEVER carousel candidates.
+      const story=matchHeadline(season,game,players);
+      if(story)items.push(story);
+      if (!Array.isArray(game.result?.players))continue;
       const at = game.releasedAt || game.result.postedAt || game.startsAt;
       for (const row of game.result.players) {
         const playerId = Number(row.player);
