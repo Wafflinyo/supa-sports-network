@@ -86,7 +86,6 @@ export function consolidateTeammateNews(items,seasons,players=[]){
     const opponent=season.teams.find(t=>String(t.id)===String(opponentId))?.name||
       'the opposing team';
     const summaryEnd=gameOutcomeContext(season,game,first.teamId);
-    const closing=summaryEnd.charAt(0).toUpperCase()+summaryEnd.slice(1);
     const playerGroups=new Map();
     for(const item of batch){
       const id=Number(item.playerId);
@@ -94,6 +93,19 @@ export function consolidateTeammateNews(items,seasons,players=[]){
       playerGroups.get(id).push(item);
     }
     const rosterNames=uniquePlayers.map(id=>names.get(id)||'A player');
+    const teamRuns=Number(game.result?.scores?.[first.teamId]);
+    const opponentRuns=Number(game.result?.scores?.[opponentId]);
+    const lost=Number.isFinite(teamRuns)&&Number.isFinite(opponentRuns)&&teamRuns<opponentRuns;
+    const week=Number(game.week);
+    const featuredNames=rosterNames.length===1?rosterNames[0]:
+      rosterNames.slice(0,-1).join(', ')+(rosterNames.length>2?', and ':' and ')+rosterNames.at(-1);
+    // Recognize the players despite the result; avoid the deflating
+    // "in Week X's loss" phrasing after a positive list of achievements.
+    const closing=lost
+      ? 'Despite their defeat against the '+opponent+
+        (Number.isInteger(week)&&week>0?' in Week '+week:'')+
+        ', '+featuredNames+' still delivered '+(rosterNames.length===1?'a standout performance':'standout performances')+'.'
+      : summaryEnd.charAt(0).toUpperCase()+summaryEnd.slice(1);
     let combined;
     if(group.type==='heating'){
       const details=uniquePlayers.map(id=>{
