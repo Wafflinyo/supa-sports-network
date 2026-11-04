@@ -98,3 +98,6 @@
 .ssl-headliner-expanded-story p{font-size:12px;line-height:1.55;color:#ecf4ff}
 .ssl-home-news .ssl-headline-story{max-width:100%}
 @media(max-width:600px){.ssl-headliner-expanded-story{max-height:170px}}
+
+/* Clicking more expands the full story vertically; the user can read it without a clipped scroll pane. */
+.ssl-headliner-expanded-story.expanded{max-height:none;overflow:visible}
