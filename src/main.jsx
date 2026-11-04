@@ -35,6 +35,7 @@ import {OfficialTeams,TeamSetup,CommissionerWorkspace,teamLogo} from './TeamIden
 import connection from './supabase-config.json'
 import './styles.css'
 import './mobile.css'
+import './site-refresh.css'
 
 const url = import.meta.env.VITE_SUPABASE_URL || connection.url
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || connection.publishableKey
