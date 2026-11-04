@@ -277,7 +277,8 @@ function App() {
         {gmToolsTab==='My Team'?<MyDraftTeam league={seasonLeague}/>:gmToolsTab==='Home Games'?<GmStadiumMatchups league={seasonLeague}/>:gmToolsTab==='Achievements'?<GmAchievements seasons={seasonLeague.seasons} teams={officialTeams} slot={access.slot}/>:gmToolsTab!=='Team Setup'&&<SeasonTeamTools league={seasonLeague} section={gmToolsTab} focus={notificationTarget}/>}
         </>}
       {page === 'Home' && <HomeDashboard league={seasonLeague} go={go}
-        newsItems={newsItems} players={players} onPlayerSelect={setSelectedPlayer}/>}
+        newsItems={newsItems} players={players} onPlayerSelect={setSelectedPlayer}
+        canPreviewHeadlines={isCommissioner}/>}
       {page === 'League Rules' && <LeagueRules/>}
       {page === 'Player Data' && <><button className="outline-btn" onClick={()=>go('Player Stats')}>BACK TO PLAYER STATS</button><PlayerData seasons={seasonLeague.seasons}/></>}
       {page === 'Player Stats' && <>
