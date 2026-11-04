@@ -1,5 +1,5 @@
 /* SSL broadcast headline deck: championship plus up to four released games. */
-.ssl-headliners{min-width:0;touch-action:pan-y;overscroll-behavior-x:contain}
+.ssl-headliners{min-width:0;touch-action:auto;overscroll-behavior:auto}
 .ssl-headliners-stage{min-width:0}
 .ssl-headliners-stage>.ssl-home-hero{margin:0}
 .ssl-headliners-controls{display:flex;align-items:center;justify-content:center;gap:12px;
