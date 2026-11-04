@@ -30,7 +30,7 @@ p=pitching({outs:15,earnedRuns:0,strikes:6,runsAllowed:4});
 assert.equal(p.pgp,30);assert.equal(p.tier,'solid');
 p=pitching({outs:15,earnedRuns:0,strikes:26,runsAllowed:4});
 assert.equal(p.pgp,40);assert.equal(p.tier,'great');
-assert(pitching({outs:14,earnedRuns:0,strikes:40,runsAllowed:5})===null,
+assert(pitching({outs:14,earnedRuns:4,strikes:40,runsAllowed:5,pitchStrikeouts:3})===null,
  'Even enormous PGP does not qualify through the 20+ PGP rule before 5 full IP');
 const four=pitching({outs:12,runsAllowed:2,earnedRuns:4,pitchStrikeouts:2});
 assert(four,'Exactly 4 IP with 2 runs allowed qualifies');
