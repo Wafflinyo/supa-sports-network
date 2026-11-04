@@ -12,7 +12,7 @@ const s1={id:'one',name:'Season 1',number:1,status:'archived',teams,order,
   picks:teams.map((t,i)=>({number:i+1,round:1,team:t.id,kind:'player',player:i+1,seconds:i+1})),
   games:[],transactions:[],preseasonReports:[],preseasonResults:[],
   playoffSeries:[],champion:null,conferenceChampions:{}};
-const s2={...s1,id:'two',name:'Season 2',number:2,status:'postdraft',
+const s2={...s1,id:'two',name:'Season 2',number:2,status:'preseason',
   games:[],transactions:[],preseasonReports:[],preseasonResults:[]};
 assert.deepEqual(historySeasons([s1,s2]).map(s=>s.name),['Season 2','Season 1']);
 assert.deepEqual(historySeasons([s2,s1]).map(s=>s.name),['Season 2','Season 1']);
