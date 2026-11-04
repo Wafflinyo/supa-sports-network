@@ -185,4 +185,12 @@ assert.throws(()=>customGameScore({pitches:-1}),/Invalid Game Score count/);
 assert.throws(()=>customGameScore({pitches:1.5}),/Invalid Game Score count/);
 assert.equal(gamePointComponents({outs:9,earnedRuns:3,pitches:40}).pgp,
   9-9+6+10,'A three-ER outing earns the one applicable +6 tier and +0.25 per pitch');
-console.log('PASS: +0.25 per pitch thrown on top of +0.5 per strike; 3+ IP earned-run tiers and PGP/TGP consistent');
+const soloShutoutMigration=readFileSync(new URL('../supabase/migrations/20261104005500_ssl_shutout_30_no_solo_cg_bonus.sql',import.meta.url),'utf8');
+assert.match(soloShutoutMigration,/3000\.0\*outs\/total_outs/);
+assert.match(soloShutoutMigration,/CASE WHEN coalesce/);
+assert.equal(customGameScore({completeGames:1,outs:21},0,30).gameScore,63,
+  'Seven-inning solo shutout counts +30 shutout, +21 IP, +12 clean-outing and no +20 CG');
+assert.equal(gamePointComponents({completeGames:1,outs:21},30).pgp,63);
+assert.equal(customGameScore({completeGames:1,outs:21,earnedRuns:1}).gameScore,48,
+  'A complete game that allows an earned run still receives +20 CG and the one-ER outing bonus');
+console.log('PASS: +0.25 per pitch, no +20 CG on solo +30 shutouts, and 3+ IP outing tier');
