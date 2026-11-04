@@ -6,6 +6,7 @@ import {teamLogo} from './TeamIdentity.jsx';
 import {ConferenceMark} from './ConferenceMark.jsx';
 import {PlayerPortrait} from './PlayerPortrait.jsx';
 import {preseasonBracket,preseasonReady,pickTimeLabel} from './preseason.js';
+import {seasonPhaseLabel} from './season-phase.js';
 import {allPreseasonGames} from './preseason-game-data.js';
 import {preseasonChampionshipFeature} from './preseason-champion-feature.js';
 import {preseasonBoxScore,reportForBracketMatch,bracketScoreOnly,seasonBoxScore} from './game-box-score-data.js';
@@ -416,7 +417,7 @@ export default function HistoryArchive({seasons=[],supabase}){
     <div className="ssl-history-season-picker" role="group" aria-label="Choose archived SSL season">
       {ordered.map(s=><button type="button" key={s.id} onClick={()=>changeSeason(s.id)}
         aria-pressed={String(season.id)===String(s.id)} className={String(season.id)===String(s.id)?'active':''}>
-        <strong>{s.name}</strong><small>{s.status==='archived'?'Completed archive':String(s.status||'In progress').toUpperCase()}</small>
+        <strong>{s.name}</strong><small>{s.status==='archived'?'Completed archive':seasonPhaseLabel(s.status)}</small>
       </button>)}
     </div>
     <div className="ssl-history-season-heading">
