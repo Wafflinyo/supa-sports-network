@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+const outingMigration=readFileSync(new URL('../supabase/migrations/20261104001500_ssl_pgp_3ip_earned_run_tiers.sql',import.meta.url),'utf8');
+assert.match(outingMigration,/THEN 12-2\*coalesce/,'Server must verify nonstacking 12/10/8/6 tier');
+assert.match(outingMigration,/>=9/,'Pitching performance bonus requires at least nine outs');
 const verifySql=(
  readFileSync(new URL('../supabase/migrations/20261029234800_ssl_pitching_outs_strikes_rebalance.sql',import.meta.url),'utf8')+'\n'+
  readFileSync(new URL('../supabase/migrations/20261103235900_ssl_pgp_2026_reweight.sql',import.meta.url),'utf8')
@@ -18,7 +21,7 @@ assert(verifySql.includes("pg_get_functiondef('league_private.ssl_manage(text,uu
  'New scoring must preserve the live existing commissioner security wrapper');
 assert(!/update league_private\.ssl_season_states/.test(verifySql),
  'Scoring migration must never mutate existing draft, lineups or saved game data');
-import {customGameScore,SSL_GAME_SCORE_WEIGHTS,SSL_HEATING_THRESHOLD} from '../src/ssl-game-score.js';
+import {customGameScore,SSL_GAME_SCORE_WEIGHTS,SSL_HEATING_THRESHOLD,pitchingOutingBonus} from '../src/ssl-game-score.js';
 import {gamePointComponents,gamePointsForReport} from '../src/game-points.js';
 import {buildReport,automaticReportMvp,previewCustomGameScore,aggregate} from '../src/season-data.js';
 import {heatingUpForSeason} from '../src/heating-up.js';
@@ -36,10 +39,10 @@ assert.equal(Object.keys(SSL_GAME_SCORE_WEIGHTS).length,25);
 assert.equal(customGameScore({
  pitchStrikeouts:2,outs:18,strikes:24,earnedRuns:2,
  completeGames:1,hrAllowed:1,mvps:1
-}).gameScore,76,
- 'two strikeouts +30, 6 IP +18, 24 strikes +12, 2 ER −6, complete game +20, 1 HR −8 and MVP +10');
-assert.equal(customGameScore({outs:18,strikes:0,earnedRuns:0,hrAllowed:0}).gameScore,18);
-assert.equal(customGameScore({outs:19,strikes:45}).gameScore,41.5,
+}).gameScore,84,
+ 'two strikeouts +30, 6 IP +18, 24 strikes +12, 2 ER −6, complete game +20, 1 HR −8, MVP +10 and two-ER outing +8');
+assert.equal(customGameScore({outs:18,strikes:0,earnedRuns:0,hrAllowed:0}).gameScore,30);
+assert.equal(customGameScore({outs:19,strikes:45}).gameScore,53.5,
  'partial innings are prorated as 1 point per recorded out');
 assert.equal(customGameScore({outs:1,strikes:1}).gameScore,1.5,
  'one-third inning earns 1 plus half a point for the strike');
@@ -115,9 +118,9 @@ assert.equal(buildReport(preview,'A',season,game,[],10).players[0].gameScore,120
 const partial={...pr,inningspitched:'6.33',strikes:13,runsallowed:2,earnedruns:2,hrallowed:1,
  completegames:1};
 const revised={...preview,pitch:[partial]};
-assert.equal(previewCustomGameScore(revised,row).gameScore,136.5,
+assert.equal(previewCustomGameScore(revised,row).gameScore,144.5,
  '6⅓ IP earns +19, thirteen strikes +6.5, ER -6, HR -8, complete game +20');
-assert.equal(previewCustomGameScore({...preview,pitch:[{...partial,scorelessinnings:999}]},row).gameScore,136.5,
+assert.equal(previewCustomGameScore({...preview,pitch:[{...partial,scorelessinnings:999}]},row).gameScore,144.5,
  'retired scoreless-inning column cannot influence the result');
 assert.equal(buildReport(revised,'A',season,game,[],null).players[0].stats.outs,19,
  'Project Rio 6.33 innings converts to 19 recorded outs');
@@ -149,4 +152,21 @@ assert.deepEqual(heat.byGame.g1.a,[]);
 const corrected={...hotSeason,games:[{...below,result:{players:[{...below.result.players[0],gameScore:120}]}},above,hotSeason.games[2]]};
 assert.equal(heatingUpForSeason(corrected).players[10].heatingUpCount,2,
  'corrected report recomputes historical qualifications, not duplicate them');
-console.log('PASS: custom 25-category Game Score, +3/IP +0.5/strike +20 CG -8/HR, +40 shutout, MVP +10 and career totals');
+for (const [er,bonus] of [[0,12],[1,10],[2,8],[3,6],[4,0]]) {
+  assert.equal(pitchingOutingBonus({outs:9,earnedRuns:er}),bonus,
+    'Each eligible pitching appearance earns exactly one earned-run tier');
+  assert.equal(gamePointComponents({outs:9,earnedRuns:er}).pgp,
+    9-3*er+bonus,'Outing tier must be counted exactly once in PGP');
+  assert.equal(customGameScore({outs:9,earnedRuns:er}).gameScore,
+    9-3*er+bonus,'The custom Game Score and PGP must agree');
+}
+for(const outs of [0,3,8]){
+  assert.equal(pitchingOutingBonus({outs,earnedRuns:0}),0,
+    'Fewer than three innings earn no outing tier');
+}
+assert.equal(pitchingOutingBonus({outs:10,earnedRuns:0}),12,'Relief and partial innings qualify after nine outs');
+assert.equal(pitchingOutingBonus({outs:9,earnedRuns:1.5}),0,'Invalid fractional earned runs cannot qualify');
+assert.equal(gamePointComponents({outs:9,earnedRuns:0},40).pgp,61,
+  'The +12 earned-run outing bonus can coexist with a +40 shutout bonus');
+assert.equal(customGameScore({outs:9,earnedRuns:0},0,40).gameScore,61);
+console.log('PASS: earned-run outing bonuses 0/1/2/3 ER = +12/+10/+8/+6 after >=3 IP, nonstacking; correct PGP/TGP calculation');
