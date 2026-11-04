@@ -1,0 +1,23 @@
+/* One-tap full reload next to the notifications bell on every screen. */
+.ssl-refresh-site{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  flex-shrink:0;min-height:44px;padding:9px 14px;border:1px solid #65799a;
+  border-radius:6px;background:#18365f;color:#fff;
+  font:900 12px Inter,Arial,sans-serif;letter-spacing:.05em;white-space:nowrap;
+}
+.ssl-refresh-site:hover{background:#264f82;border-color:#f1c73e}
+.ssl-refresh-site:focus-visible{outline:3px solid #f1c73e;outline-offset:3px}
+.ssl-refresh-site svg{flex-shrink:0}
+@media(max-width:700px){
+  .ssl-refresh-site{width:43px;height:43px;min-height:43px;padding:0;border-radius:50%}
+  .ssl-refresh-site span{display:none}
+}
+@media(max-width:420px){
+  .masthead-inner{gap:5px}
+  .mobile-menu{min-width:46px;width:46px;min-height:43px;padding:0}
+  .mobile-menu span{display:none}
+  .brand{gap:5px}
+  .brand img{width:40px;height:56px}
+  .brand strong{font-size:clamp(16px,4.9vw,21px)}
+  .brand small{display:none}
+}
