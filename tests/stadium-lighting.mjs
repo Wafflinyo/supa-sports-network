@@ -64,7 +64,8 @@ assert(!schedule.includes('ssl_set_stadium_variant'),
 assert(tools.includes("p_game:String(game.id),p_variant:choice"));
 assert(tools.includes('SAVE DAY / NIGHT'),'GM must save, not auto-select on tap');
 assert(tools.includes('homeGames(s,team.id)'),'GM can only see their home matchups');
-assert(tools.includes("dateLabel(game.startsAt)"),'future undated matchups must render');
+assert(!tools.includes('dateLabel(game.startsAt)')&&!tools.includes('DATE & TIME TBD'),
+  'future games render from their week and Stadium without a date placeholder');
 assert(sql.includes("access_record->>'role','') <> 'gm'"),
   'server must limit selection to GMs');
 assert(sql.includes("game_record->>'home'<>franchise::text"),
