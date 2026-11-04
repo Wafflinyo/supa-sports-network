@@ -42,3 +42,11 @@
 .ssl-box-no-report{padding:25px}
 .ssl-box-no-report strong{color:#162e56}
 @media(max-width:650px){.ssl-box-backdrop{padding:5px;align-items:center}.ssl-box-dialog{max-height:calc(100dvh - 10px);border-radius:8px}.ssl-box-header{padding:14px}.ssl-box-header h2{font-size:19px}.ssl-box-scoreboard{padding:12px;gap:6px}.ssl-box-scoreboard>div{padding:9px;grid-template-columns:minmax(0,1fr) auto}.ssl-box-scoreboard strong{font-size:12px}.ssl-box-scoreboard b{font-size:24px}.ssl-box-score-summary{padding:9px 12px;font-size:11px}.ssl-box-tabs{padding-left:5px;padding-right:5px}.ssl-box-tabs button{padding:11px 12px}.ssl-box-team{padding:12px 10px}.ssl-box-team h3{font-size:15px}.ssl-box-table .ssl-box-player{min-width:128px;max-width:150px}.ssl-box-table th,.ssl-box-table td{padding:10px 8px}.ssl-box-instructions{margin:11px 12px 0}}
+
+/* Commissioner upload review: same complete tabbed box score, inline rather
+   than a second popup. The dialog is scrollable on both desktop and phones. */
+.ssl-box-inline{width:100%;max-width:100%;max-height:none;overflow:visible;box-shadow:none;border:1px solid #cbd7e7;margin:18px 0 22px;border-radius:10px}
+.ssl-box-inline .ssl-box-header{border-radius:9px 9px 0 0}
+.ssl-box-inline .ssl-box-body{min-width:0}
+.ssl-rio-dialog-content .ssl-box-inline .ssl-box-table-scroll{overflow-x:auto}
+.ssl-rio-dialog-content .ssl-box-inline .ssl-box-tabs{flex-wrap:nowrap}
