@@ -88,14 +88,14 @@ assert.equal(gameOutcomeContext(season,dramatic,'checkers'),
 assert.equal(matchPerformanceHighlights(dramatic,players).filter(e=>e.kind==='pitching').length,2,
   'Both qualifying pitchers must be retained, not deduped by stat type');
 
-// Preseason champion always stays featured, other slides must be official
-// distinct matches, never staged reports or repetitive individual stories.
+// Week 1 released match headlines lead; preseason champion is LAST if
+// fewer than five match results have been released.
 const champion={seasonId:'s1',champion:teams[0]};
 const stories=[match,matchHeadline(season,close,players),matchHeadline(season,result('shutout',10,0,[]),players)];
 const pending={...dramatic,id:'private',stage:'recorded'};
 assert(!matchHeadline(season,pending,players),'No public headline for private uploads');
 const deck=homepageHeadlineSlides(champion,stories,'s1');
-assert.equal(deck[0].kind,'champion');
+assert.equal(deck.at(-1).kind,'champion');
 assert.equal(deck.length,4);
 assert.equal(new Set(deck.map(s=>s.id)).size,deck.length);
 assert(homepageHeadlineSlides(champion,stories,'s1',2).length<=2);
