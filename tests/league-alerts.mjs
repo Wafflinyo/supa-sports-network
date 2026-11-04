@@ -82,9 +82,9 @@ const newUpdate=[...completed,{id:'new-update',type:'announcement'}];
 assert.deepEqual(unseenLeagueAlertIds(newUpdate,acknowledged),['new-update'],
   'A future new alert is still delivered after the user has viewed old ones');
 const bellSource=readFileSync(new URL('../src/LeagueNotifications.jsx',import.meta.url),'utf8');
-assert.match(bellSource,/aria-haspopup="true" onClick=\\{toggleBell\\}/,
+assert(bellSource.includes('aria-haspopup="true" onClick={toggleBell}'),
   'Bell button must call the acknowledge-on-open handler, not just toggle visibility');
-assert.match(bellSource,/setVisibleIds\\(unseen\\);\\s*markRead\\(unseen\\);\\s*setOpen\\(true\\);/,
+assert.match(bellSource,/setVisibleIds\(unseen\);\s*markRead\(unseen\);\s*setOpen\(true\);/,
   'The bell acknowledges all current alerts as soon as it is opened');
 const play={...regular,status:'postseason'};
 assert(find(buildLeagueAlerts({...args,season:play}),':playoff-bracket'),'announce playoff bracket');
