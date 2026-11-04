@@ -7,7 +7,7 @@ export const SSL_GAME_SCORE_WEIGHTS=Object.freeze({
   putouts:5,assists:4,buddyJumpPutouts:15,doublePlays:8,triplePlays:18,
   // Every three recorded pitching outs equal one inning (+3 total).
   // Score full and partial innings proportionally; don't use rounded Rio IP.
-  pitchStrikeouts:15,outs:1,strikes:.5,earnedRuns:-3,
+  pitchStrikeouts:15,outs:1,strikes:.5,pitches:.25,earnedRuns:-3,
   completeGames:20,hrAllowed:-8,mvps:10,
   bobbles:-6,doublePlaysHitInto:-8,triplePlaysHitInto:-12
 });

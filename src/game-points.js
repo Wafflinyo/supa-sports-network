@@ -4,7 +4,7 @@ import {SSL_GAME_SCORE_WEIGHTS,customGameScore,pitchingOutingBonus} from './ssl-
 export const GAME_POINT_KEYS=Object.freeze({
   ogp:['hits','runs','rbi','homeRuns','doubles','triples','twoHr','threeHr','grandSlams','totalBases','doublePlaysHitInto','triplePlaysHitInto'],
   dgp:['putouts','assists','buddyJumpPutouts','doublePlays','triplePlays','bobbles'],
-  pgp:['pitchStrikeouts','outs','strikes','earnedRuns','completeGames','hrAllowed'],
+  pgp:['pitchStrikeouts','outs','strikes','pitches','earnedRuns','completeGames','hrAllowed'],
 });
 const round2=n=>Math.round((n+Number.EPSILON)*100)/100;
 export function gamePointComponents(stats={},shutoutBonus=0){

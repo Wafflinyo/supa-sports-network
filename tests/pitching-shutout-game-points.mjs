@@ -42,9 +42,9 @@ const preview={
     {player:'Gamma',chosen:3,label:'B',position:'P',runs:0,itemscore:0},
   ],
   pitch:[
-    {player:'Alpha',chosen:1,label:'A',inningspitched:3,strikes:0},
-    {player:'Beta',chosen:2,label:'A',inningspitched:6,strikes:0},
-    {player:'Gamma',chosen:3,label:'B',inningspitched:9,strikes:0},
+    {player:'Alpha',chosen:1,label:'A',inningspitched:3,strikes:0,pitches:20},
+    {player:'Beta',chosen:2,label:'A',inningspitched:6,strikes:0,pitches:30},
+    {player:'Gamma',chosen:3,label:'B',inningspitched:9,strikes:0,pitches:40},
   ],
 };
 assert.deepEqual([...previewShutoutBonuses(preview)],[['1',13.33],['2',26.67]],'Preview must include pitcher ratios');
@@ -57,9 +57,9 @@ for(const row of preview.rows){
   const saved=report.players.find(p=>p.player===row.chosen);
   assert.equal(previewCustomGameScore(preview,row).gameScore,saved.gameScore,'Preview and saved report must agree');
 }
-assert.equal(report.players[0].gameScore,40.33,'Alpha run + pitching innings + shutout share +12 outing tier');
-assert.equal(report.players[1].gameScore,56.67,'Beta 6 innings + 26.67 shared shutout +12 outing tier');
-assert.equal(gamePointsForReport(report.players[1]).pgp,56.67);
+assert.equal(report.players[0].gameScore,45.33,'Alpha run + pitching innings + shutout share +12 outing tier');
+assert.equal(report.players[1].gameScore,64.17,'Beta 6 innings + 26.67 shared shutout +12 outing tier');
+assert.equal(gamePointsForReport(report.players[1]).pgp,64.17);
 const populated={...season,games:[{...game,result:{players:report.players,scores:{away:1,home:0}}}]};
 const aggregateRows=aggregate(populated);
 assert.equal(aggregateRows[1].combinedShutouts,1);
@@ -69,7 +69,7 @@ assert.equal(aggregateRows[1].shutoutBonus,13.33);
 const ordinaryBox=seasonBoxScore({teams:[{id:'away',name:'Alpha Team'},{id:'home',name:'Gamma Team'}]},populated.games[0]);
 assert.equal(ordinaryBox.teams[0].players[0].stats.combinedShutouts,1);
 assert.equal(ordinaryBox.teams[0].players[1].stats.combinedShutouts,1);
-assert.equal(ordinaryBox.teams[0].totalGamePoints,97);
+assert.equal(ordinaryBox.teams[0].totalGamePoints,109.5);
 const shutoutOnly={...preview,pitch:preview.pitch.filter(p=>p.chosen!==2)};
 const oneReport=buildReport(shutoutOnly,'A',season,game,[],null);
 assert.equal(oneReport.players[0].shutoutBonus,40);
@@ -86,21 +86,21 @@ const diddy=ruffiansPlayers.find(p=>p.playerId===4);
 assert.equal(diddy.stats.shutoutBonus,40);
 assert.equal(diddy.stats.shutouts,1);
 assert.equal(diddy.stats.combinedShutouts,0);
-assert.equal(diddy.stats.pgp,114.5);
-assert.equal(diddy.stats.tgp,148.5);
+assert.equal(diddy.stats.pgp,125.25);
+assert.equal(diddy.stats.tgp,159.25);
 assert.equal(ruffiansPlayers.find(p=>p.playerId===13).stats.tgp,-8,'Negative Game Points still allowed');
 const away=preseasonTeamStats().find(t=>t.teamName==='Rogueport Ruffians');
 assert.equal(away.stats.shutouts,1);
 assert.equal(away.stats.combinedShutouts,0);
 assert.equal(away.stats.shutoutBonus,40);
-assert.equal(away.stats.tgp,495.5);
+assert.equal(away.stats.tgp,506.25);
 const seasonPlayer=preseasonPlayerStats().find(p=>p.playerId===4);
 assert.equal(seasonPlayer.stats.shutouts,1);
 assert.equal(seasonPlayer.stats.shutoutBonus,40);
 const box=preseasonBoxScore(ruffians);
 assert.equal(box.teams[0].players.find(p=>p.playerId===4).stats.shutouts,1);
-assert.equal(box.teams[0].players.find(p=>p.playerId===4).points.tgp,148.5);
-assert.equal(box.teams[0].totalGamePoints,495.5);
+assert.equal(box.teams[0].players.find(p=>p.playerId===4).points.tgp,159.25);
+assert.equal(box.teams[0].totalGamePoints,506.25);
 for(const game of preseasonGames){
   const pts=preseasonPlayerStatsForGame(game);
   const totalShutouts=pts.filter(p=>p.stats.shutoutBonus>0);

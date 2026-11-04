@@ -26,8 +26,8 @@ for(const report of preseasonGames){
 }
 const hopedogo=preseasonGames.find(g=>g.gameId==='PSR1 Hopedogo @ Voidstriders');
 const hopedogoBox=preseasonBoxScore(hopedogo);
-assert.equal(hopedogoBox.teams[0].totalGamePoints,658);
-assert.equal(hopedogoBox.teams[1].totalGamePoints,409);
+assert.equal(hopedogoBox.teams[0].totalGamePoints,669.25);
+assert.equal(hopedogoBox.teams[1].totalGamePoints,424.5);
 assert.equal(hopedogoBox.teams[0].players.find(p=>p.playerId===57).mvp,true);
 const tanks=preseasonBoxScore(preseasonGames.find(g=>g.gameId==='PSR1 Fuggetaboudits @ Tanks'));
 const waluigi=tanks.teams[1].players.find(p=>p.name==='Waluigi');
@@ -59,7 +59,7 @@ const game={
   result:{
     scores:{away:3,home:5},
     players:[
-      {player:6,team:'home',positions:['P','2B'],stats:{hits:2,runs:1,rbi:1,putouts:1,pitchStrikeouts:1,outs:3,strikes:10,mvps:1},itemScore:4},
+      {player:6,team:'home',positions:['P','2B'],stats:{hits:2,runs:1,rbi:1,putouts:1,pitchStrikeouts:1,outs:3,strikes:10,pitches:12,mvps:1},itemScore:4},
       {player:12,team:'away',positions:['3B'],stats:{hits:1,runs:2,rbi:1,putouts:1},itemScore:0},
     ],
   },
@@ -72,7 +72,8 @@ assert.equal(regular.teams[1].players[0].name,'Daisy');
 assert.equal(regular.teams[1].players[0].mvp,true);
 assert.equal(regular.teams[1].players[0].points.ogp,22);
 assert.equal(regular.teams[1].players[0].itemScore,4);
-assert.equal(regular.teams[1].players[0].points.tgp,64);
+assert.equal(regular.teams[1].players[0].points.tgp,67);
+assert.equal(regular.teams[1].players[0].points.pgp,26,'PGP counts +3 for 12 pitches as well as +5 for strikes');
 assert.equal(seasonBoxScore(season,{...game,stage:'recorded'}),null,'Do not leak unreleased report statistics');
 const finalWithoutReport=seasonBoxScore(season,{...game,result:{scores:{away:3,home:5}}});
 assert.equal(finalWithoutReport.hasPlayerStats,false,'Final scores without player reports must be represented honestly');
