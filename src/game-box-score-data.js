@@ -42,6 +42,29 @@ export function preseasonBoxScore(report){
     hasPlayerStats:entries.length>0,
   };
 }
+// The database stores valid integer counting totals, not rounded rates.
+// Reconstruct batting and pitching rates for private previews and public box
+// scores from the same persisted counts so neither needs unsafe rate fields.
+export function gameBoxScoreRates(stats={}){
+  const s={...stats};
+  const n=key=>Number(s[key]||0);
+  const rate=(a,b)=>b>0?a/b:null;
+  const officialAb=n('battersFaced')-n('pitchWalks')-n('beanBalls');
+  s.inningsPitched=n('outs')/3;
+  s.battingAverage=rate(n('hits'),n('atBats'));
+  s.onBase=rate(n('hits')+n('batWalks')+n('hitByPitch'),n('plateAppearances'));
+  s.slug=rate(n('totalBases'),n('atBats'));
+  s.onBasePlusSlug=s.onBase==null||s.slug==null?null:s.onBase+s.slug;
+  s.starSlug=rate(n('starBases'),n('starSwings'));
+  s.era7=rate(n('earnedRuns')*21,n('outs'));
+  s.era9=rate(n('earnedRuns')*27,n('outs'));
+  s.whip=rate((n('hitsAllowed')+n('pitchWalks'))*3,n('outs'));
+  s.baAgainst=rate(n('hitsAllowed'),officialAb);
+  s.obAgainst=rate(n('hitsAllowed')+n('pitchWalks')+n('beanBalls'),n('battersFaced'));
+  s.slgAgainst=rate(n('singlesAllowed')+2*n('doublesAllowed')+3*n('triplesAllowed')+4*n('hrAllowed'),officialAb);
+  s.opsAgainst=s.obAgainst==null||s.slgAgainst==null?null:s.obAgainst+s.slgAgainst;
+  return s;
+}
 export function seasonBoxScore(season,game){
   if(!season||!game||game.stage!=='final'||!game.result?.scores)return null;
   const names=new Map((season.teams||[]).map(t=>[String(t.id),t.name]));
@@ -50,7 +73,7 @@ export function seasonBoxScore(season,game){
     const shutoutBonus=Number(row.shutoutBonus||0);
     const participatingPitchers=resultPlayers.filter(p=>
       p.team===row.team&&Number(p.shutoutBonus||0)>0).length;
-    const stats={...row.stats,...pitcherShutoutStats(shutoutBonus,participatingPitchers),shutoutBonus};
+    const stats=gameBoxScoreRates({...row.stats,...pitcherShutoutStats(shutoutBonus,participatingPitchers),shutoutBonus});
     const points=gamePointsForReport(row);
     return {
       playerId:Number(row.player),
@@ -74,6 +97,21 @@ export function seasonBoxScore(season,game){
   };
 }
 
+// Only call this from commissioner-only interfaces. The submitted report is
+// transformed into a normal box-score model for inspection, but is never
+// written to the public schedule or released by this preview.
+export function previewPrivateGameBoxScore(season,game,report){
+  if(!season||!game||!Array.isArray(report?.players)||!report.players.length)return null;
+  const scores=Object.fromEntries([game.away,game.home].map(tid=>[
+    tid,report.players.filter(p=>String(p.team)===String(tid))
+      .reduce((sum,p)=>sum+Number(p.stats?.runs||0),0),
+  ]));
+  const box=seasonBoxScore(season,{
+    ...game,stage:'final',result:{...report,scores},
+  });
+  return box?{...box,stage:'COMMISSIONER ONLY · NOT RELEASED',
+    label:game.label||'PRIVATE GAME FILE REVIEW'}:null;
+}
 // The preseason seeding is generated from the draft. Never connect a report
 // to a different opponent or conflicting score simply because its round matches.
 export function reportForBracketMatch(match,reports=preseasonGames){
