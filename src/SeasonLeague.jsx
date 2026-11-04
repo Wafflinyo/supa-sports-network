@@ -1,6 +1,7 @@
 import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
 import {PowerRankings,PreseasonTournament} from './SeasonPreseason.jsx';
 import {visibleGamePointFields} from './game-point-columns.js';
+import {seasonPhaseLabel} from './season-phase.js';
 import {seasonBoxScore} from './game-box-score-data.js';
 import GameBoxScore from './GameBoxScore.jsx';
 import RioReportDialog from './RioReportDialog.jsx';
@@ -307,7 +308,7 @@ export function SeasonSelector({ league }) {
         >
           {seasons.map((s) => (
             <option key={s.id} value={s.id}>
-              {s.name} · {s.status}
+              {s.name} · {seasonPhaseLabel(s.status)}
             </option>
           ))}
         </select>
@@ -427,7 +428,7 @@ export function SeasonWorkspace({ league, registeredTeams }) {
           </Box>
           {s && (
             <>
-              <Box title={`${s.name} · ${s.status.toUpperCase()}`}>
+              <Box title={`${s.name} · ${seasonPhaseLabel(s.status)}`}>
                 <p>
                   Registered teams are managed in Team Setup. All 12 need a team name, home location, logo, and conference selection before you can schedule the draft.
                 </p>
@@ -1081,7 +1082,7 @@ export function RosterManager({ league: l, focus=null }) {
     </Box>}
     {!chosen?<Box title="ROSTER"><p>{l.access.role==='commissioner'?'Choose a team above to manage its roster.':'Your franchise will appear once the commissioner adds it to Season 1.'}</p></Box>:<>
       <div id="ssl-roster-players" className="ssl-roster-notification-focus"><Box title={`${chosen.name.toUpperCase()} · ROSTER`}>
-        <p><strong>{roster.length} players</strong> · {hasDefault?'Default lineup saved':'Default lineup not saved yet'} · {s.status.toUpperCase()}</p>
+        <p><strong>{roster.length} players</strong> · {hasDefault?'Default lineup saved':'Default lineup not saved yet'} · {seasonPhaseLabel(s.status)}</p>
         {roster.length===0?<p>Players will appear as they are drafted.</p>:<div className="roster-manager-players">{roster.map(id=><div key={id} className="roster-manager-player"><Player id={id} seasons={l.seasons}/><HeatMark playerId={id} inline/></div>)}</div>}
       </Box></div>
       <Box title="NEXT SEASON DRAFT PICKS">
@@ -2619,7 +2620,7 @@ export function SeasonHome({ league: l, go }) {
     upcoming = s.games.filter((g) => g.stage !== "final").slice(0, 3);
   return (
     <div className="season-home">
-      <Box title={`${s.name} · ${s.status.toUpperCase()}`}>
+      <Box title={`${s.name} · ${seasonPhaseLabel(s.status)}`}>
         <p>
           {s.teams.length} teams · {s.picks.length} draft picks ·{" "}
           {s.baseDraftRounds || 12} main rounds
