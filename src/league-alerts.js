@@ -1,5 +1,5 @@
 import {preseasonReady} from './preseason.js';
-import {gameLineupIsEditable} from './roster-lineups.js';
+import {upcomingLineupReminderGames} from './roster-lineups.js';
 import {validLineup} from './season-data.js';
 import {heatingUpForSeason} from './heating-up.js';
 
@@ -8,7 +8,6 @@ import {heatingUpForSeason} from './heating-up.js';
 // unplayed/scheduled lineup submissions.
 const activePhases = new Set(['postdraft','regular','postseason','retention']);
 const postseasonPhases = new Set(['postseason','retention','offseason','archived']);
-const sevenDays = 7 * 24 * 60 * 60 * 1000;
 const twoDays = 2 * 24 * 60 * 60 * 1000;
 const matchesTeam = (game, id) => String(game?.home) === String(id) || String(game?.away) === String(id);
 const stamp = value => Number.isFinite(Date.parse(value || '')) ? Date.parse(value) : 0;
@@ -99,12 +98,7 @@ export function buildLeagueAlerts({season, myTeam, role, newsItems = [], now = D
   // changed since the GM last saw it. Do not treat a new schedule as a change.
   if(teamId)alerts.push(...scheduleChanges.filter(e=>e.id?.startsWith(id+':schedule-change:') && String(e.teamId)===String(teamId)));
   if (teamId && ['regular','postseason'].includes(season.status)) {
-    const nextGames=(season.games || [])
-      .filter(g=>matchesTeam(g,teamId) && g.stage==='scheduled' &&
-        stamp(g.startsAt)>now && stamp(g.startsAt)<=now+sevenDays &&
-        gameLineupIsEditable(season,teamId,g) &&
-        !validLineup(season,teamId,g.lineups?.[teamId]))
-      .sort((a,b)=>stamp(a.startsAt)-stamp(b.startsAt)).slice(0,3);
+    const nextGames=upcomingLineupReminderGames(season,teamId,now).slice(0,3);
     for (const game of nextGames) {
       const opponent=teamName(String(game.home)===String(teamId)?game.away:game.home);
       alerts.push({

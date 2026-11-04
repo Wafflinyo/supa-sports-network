@@ -17,7 +17,7 @@ import {supportsStadiumVariant,matchupStadiumVariant} from './stadium-lighting.j
 import DraftChat from './DraftChat.jsx';
 import {heatingUpForSeason,HEATING_UP_THRESHOLD} from './heating-up.js';
 import {gamePointsForReport} from './game-points.js';
-import {effectiveGameLineup,gameLineupIsEditable,teamGameLineups,savedLineupLabel,gameLineupSubmissionStatus} from './roster-lineups.js';
+import {effectiveGameLineup,gameLineupIsEditable,teamGameLineups,savedLineupLabel,gameLineupSubmissionStatus,upcomingLineupReminderGames} from './roster-lineups.js';
 import {
   SeasonRuleControls,
   PublicBallots,
@@ -342,14 +342,7 @@ export function SeasonPrompts({ league, go }) {
     needs =
       ["postdraft", "regular", "postseason", "retention"].includes(s.status) &&
       !validLineup(s, t.id, s.defaults?.[t.id]),
-    upcoming =
-      s.schedulePublished &&
-      s.games
-        .filter(
-          (g) => g.stage === "scheduled" && [g.away, g.home].includes(t.id),
-        )
-        .sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt))
-        .find((g) => !validLineup(s, t.id, g.lineups?.[t.id]));
+    upcoming = upcomingLineupReminderGames(s, t.id, l.now)[0] || null;
   const pending = l.inbox.filter(
     (o) =>
       ["pending", "ready"].includes(o.status) && !o.accepted.includes(t.id),
