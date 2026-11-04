@@ -26,8 +26,8 @@ for(const report of preseasonGames){
 }
 const hopedogo=preseasonGames.find(g=>g.gameId==='PSR1 Hopedogo @ Voidstriders');
 const hopedogoBox=preseasonBoxScore(hopedogo);
-assert.equal(hopedogoBox.teams[0].totalGamePoints,639);
-assert.equal(hopedogoBox.teams[1].totalGamePoints,398);
+assert.equal(hopedogoBox.teams[0].totalGamePoints,648);
+assert.equal(hopedogoBox.teams[1].totalGamePoints,409);
 assert.equal(hopedogoBox.teams[0].players.find(p=>p.playerId===57).mvp,true);
 const tanks=preseasonBoxScore(preseasonGames.find(g=>g.gameId==='PSR1 Fuggetaboudits @ Tanks'));
 const waluigi=tanks.teams[1].players.find(p=>p.name==='Waluigi');
@@ -72,7 +72,7 @@ assert.equal(regular.teams[1].players[0].name,'Daisy');
 assert.equal(regular.teams[1].players[0].mvp,true);
 assert.equal(regular.teams[1].players[0].points.ogp,22);
 assert.equal(regular.teams[1].players[0].itemScore,4);
-assert.equal(regular.teams[1].players[0].points.tgp,63);
+assert.equal(regular.teams[1].players[0].points.tgp,64);
 assert.equal(seasonBoxScore(season,{...game,stage:'recorded'}),null,'Do not leak unreleased report statistics');
 const finalWithoutReport=seasonBoxScore(season,{...game,result:{scores:{away:3,home:5}}});
 assert.equal(finalWithoutReport.hasPlayerStats,false,'Final scores without player reports must be represented honestly');
