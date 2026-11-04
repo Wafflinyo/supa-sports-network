@@ -85,7 +85,7 @@ function ChampionshipHero({feature,supabase,players,onResults}){
     </div>
   </section>;
 }
-export default function HomeDashboard({league,go,newsItems=[],players=[],onPlayerSelect}){
+export default function HomeDashboard({league,go,newsItems=[],players=[],onPlayerSelect,canPreviewHeadlines=false}){
   const season=league?.season;
   const [showAllNews,setShowAllNews]=useState(false);
   const board=useMemo(()=>homeWeekBoard(season),[season]);
@@ -93,7 +93,7 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
   const ranks=useMemo(()=>powerRankings(season),[season]);
   const table=useMemo(()=>standings(season),[season]);
   const championship=useMemo(()=>latestPreseasonChampionship(league?.seasons||[],players),[league?.seasons,players]);
-  const headlines=useMemo(()=>homepageHeadlineSlides(championship,newsItems,season?.id,5,season),[championship,newsItems,season]);
+  const headlines=useMemo(()=>homepageHeadlineSlides(championship,newsItems,season?.id,5,season,canPreviewHeadlines),[championship,newsItems,season,canPreviewHeadlines]);
   const openGame=game=>go('Schedule',null,{focus:'game',gameId:game.id});
   const openStory=story=>{
     if(story.seasonId!=null&&String(story.seasonId)!==String(league?.season?.id))
