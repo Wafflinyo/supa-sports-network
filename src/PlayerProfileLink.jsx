@@ -1,4 +1,5 @@
 import React,{createContext,useContext} from 'react';
+import {HeatMark} from './HeatingUpBadge.jsx';
 
 // One career profile is owned by the top-level SSL app. Every player surface
 // can request it without creating extra overlapping modal instances.
@@ -12,6 +13,6 @@ export function PlayerProfileLink({player,children,className='',title}){
   return <button type="button" className={'ssl-player-profile-link '+className}
     aria-label={title||'View '+player.name+' career statistics'}
     onClick={()=>open?.(player)}>
-    {children}
+    {children}<HeatMark playerId={player.id} inline/>
   </button>;
 }
