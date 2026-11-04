@@ -4,6 +4,7 @@ import {visibleGamePointFields} from './game-point-columns.js';
 import {seasonPhaseLabel} from './season-phase.js';
 import {seasonBoxScore,previewPrivateGameBoxScore} from './game-box-score-data.js';
 import GameBoxScore from './GameBoxScore.jsx';
+import GameStoryEditor from './GameStoryEditor.jsx';
 import RioReportDialog from './RioReportDialog.jsx';
 import PreseasonStats from './PreseasonStats.jsx';
 import NextSeasonDraftPicks from './NextSeasonDraftPicks.jsx';
@@ -1455,6 +1456,8 @@ function Schedule({ league: l, commissioner = false }) {
                 {!["final", "cancelled"].includes(g.stage) && (
                   <BroadcastControls league={l} game={g} />
                 )}
+                {['recorded','final'].includes(g.stage)&&
+                  <GameStoryEditor key={g.id} league={l} game={g}/>}
                 <details>
                   <summary>VIEW LINEUPS & SUBMISSION STATUS</summary>
                   {[g.away, g.home].map((id) => {

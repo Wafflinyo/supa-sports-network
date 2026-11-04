@@ -1,5 +1,5 @@
 import React,{useMemo,useState} from 'react';
-import {CalendarDays,Trophy,Shield,BarChart3,List,ArrowRight,Megaphone} from 'lucide-react';
+import {CalendarDays,Trophy,Shield,BarChart3,List,ArrowRight,Megaphone,Newspaper} from 'lucide-react';
 import {powerRankings} from './power-rankings.js';
 import {standings} from './season-data.js';
 import {ConferenceMark} from './ConferenceMark.jsx';
@@ -9,6 +9,9 @@ import {HeatFlame} from './HeatingUpBadge.jsx';
 import {teamLogo} from './TeamIdentity.jsx';
 import {PlayerPortrait} from './PlayerPortrait.jsx';
 import {latestPreseasonChampionship} from './preseason-champion-feature.js';
+import {homepageHeadlineSlides} from './game-headlines.js';
+import HomeHeadliners from './HomeHeadliners.jsx';
+import HeadlineReadMore from './HeadlineReadMore.jsx';
 import './home-dashboard.css';
 
 function CardTitle({kicker,children,action}){
@@ -90,7 +93,13 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
   const ranks=useMemo(()=>powerRankings(season),[season]);
   const table=useMemo(()=>standings(season),[season]);
   const championship=useMemo(()=>latestPreseasonChampionship(league?.seasons||[],players),[league?.seasons,players]);
+  const headlines=useMemo(()=>homepageHeadlineSlides(championship,newsItems,season?.id),[championship,newsItems,season?.id]);
   const openGame=game=>go('Schedule',null,{focus:'game',gameId:game.id});
+  const openStory=story=>{
+    if(story.seasonId!=null&&String(story.seasonId)!==String(league?.season?.id))
+      league?.setSelected?.(story.seasonId);
+    go('Schedule',null,{focus:'game',gameId:story.gameId});
+  };
   const openPreseason=seasonId=>{
     if(seasonId!=null && String(seasonId)!==String(league?.season?.id))
       league?.setSelected?.(seasonId);
@@ -98,8 +107,10 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
   };
   return <div className="ssl-home-layout">
     <div className="ssl-home-main">
-      {championship?<ChampionshipHero feature={championship} supabase={league?.supabase}
-        players={players} onResults={()=>openPreseason(championship.seasonId)}/>:
+      {headlines.length?<HomeHeadliners slides={headlines} seasons={league?.seasons||[]}
+        supabase={league?.supabase} players={players} onOpenGame={openStory}
+        championContent={championship?<ChampionshipHero feature={championship} supabase={league?.supabase}
+          players={players} onResults={()=>openPreseason(championship.seasonId)}/>:null}/>:
       <section className="hero ssl-home-hero" aria-label="Sluggers Supa League">
         <div className="hero-content">
           <span className="eyebrow">WELCOME TO THE LEAGUE</span>
@@ -113,15 +124,15 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
         <CardTitle kicker="FROM AROUND THE LEAGUE">LEAGUE NEWS FEED</CardTitle>
         {newsItems.length?<div className="league-news-scroll" aria-label="Official league news">
           {(showAllNews?newsItems:newsItems.slice(0,8)).map(item=><article key={item.id} className={`news-item news-item-live news-${item.category}`}>
-            <span className="news-mark" aria-hidden="true">{item.category==='heating'?<HeatFlame/>:item.category==='trade'?<Shield size={27}/>:item.category==='preseason-champion'?<Trophy size={27}/>:item.category==='pitching'?<Trophy size={27}/>:<Megaphone size={27}/>}</span>
+            <span className="news-mark" aria-hidden="true">{item.category==='heating'?<HeatFlame/>:item.category==='trade'?<Shield size={27}/>:item.category==='match'?<Newspaper size={27}/>:item.category==='preseason-champion'?<Trophy size={27}/>:item.category==='pitching'?<Trophy size={27}/>:<Megaphone size={27}/>}</span>
             <div className="news-copy">
               <small>{item.label}{item.private?' · PRIVATE PREVIEW':''}{item.at?' · '+new Date(item.at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):''}</small>
               <h3>{item.title}</h3>{item.category==='trade'&&item.tradeGroups?.length
                 ?<TradeNewsBreakdown groups={item.tradeGroups}/>
-                :<p>{item.summary}</p>}
+                :<HeadlineReadMore id={item.id} text={item.summary} limit={195}/>}
             </div>
-            <button type="button" aria-label={item.category==='preseason-champion'?'View preseason results':item.playerId?'View player profile':'View transactions'}
-              onClick={()=>{if(item.category==='preseason-champion'){openPreseason(item.seasonId);}else if(item.playerId){const p=players.find(x=>x.id===item.playerId);if(p)onPlayerSelect(p);}else go('Transactions');}}>›</button>
+            <button type="button" aria-label={item.category==='preseason-champion'?'View preseason results':['match','team-game'].includes(item.category)?'View match and box score':item.playerId?'View player profile':'View transactions'}
+              onClick={()=>{if(item.category==='preseason-champion'){openPreseason(item.seasonId);}else if(['match','team-game'].includes(item.category)){openStory(item);}else if(item.playerId){const p=players.find(x=>x.id===item.playerId);if(p)onPlayerSelect(p);}else go('Transactions');}}>›</button>
           </article>)}
         </div>:<div className="news-item"><span className="news-mark"><Trophy size={26}/></span>
           <div><small>LEAGUE UPDATE</small><h3>Latest league news will appear here</h3><p>Official game highlights, transactions and Heating Up notices appear as they happen.</p></div>

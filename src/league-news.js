@@ -1,5 +1,6 @@
 import {HEATING_UP_THRESHOLD} from './heating-up.js';
 import {preseasonChampionshipFeature} from './preseason-champion-feature.js';
+import {matchHeadline,gameOutcomeContext,pitchingNewsPerformance} from './game-headlines.js';
 // Derived newsroom: headlines refresh when official reports are corrected.
 // Recorded games remain commissioner-only until their results are released.
 
@@ -37,13 +38,60 @@ function homerDetails(stats) {
   return {total, events};
 }
 
-function pitchingDetail(stats) {
-  // Rio's innings are recorded as outs (three outs = one inning).
-  // Avoid floating-point "5.1 innings" mistakes: 5.1 means 5 IP + 1 out.
-  const outs = amount(stats.outs);
-  return {outs, innings: `${Math.floor(outs / 3)}.${outs % 3}`,
-    runsAllowed: amount(stats.runsAllowed),
-    strikeouts: amount(stats.pitchStrikeouts)};
+// A team gets one collective performance post for a matchup when multiple
+// teammates qualify. Every qualifying highlight is retained, but each player
+// is introduced once rather than generating competing standalone posts.
+export function consolidateTeammateNews(items,seasons,players=[]){
+  const groups=new Map();
+  const eligible=new Set(['heating','home-run','offense','defense','pitching','perfect-batting']);
+  for(const item of items){
+    if(!eligible.has(item.category)||!item.gameId||!item.teamId)continue;
+    const key=String(item.seasonId||item.season)+':'+item.gameId+':'+item.teamId;
+    if(!groups.has(key))groups.set(key,[]);
+    groups.get(key).push(item);
+  }
+  const replacements=new Map(),remove=new Set();
+  const nameById=new Map(players.map(p=>[Number(p.id),p.name]));
+  for(const [key,group] of groups){
+    const distinct=[...new Set(group.map(x=>x.playerId).filter(x=>x!=null))];
+    if(distinct.length<2)continue;
+    const representative=group[0];
+    const season=(seasons||[]).find(s=>
+      String(s.id)===String(representative.seasonId)||
+      s.name===representative.season);
+    const game=season?.games?.find(g=>String(g.id)===String(representative.gameId));
+    const home=(season?.teams||[]).find(t=>String(t.id)===String(representative.teamId));
+    if(!game||!home||game.stage!=='final')continue;
+    const byPlayer=new Map();
+    for(const item of group){
+      if(!byPlayer.has(item.playerId))byPlayer.set(item.playerId,[]);
+      byPlayer.get(item.playerId).push(item);
+    }
+    const remarks=[...byPlayer].map(([id,stories])=>{
+      const person=nameById.get(Number(id))||'A player';
+      const details=stories.map(item=>item.summary.replace(/\s+against\s+.+?(?:\.|$)/i,'.').trim())
+        .map(x=>x.replace(/[. ]+$/,'')).filter(Boolean);
+      return person+': '+details.join('; ')+'.';
+    });
+    const closing='All of it happened '+gameOutcomeContext(season,game,representative.teamId);
+    const combined={
+      ...representative,
+      id:'team-game:'+key,category:'team-game',tier:'teammates',label:'TEAM GAME STANDOUTS',
+      title:distinct.map(id=>nameById.get(Number(id))||'A player').join(', ')+
+        ' lead '+home.name+' in a standout team effort!',
+      summary:remarks.join(' ')+' '+closing,
+      seasonId:season.id,playerId:null,gameId:game.id,
+      collectivePlayers:distinct,private:false,
+    };
+    replacements.set(representative.id,combined);
+    for(const item of group)remove.add(item.id);
+  }
+  const output=[];
+  for(const item of items){
+    if(replacements.has(item.id))output.push(replacements.get(item.id));
+    else if(!remove.has(item.id))output.push(item);
+  }
+  return output;
 }
 
 export function leagueNews(seasons, players, {includeRecorded = false} = {}) {
@@ -52,8 +100,12 @@ export function leagueNews(seasons, players, {includeRecorded = false} = {}) {
   for (const season of seasons || []) {
     const teamName = id => season.teams?.find(t => t.id === id)?.name || 'the opposing team';
     for (const game of season.games || []) {
-      if (!(game.stage === 'final' || (includeRecorded && game.stage === 'recorded'))
-        || !Array.isArray(game.result?.players)) continue;
+      if (!(game.stage === 'final' || (includeRecorded && game.stage === 'recorded'))) continue;
+      // Only released, score-verified matches qualify for the public headline
+      // newsroom. Private staged reports are NEVER carousel candidates.
+      const story=matchHeadline(season,game,players);
+      if(story)items.push(story);
+      if (!Array.isArray(game.result?.players))continue;
       const at = game.releasedAt || game.result.postedAt || game.startsAt;
       for (const row of game.result.players) {
         const playerId = Number(row.player);
@@ -66,7 +118,7 @@ export function leagueNews(seasons, players, {includeRecorded = false} = {}) {
           wording(game.id, playerId, category, tier, alternatives);
         const add = (category, tier, label, title, summary) => items.push({
           id: `${key}:${category}`, category, tier, label, title, summary, at,
-          season: season.name, gameId: game.id, playerId, teamId: row.team,
+          season: season.name, seasonId: season.id, gameId: game.id, playerId, teamId: row.team,
           private: game.stage === 'recorded',
         });
 
@@ -159,24 +211,24 @@ export function leagueNews(seasons, players, {includeRecorded = false} = {}) {
             `${defense} combined putouts, assists, double plays, triple plays and Buddy Jump putouts against ${opponent}.`);
         }
 
-        const pitch = pitchingDetail(stats);
-        if (pitch.outs >= 15 && pitch.runsAllowed <= 3) {
-          // Zero Ks still qualifies: innings and runs allowed are the only gates.
-          const tier = pitch.runsAllowed === 0 ? 'scoreless'
-            : pitch.runsAllowed === 1 ? 'outstanding'
-            : pitch.runsAllowed === 2 ? 'strong' : 'solid';
-          add('pitching', tier,
-            tier === 'scoreless' ? 'DOMINANT PITCHING OUTING' :
-            tier === 'outstanding' ? 'OUTSTANDING PITCHING OUTING' :
-            tier === 'strong' ? 'STRONG PITCHING OUTING' : 'SOLID PITCHING OUTING',
-            headline('pitching', tier, tier === 'scoreless'
-              ? [`${player} shuts down the opposition!`, `${player} delivers scoreless pitching!`, `${player} keeps the scoreboard clean!`]
-              : tier === 'outstanding'
-              ? [`${player} delivers a stellar outing on the mound!`, `${player} is sharp from start to finish!`, `${player} shines on the mound!`]
-              : tier === 'strong'
-              ? [`${player} turns in a strong pitching performance!`, `${player} keeps hitters under control!`, `${player} delivers on the mound!`]
-              : [`${player} puts together a solid pitching outing!`, `${player} keeps the game in check!`, `${player} holds the opposition to three runs!`]),
-            `${pitch.innings} IP, ${plural(pitch.strikeouts, 'strikeout')}, ${plural(pitch.runsAllowed, 'run')} allowed against ${opponent}.`);
+        const pitch=pitchingNewsPerformance(row,game);
+        if(pitch) {
+          const label=pitch.shutout?'SHUTOUT PITCHING PERFORMANCE':
+            pitch.tier==='great'?'GREAT PITCHING OUTING':
+            pitch.tier==='solid'?'SOLID PITCHING OUTING':
+            pitch.tier==='good'?'GOOD PITCHING OUTING':
+            'STRONG RUN PREVENTION';
+          const title=pitch.shutout
+            ?player+' helps shut out '+opponent+'!'
+            :pitch.tier==='great'
+              ?player+' delivers a great outing on the mound!'
+              :pitch.tier==='solid'
+                ?player+' puts together a solid pitching performance!'
+                :pitch.tier==='good'
+                  ?player+' turns in a good pitching outing!'
+                  :player+' keeps hitters under control!';
+          add('pitching',pitch.tier,label,title,
+            pitch.detail+' against '+opponent+'.');
         }
 
         // Use the same on-base events and PA denominator as the site's stats.
@@ -270,5 +322,6 @@ export function leagueNews(seasons, players, {includeRecorded = false} = {}) {
     }
   }
   const validDate = time => Number.isFinite(Date.parse(time || '')) ? Date.parse(time) : 0;
-  return items.sort((a, b) => validDate(b.at) - validDate(a.at) || a.id.localeCompare(b.id));
+  return consolidateTeammateNews(items,seasons,players)
+    .sort((a, b) => validDate(b.at) - validDate(a.at) || a.id.localeCompare(b.id));
 }
