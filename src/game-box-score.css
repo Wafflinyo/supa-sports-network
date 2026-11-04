@@ -50,3 +50,22 @@
 .ssl-box-inline .ssl-box-body{min-width:0}
 .ssl-rio-dialog-content .ssl-box-inline .ssl-box-table-scroll{overflow-x:auto}
 .ssl-rio-dialog-content .ssl-box-inline .ssl-box-tabs{flex-wrap:nowrap}
+
+/* The Game Info line score belongs above batting/pitching totals, in the
+   commissioner-only report preview and every officially released game. */
+.ssl-box-innings{padding:15px 20px 12px;border-bottom:1px solid #dbe3ee;min-width:0}
+.ssl-box-innings>h3{margin:0 0 9px;font:900 21px 'Barlow Condensed',Impact,sans-serif;color:#17365b}
+.ssl-box-innings-scroll{overflow-x:auto;max-width:100%;overscroll-behavior-x:contain;
+ border:1px solid #ccd8e9;border-radius:7px}
+.ssl-box-innings-table{width:100%;border-spacing:0;border-collapse:collapse;min-width:max-content;
+ background:white;font-size:13px;color:#173054;font-variant-numeric:tabular-nums}
+.ssl-box-innings-table th,.ssl-box-innings-table td{padding:10px 12px;
+ border-right:1px solid #dbe3ee;border-bottom:1px solid #dbe3ee;text-align:center;min-width:27px}
+.ssl-box-innings-table thead th{background:#18355e;color:white}
+.ssl-box-innings-table tbody th{position:sticky;left:0;background:#f1f5fb;text-align:left;
+ min-width:125px;max-width:230px;white-space:normal;z-index:1}
+.ssl-box-innings-table tbody tr:last-child td,.ssl-box-innings-table tbody tr:last-child th{border-bottom:0}
+.ssl-box-innings-total{font-weight:900;background:#fff2cd}
+.ssl-box-innings-table thead .ssl-box-innings-total{color:#ffd342;background:#18355e}
+.ssl-box-innings>p{margin:8px 0 0;color:#64748b;font-size:11px}
+@media(max-width:600px){.ssl-box-innings{padding:12px 12px}.ssl-box-innings-table th,.ssl-box-innings-table td{padding:9px 10px}}

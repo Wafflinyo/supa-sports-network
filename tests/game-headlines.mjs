@@ -107,9 +107,9 @@ const champion={seasonId:'season-1',champion:{name:'Moleville Haliban'}};
 const six=Array.from({length:8},(_,i)=>({...event,id:'match:game'+i,
   gameId:'game'+i,at:new Date(Date.parse(event.at)-i*1000).toISOString()}));
 const slides=homepageHeadlineSlides(champion,six,season.id);
-assert.equal(slides.length,5,'Champion + four unique game features max');
-assert.equal(slides[0].kind,'champion');
-assert.deepEqual(slides.slice(1).map(x=>x.kind),['match','match','match','match']);
+assert.equal(slides.length,5,'Five released Week 1 match headlines fill the carousel');
+assert(slides.every(x=>x.kind==='match'),
+  'The preseason champion disappears when Week 1 supplies five game headlines');
 assert.equal(homepageHeadlineSlides(null,six,season.id).length,5);
 assert.equal(homepageHeadlineSlides(null,[{...event,private:true}],season.id).length,0);
 assert.equal(new Set(slides.map(x=>x.id)).size,5);
