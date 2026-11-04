@@ -53,13 +53,13 @@ export function makePreseasonReport(preview,season,match,players){
     round:match.round,matchKey:match.key,
     away:match.high.name,home:match.low.name,
     awayScore:scores[ids[0]],homeScore:scores[ids[1]],
-    mvp:Number(mvp),fields,players:compactPlayers,
+    mvp:Number(mvp),fields,players:compactPlayers,innings:raw.innings,
   };
   return {
     schema:1,seasonId:String(season.id),matchKey:match.key,teamA:ids[0],teamB:ids[1],
     scoreA:scores[ids[0]],scoreB:scores[ids[1]],
     filename:raw.filename,fingerprint:raw.fingerprint,
-    players:raw.players,compact,
+    players:raw.players,innings:raw.innings,compact,
   };
 }
 export function preseasonPreviewBox(season,match,report){
@@ -88,6 +88,7 @@ export function preseasonPreviewBox(season,match,report){
         totalGamePoints:round2(people.reduce((s,p)=>s+Number(p.points.tgp||0),0)),
       };
     }),
+    innings:report.innings||report.compact?.innings||null,
     hasPlayerStats:true,
   };
 }
