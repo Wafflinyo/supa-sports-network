@@ -1,6 +1,6 @@
 import {HEATING_UP_THRESHOLD} from './heating-up.js';
 import {preseasonChampionshipFeature} from './preseason-champion-feature.js';
-import {matchHeadline} from './game-headlines.js';
+import {matchHeadline,gameOutcomeContext} from './game-headlines.js';
 // Derived newsroom: headlines refresh when official reports are corrected.
 // Recorded games remain commissioner-only until their results are released.
 
@@ -47,6 +47,62 @@ function pitchingDetail(stats) {
     strikeouts: amount(stats.pitchStrikeouts)};
 }
 
+// A team gets one collective performance post for a matchup when multiple
+// teammates qualify. Every qualifying highlight is retained, but each player
+// is introduced once rather than generating competing standalone posts.
+export function consolidateTeammateNews(items,seasons,players=[]){
+  const groups=new Map();
+  const eligible=new Set(['heating','home-run','offense','defense','pitching','perfect-batting']);
+  for(const item of items){
+    if(!eligible.has(item.category)||!item.gameId||!item.teamId)continue;
+    const key=String(item.seasonId||item.season)+':'+item.gameId+':'+item.teamId;
+    if(!groups.has(key))groups.set(key,[]);
+    groups.get(key).push(item);
+  }
+  const replacements=new Map(),remove=new Set();
+  const nameById=new Map(players.map(p=>[Number(p.id),p.name]));
+  for(const [key,group] of groups){
+    const distinct=[...new Set(group.map(x=>x.playerId).filter(x=>x!=null))];
+    if(distinct.length<2)continue;
+    const representative=group[0];
+    const season=(seasons||[]).find(s=>
+      String(s.id)===String(representative.seasonId)||
+      s.name===representative.season);
+    const game=season?.games?.find(g=>String(g.id)===String(representative.gameId));
+    const home=(season?.teams||[]).find(t=>String(t.id)===String(representative.teamId));
+    if(!game||!home||game.stage!=='final')continue;
+    const byPlayer=new Map();
+    for(const item of group){
+      if(!byPlayer.has(item.playerId))byPlayer.set(item.playerId,[]);
+      byPlayer.get(item.playerId).push(item);
+    }
+    const remarks=[...byPlayer].map(([id,stories])=>{
+      const person=nameById.get(Number(id))||'A player';
+      const details=stories.map(item=>item.summary.replace(/\s+against\s+.+?(?:\.|$)/i,'.').trim())
+        .map(x=>x.replace(/[. ]+$/,'')).filter(Boolean);
+      return person+': '+details.join('; ')+'.';
+    });
+    const closing='All of it happened '+gameOutcomeContext(season,game,representative.teamId);
+    const combined={
+      ...representative,
+      id:'team-game:'+key,category:'team-game',tier:'teammates',label:'TEAM GAME STANDOUTS',
+      title:distinct.map(id=>nameById.get(Number(id))||'A player').join(', ')+
+        ' lead '+home.name+' in a standout team effort!',
+      summary:remarks.join(' ')+' '+closing,
+      seasonId:season.id,playerId:null,gameId:game.id,
+      collectivePlayers:distinct,private:false,
+    };
+    replacements.set(representative.id,combined);
+    for(const item of group)remove.add(item.id);
+  }
+  const output=[];
+  for(const item of items){
+    if(replacements.has(item.id))output.push(replacements.get(item.id));
+    else if(!remove.has(item.id))output.push(item);
+  }
+  return output;
+}
+
 export function leagueNews(seasons, players, {includeRecorded = false} = {}) {
   const pool = new Map(players.map(p => [Number(p.id), p.name]));
   const items = [];
@@ -71,7 +127,7 @@ export function leagueNews(seasons, players, {includeRecorded = false} = {}) {
           wording(game.id, playerId, category, tier, alternatives);
         const add = (category, tier, label, title, summary) => items.push({
           id: `${key}:${category}`, category, tier, label, title, summary, at,
-          season: season.name, gameId: game.id, playerId, teamId: row.team,
+          season: season.name, seasonId: season.id, gameId: game.id, playerId, teamId: row.team,
           private: game.stage === 'recorded',
         });
 
@@ -275,5 +331,6 @@ export function leagueNews(seasons, players, {includeRecorded = false} = {}) {
     }
   }
   const validDate = time => Number.isFinite(Date.parse(time || '')) ? Date.parse(time) : 0;
-  return items.sort((a, b) => validDate(b.at) - validDate(a.at) || a.id.localeCompare(b.id));
+  return consolidateTeammateNews(items,seasons,players)
+    .sort((a, b) => validDate(b.at) - validDate(a.at) || a.id.localeCompare(b.id));
 }
