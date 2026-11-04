@@ -68,7 +68,7 @@ assert(!bell.includes('Date.parse(game.startsAt)'),'one-tap default ignores none
 const schedule=readFileSync(new URL('../src/SeasonLeague.jsx',import.meta.url),'utf8');
 assert(!schedule.includes('DATE & TIME TBD'),'no date placeholders in the game schedule');
 assert(!schedule.includes('GameDateEditor'),'there is no game-date editor');
-assert.match(schedule,/PREVIEW PRIVATE GAME REPORT/);
+assert.match(schedule,/PREVIEW SAVED PRIVATE BOX SCORE/);
 const homeGames=readFileSync(new URL('../src/GmStadiumMatchups.jsx',import.meta.url),'utf8');
 const archive=readFileSync(new URL('../src/HistoryArchive.jsx',import.meta.url),'utf8');
 assert(!homeGames.includes('DATE & TIME TBD')&&!homeGames.includes('dateLabel(game.startsAt)'),
