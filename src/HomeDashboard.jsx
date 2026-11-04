@@ -11,6 +11,7 @@ import {PlayerPortrait} from './PlayerPortrait.jsx';
 import {latestPreseasonChampionship} from './preseason-champion-feature.js';
 import {homepageHeadlineSlides} from './game-headlines.js';
 import HomeHeadliners from './HomeHeadliners.jsx';
+import HeadlineReadMore from './HeadlineReadMore.jsx';
 import './home-dashboard.css';
 
 function CardTitle({kicker,children,action}){
@@ -128,10 +129,10 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
               <small>{item.label}{item.private?' · PRIVATE PREVIEW':''}{item.at?' · '+new Date(item.at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):''}</small>
               <h3>{item.title}</h3>{item.category==='trade'&&item.tradeGroups?.length
                 ?<TradeNewsBreakdown groups={item.tradeGroups}/>
-                :<p>{item.summary}</p>}
+                :<HeadlineReadMore id={item.id} text={item.summary} limit={195}/>}
             </div>
-            <button type="button" aria-label={item.category==='preseason-champion'?'View preseason results':item.category==='match'?'View match and box score':item.playerId?'View player profile':'View transactions'}
-              onClick={()=>{if(item.category==='preseason-champion'){openPreseason(item.seasonId);}else if(item.category==='match'){openStory(item);}else if(item.playerId){const p=players.find(x=>x.id===item.playerId);if(p)onPlayerSelect(p);}else go('Transactions');}}>›</button>
+            <button type="button" aria-label={item.category==='preseason-champion'?'View preseason results':['match','team-game'].includes(item.category)?'View match and box score':item.playerId?'View player profile':'View transactions'}
+              onClick={()=>{if(item.category==='preseason-champion'){openPreseason(item.seasonId);}else if(['match','team-game'].includes(item.category)){openStory(item);}else if(item.playerId){const p=players.find(x=>x.id===item.playerId);if(p)onPlayerSelect(p);}else go('Transactions');}}>›</button>
           </article>)}
         </div>:<div className="news-item"><span className="news-mark"><Trophy size={26}/></span>
           <div><small>LEAGUE UPDATE</small><h3>Latest league news will appear here</h3><p>Official game highlights, transactions and Heating Up notices appear as they happen.</p></div>
