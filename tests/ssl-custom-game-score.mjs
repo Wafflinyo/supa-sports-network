@@ -169,9 +169,9 @@ for(const outs of [0,3,8]){
 }
 assert.equal(pitchingOutingBonus({outs:10,earnedRuns:0}),12,'Relief and partial innings qualify after nine outs');
 assert.equal(pitchingOutingBonus({outs:9,earnedRuns:1.5}),0,'Invalid fractional earned runs cannot qualify');
-assert.equal(gamePointComponents({outs:9,earnedRuns:0},40).pgp,61,
-  'The +12 earned-run outing bonus can coexist with a +40 shutout bonus');
-assert.equal(customGameScore({outs:9,earnedRuns:0},0,40).gameScore,61);
+assert.equal(gamePointComponents({outs:9,earnedRuns:0},30).pgp,51,
+  'The +12 earned-run outing bonus can coexist with a +30 shutout bonus');
+assert.equal(customGameScore({outs:9,earnedRuns:0},0,30).gameScore,51);
 assert.equal(SSL_GAME_SCORE_WEIGHTS.pitches,.25);
 assert.equal(customGameScore({pitches:20,strikes:8}).gameScore,9,
   'Twenty total pitches are +5 and eight strikes are an additional +4');
