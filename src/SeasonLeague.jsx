@@ -2,7 +2,7 @@ import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
 import {PowerRankings,PreseasonTournament} from './SeasonPreseason.jsx';
 import {visibleGamePointFields} from './game-point-columns.js';
 import {seasonPhaseLabel} from './season-phase.js';
-import {seasonBoxScore} from './game-box-score-data.js';
+import {seasonBoxScore,previewPrivateGameBoxScore} from './game-box-score-data.js';
 import GameBoxScore from './GameBoxScore.jsx';
 import RioReportDialog from './RioReportDialog.jsx';
 import PreseasonStats from './PreseasonStats.jsx';
@@ -197,7 +197,7 @@ export function useSeasonLeague(supabase, access) {
     const t = setInterval(() => setNow(Date.now() + serverOffsetMs.current), 1000);
     return () => clearInterval(t);
   }, []);
-  async function act(operation, payload = {}) {
+  async function act(operation, payload = {}, {onError} = {}) {
     if (busy) return false;
     setBusy(true);
     setError("");
@@ -213,7 +213,7 @@ export function useSeasonLeague(supabase, access) {
       await refresh();
       setNotice(
         operation === "result"
-          ? "Report saved privately. Lineups are locked; results release after the premiere."
+          ? "Project Rio report saved PRIVATELY. Lineups locked. Preview the saved box score, then choose RELEASE RESULTS PUBLICLY when ready."
           : operation === "add_player"
             ? "Player successfully added. Update your default lineup."
             : "Saved.",
@@ -221,6 +221,7 @@ export function useSeasonLeague(supabase, access) {
       return r.data || true;
     } catch (e) {
       setError(e.message);
+      onError?.(e.message);
       return false;
     } finally {
       setBusy(false);
@@ -1400,7 +1401,7 @@ function Schedule({ league: l, commissioner = false }) {
                   <ScheduleMatchupHeading season={s} game={g} />
                   <p className="matchup-conference"><ConferenceMark id={s.teams.find(t=>t.id===g.home)?.conference} size={19}/> {matchupType(s,g)}</p>
                   <strong>{g.stage === "recorded"
-                    ? "AWAITING PREMIERE RESULT RELEASE · LINEUPS LOCKED"
+                    ? "PRIVATE REPORT SAVED · NOT RELEASED · LINEUPS LOCKED"
                     : g.stage.toUpperCase()}</strong>
                 </>
               )}
@@ -1434,14 +1435,21 @@ function Schedule({ league: l, commissioner = false }) {
                     setReportGame(reportGame === g.id ? null : g.id)
                   }
                 >
-                  {["recorded", "final"].includes(g.stage)
-                    ? "REPLACE / CORRECT REPORT"
-                    : "UPLOAD PROJECT RIO XLSX & LOCK LINEUPS"}
+                  {g.stage==="recorded"
+                    ? "REPLACE PRIVATE REPORT"
+                    : g.stage==="final"
+                      ? "CORRECT RELEASED REPORT"
+                      : "UPLOAD PROJECT RIO XLSX / ODS"}
                 </button>
-                {g.stage==='recorded'&&g.result?.scores&&
+                {g.stage==='recorded'&&g.result?.scores&&<>
                   <button type="button" className="outline-btn" onClick={()=>setBoxGameId(g.id)}>
-                    PREVIEW PRIVATE GAME REPORT
-                  </button>}
+                    PREVIEW SAVED PRIVATE BOX SCORE
+                  </button>
+                  <button type="button" className="red-btn" disabled={l.busy}
+                    onClick={()=>{if(confirm("Release this saved Project Rio game report publicly? This updates standings, player stats and Heating Up."))l.act("release_result",{game:g.id})}}>
+                    RELEASE RESULTS PUBLICLY
+                  </button>
+                </>}
                 {!["final", "cancelled"].includes(g.stage) && (
                   <BroadcastControls league={l} game={g} />
                 )}
@@ -1496,6 +1504,18 @@ function ReportImport({ league: l, game, onDone }) {
   const autoMvp = useMemo(()=>{
     try{return preview&&automaticReportMvp(preview,awayLabel)}catch{return null}
   },[preview,awayLabel]);
+  // Build the exact outgoing report once, before permitting submission.
+  // The same report powers the fully tabbed private box-score preview.
+  const review=useMemo(()=>{
+    if(!preview?.rows?.length||!autoMvp ||
+      preview.rows.some(r=>!r.chosen)||preview.pitch.some(r=>!r.chosen))
+      return {report:null,box:null,error:null};
+    try{
+      const report=buildReport(preview,awayLabel,
+        {...l.season,rosters:game.frozenRosters||l.season.rosters},game,pool,autoMvp);
+      return {report,box:previewPrivateGameBoxScore(l.season,game,report),error:null};
+    }catch(e){return {report:null,box:null,error:e.message};}
+  },[preview,awayLabel,autoMvp,l.season,game]);
   return (
     <div className="report-import">
       <h3>PROJECT RIO RESULT REVIEW</h3>
@@ -1700,34 +1720,31 @@ function ReportImport({ league: l, game, onDone }) {
             </p>
           ))}
           <p><strong>Automatic Match MVP:</strong> {autoMvp ? name(autoMvp) : 'Map both teams to determine MVP (no tied game)'}</p>
+          {review.error&&<p className="season-error" role="alert">{review.error}</p>}
+          {review.box&&<>
+            <h4>FULL BOX SCORE · PRIVATE PREVIEW</h4>
+            <p>Review the <strong>Batting, Fielding, Pitching and Game Points</strong> tabs for both teams. Nothing is public until you save and later release this report.</p>
+            <GameBoxScore game={review.box} inline/>
+          </>}
           <button
             className="red-btn"
             disabled={
               l.busy ||
               preview.rows.some((r) => !r.chosen) ||
-              preview.pitch.some((r) => !r.chosen) || !autoMvp
+              preview.pitch.some((r) => !r.chosen) || !autoMvp || !review.report
             }
             onClick={async () => {
+              setError("");
               try {
-                const report = buildReport(
-                  preview,
-                  awayLabel,
-                  {
-                    ...l.season,
-                    rosters: game.frozenRosters || l.season.rosters,
-                  },
-                  game,
-                  pool,
-                  autoMvp,
-                );
-                if (await l.act("result", { game: game.id, report })) onDone();
-              } catch (e) {
-                setError(e.message);
-              }
+                const saved=await l.act("result",{game:game.id,report:review.report},
+                  {onError:message=>setError(message)});
+                if(saved)onDone();
+              }catch(e){setError(e.message);}
             }}
           >
-            SAVE PRIVATE REPORT & LOCK LINEUPS
+            {l.busy?"SAVING PRIVATE REPORT…":"SAVE PRIVATE REPORT & LOCK LINEUPS"}
           </button>
+          {error&&<p className="season-error" role="alert">{error}</p>}
         </>
       )}
     </div>
