@@ -10,6 +10,20 @@ export function gameLineupIsEditable(season,team,game){
     game && ['scheduled','live'].includes(game.stage) &&
     !game.lockedAt && [game.away,game.home].includes(team));
 }
+// Notify only for genuinely upcoming, dated fixtures in an active season.
+// Published schedules can contain months of TBD games; those are NOT lineup
+// deadlines and must never trigger the persistent GM action banner.
+export const GAME_LINEUP_REMINDER_WINDOW_MS=7*24*60*60*1000;
+export function upcomingLineupReminderGames(season,team,now=Date.now()){
+  if(!season?.schedulePublished||!['regular','postseason'].includes(season.status))return [];
+  return (season.games||[]).filter(game=>{
+    const kickoff=Date.parse(game?.startsAt||'');
+    return game.stage==='scheduled' &&
+      gameLineupIsEditable(season,team,game) &&
+      Number.isFinite(kickoff) && kickoff>now && kickoff<=now+GAME_LINEUP_REMINDER_WINDOW_MS &&
+      !validLineup(season,team,game.lineups?.[team]);
+  }).sort((a,b)=>Date.parse(a.startsAt)-Date.parse(b.startsAt));
+}
 export function teamGameLineups(season,team){
   return [...(season?.games||[])].filter(g=>[g.away,g.home].includes(team))
     .sort((a,b)=>new Date(a.startsAt).getTime()-new Date(b.startsAt).getTime());
