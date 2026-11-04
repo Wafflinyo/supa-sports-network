@@ -1,9 +1,11 @@
 import React,{useEffect,useState} from 'react';
+import {inningScoringDrama} from './rio-inning-scores.js';
 
 // The commissioner verifies scoring sequence details not available in Rio.
 // Never invent lead swaps, late rallies, or walk-offs from final scores alone.
 export default function GameStoryEditor({league,game}){
  const saved=game.story||{};
+ const calculated=inningScoringDrama(game.result?.innings);
  const [leadChanges,setLeadChanges]=useState(String(saved.leadChanges??0));
  const [lateFinish,setLateFinish]=useState(saved.lateFinish||'none');
  const [note,setNote]=useState(saved.note||'');
@@ -17,7 +19,7 @@ export default function GameStoryEditor({league,game}){
  },[game.id,game.story?.leadChanges,game.story?.lateFinish,game.story?.note]);
  const submit=async event=>{
    event.preventDefault();setError('');setFeedback('');
-   const count=Number(leadChanges);
+   const count=calculated?.leadChanges??Number(leadChanges);
    if(!Number.isInteger(count)||count<0||count>20){
      setError('Enter a whole number of confirmed lead changes, from 0 to 20.');return;
    }
@@ -25,7 +27,7 @@ export default function GameStoryEditor({league,game}){
    try{
      const response=await league.supabase.rpc('ssl_game_story_save',{
        target_season:league.season.id,target_game:game.id,
-       story:{leadChanges:count,lateFinish,note:note.trim()},
+       story:{leadChanges:count,lateFinish:calculated?.lateFinish??lateFinish,note:note.trim()},
      });
      if(response.error)throw response.error;
      await league.refresh();
@@ -37,10 +39,16 @@ export default function GameStoryEditor({league,game}){
  };
  return <details className="ssl-game-story-editor">
    <summary>GAME STORY · LEAD CHANGES / LAST-INNING FINISH</summary>
-   <p>Project Rio records final statistics but not the order of scoring plays. Add only details you personally verified. They stay hidden until you release this game result.</p>
+   {calculated?<p role="status"><strong>Automatically read from Project Rio Game Info:</strong>
+     {' '}{calculated.inningCount} innings · {calculated.leadChanges} lead changes ·
+     {' '}{calculated.lateFinish==='walkoff'?'Walk-off finish':
+       calculated.lateFinish==='late-comeback'?'Late comeback':'No final-inning reversal'}.
+     You do not need to confirm these; they update whenever the report changes.</p>:
+     <p>This older game report has no saved inning-by-inning scoring.
+       Replace its private report with a Game Info sheet to calculate lead changes automatically.</p>}
    <form className="season-form" onSubmit={submit}>
-     <div className="season-inline">
-       <label>Confirmed lead changes
+     {!calculated&&<div className="season-inline">
+       <label>Confirmed lead changes (older reports only)
          <input type="number" min="0" max="20" step="1" required
            value={leadChanges} onChange={e=>setLeadChanges(e.target.value)}/>
        </label>
@@ -51,7 +59,7 @@ export default function GameStoryEditor({league,game}){
            <option value="walkoff">Walk-off / final-play win</option>
          </select>
        </label>
-     </div>
+     </div>}
      <label>Additional verified game detail (optional)
        <textarea maxLength={240} rows={2} value={note}
          placeholder="Example: A two-run rally in the bottom of the seventh broke the tie."
