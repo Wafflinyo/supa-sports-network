@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-const verifySql=readFileSync(new URL('../supabase/migrations/20261103235900_ssl_pgp_2026_reweight.sql',import.meta.url),'utf8');
+const verifySql=(
+ readFileSync(new URL('../supabase/migrations/20261029234800_ssl_pitching_outs_strikes_rebalance.sql',import.meta.url),'utf8')+'\n'+
+ readFileSync(new URL('../supabase/migrations/20261103235900_ssl_pgp_2026_reweight.sql',import.meta.url),'utf8')
+).replaceAll("''","'");
 for(const [name,term] of Object.entries({
  innings:"+ 1*coalesce((score_row->'stats'->>'outs')", 
  strikes:"+ 0.5*coalesce((score_row->'stats'->>'strikes')",
