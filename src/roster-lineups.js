@@ -7,7 +7,7 @@ export function effectiveGameLineup(season,team,game){
 }
 export function gameLineupIsEditable(season,team,game){
   return Boolean(season?.schedulePublished &&
-    ['postdraft','regular','postseason'].includes(season.status) &&
+    ['preseason','regular','postseason'].includes(season.status) &&
     game && ['scheduled','live'].includes(game.stage) &&
     !game.lockedAt && [game.away,game.home].includes(team));
 }
