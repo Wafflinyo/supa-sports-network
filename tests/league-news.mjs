@@ -32,21 +32,30 @@ const season = {
 };
 const feed = leagueNews([season], names);
 const byCategory = category => feed.filter(item => item.category === category);
+const recognition = (list, category) => list
+  .flatMap(item => item.recognitions || [item])
+  .find(item => item.category === category);
 assert.deepEqual(byCategory('heating').map(e => e.playerId), [1]);
-assert.equal(byCategory('home-run').length, 1);
-assert.equal(byCategory('offense').length, 1);
-assert.equal(byCategory('defense').length, 1);
-assert.equal(byCategory('pitching').length, 1);
+assert.equal(byCategory('team-game').length, 1,
+  'One player qualifying for HR, offense, defense and pitching gets ONE stats article');
+assert.equal(byCategory('home-run').length, 0);
+assert.equal(byCategory('offense').length, 0);
+assert.equal(byCategory('defense').length, 0);
+assert.equal(byCategory('pitching').length, 0);
 assert.equal(byCategory('perfect-batting').length, 0);
 assert.equal(byCategory('trade').length, 1);
-assert.equal(feed.length, 6, 'only released games and one approved trade may appear');
+assert.equal(feed.length, 3, 'one heating announcement, one combined stat post, one trade');
 assert(byCategory('heating')[0].summary.includes('Color Clash Crushers'));
-assert.equal(byCategory('home-run')[0].label, 'MULTI-HR PERFORMANCE');
-assert(byCategory('home-run')[0].summary.includes('three-run home run'));
+assert.equal(recognition(feed,'home-run').label, 'MULTI-HR PERFORMANCE');
+assert(recognition(feed,'home-run').summary.includes('three-run home run'));
 assert(byCategory('trade')[0].title.includes('Tropical Wiggler'));
-assert(byCategory('pitching')[0].summary.includes('5.0 IP'));
-assert.equal(byCategory('offense')[0].tier, 'good');
-assert.equal(byCategory('defense')[0].tier, 'good');
+assert(recognition(feed,'pitching').summary.includes('5.0 IP'));
+assert.equal(recognition(feed,'offense').tier, 'good');
+assert.equal(recognition(feed,'defense').tier, 'good');
+assert(byCategory('team-game')[0].summary.includes('Home runs:') &&
+  byCategory('team-game')[0].summary.includes('Offense:') &&
+  byCategory('team-game')[0].summary.includes('Fielding:') &&
+  byCategory('team-game')[0].summary.includes('Pitching:'));
 
 const corrected = structuredClone(season);
 corrected.games[0].result.players[0].stats.homeRuns = 1;
@@ -55,13 +64,16 @@ corrected.games[0].result.players[0].stats.threeHr = 0;
 corrected.games[0].result.players[0].gameScore = 89;
 const edited = leagueNews([corrected], names);
 assert.equal(edited.filter(e => e.category === 'heating').length, 0);
-assert.equal(edited.find(e => e.category === 'home-run').tier, 'solo');
+assert.equal(recognition(edited,'home-run').tier, 'solo');
 assert.equal(edited.filter(e => e.category === 'trade').length, 1);
 assert.deepEqual(leagueNews([season], names), feed,
   'regeneration must not mutate data or randomize headlines');
 const privateFeed = leagueNews([season], names, {includeRecorded: true});
-assert.equal(privateFeed.filter(e => e.private).length, 5,
-  'commissioner preview includes embargoed recorded events');
+assert.equal(privateFeed.filter(e => e.private).length, 2,
+  'commissioner sees grouped private stat recognition and separate heating');
+assert(privateFeed.filter(e => e.private).every(e =>
+  ['heating','team-game'].includes(e.category)),
+  'private grouping never leaks an embargoed article into the public feed');
 assert.equal(feed.filter(e => e.private).length, 0,
   'public must never see recorded events');
 
@@ -73,7 +85,7 @@ function spot(stats, options = {}) {
   }]};
   return leagueNews([oneGame], names, options).filter(x => x.category !== 'heating');
 }
-const find = (stats, category) => spot(stats).find(e => e.category === category);
+const find = (stats, category) => recognition(spot(stats),category);
 
 // The 3HR category means ONE three-run homer, not three home runs.
 const threeRun = find({homeRuns: 1, threeHr: 1}, 'home-run');
