@@ -240,7 +240,7 @@ export function leagueNews(seasons, players, {includeRecorded = false} = {}) {
               : tier === 'outstanding'
               ? [`${player} powers an outstanding offensive outing!`, `${player} takes over offensively!`, `${player} delivers a huge game at the plate!`]
               : [`${player} puts on an offensive masterclass!`, `${player} has a monster day at the plate!`, `${player} leads an incredible offensive display!`]),
-            `${plural(runs, 'run')} scored and ${rbi} RBI against ${opponent} — ${production} combined runs and RBI.`);
+            `${[runs>0?plural(runs,'run')+' scored':null,rbi>0?plural(rbi,'RBI','RBI'):null].filter(Boolean).join(' and ')} against ${opponent} — ${production} combined runs and RBI.`);
         }
 
         const defenseKeys = ['putouts', 'assists', 'doublePlays', 'triplePlays', 'buddyJumpPutouts'];
@@ -297,7 +297,7 @@ export function leagueNews(seasons, players, {includeRecorded = false} = {}) {
               : tier === 'outstanding'
               ? [`${player} simply cannot be kept off base!`, `${player} delivers a perfect on-base performance!`, `${player} reaches safely in every plate appearance!`]
               : [`${player} puts on a flawless on-base clinic!`, `${player} has a remarkable perfect day at the plate!`, `${player} is unstoppable at the plate!`]),
-            `${reached}-for-${pa} reaching base against ${opponent}: ${plural(hits, 'hit')}, ${plural(walks, 'walk')} and ${plural(hitByPitch, 'hit by pitch', 'hit by pitches')}.`);
+            `${reached}-for-${pa} reaching base against ${opponent}: ${[hits>0?plural(hits,'hit'):null,walks>0?plural(walks,'walk'):null,hitByPitch>0?plural(hitByPitch,'hit by pitch','hit by pitches'):null].filter(Boolean).join(', ')}.`);
         }
       }
     }
