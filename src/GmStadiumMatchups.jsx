@@ -1,12 +1,8 @@
 import React,{useEffect,useState} from 'react';
 import {homeStadium} from './matchup-display.js';
 import {homeGames,homeOpponent,supportsStadiumVariant,canEditStadiumVariant} from './stadium-lighting.js';
-import {Sun,Moon,CheckCircle2,CalendarClock,MapPin,LockKeyhole} from 'lucide-react';
+import {Sun,Moon,CheckCircle2,MapPin,LockKeyhole} from 'lucide-react';
 import './gm-stadium-matchups.css';
-
-const dateLabel=value=>value?new Intl.DateTimeFormat('en-US',{
-  dateStyle:'medium',timeStyle:'short',timeZone:'America/New_York'
-}).format(new Date(value))+' ET':'DATE & TIME TBD';
 
 function MatchupSetting({league:l,game,teamId,stadium}){
   const s=l.season;
@@ -38,7 +34,7 @@ function MatchupSetting({league:l,game,teamId,stadium}){
       <div>
         <small>WEEK {game.week||'TBD'} · {game.phase==='playoffs'?'PLAYOFF HOME GAME':'REGULAR SEASON · HOME'}</small>
         <h3>{homeOpponent(s,game)} <span className="gm-stadium-at">@</span> {s.teams.find(t=>String(t.id)===String(teamId))?.name||'Your Team'}</h3>
-        <p><MapPin size={15}/>{stadium||'HOME STADIUM TBD'} <span aria-hidden="true">·</span> <CalendarClock size={15}/>{dateLabel(game.startsAt)}</p>
+        <p><MapPin size={15}/>{stadium||'HOME STADIUM TBD'}</p>
       </div>
       <div className="gm-stadium-current">
         {hasVersions ? current
@@ -77,7 +73,7 @@ export default function GmStadiumMatchups({league:l}){
     <div className="gm-stadium-workspace-heading">
       <span>GM TOOLS · HOME FIELD MANAGEMENT</span>
       <h2>YOUR HOME MATCHUPS</h2>
-      <p>Choose <strong>Day</strong> or <strong>Night</strong> for home games at Stadiums that offer both versions. You can set <strong>any future week's game now</strong>—you don't need to wait for the game date or matchup week.</p>
+      <p>Choose <strong>Day</strong> or <strong>Night</strong> for home games at Stadiums that offer both versions. You can set <strong>any future week's game now</strong>, without dates or times.</p>
       {stadium&&<p className="gm-stadium-home"><MapPin size={17}/> Your home Stadium: <strong>{stadium}</strong></p>}
     </div>
     {selectable&&<div className="gm-stadium-summary">
