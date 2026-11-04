@@ -6,8 +6,8 @@ export default function HeadlineReadMore({text,id,limit=180,className=''}) {
   const [expanded,setExpanded]=useState(false);
   useEffect(()=>setExpanded(false),[id]);
   const full=String(text||'');
-  // Grouped stat articles have one bullet per player, then a separate
-  // game-result line. Keep the structure semantic in both headline locations.
+  // Grouped stat articles have one self-contained reporter paragraph per player.
+  // Retain semantic bullets and generous spacing on both desktop and mobile.
   if(full.startsWith('• ')){
     const [achievements,...context]=full.split(/\n\n/);
     const bullets=achievements.split('\n').filter(Boolean).map(line=>line.replace(/^•\s*/, ''));
@@ -15,8 +15,8 @@ export default function HeadlineReadMore({text,id,limit=180,className=''}) {
     const cutoff=full.length>limit;
     const shown=expanded||!cutoff?bullets:bullets.slice(0,1);
     return <div className={'ssl-headline-story ssl-headline-bullets '+className+(expanded?' expanded':'')}>
-      <ul style={{paddingLeft:'1.25em',margin:'0 0 .45em'}}>
-        {shown.map((line,index)=><li key={index} style={{marginBottom:'.35em'}}>{line}</li>)}
+      <ul style={{paddingLeft:'1.3em',margin:'0 0 .65em',lineHeight:1.55}}>
+        {shown.map((line,index)=><li key={index} style={{marginBottom:'.95em'}}>{line}</li>)}
       </ul>
       {(expanded||!cutoff)&&closing&&<p style={{margin:'0'}}>{closing}</p>}
       {cutoff&&<button type="button" className="ssl-headline-expand"
