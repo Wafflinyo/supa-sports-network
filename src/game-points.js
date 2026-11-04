@@ -1,6 +1,6 @@
 // Per-game components use the same official SSL Game Score weights.
 // Item Score and MVP bonus belong to TGP, not the three performance categories.
-import {SSL_GAME_SCORE_WEIGHTS,customGameScore} from './ssl-game-score.js';
+import {SSL_GAME_SCORE_WEIGHTS,customGameScore,pitchingOutingBonus} from './ssl-game-score.js';
 export const GAME_POINT_KEYS=Object.freeze({
   ogp:['hits','runs','rbi','homeRuns','doubles','triples','twoHr','threeHr','grandSlams','totalBases','doublePlaysHitInto','triplePlaysHitInto'],
   dgp:['putouts','assists','buddyJumpPutouts','doublePlays','triplePlays','bobbles'],
@@ -11,7 +11,7 @@ export function gamePointComponents(stats={},shutoutBonus=0){
   const points={};
   for(const [group,keys] of Object.entries(GAME_POINT_KEYS))
     points[group]=round2(keys.reduce((sum,key)=>sum+(Number(stats?.[key]??0)||0)*SSL_GAME_SCORE_WEIGHTS[key],0));
-  points.pgp=round2(points.pgp+Number(shutoutBonus||0));
+  points.pgp=round2(points.pgp+Number(shutoutBonus||0)+pitchingOutingBonus(stats));
   return points;
 }
 export function gamePointsForReport(report){
