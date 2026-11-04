@@ -2,6 +2,20 @@
 // only when the commissioner explicitly records it; Rio has no play-by-play.
 const n=value=>Number.isFinite(Number(value))&&Number(value)>0?Number(value):0;
 const ip=outs=>Math.floor(outs/3)+'.'+(outs%3);
+// One factual context line for any game/team performance post. It never
+// guesses at an inning or comeback from the score alone.
+export function gameOutcomeContext(season,game,teamId){
+ const teams=new Map((season?.teams||[]).map(t=>[String(t.id),t.name]));
+ const opponentId=String(game.away)===String(teamId)?String(game.home):String(game.away);
+ const opponent=teams.get(opponentId)||'the opposing team';
+ const teamRuns=Number(game.result?.scores?.[teamId]);
+ const opponentRuns=Number(game.result?.scores?.[opponentId]);
+ const result=Number.isFinite(teamRuns)&&Number.isFinite(opponentRuns)
+   ?teamRuns>opponentRuns?'win':teamRuns<opponentRuns?'loss':'tie':'game';
+ const week=Number(game.week);
+ const where=Number.isInteger(week)&&week>0?'Week '+week+"'s":'the';
+ return 'in '+where+' '+result+' against the '+opponent+'.';
+}
 export function matchPerformanceHighlights(game,players=[]){
  const names=new Map(players.map(p=>[Number(p.id),p.name]));
  const scores=game?.result?.scores||{},a=Number(scores[game.away]),h=Number(scores[game.home]);
@@ -23,14 +37,13 @@ export function matchPerformanceHighlights(game,players=[]){
   else if(outs>=15&&allowed<=2)add('pitching',76+ks,name+' went '+ip(outs)+' IP with '+allowed+' runs allowed');
   else if(ks>=4)add('pitching',73+ks,name+' struck out '+ks);
  }
- candidate.sort((a,b)=>b.rank-a.rank||Number(b.teamId===winner)-Number(a.teamId===winner)||a.playerId-b.playerId);
- const output=[],seen=new Set();
- for(const event of candidate){
-  if(seen.has(event.kind))continue;
-  seen.add(event.kind);output.push(event);
-  if(output.length===3)break;
- }
- return output;
+ candidate.sort((a,b)=>b.rank-a.rank||
+   Number(b.teamId===winner)-Number(a.teamId===winner)||
+   a.playerId-b.playerId);
+ // Preserve EVERY qualifying teammate, including several players with the
+ // same type of highlight. Presentation groups them by team instead of
+ // limiting the entire matchup to one batter/one pitcher/one fielder.
+ return candidate;
 }
 export function matchHeadline(season,game,players=[]){
  if(game?.stage!=='final'||!game.result?.scores)return null;
@@ -65,8 +78,16 @@ export function matchHeadline(season,game,players=[]){
  if(leadChanges>=2)details.push(leadChanges+' confirmed lead changes');
  if(kind==='walkoff')details.push('Confirmed walk-off finish');
  if(kind==='comeback')details.push('Confirmed late-inning comeback');
- if(highlights.length)details.push(highlights.map(e=>e.text).join(' · '));
+ // Mention multiple players together, once per club, not as individual
+ // repeated headlines. Their best numbers all remain readable with "more".
+ for(const teamId of [winnerId,loserId]){
+   const teamHighlights=highlights.filter(e=>e.teamId===teamId);
+   if(!teamHighlights.length)continue;
+   const club=names.get(teamId)||'This club';
+   details.push(club+': '+teamHighlights.map(e=>e.text).join('; '));
+ }
  if(note)details.push(note);
+ details.push('The standout performances came '+gameOutcomeContext(season,game,winnerId));
  return {id:'match:'+game.id,category:'match',tier:kind,label:labels[kind],
    title,summary:details.join('. ')||winner+' beat '+loser+' '+score+'.',
    season:season.name,seasonId:season.id,gameId:game.id,
