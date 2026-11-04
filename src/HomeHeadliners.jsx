@@ -2,6 +2,7 @@ import React,{useEffect,useRef,useState} from 'react';
 import {ChevronLeft,ChevronRight,Newspaper,Trophy} from 'lucide-react';
 import {teamLogo} from './TeamIdentity.jsx';
 import {PlayerPortrait} from './PlayerPortrait.jsx';
+import HeadlineReadMore from './HeadlineReadMore.jsx';
 import './home-headliners.css';
 
 function Crest({team,supabase,large=false}){
@@ -46,12 +47,8 @@ function MatchStorySlide({story,seasons,supabase,players,onOpenGame}){
      </div>}
      <div className="ssl-headliner-keyplays">
        <strong>{story.highlights?.length?'STANDOUT PERFORMANCES':'GAME HIGHLIGHTS'}</strong>
-       {story.highlights?.length?<ul>{story.highlights.map(event=>
-         <li key={event.kind}>{event.text}</li>)}</ul>:
-         <p>{story.summary}</p>}
-       {story.leadChanges>=2&&<p>{story.leadChanges} confirmed lead changes</p>}
-       {story.lateFinish==='walkoff'&&<p>Walk-off finish confirmed</p>}
-       {story.lateFinish==='late-comeback'&&<p>Late-inning comeback confirmed</p>}
+       <HeadlineReadMore key={story.id} id={story.id}
+         text={story.summary} limit={155} className="ssl-headliner-expanded-story"/>
      </div>
    </div>
  </section>;
