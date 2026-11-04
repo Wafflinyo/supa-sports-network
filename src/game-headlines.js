@@ -1,4 +1,5 @@
 import {gamePointsForReport} from './game-points.js';
+import {HEATING_UP_THRESHOLD} from './heating-up.js';
 import {inningScoringDrama} from './rio-inning-scores.js';
 // Match stories use official result totals. Inning-by-inning drama is described
 // only when the commissioner explicitly records it; Rio has no play-by-play.
@@ -86,8 +87,8 @@ export function matchPerformanceHighlights(game,players=[]){
  // limiting the entire matchup to one batter/one pitcher/one fielder.
  return candidate;
 }
-export function matchHeadline(season,game,players=[]){
- if(game?.stage!=='final'||!game.result?.scores)return null;
+export function matchHeadline(season,game,players=[],{includeRecorded=false}={}){
+ if(!(game?.stage==='final'||(includeRecorded&&game?.stage==='recorded'))||!game.result?.scores)return null;
  const a=Number(game.result.scores[game.away]),h=Number(game.result.scores[game.home]);
  if(!Number.isFinite(a)||!Number.isFinite(h)||a<0||h<0||a===h)return null;
  const winnerId=String(a>h?game.away:game.home),loserId=String(a>h?game.home:game.away);
@@ -108,6 +109,24 @@ export function matchHeadline(season,game,players=[]){
   lateFinish==='late-comeback'&&margin<=2?'comeback':
   small===0?'shutout':margin>=8?'blowout':margin<=2?'close':'result';
  const highlights=matchPerformanceHighlights(game,players),best=highlights.find(x=>x.kind==='batting'&&x.teamId===winnerId&&/home runs|grand slam/.test(x.text));
+ // Dominant team headlines spotlight the winner. Competitive games recognize
+ // the top performers on both sides, including players on the losing club.
+ const teamSpotlight=['blowout','shutout'].includes(kind)?'winner':'both';
+ const topPlayers=(game.result?.players||[])
+   .filter(row=>teamSpotlight==='both'||String(row.team)===winnerId)
+   .map(row=>{
+     const score=gamePointsForReport(row).tgp;
+     const id=Number(row.player);
+     const hasOfficialScore=typeof row.gameScore==='number'&&Number.isFinite(row.gameScore);
+     const hasStats=Object.values(row.stats||{}).some(value=>Number.isFinite(Number(value))&&Number(value)!==0);
+     return {playerId:id,name:players.find(p=>Number(p.id)===id)?.name||'Player '+id,
+       teamId:String(row.team),gamePoints:score,heatingUp:score>=HEATING_UP_THRESHOLD,
+       meaningful:hasOfficialScore||hasStats};
+   })
+   .filter(row=>row.meaningful&&Number.isFinite(row.gamePoints))
+   .sort((a,b)=>b.gamePoints-a.gamePoints||a.playerId-b.playerId)
+   .slice(0,3)
+   .map(({meaningful,...row})=>row);
  const score=big+'–'+small;
  let title=kind==='walkoff'?winner+' steal a walk-off thriller, '+score+'!':
   kind==='comeback'?winner+' complete a late comeback, '+score+'!':
@@ -140,17 +159,17 @@ export function matchHeadline(season,game,players=[]){
    season:season.name,seasonId:season.id,gameId:game.id,
    winnerId,loserId,winner,loser,winnerRuns:big,loserRuns:small,
    awayRuns:a,homeRuns:h,awayId:String(game.away),homeId:String(game.home),
-   week:game.week||null,leadChanges,lateFinish,highlights,
+   week:game.week||null,leadChanges,lateFinish,highlights,topPlayers,teamSpotlight,
    importance:kind==='walkoff'?100:kind==='comeback'?96:
     kind==='shutout'?91:kind==='blowout'?86:kind==='close'?82:58,
-   at:game.releasedAt||game.result.postedAt||null,private:false};
+   at:game.releasedAt||game.result.postedAt||null,private:game.stage==='recorded'};
 }
 // At most five slides. The season's active Upcoming Matches week determines
 // when the preseason champion must disappear, even before Week 2 has a final.
 // Earlier official game stories backfill unused slots as the new week arrives.
-export function homepageHeadlineSlides(championship,items,seasonId,maximum=5,season=null){
+export function homepageHeadlineSlides(championship,items,seasonId,maximum=5,season=null,allowPrivate=false){
  const limit=Math.min(Math.max(Number(maximum)||5,1),5);
- const news=(items||[]).filter(i=>i.category==='match'&&!i.private&&i.gameId&&
+ const news=(items||[]).filter(i=>i.category==='match'&&(!i.private||allowPrivate)&&i.gameId&&
    String(i.seasonId)===String(seasonId));
  const weekOf=i=>{const n=Number(i.week);return Number.isInteger(n)&&n>0?n:null;};
  const regular=(season?.games||[]).filter(g=>g.phase==='regular'&&Number.isInteger(Number(g.week)));
@@ -168,6 +187,7 @@ export function homepageHeadlineSlides(championship,items,seasonId,maximum=5,sea
  const current=news.filter(i=>weekOf(i)!==null);
  const timestamp=i=>{const n=Date.parse(i.at||'');return Number.isFinite(n)?n:0;};
  current.sort((a,b)=>(weekOf(b)||0)-(weekOf(a)||0)||
+   (allowPrivate?Number(!!b.private)-Number(!!a.private):0)||
    (b.importance||0)-(a.importance||0)||
    timestamp(b)-timestamp(a)||a.id.localeCompare(b.id));
  const slides=[],used=new Set();
