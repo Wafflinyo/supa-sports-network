@@ -190,6 +190,16 @@ const counts = new Set(
         ].includes(k),
     ),
 );
+// Project Rio's rate fields are calculated for the preview and public box
+// scores, but the season-result RPC accepts *integer counting stats only*.
+// Derived percentages, ERA, WHIP and innings pitched (decimal) must never be
+// included in a saved report. Keep outs and complete-game counts explicitly;
+// they are not regular spreadsheet counting-column keys.
+const savedCountingFields=new Set([...counts,'outs','completeGames','starBases','mvps']);
+export function savedReportCountingStats(stats){
+  return Object.fromEntries(Object.entries(stats||{}).filter(([key])=>
+    savedCountingFields.has(key)));
+}
 const aliases = {
   atBats: ["At Bats", "At-Bats"],
   plateAppearances: ["Plate Appearances"],
@@ -391,7 +401,7 @@ export function buildReport(preview, awayLabel, season, game, players, mvp) {
         .split(/[\/,;→\-]+/)
         .map((x) => x.trim())
         .filter(Boolean),
-      stats,
+      stats:savedReportCountingStats(stats),
     });
   }
   if (new Set(result.map((x) => x.player)).size !== result.length)

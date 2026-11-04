@@ -157,7 +157,7 @@ function App() {
   useEffect(()=>{loadOfficialTeams();const timer=setInterval(loadOfficialTeams,15000);return()=>clearInterval(timer)},[])
   const seasonLeague=useSeasonLeague(supabase,{...access,signedIn:!!session})
   const seasonStats=useMemo(()=>aggregate(seasonLeague.season),[seasonLeague.season])
-  const seasonHeating=useMemo(()=>heatingUpForSeason(seasonLeague.season,{includeRecorded:access.role==='commissioner'}),[seasonLeague.season,access.role])
+  const seasonHeating=useMemo(()=>heatingUpForSeason(seasonLeague.season),[seasonLeague.season])
   const hotIds=useMemo(()=>new Set(Object.entries(seasonHeating.players).filter(([,r])=>r.currentHotStreak>0).map(([id])=>Number(id))),[seasonHeating])
   const newsItems=useMemo(()=>leagueNews(seasonLeague.seasons,playerPool,{includeRecorded:access.role==='commissioner'}),[seasonLeague.seasons,access.role])
   const players=useMemo(()=>basePlayers.map(p=>{const base=seasonStats[p.id],heat=seasonHeating.players[p.id];const stats=base?{...base,...(heat||{})}:heat;return {...p,...stats,stats,team:seasonLeague.season?.teams.find(t=>seasonLeague.season.rosters[t.id]?.includes(p.id))?.name,perGame:base?Object.fromEntries(Object.entries(base).filter(([,v])=>typeof v==='number').map(([k,v])=>[k,perGameOnly.has(k)&&k!=='inningsPitched'?v:v/base.gamesPlayed])):null}}),[seasonStats,seasonLeague.season,seasonHeating])
@@ -300,7 +300,7 @@ function App() {
     </main>
     <PwaInstall/>
     <footer><div className="container footer-inner"><span>SLUGGERS <b>SUPA</b> LEAGUE</span><small>LEAGUE DATA AND FANTASY HUB</small></div></footer>
-    {selectedPlayer && <PlayerProfile careerSeasons={careerSeasons} fullSeasons={seasonLeague.seasons} includeRecorded={access.role==='commissioner'} player={players.find(p=>p.id===selectedPlayer.id)||selectedPlayer} PlayerAvatar={PlayerAvatar} onClose={() => setSelectedPlayer(null)}/>}
+    {selectedPlayer && <PlayerProfile careerSeasons={careerSeasons} fullSeasons={seasonLeague.seasons} includeRecorded={false} player={players.find(p=>p.id===selectedPlayer.id)||selectedPlayer} PlayerAvatar={PlayerAvatar} onClose={() => setSelectedPlayer(null)}/>}
     {authOpen && <AccountDialog supabase={supabase} session={session} onClose={() => setAuthOpen(false)} onAccess={next=>{setAccess(next);if(next.role==='gm')setTeamWelcomeSeen(false)}}/>}
     {isGM&&Number.isFinite(Number(access.slot))&&
       <GmAchievementNotifications

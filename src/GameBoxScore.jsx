@@ -58,46 +58,54 @@ function TeamBoxTable({team,tab}){
     </>:<p className="ssl-box-empty">No {tab.toLowerCase()} player statistics were supplied for this team.</p>}
   </section>;
 }
-export default function GameBoxScore({game,onClose}){
-  const [tab,setTab]=useState('Game Points');
+export default function GameBoxScore({game,onClose,inline=false}){
+  const [tab,setTab]=useState(inline?'Batting':'Game Points');
   const closeRef=useRef(null);
   useEffect(()=>{
-    if(!game)return;
+    if(!game||inline)return;
     const previous=document.activeElement;
     closeRef.current?.focus();
-    const keydown=event=>{if(event.key==='Escape'){event.preventDefault();onClose();}};
+    const keydown=event=>{if(event.key==='Escape'){event.preventDefault();onClose?.();}};
     document.addEventListener('keydown',keydown);
     return ()=>{document.removeEventListener('keydown',keydown);if(previous?.isConnected)previous.focus();};
-  },[game?.id,onClose]);
-  useEffect(()=>setTab('Game Points'),[game?.id]);
+  },[game?.id,inline,onClose]);
+  useEffect(()=>setTab(inline?'Batting':'Game Points'),[game?.id,inline]);
   if(!game)return null;
   const [away,home]=game.teams;
-  return <div className="ssl-box-backdrop" onMouseDown={event=>{if(event.target===event.currentTarget)onClose()}}>
-    <section className="ssl-box-dialog" role="dialog" aria-modal="true" aria-label={away.name+' at '+home.name+' box score'}>
-      <div className="ssl-box-header">
-        <div><small>{game.stage} · {game.label}</small><h2>FULL BOX SCORE</h2></div>
-        <button ref={closeRef} type="button" className="ssl-box-close" onClick={onClose} aria-label="Close box score">×</button>
+  const title=away.name+' at '+home.name+' box score';
+  const content=<>
+    <div className="ssl-box-header">
+      <div>
+        <small>{inline?'COMMISSIONER-ONLY PRIVATE PREVIEW':game.stage} · {game.label}</small>
+        <h2>{inline?'PREVIEW FULL BOX SCORE':'FULL BOX SCORE'}</h2>
       </div>
-      <div className="ssl-box-scoreboard">
-        <div><span className="ssl-box-away">{away.sideLabel||"AWAY"}</span><strong>{away.name}</strong><b>{away.score}</b></div>
-        <div><span className="ssl-box-home">{home.sideLabel||"HOME"}</span><strong>{home.name}</strong><b>{home.score}</b></div>
+      {!inline&&<button ref={closeRef} type="button" className="ssl-box-close" onClick={onClose} aria-label="Close box score">×</button>}
+    </div>
+    <div className="ssl-box-scoreboard">
+      <div><span className="ssl-box-away">{away.sideLabel||"AWAY"}</span><strong>{away.name}</strong><b>{away.score}</b></div>
+      <div><span className="ssl-box-home">{home.sideLabel||"HOME"}</span><strong>{home.name}</strong><b>{home.score}</b></div>
+    </div>
+    <div className="ssl-box-score-summary">
+      <strong>{inline?'PREVIEW — NOT PUBLISHED':'FINAL'}</strong><span>HITS: {away.hits} – {home.hits}</span>
+      {game.hasPlayerStats&&<span>TEAM GAME POINTS: {away.totalGamePoints.toFixed(2)} – {home.totalGamePoints.toFixed(2)}</span>}
+    </div>
+    {game.hasPlayerStats?<div className="ssl-box-body">
+      <div className="ssl-box-tabs" role="tablist" aria-label="Box score statistic categories">
+        {Object.keys(categories).map(category=><button key={category} type="button" role="tab"
+          aria-selected={tab===category} className={tab===category?'active':''}
+          onClick={()=>setTab(category)}>{category}</button>)}
       </div>
-      <div className="ssl-box-score-summary">
-        <strong>FINAL</strong><span>HITS: {away.hits} – {home.hits}</span>
-        {game.hasPlayerStats&&<span>TEAM GAME POINTS: {away.totalGamePoints.toFixed(2)} – {home.totalGamePoints.toFixed(2)}</span>}
-      </div>
-      {game.hasPlayerStats?<div className="ssl-box-body">
-        <div className="ssl-box-tabs" role="tablist" aria-label="Box score statistic categories">
-          {Object.keys(categories).map(category=><button key={category} type="button" role="tab"
-            aria-selected={tab===category} className={tab===category?'active':''}
-            onClick={()=>setTab(category)}>{category}</button>)}
-        </div>
-        <p className="ssl-box-instructions">Scroll each team's table sideways to view all {tab.toLowerCase()} columns. Tap a category to switch stats.</p>
-        {game.teams.map(team=><TeamBoxTable key={team.key} team={team} tab={tab}/>)}
-      </div>:<div className="ssl-box-no-report">
-        <strong>The final score is recorded.</strong>
-        <p>A full player-by-player Project Rio report has not been uploaded for this game yet. Scores shown above are confirmed, but individual statistics aren't available.</p>
-      </div>}
+      <p className="ssl-box-instructions">Scroll each team's table sideways to view all {tab.toLowerCase()} columns. Tap a category to switch stats.</p>
+      {game.teams.map(team=><TeamBoxTable key={team.key} team={team} tab={tab}/>)}
+    </div>:<div className="ssl-box-no-report">
+      <strong>The final score is recorded.</strong>
+      <p>A full player-by-player Project Rio report has not been uploaded for this game yet. Scores shown above are confirmed, but individual statistics aren't available.</p>
+    </div>}
+  </>;
+  if(inline)return <section className="ssl-box-dialog ssl-box-inline" aria-label={title}>{content}</section>;
+  return <div className="ssl-box-backdrop" onMouseDown={event=>{if(event.target===event.currentTarget)onClose?.()}}>
+    <section className="ssl-box-dialog" role="dialog" aria-modal="true" aria-label={title}>
+      {content}
     </section>
   </div>;
 }
