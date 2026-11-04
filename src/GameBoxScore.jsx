@@ -8,8 +8,7 @@ const categories={
     ['shutoutBonus','Shutout Bonus'],['mvpBonus','MVP Bonus'],['tgp','TGP'],
   ],
   'Batting':[
-    ...columns['Offensive Stats'].filter(([k])=>!['gamesPlayed','mvps'].includes(k))
-      .flatMap(column=>column[0]==='rbi'?[column,['homeRuns','Home Runs']]:[column]),
+    ...columns['Offensive Stats'].filter(([k])=>!['gamesPlayed','mvps'].includes(k)),
   ],
   'Fielding':columns['Defensive Stats'].filter(([k])=>!['gamesPlayed','mvps'].includes(k)),
   'Pitching':columns['Pitching Stats'].filter(([k])=>!['gamesPlayed','mvps'].includes(k)),
@@ -41,7 +40,7 @@ function TeamBoxTable({team,tab}){
     </div>
     {players.length?<>
       <div className="ssl-box-table-scroll" role="region" tabIndex={0} aria-label={team.name+' '+tab+' box score'}>
-        <table className="ssl-box-table">
+        <table key={tab} className="ssl-box-table">
           <thead><tr><th scope="col" className="ssl-box-player">Player</th>
             {fields.map(([key,label])=><th scope="col" key={key} title={label}>{label}</th>)}
           </tr></thead>
