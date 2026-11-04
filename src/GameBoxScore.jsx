@@ -64,7 +64,7 @@ function InningLineScore({game}){
     return <section className="ssl-box-innings ssl-box-innings-unavailable" aria-label="Inning-by-inning score unavailable">
       <h3>SCORING BY INNING</h3>
       <p>The original Project Rio Game Info inning scores were not saved with this report.
-        {game.stage==='COMMISSIONER ONLY · NOT RELEASED'||String(game.label||'').includes('COMMISSIONER PRIVATE PREVIEW')
+        {String(game.stage||'').includes('PRIVATE')||String(game.label||'').includes('COMMISSIONER')
           ?' Replace the saved private report with its original Project Rio ODS/XLSX file to restore the inning breakdown before releasing.'
           :' The inning breakdown cannot be reconstructed from the final score alone.'}
       </p>
