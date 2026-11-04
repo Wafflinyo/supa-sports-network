@@ -1,3 +1,4 @@
+import {gamePointsForReport} from './game-points.js';
 // Match stories use official result totals. Inning-by-inning drama is described
 // only when the commissioner explicitly records it; Rio has no play-by-play.
 const n=value=>Number.isFinite(Number(value))&&Number(value)>0?Number(value):0;
@@ -16,6 +17,44 @@ export function gameOutcomeContext(season,game,teamId){
  const where=Number.isInteger(week)&&week>0?'Week '+week+"'s":'the';
  return 'in '+where+' '+result+' against the '+opponent+'.';
 }
+// Report PGP is calculated with the SAME official SSL scoring weights used
+// by the box score. Never confuse an individual pitcher's PGP with TGP.
+export function pitchingNewsPerformance(row,game){
+ const stats=row?.stats||{};
+ const outs=Number(stats.outs||0),ks=Number(stats.pitchStrikeouts||0);
+ const runs=stats.runsAllowed==null?null:Number(stats.runsAllowed);
+ const earned=stats.earnedRuns==null?null:Number(stats.earnedRuns);
+ if(!Number.isFinite(outs)||outs<=0)return null;
+ const points=gamePointsForReport(row).pgp;
+ const opponent=String(row.team)===String(game.away)?game.home:game.away;
+ const opponentScore=Number(game?.result?.scores?.[opponent]);
+ const ownScore=Number(game?.result?.scores?.[row.team]);
+ // Any participating pitcher in an official TEAM shutout qualifies,
+ // including relievers in a combined shutout.
+ const shutout=Number.isFinite(opponentScore)&&opponentScore===0&&
+   Number.isFinite(ownScore)&&ownScore>0;
+ const pointsEligible=outs>=15&&points>=20;
+ const lowRuns=outs>=12&&(
+   (runs!=null&&Number.isFinite(runs)&&runs<=2)||
+   (earned!=null&&Number.isFinite(earned)&&earned<=2)
+ );
+ if(!shutout&&!pointsEligible&&!lowRuns)return null;
+ const tier=pointsEligible
+   ?points>=40?'great':points>=30?'solid':'good'
+   :shutout?'shutout':'efficient';
+ const score=Number.isFinite(points)?points.toFixed(2).replace(/\.00$/,''):'0';
+ const level=tier==='great'?'great pitching outing':
+   tier==='solid'?'solid pitching outing':
+   tier==='good'?'good pitching outing':
+   tier==='shutout'?'shutout performance':'strong run prevention';
+ const detail=[ip(outs)+' IP'];
+ if(runs!=null&&Number.isFinite(runs))detail.push(runs+' runs allowed');
+ if(earned!=null&&Number.isFinite(earned))detail.push(earned+' earned runs');
+ if(ks>0)detail.push(ks+' '+(ks===1?'strikeout':'strikeouts'));
+ detail.push(score+' PGP');
+ return {shutout,pointsEligible,lowRuns,tier,level,outs,ks,runs,earned,pgp:points,
+   detail:detail.join(', ')};
+}
 export function matchPerformanceHighlights(game,players=[]){
  const names=new Map(players.map(p=>[Number(p.id),p.name]));
  const scores=game?.result?.scores||{},a=Number(scores[game.away]),h=Number(scores[game.home]);
@@ -32,10 +71,11 @@ export function matchPerformanceHighlights(game,players=[]){
   const defense=['putouts','assists','doublePlays','triplePlays','buddyJumpPutouts'].reduce((sum,k)=>sum+n(s[k]),0);
   if(defense>=8)add('fielding',70+Math.min(defense,20),name+' recorded '+defense+' defensive contributions');
   else if(n(s.buddyJumpPutouts)>=2)add('fielding',71,name+' made '+n(s.buddyJumpPutouts)+' Buddy Jump putouts');
-  const outs=n(s.outs),ks=n(s.pitchStrikeouts),allowed=n(s.runsAllowed);
-  if(outs>=15&&allowed===0)add('pitching',96+Math.min(ks,8),name+' pitched '+ip(outs)+' scoreless innings'+(ks?' with '+ks+' strikeouts':''));
-  else if(outs>=15&&allowed<=2)add('pitching',76+ks,name+' went '+ip(outs)+' IP with '+allowed+' runs allowed');
-  else if(ks>=4)add('pitching',73+ks,name+' struck out '+ks);
+  const pitch=pitchingNewsPerformance(row,game);
+  if(pitch)add('pitching',
+    (pitch.shutout?104:0)+(pitch.tier==='great'?40:pitch.tier==='solid'?30:20)+
+    Math.min(pitch.ks,12),
+    name+' delivered '+pitch.level+' ('+pitch.detail+')');
  }
  candidate.sort((a,b)=>b.rank-a.rank||
    Number(b.teamId===winner)-Number(a.teamId===winner)||
