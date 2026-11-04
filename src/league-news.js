@@ -1,6 +1,6 @@
 import {HEATING_UP_THRESHOLD} from './heating-up.js';
 import {preseasonChampionshipFeature} from './preseason-champion-feature.js';
-import {matchHeadline,gameOutcomeContext} from './game-headlines.js';
+import {matchHeadline,gameOutcomeContext,pitchingNewsPerformance} from './game-headlines.js';
 // Derived newsroom: headlines refresh when official reports are corrected.
 // Recorded games remain commissioner-only until their results are released.
 
@@ -36,15 +36,6 @@ function homerDetails(stats) {
   // Historic reports may have only the total Home Runs column.
   const total = classifiedCount > 0 ? classifiedCount : amount(stats.homeRuns);
   return {total, events};
-}
-
-function pitchingDetail(stats) {
-  // Rio's innings are recorded as outs (three outs = one inning).
-  // Avoid floating-point "5.1 innings" mistakes: 5.1 means 5 IP + 1 out.
-  const outs = amount(stats.outs);
-  return {outs, innings: `${Math.floor(outs / 3)}.${outs % 3}`,
-    runsAllowed: amount(stats.runsAllowed),
-    strikeouts: amount(stats.pitchStrikeouts)};
 }
 
 // A team gets one collective performance post for a matchup when multiple
@@ -220,24 +211,24 @@ export function leagueNews(seasons, players, {includeRecorded = false} = {}) {
             `${defense} combined putouts, assists, double plays, triple plays and Buddy Jump putouts against ${opponent}.`);
         }
 
-        const pitch = pitchingDetail(stats);
-        if (pitch.outs >= 15 && pitch.runsAllowed <= 3) {
-          // Zero Ks still qualifies: innings and runs allowed are the only gates.
-          const tier = pitch.runsAllowed === 0 ? 'scoreless'
-            : pitch.runsAllowed === 1 ? 'outstanding'
-            : pitch.runsAllowed === 2 ? 'strong' : 'solid';
-          add('pitching', tier,
-            tier === 'scoreless' ? 'DOMINANT PITCHING OUTING' :
-            tier === 'outstanding' ? 'OUTSTANDING PITCHING OUTING' :
-            tier === 'strong' ? 'STRONG PITCHING OUTING' : 'SOLID PITCHING OUTING',
-            headline('pitching', tier, tier === 'scoreless'
-              ? [`${player} shuts down the opposition!`, `${player} delivers scoreless pitching!`, `${player} keeps the scoreboard clean!`]
-              : tier === 'outstanding'
-              ? [`${player} delivers a stellar outing on the mound!`, `${player} is sharp from start to finish!`, `${player} shines on the mound!`]
-              : tier === 'strong'
-              ? [`${player} turns in a strong pitching performance!`, `${player} keeps hitters under control!`, `${player} delivers on the mound!`]
-              : [`${player} puts together a solid pitching outing!`, `${player} keeps the game in check!`, `${player} holds the opposition to three runs!`]),
-            `${pitch.innings} IP, ${plural(pitch.strikeouts, 'strikeout')}, ${plural(pitch.runsAllowed, 'run')} allowed against ${opponent}.`);
+        const pitch=pitchingNewsPerformance(row,game);
+        if(pitch) {
+          const label=pitch.shutout?'SHUTOUT PITCHING PERFORMANCE':
+            pitch.tier==='great'?'GREAT PITCHING OUTING':
+            pitch.tier==='solid'?'SOLID PITCHING OUTING':
+            pitch.tier==='good'?'GOOD PITCHING OUTING':
+            'STRONG RUN PREVENTION';
+          const title=pitch.shutout
+            ?player+' helps shut out '+opponent+'!'
+            :pitch.tier==='great'
+              ?player+' delivers a great outing on the mound!'
+              :pitch.tier==='solid'
+                ?player+' puts together a solid pitching performance!'
+                :pitch.tier==='good'
+                  ?player+' turns in a good pitching outing!'
+                  :player+' keeps hitters under control!';
+          add('pitching',pitch.tier,label,title,
+            pitch.detail+' against '+opponent+'.');
         }
 
         // Use the same on-base events and PA denominator as the site's stats.
