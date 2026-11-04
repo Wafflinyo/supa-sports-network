@@ -101,3 +101,43 @@
 
 /* Clicking more expands the full story vertically; the user can read it without a clipped scroll pane. */
 .ssl-headliner-expanded-story.expanded{max-height:none;overflow:visible}
+
+
+/* Private commissioner-only slide; never present it as a published result. */
+.ssl-headliner-private-tag{display:inline-block;margin-left:10px;padding:3px 7px;
+ border:1px solid #ffce4f;border-radius:4px;color:#ffda6a;
+ font:800 10px/1.2 system-ui,sans-serif;letter-spacing:.05em;vertical-align:middle}
+.ssl-home-layout .ssl-headliner-logo-stage{min-width:0;display:flex;align-items:center;
+ justify-content:center;gap:14px;min-height:100px}
+.ssl-headliner-logo-stage.solo .ssl-headliner-crest.featured{width:100%;max-width:220px}
+.ssl-headliner-logo-stage.matchup .ssl-headliner-crest.featured{
+ width:min(43%,145px);height:100px;min-width:0;flex:0 1 145px}
+.ssl-headliner-logo-stage.matchup .ssl-headliner-crest.featured img{height:100px}
+.ssl-headliner-versus{font:900 20px/1 'Barlow Condensed',Impact,sans-serif;
+ color:#ffd342;flex:none}
+.ssl-headliner-leaders{background:#081f42e6;border:1px solid #5e81b3a1;
+ border-radius:8px;padding:11px 12px;min-width:0}
+.ssl-headliner-leaders>strong{display:block;margin-bottom:8px;
+ color:#ffd342;font:900 16px/1.15 'Barlow Condensed',Impact,sans-serif;letter-spacing:.035em}
+.ssl-headliner-leaders ol{list-style:none;padding:0;margin:0;display:grid;gap:7px}
+.ssl-headliner-leaders li{display:flex;align-items:center;gap:8px;
+ min-width:0;border-top:1px solid #668ab840;padding-top:6px}
+.ssl-headliner-rank{font:900 16px/1 'Barlow Condensed',Impact,sans-serif;
+ color:#ffdc53;min-width:13px}
+.ssl-headliner-player-name{min-width:0;flex:1;font:750 13px/1.2 system-ui,sans-serif;
+ color:#f4f8ff;overflow-wrap:anywhere}
+.ssl-headliner-tgp{white-space:nowrap;font:900 19px/1 'Barlow Condensed',Impact,sans-serif;
+ color:#ffdf67;font-variant-numeric:tabular-nums}
+.ssl-headliner-tgp small{font:800 10px/1 system-ui,sans-serif;color:#d0def0}
+.ssl-headliner-hot{display:inline-flex;align-items:center;justify-content:center;
+ width:19px;min-width:19px;height:23px}
+.ssl-headliner-hot svg{width:100%;height:100%}
+@media(max-width:600px){
+ .ssl-headliner-logo-stage.matchup .ssl-headliner-crest.featured{height:72px;max-width:110px}
+ .ssl-headliner-logo-stage.matchup .ssl-headliner-crest.featured img{height:72px}
+ .ssl-home-layout .ssl-headliner-logo-stage{min-height:76px}
+ .ssl-headliner-leaders{padding:10px}
+ .ssl-headliner-player-name{font-size:12px}
+ .ssl-headliner-tgp{font-size:17px}
+ .ssl-headliner-private-tag{margin-left:0;margin-top:4px}
+}
