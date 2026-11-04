@@ -5,6 +5,12 @@ import {GAME_POINT_KEYS,gamePointComponents,gamePointsForReport} from '../src/ga
 assert.equal(SSL_GAME_SCORE_WEIGHTS.hitsAllowed,-0.25);
 assert.equal(SSL_GAME_SCORE_WEIGHTS.pitchWalks,-2);
 assert.equal(SSL_GAME_SCORE_WEIGHTS.beanBalls,-2);
+assert.equal(SSL_GAME_SCORE_WEIGHTS.earnedRuns,-3,'Earned runs cost three PGP each');
+assert.equal(SSL_GAME_SCORE_WEIGHTS.runsAllowed,undefined,'Runs allowed is tracked but never independently penalized');
+assert(!GAME_POINT_KEYS.pgp.includes('runsAllowed'));
+assert.equal(gamePointComponents({runsAllowed:5,earnedRuns:0}).pgp,0);
+assert.equal(gamePointComponents({runsAllowed:5,earnedRuns:2}).pgp,-6);
+assert.equal(customGameScore({runsAllowed:5,earnedRuns:2}).gameScore,-6);
 for(const field of ['hitsAllowed','pitchWalks','beanBalls']){
   assert(GAME_POINT_KEYS.pgp.includes(field),field+' must be scored in PGP');
   assert(!GAME_POINT_KEYS.ogp.includes(field),field+' must not affect offense');
