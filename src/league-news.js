@@ -1,6 +1,7 @@
 import {HEATING_UP_THRESHOLD} from './heating-up.js';
 import {preseasonChampionshipFeature} from './preseason-champion-feature.js';
 import {matchHeadline,gameOutcomeContext,pitchingNewsPerformance} from './game-headlines.js';
+import {reporterParagraph} from './reporter-copy.js';
 // Derived newsroom: headlines refresh when official reports are corrected.
 // Recorded games remain commissioner-only until their results are released.
 
@@ -38,134 +39,6 @@ function homerDetails(stats) {
   return {total, events};
 }
 
-
-// Read the official report once per featured player, then write one
-// broadcast-style paragraph instead of stacking stat-category labels.
-// Deterministic phrasing keeps previews, refreshes and public posts consistent.
-const naturalList = entries => {
-  if(entries.length<2)return entries[0]||'';
-  if(entries.length===2)return entries.join(' and ');
-  return entries.slice(0,-1).join(', ')+', and '+entries.at(-1);
-};
-function reporterParagraph(person,id,categories,game,teamId,opponent,teamName,position=0){
-  const row=game.result?.players?.find(r=>Number(r.player)===Number(id)&&String(r.team)===String(teamId));
-  if(!row)return null;
-  const stats=row.stats||{},shown=new Set(categories),sentences=[];
-  const num=(key)=>amount(stats[key]);
-  const choose=(kind,options)=>wording(game.id,id,'reporter',kind,options);
-  const hasHomer=shown.has('home-run'),hasOffense=shown.has('offense');
-  const homeRuns=homerDetails(stats);
-  const eventNames={
-    oneHr:'solo homer',twoHr:'two-run homer',threeHr:'three-run homer',grandSlams:'grand slam',
-  };
-  const known=homeRuns.events.reduce((sum,event)=>sum+event.count,0);
-  const homerWords=homeRuns.events.map(event=>
-    (event.count===1?'a ':event.count+' ')+eventNames[event.key]+(event.count===1?'':'s'));
-  const otherHomers=Math.max(0,homeRuns.total-known);
-  if(otherHomers)homerWords.push(otherHomers===1?'a homer':otherHomers+' homers');
-  const homers=naturalList(homerWords);
-  const runs=num('runs'),rbi=num('rbi');
-  const production=naturalList([
-    runs?plural(runs,'run')+' scored':null,
-    rbi?plural(rbi,'RBI','RBI'):null,
-  ].filter(Boolean));
-  if(hasHomer&&hasOffense&&homers&&production){
-    sentences.push(choose('offense-homer',[
-      person+' sparked the offense with '+production+', including '+homers+'.',
-      person+' brought the power with '+homers+', finishing with '+production+'.',
-      person+' made an impact at the plate, posting '+production+' and launching '+homers+'.',
-    ]));
-  }else if(hasHomer&&homers){
-    sentences.push(choose('homer',[
-      person+' showed off the power, launching '+homers+'.',
-      person+' made noise at the plate with '+homers+'.',
-      person+' gave the lineup a jolt with '+homers+'.',
-    ]));
-  }else if(hasOffense&&production){
-    sentences.push(choose('offense',[
-      person+' helped spark the attack with '+production+'.',
-      person+' made a difference at the plate, tallying '+production+'.',
-      person+' delivered a strong offensive outing with '+production+'.',
-    ]));
-  }
-  if(shown.has('defense')){
-    const defense=naturalList([
-      ['putouts','putout'],['assists','assist'],['doublePlays','double play'],
-      ['triplePlays','triple play'],['buddyJumpPutouts','Buddy Jump putout'],
-    ].filter(([key])=>num(key)>0).map(([key,label])=>plural(num(key),label)));
-    if(defense){
-      sentences.push(sentences.length?choose('defense-bridge',[
-        'The impact carried over to the field, with '+defense+'.',
-        'That was only half the story: defensively, '+person+' added '+defense+'.',
-        'On defense, the effort continued with '+defense+'.',
-      ]):choose('defense',[
-        person+' made a statement defensively, recording '+defense+'.',
-        person+' made their presence felt in the field with '+defense+'.',
-        person+' put on a defensive clinic, tallying '+defense+'.',
-        person+' delivered with the glove, collecting '+defense+'.',
-      ]));
-    }
-  }
-  if(shown.has('pitching')){
-    const pitch=pitchingNewsPerformance(row,game);
-    if(pitch){
-      const innings=Math.floor(pitch.outs/3)+'.'+(pitch.outs%3);
-      const figures=[innings+' innings pitched'];
-      if(pitch.runs===0)figures.push('no runs allowed');
-      else if(pitch.runs!=null&&pitch.runs>0)figures.push(plural(pitch.runs,'run')+' allowed');
-      if(pitch.earned!=null&&pitch.earned>0&&pitch.earned!==pitch.runs)
-        figures.push(plural(pitch.earned,'earned run'));
-      if(pitch.ks>0)figures.push(plural(pitch.ks,'strikeout'));
-      if(pitch.pgp>=20)figures.push(Number(pitch.pgp.toFixed(2))+' PGP');
-      const performance=naturalList(figures);
-      const start=sentences.length?'On the mound, '+person+' also contributed ':
-        person+(pitch.shutout?' helped secure the team shutout with ':
-          ' delivered on the mound with ');
-      sentences.push(start+performance+'.');
-    }
-  }
-  if(shown.has('perfect-batting')){
-    const hits=stats.hits!=null?num('hits'):
-      num('singles')+num('doubles')+num('triples')+homeRuns.total;
-    const walks=num('batWalks'),hbp=num('hitByPitch');
-    const pa=num('plateAppearances')||
-      num('atBats')+walks+hbp+num('sacFlys');
-    const details=naturalList([
-      hits?plural(hits,'hit'):null,
-      walks?plural(walks,'walk'):null,
-      hbp?plural(hbp,'hit by pitch','hit by pitches'):null,
-    ].filter(Boolean));
-    if(pa>0)sentences.push((sentences.length?'The performance also included reaching':person+' reached')+
-      ' base in all '+pa+' plate appearances'+(details?', with '+details:'')+'.');
-  }
-  if(!sentences.length)return null;
-  // Reference the score accurately. A close win means a real 1- or 2-run
-  // margin, never a guessed comeback, walk-off, or blowout.
-  const score=game.result?.scores||{};
-  const opponentId=String(game.away)===String(teamId)?game.home:game.away;
-  const valid=Object.hasOwn(score,teamId)&&Object.hasOwn(score,opponentId);
-  const our=valid?Number(score[teamId]):NaN;
-  const theirs=valid?Number(score[opponentId]):NaN;
-  const week=Number(game.week),weekName=Number.isInteger(week)&&week>0?'Week '+week:'';
-  const close=Number.isFinite(our)&&Number.isFinite(theirs)&&Math.abs(our-theirs)<=2;
-  let context='';
-  if(Number.isFinite(our)&&Number.isFinite(theirs)){
-    if(our>theirs){
-      const descriptor=close?'close win':'win';
-      context=position%3===0?'in '+(weekName?weekName+"'s ":'the ')+descriptor+' over the '+opponent:
-        position%3===1?'as '+teamName+' secured '+(weekName?'its '+weekName+' ':'the ')+'victory':
-        'in the same '+(close?'hard-fought ':'')+'victory';
-    }else if(our<theirs){
-      context=position%3===0?'despite '+(weekName?'the '+weekName+' ':'the ')+'defeat to the '+opponent:
-        position%3===1?'even as '+teamName+' fell short against the '+opponent:
-        'despite the team coming up short'+(weekName?' in '+weekName:'');
-    }else{
-      context='against the '+opponent+(weekName?' in '+weekName:'');
-    }
-  }else context='against the '+opponent+(weekName?' in '+weekName:'');
-  const last=sentences.pop().replace(/[.!]\s*$/,'');
-  return [...sentences,last+' '+context+'.'].join(' ');
-}
 
 // Group recognition by the SAME season, team and game. Heating Up remains a
 // separate class of news and is only combined when two or more teammates
