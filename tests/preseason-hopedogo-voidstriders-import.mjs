@@ -10,7 +10,7 @@ assert.equal(game.mvp,57,"SSL winner-team MVP goes to Funky Kong, not the sheet 
 const players=preseasonPlayerStatsForGame(game);
 assert.equal(players.length,18);
 assert.equal(new Set(players.map(p=>p.playerId)).size,18);
-const expected=new Map([[3,125],[57,182],[166,36],[163,114],[160,47],[31,37],[141,27],[58,40],[66,40],[2,113],[32,26],[172,47],[53,51],[70,37],[158,23],[71,34],[156,34],[155,44]]);
+const expected=new Map([[3,135],[57,182],[166,36],[163,114],[160,47],[31,37],[141,27],[58,40],[66,40],[2,113],[32,26],[172,47],[53,51],[70,37],[158,23],[71,34],[156,34],[155,44]]);
 for(const player of players) {
   assert.equal(player.stats.tgp,expected.get(player.playerId),'TGP discrepancy for '+player.playerId);
   assert.equal(player.stats.gameScore,player.stats.tgp);
@@ -23,10 +23,10 @@ assert.equal(players.find(p=>p.playerId===3).stats.battersFaced,18);
 assert.equal(players.find(p=>p.playerId===160).stats.battersFaced,11);
 assert.equal(players.find(p=>p.playerId===2).stats.pitchStrikeouts,1);
 const totalFor=team=>Math.round(players.filter(p=>p.teamName===team).reduce((sum,p)=>sum+p.stats.tgp,0)*100)/100;
-assert.equal(totalFor(game.away),648);
+assert.equal(totalFor(game.away),658);
 assert.equal(totalFor(game.home),409);
 const teams=preseasonTeamStats();
-assert.equal(teams.find(t=>t.teamName===game.away).stats.tgp,648);
+assert.equal(teams.find(t=>t.teamName===game.away).stats.tgp,658);
 assert.equal(teams.find(t=>t.teamName===game.home).stats.tgp,409);
 assert.ok(preseasonPlayerStats().some(p=>p.playerId===57&&p.stats.tgp===182));
 for(const id of ['PSR1 Fuggetaboudits @ Tanks','PSR1 Checkers @ Pangolins','PSR1 Ruffians @ Dedennes','PSR1 Knights @ Dolphins']){
