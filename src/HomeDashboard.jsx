@@ -14,6 +14,8 @@ import HomeHeadliners from './HomeHeadliners.jsx';
 import HeadlineReadMore from './HeadlineReadMore.jsx';
 import './home-dashboard.css';
 
+const NEWS_PAGE_SIZE=8;
+
 function CardTitle({kicker,children,action}){
   return <div className="ssl-home-card-title"><div><small>{kicker}</small><h2>{children}</h2></div>{action}</div>;
 }
@@ -87,7 +89,10 @@ function ChampionshipHero({feature,supabase,players,onResults}){
 }
 export default function HomeDashboard({league,go,newsItems=[],players=[],onPlayerSelect,canPreviewHeadlines=false}){
   const season=league?.season;
-  const [showAllNews,setShowAllNews]=useState(false);
+  const [visibleNewsCount,setVisibleNewsCount]=useState(NEWS_PAGE_SIZE);
+  const displayedNewsCount=Math.min(visibleNewsCount,newsItems.length);
+  const gameNewsCount=new Set(newsItems.filter(item=>item.gameId).map(item=>String(item.seasonId||item.season)+':'+item.gameId)).size;
+  const unreleasedNewsCount=new Set(newsItems.filter(item=>item.private&&item.gameId).map(item=>String(item.seasonId||item.season)+':'+item.gameId)).size;
   const board=useMemo(()=>homeWeekBoard(season),[season]);
   const finals=useMemo(()=>homeRecentResults(season,6),[season]);
   const ranks=useMemo(()=>powerRankings(season),[season]);
@@ -122,8 +127,13 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
       </section>}
       <section className="panel ssl-home-news" id="ssl-league-news" style={{scrollMarginTop:125}}>
         <CardTitle kicker="FROM AROUND THE LEAGUE">LEAGUE NEWS FEED</CardTitle>
+        {!!newsItems.length&&<div className="ssl-home-news-status" role="status">
+          <span><strong>{newsItems.length}</strong> POSTS · <strong>{gameNewsCount}</strong> GAMES COVERED
+            {unreleasedNewsCount>0&&<small> · {unreleasedNewsCount} UNRELEASED GAME {unreleasedNewsCount===1?'PREVIEW':'PREVIEWS'}</small>}</span>
+          <span>SHOWING {displayedNewsCount} OF {newsItems.length}</span>
+        </div>}
         {newsItems.length?<div className="league-news-scroll" aria-label="Official league news">
-          {(showAllNews?newsItems:newsItems.slice(0,8)).map(item=><article key={item.id} className={`news-item news-item-live news-${item.category}`}>
+          {newsItems.slice(0,visibleNewsCount).map(item=><article key={item.id} className={`news-item news-item-live news-${item.category}`}>
             <span className="news-mark" aria-hidden="true">{item.category==='heating'?<HeatFlame/>:item.category==='trade'?<Shield size={27}/>:item.category==='match'?<Newspaper size={27}/>:item.category==='preseason-champion'?<Trophy size={27}/>:item.category==='pitching'?<Trophy size={27}/>:<Megaphone size={27}/>}</span>
             <div className="news-copy">
               <small>{item.label}{item.private?' · PRIVATE PREVIEW':''}{item.at?' · '+new Date(item.at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):''}</small>
@@ -137,8 +147,12 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
         </div>:<div className="news-item"><span className="news-mark"><Trophy size={26}/></span>
           <div><small>LEAGUE UPDATE</small><h3>Latest league news will appear here</h3><p>Official game highlights, transactions and Heating Up notices appear as they happen.</p></div>
         </div>}
-        {newsItems.length>8&&<button type="button" className="outline-btn news-more"
-          onClick={()=>setShowAllNews(v=>!v)}>{showAllNews?'SHOW RECENT NEWS':`VIEW ALL ${newsItems.length} HEADLINES`}</button>}
+        {newsItems.length>visibleNewsCount&&<button type="button" className="outline-btn news-more"
+          onClick={()=>setVisibleNewsCount(count=>Math.min(count+NEWS_PAGE_SIZE,newsItems.length))}>
+          LOAD {Math.min(NEWS_PAGE_SIZE,newsItems.length-visibleNewsCount)} MORE POSTS · {newsItems.length-visibleNewsCount} REMAINING
+        </button>}
+        {visibleNewsCount>NEWS_PAGE_SIZE&&<button type="button" className="ssl-home-news-reset"
+          onClick={()=>setVisibleNewsCount(NEWS_PAGE_SIZE)}>SHOW RECENT POSTS ONLY</button>}
       </section>
     </div>
     <aside className="ssl-home-sidebar" aria-label="League scoreboard and rankings">
