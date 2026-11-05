@@ -19,7 +19,7 @@ const wins = [
     description: "Win your team's opening regular-season matchup.", field: 'opener', threshold: 1, season: true, rank: 1},
   ...series('winning', 'Wins', 'trophy', 'wins', [1,5,10,15,20],
     ['First Dub', 'Five Alive', 'Double-Digit Dominance', 'The Contender', 'Twenty-Win Club'], 'regular-season wins', {season:true}),
-  {id: 'winning-perfect', group: 'wins', category: 'Wins', icon: 'crown', name: 'Flawless Season',
+  {id: 'winning-perfect', group: 'wins', category: 'Wins', icon: 'crown', name: 'Perfect Season',
     description: 'Win all 22 regular-season matches with a perfect 22–0 record.', field: 'perfect', threshold: 22, season: true, rank: 7},
 ];
 
