@@ -37,6 +37,7 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import pool from "./players.json";
 import { teamLogo } from "./TeamIdentity.jsx";
 import { ConferenceMark } from './ConferenceMark.jsx';
+import {publicLeagueSeasons} from './public-league-view.js';
 import { PlayerPortrait } from "./PlayerPortrait.jsx";
 import {PlayerProfileLink} from './PlayerProfileLink.jsx';
 import {HeatMark} from './HeatingUpBadge.jsx';
@@ -111,12 +112,7 @@ export function useSeasonLeague(supabase, access, publicSupabase = null) {
   const serverOffsetMs = useRef(0);
   // A signed-out viewer must never see private game reports retained in memory
   // from a previous commissioner session while the anonymous refresh completes.
-  const guestSeasons = useMemo(() => seasons.map(st => ({
-    ...st,
-    games: (st.games || []).map(game => game.stage === 'recorded'
-      ? {...game, result: undefined, story: undefined}
-      : game),
-  })), [seasons]);
+  const guestSeasons = useMemo(() => publicLeagueSeasons(seasons), [seasons]);
   const visibleSeasons = access.signedIn ? seasons : guestSeasons;
   const season = visibleSeasons.find(s => s.id === selected) || visibleSeasons[0] || null;
   const refreshToken = useRef(0);
