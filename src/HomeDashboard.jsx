@@ -112,6 +112,15 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
   };
   return <div className="ssl-home-layout">
     <div className="ssl-home-main">
+      {(!season || (league?.access?.role==='viewer'&&league?.error))&&
+        <div className="panel ssl-home-public-status" role={league?.error?'alert':'status'}>
+          <span>{league?.error
+            ?'Public league information could not be fully loaded: '+league.error
+            :'Loading publicly released SSL results and preseason history...'}</span>
+          {league?.error&&<button type="button" className="outline-btn" onClick={()=>league?.refresh?.()}>
+            RETRY PUBLIC DATA
+          </button>}
+        </div>}
       {headlines.length?<HomeHeadliners slides={headlines} seasons={league?.seasons||[]}
         supabase={league?.supabase} players={players} onOpenGame={openStory}
         championContent={championship?<ChampionshipHero feature={championship} supabase={league?.supabase}
