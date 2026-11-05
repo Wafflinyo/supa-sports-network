@@ -35,11 +35,10 @@ assert.deepEqual(SSL_GAME_SCORE_WEIGHTS,{
   twoHr:8,threeHr:12,grandSlams:15,totalBases:4,
   putouts:5,assists:4,buddyJumpPutouts:15,doublePlays:8,triplePlays:18,
   pitchStrikeouts:15,outs:1,strikes:.5,pitches:.25,earnedRuns:-3,
-  hitsAllowed:-.25,pitchWalks:-2,beanBalls:-2,
   completeGames:20,hrAllowed:-8,mvps:10,
   bobbles:-6,doublePlaysHitInto:-8,triplePlaysHitInto:-12
 });
-assert.equal(Object.keys(SSL_GAME_SCORE_WEIGHTS).length,29);
+assert.equal(Object.keys(SSL_GAME_SCORE_WEIGHTS).length,26);
 assert.equal(customGameScore({
  pitchStrikeouts:2,outs:18,strikes:24,earnedRuns:2,
  completeGames:1,hrAllowed:1,mvps:1
