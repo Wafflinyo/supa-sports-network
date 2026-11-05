@@ -10,7 +10,7 @@
     "test:season": "SSL_TIMELINE_TEST=1 SSL_RULES_TEST=1 node tests/season-workflow.mjs && node tests/rio-import.mjs && node tests/home-dashboard.mjs",
     "test:pwa": "node tests/pwa.mjs",
     "test:access": "node tests/access-codes.mjs",
-    "prebuild": "node tests/home-dashboard.mjs && node tests/home-standings.mjs && node tests/rio-team-mapping.mjs && node tests/preseason-private-rio-upload.mjs && node tests/rio-upload-workspace.mjs && node tests/preseason-champion-home.mjs && node tests/ssl-history-archive.mjs && node tests/roster-next-season-picks.mjs && node tests/power-rankings-pitching-weights.mjs && node tests/league-news-prose.mjs && node tests/headline-previews.mjs && node tests/rio-inning-box-score.mjs && node tests/pgp-allowed-baserunners.mjs"
+    "prebuild": "node tests/home-dashboard.mjs && node tests/home-standings.mjs && node tests/rio-team-mapping.mjs && node tests/preseason-private-rio-upload.mjs && node tests/rio-upload-workspace.mjs && node tests/preseason-champion-home.mjs && node tests/ssl-history-archive.mjs && node tests/roster-next-season-picks.mjs && node tests/power-rankings-pitching-weights.mjs && node tests/league-news-prose.mjs && node tests/headline-previews.mjs && node tests/rio-inning-box-score.mjs && node tests/pgp-allowed-baserunners.mjs && node tests/news-feed-capacity.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.117.2",
