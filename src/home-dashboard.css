@@ -201,3 +201,9 @@
   .ssl-champion-leaderboard li{gap:10px}
   .ssl-champion-leader-agp{font-size:18px}
 }
+
+/* Public league history remains accessible to signed-out visitors. */
+.ssl-home-public-status{display:flex;align-items:center;justify-content:space-between;
+ flex-wrap:wrap;gap:12px;padding:14px 18px;margin-bottom:12px;
+ color:#324760;font:700 13px/1.5 system-ui,sans-serif}
+.ssl-home-public-status .outline-btn{flex:none;max-width:100%;font-size:11px}
