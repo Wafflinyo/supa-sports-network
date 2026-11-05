@@ -37,7 +37,14 @@
 .ssl-home-rank-name>b{width:19px;flex:none;color:#344e73}
 .ssl-home-rank-name>strong{font-weight:800;overflow-wrap:anywhere}
 .ssl-home-rank-score{color:#1a4b87;white-space:nowrap;font-size:13px;font-weight:900;font-variant-numeric:tabular-nums}
-.ssl-home-news .league-news-scroll{max-height:840px}
+.ssl-home-news .league-news-scroll{max-height:none;overflow:visible}
+.ssl-home-news-status{display:flex;align-items:center;justify-content:space-between;gap:8px 14px;
+ flex-wrap:wrap;padding:9px 17px;background:#f2f5fa;border-bottom:1px solid #dfe6ef;
+ color:#526683;font:800 11px/1.5 system-ui,sans-serif;letter-spacing:.055em}
+.ssl-home-news-status strong{color:#123056;font-variant-numeric:tabular-nums}
+.ssl-home-news-status small{font-size:11px;color:#c52939;font-weight:900}
+.ssl-home-news-reset{display:block;margin:0 auto 14px;padding:8px 12px;border:0;background:transparent;
+ color:#1c3b68;text-decoration:underline;font:800 12px/1.3 system-ui,sans-serif;cursor:pointer}
 .ssl-home-news .news-item.news-item-live{padding:15px 17px}
 .ssl-home-news .news-item-live h3{font-size:22px}
 .ssl-home-news .news-item-live p{font-size:13px}
