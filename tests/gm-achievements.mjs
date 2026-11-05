@@ -3,6 +3,7 @@ import {GM_ACHIEVEMENTS,earnedAchievements,achievementProgress} from '../src/gm-
 const badges=GM_ACHIEVEMENTS;
 assert.equal(badges.length,93);
 assert.equal(new Set(badges.map(b=>b.id)).size,93);
+assert.equal(badges.find(b=>b.id==='winning-perfect')?.name,'Perfect Season');
 assert.equal(badges.filter(b=>b.category==='Wins').length,7);
 assert.equal(badges.filter(b=>b.category==='Offense').length,25);
 assert.equal(badges.filter(b=>b.category==='Defense').length,34);
