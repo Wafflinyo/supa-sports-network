@@ -128,7 +128,14 @@
 .conference-pick strong{font-family:'Barlow Condensed',sans-serif;font-size:23px}
 .conference-pick span{color:#617086;font-size:12px;font-weight:700}
 
-.standings-team-name{display:flex;align-items:center;gap:9px;min-width:185px}
+.standings-team-name{display:flex;align-items:center;gap:11px;min-width:205px}
+.standings-team-logo,.standings-team-logo-fallback{display:block;width:40px;height:40px;flex:0 0 40px;object-fit:contain}
+.standings-team-logo-fallback{background:#e8edf5;border-radius:4px}
+.standings-team-details{display:flex;flex-direction:column;justify-content:center;gap:5px;min-width:0}
+.standings-team-title{font-weight:800;color:#10244b;white-space:normal;line-height:1.12}
+.standings-team-conference{display:flex;align-items:center;gap:5px;color:#65748b;font-size:12px;font-weight:700;line-height:1.2;white-space:normal}
+.standings-team-conference .conference-mark{width:15px;height:15px;flex:0 0 15px;object-fit:contain}
+@media(max-width:580px){.standings-team-name{gap:8px;min-width:160px}.standings-team-logo,.standings-team-logo-fallback{width:34px;height:34px;flex-basis:34px}.standings-team-conference{font-size:11px}}
 .standings-conference-heading{display:flex;align-items:center;gap:15px;font-size:23px!important;font-weight:800;color:#10244b!important}
 .season-team summary small .conference-mark{margin-right:5px}
 .conference-auto-note{padding:15px;margin-bottom:14px;background:#f5f8fc;border-left:4px solid #1d4f95}
