@@ -2393,7 +2393,21 @@ function Standings({ league: l }) {
           <tbody>
             {rows.map(t=>(
               <tr key={t.id}>
-                <td><span className="standings-team-name"><ConferenceMark id={t.conference} size={28}/><span>{t.name}<small style={{display:"block"}}>{conferences[t.conference]||"Conference pending"}</small></span></span></td>
+                <td>
+                  <span className="standings-team-name">
+                    {t.logoPath&&l.supabase
+                      ?<img className="standings-team-logo" src={teamLogo(l.supabase,t.logoPath)}
+                        width={40} height={40} alt={t.name+' logo'}/>
+                      :<span className="standings-team-logo-fallback" aria-hidden="true"/>}
+                    <span className="standings-team-details">
+                      <span className="standings-team-title">{t.name}</span>
+                      <small className="standings-team-conference">
+                        <ConferenceMark id={t.conference} size={15}/>
+                        <span>{conferences[t.conference]||"Conference pending"}</span>
+                      </small>
+                    </span>
+                  </span>
+                </td>
                 <td>{t.wins+t.losses}</td><td>{t.wins}</td><td>{t.losses}</td>
                 <td>{t.pct.toFixed(3)}</td><td>{t.runsFor}</td><td>{t.runsAgainst}</td>
                 <td>{t.runsFor-t.runsAgainst}</td>
