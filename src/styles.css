@@ -189,7 +189,7 @@
 
 /* Official SSL newsroom */
 .news-panel{min-width:0}
-.league-news-scroll{max-height:860px;overflow:auto;overscroll-behavior:contain}
+.league-news-scroll{max-height:none;overflow:visible;overscroll-behavior:auto}
 .news-item.news-item-live{padding:16px 19px;gap:14px;border-top:1px solid #e6eaf0;align-items:flex-start}
 .news-item-live .news-mark{width:54px;height:55px;min-width:54px;color:#ffc951;border-radius:6px}
 .news-item-live .news-mark svg{width:28px;height:34px}
