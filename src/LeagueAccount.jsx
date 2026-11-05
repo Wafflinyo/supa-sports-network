@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { X, CircleUserRound } from 'lucide-react'
 
-export function AccountDialog({supabase,session,onClose,onAccess}) {
+export function AccountDialog({supabase,session,onClose,onAccess,onKeepSignedIn}) {
  const [mode,setMode]=useState('login')
  const [username,setUsername]=useState('')
  const [password,setPassword]=useState('')
+ const [keepSignedIn,setKeepSignedIn]=useState(false)
  const [code,setCode]=useState('')
  const [showCode,setShowCode]=useState(false)
  const [busy,setBusy]=useState(false)
@@ -22,6 +23,8 @@ export function AccountDialog({supabase,session,onClose,onAccess}) {
      if(!detail && response.error?.context){try{detail=(await response.error.context.json()).error}catch{}}
      throw new Error(detail||'Could not sign in. Please try again.')
     }
+    // Configure the session destination before Supabase stores the tokens.
+    onKeepSignedIn?.(mode==='login' && keepSignedIn)
     const signed=await supabase.auth.setSession(response.data.session)
     if(signed.error) throw signed.error
     if(mode==='signup') setMode('login')
@@ -47,6 +50,11 @@ export function AccountDialog({supabase,session,onClose,onAccess}) {
   {session?<p>Signed in as <strong>{session.user.email?.split('@')[0]}</strong>. Current access: <strong>{access.role}</strong>{access.team?` — ${access.team}`:''}.</p>:<><div className="stat-view-switch">{['login','signup'].map(m=><button key={m} className={mode===m?'active':''} onClick={()=>{setMode(m);setMessage('')}}>{m==='login'?'SIGN IN':'CREATE ACCOUNT'}</button>)}</div><p>No email required. Leave the code blank for ordinary fantasy access. GM and commissioner codes apply to this sign-in only.</p></>}
   <form onSubmit={submit}>
    {!session&&<><label htmlFor="account-username">USERNAME</label><input id="account-username" required pattern="[A-Za-z0-9_]{3,24}" minLength={3} maxLength={24} autoComplete="username" value={username} onChange={e=>setUsername(e.target.value)} placeholder="3–24 letters, numbers or underscores"/><label htmlFor="account-password">PASSWORD</label><input id="account-password" type="password" required minLength={10} maxLength={128} autoComplete={mode==='signup'?'new-password':'current-password'} value={password} onChange={e=>setPassword(e.target.value)}/></>}
+   {!session&&mode==='login'&&<label className="account-remember-option" htmlFor="account-keep-signed-in">
+     <input id="account-keep-signed-in" type="checkbox" checked={keepSignedIn}
+       onChange={e=>setKeepSignedIn(e.target.checked)}/>
+     <span>KEEP ME SIGNED IN</span>
+   </label>}
    <label htmlFor="account-code">GM / COMMISSIONER CODE (OPTIONAL)</label><input id="account-code" type={showCode?"text":"password"} autoComplete="off" autoCapitalize="characters" spellCheck={false} value={code} onChange={e=>setCode(e.target.value)} placeholder="COMM-XXXX-XXXX or GM-XXXX-XXXX"/><button type="button" className="text-link" aria-controls="account-code" aria-pressed={showCode} onClick={()=>setShowCode(!showCode)}>{showCode?"HIDE CODE":"SHOW CODE"}</button><p className="setup-note">Required each sign-in for GM/commissioner tools. Use Update Session Access to enable tools without logging out. Blank = ordinary access.</p>
    <button disabled={busy||!supabase} className="red-btn">{busy?'PLEASE WAIT…':session?'UPDATE SESSION ACCESS':mode==='signup'?'CREATE ACCOUNT':'SIGN IN'}</button>
   </form>
