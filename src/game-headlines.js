@@ -149,8 +149,11 @@ export function matchHeadline(season,game,players=[],{includeRecorded=false}={})
  const loserHighlights=highlights.filter(e=>e.teamId===loserId);
  if(winnerHighlights.length){
    details.push(winner+': '+winnerHighlights.map(e=>e.text).join('; '));
+   // Include a walk-off directly in the victory recap instead of adding
+   // an awkward "Confirmed walk-off finish" disclaimer at the bottom.
+   const context=gameOutcomeContext(season,game,winnerId).replace(/[.]$/,'');
    details.push('These standout performances came '+
-     gameOutcomeContext(season,game,winnerId).replace(/[.]$/,''));
+     (kind==='walkoff'?context.replace(' win against ',' walk-off win against '):context));
  }
  if(loserHighlights.length){
    details.push(loser+': '+loserHighlights.map(e=>e.text).join('; '));
@@ -160,7 +163,6 @@ export function matchHeadline(season,game,players=[],{includeRecorded=false}={})
      ', these players left it all out on the diamond');
  }
  if(leadChanges>=2)details.push(leadChanges+' confirmed lead changes');
- if(kind==='walkoff')details.push('Confirmed walk-off finish');
  if(kind==='comeback')details.push('Confirmed late-inning comeback');
  if(note)details.push(note.replace(/[.!?]+$/,''));
  return {id:'match:'+game.id,category:'match',tier:kind,label:labels[kind],

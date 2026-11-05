@@ -37,6 +37,24 @@ assert(text.includes('Wario')&&text.includes('Yoshi')&&
  'Keep all qualifying teammates on both sides of the final-score story');
 assert(!text.includes('..'),'No extra punctuation between team sections');
 
+// The walk-off outcome belongs in the winning team's recap, with no
+// standalone "Confirmed walk-off finish" line after game highlights.
+const walkoffGame={...game,id:'walkoff-recap',
+  result:{...game.result,scores:{w:5,l:4}},
+  story:{lateFinish:'walkoff'},
+};
+const walkoffStory=matchHeadline(season,walkoffGame,players);
+assert.equal(walkoffStory.tier,'walkoff');
+assert.match(walkoffStory.summary,
+ /These standout performances came in Week 1's walk-off win against the Starborn Voidstriders/);
+assert.doesNotMatch(walkoffStory.summary,/Confirmed walk-off finish/i);
+assert(walkoffStory.summary.indexOf("Week 1's walk-off win") <
+ walkoffStory.summary.indexOf('Starborn Voidstriders:'),
+ 'Walk-off context stays with winning players, ahead of losing-team highlights');
+const privateWalkoff=matchHeadline(season,{...walkoffGame,stage:'recorded'},players,{includeRecorded:true});
+assert.equal(privateWalkoff.summary,walkoffStory.summary,
+ 'Private walk-off previews use the same natural wording');
+
 const privateStory=matchHeadline(season,{...game,stage:'recorded'},players,{includeRecorded:true});
 assert(privateStory.private,'Commissioner preview stays private');
 assert.equal(privateStory.summary,text,'Previews and public recaps use the same team-first order');
