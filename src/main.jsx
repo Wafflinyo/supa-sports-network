@@ -169,7 +169,7 @@ function App() {
   const seasonStats=useMemo(()=>aggregate(seasonLeague.season),[seasonLeague.season])
   const seasonHeating=useMemo(()=>heatingUpForSeason(seasonLeague.season),[seasonLeague.season])
   const hotIds=useMemo(()=>new Set(Object.entries(seasonHeating.players).filter(([,r])=>r.currentHotStreak>0).map(([id])=>Number(id))),[seasonHeating])
-  const newsItems=useMemo(()=>leagueNews(seasonLeague.seasons,playerPool,{includeRecorded:access.role==='commissioner'}),[seasonLeague.seasons,access.role])
+  const newsItems=useMemo(()=>leagueNews(seasonLeague.seasons,playerPool,{includeRecorded:!!session&&access.role==='commissioner'}),[seasonLeague.seasons,session,access.role])
   const players=useMemo(()=>basePlayers.map(p=>{const base=seasonStats[p.id],heat=seasonHeating.players[p.id];const stats=base?{...base,...(heat||{})}:heat;return {...p,...stats,stats,team:seasonLeague.season?.teams.find(t=>seasonLeague.season.rosters[t.id]?.includes(p.id))?.name,perGame:base?Object.fromEntries(Object.entries(base).filter(([,v])=>typeof v==='number').map(([k,v])=>[k,perGameOnly.has(k)&&k!=='inningsPitched'?v:v/base.gamesPlayed])):null}}),[seasonStats,seasonLeague.season,seasonHeating])
   const careerSeasons=useMemo(()=>seasonLeague.seasons.map(s=>({id:s.id,playerStats:aggregate(s)})),[seasonLeague.seasons])
   const liveGames=useMemo(()=>fantasyGames(seasonLeague.seasons),[seasonLeague.seasons])
