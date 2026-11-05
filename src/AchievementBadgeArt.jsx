@@ -9,6 +9,7 @@ import {
   ArrowUp, CircleCheck, BadgeCheck, Crosshair,
 } from 'lucide-react';
 import {badgeScenes} from './achievement-badge-scenes.js';
+import {badgeRedesignUrl} from './badge-art-rollout.js';
 
 const palette = {
   Wins: ['#bd354c','#6b142f','#f8cd7d'],
@@ -179,6 +180,10 @@ function Treatment({layout,tint}) {
 }
 
 export function AchievementBadgeArt({badge,earned=false}) {
+  const releasedArtwork=badgeRedesignUrl(badge.id,import.meta.env.BASE_URL);
+  if(releasedArtwork) return <img
+    className={`achievement-insignia achievement-redesigned-insignia ${earned?'is-unlocked':'is-locked'}`}
+    src={releasedArtwork} alt={badge.name+': '+(earned?'unlocked':'locked')} loading="lazy"/>;
   const scene=badgeScenes[badge.id];
   const [primary,deep,gold]=palette[badge.category]||palette.Wins;
   const grad='achievement-metal-'+badge.id;
