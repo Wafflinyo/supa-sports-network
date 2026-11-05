@@ -97,7 +97,7 @@ function Box({ title, children }) {
     </section>
   );
 }
-export function useSeasonLeague(supabase, access) {
+export function useSeasonLeague(supabase, access, publicSupabase = null) {
   const [seasons, setSeasons] = useState([]),
     [selected, setSelected] = useState(null),
     [inbox, setInbox] = useState([]),
@@ -110,9 +110,15 @@ export function useSeasonLeague(supabase, access) {
     [now, setNow] = useState(Date.now());
   const serverOffsetMs = useRef(0);
   const season = seasons.find((s) => s.id === selected) || seasons[0] || null;
+  const refreshToken = useRef(0);
   async function refresh() {
-    if (!supabase) return;
-    const r = await supabase.rpc("ssl_seasons");
+    // Guests must use a session-free client. Signing out must never hide
+    // publicly released results or depend on a prior authenticated session.
+    const reader = access.signedIn ? supabase : (publicSupabase || supabase);
+    if (!reader) return;
+    const token = ++refreshToken.current;
+    const r = await reader.rpc("ssl_seasons");
+    if (token !== refreshToken.current) return;
     if (r.error) {
       setError(r.error.message);
       return;
@@ -128,7 +134,7 @@ export function useSeasonLeague(supabase, access) {
     const ids=rawSeasons.map(s=>s.id).filter(Boolean);
     let bySeason=new Map();
     if(ids.length){
-      const tournament=await supabase.from('ssl_preseason_results')
+      const tournament=await reader.from('ssl_preseason_results')
         .select('season_id,match_key,team_a,team_b,score_a,score_b,recorded_at')
         .in('season_id',ids);
       if(!tournament.error){
@@ -143,7 +149,7 @@ export function useSeasonLeague(supabase, access) {
     // regular-season results. The RPC never exposes private staged uploads.
     let published=[];
     if(ids.length){
-      const reports=await supabase.rpc('ssl_preseason_published_reports',{target_season:null});
+      const reports=await reader.rpc('ssl_preseason_published_reports',{target_season:null});
       if(!reports.error&&Array.isArray(reports.data))published=reports.data;
     }
     const releasedBySeason=new Map();
@@ -154,6 +160,8 @@ export function useSeasonLeague(supabase, access) {
       if(report.compact?.players)a.push(report.compact);
       releasedBySeason.set(key,a);
     }
+    // Ignore stale responses after a login/logout transition or newer poll.
+    if (token !== refreshToken.current) return;
     setSeasons(rawSeasons.map(s=>({...s,
       preseasonResults:bySeason.get(s.id)||[],
       preseasonReports:releasedBySeason.get(String(s.id))||[],
@@ -162,7 +170,7 @@ export function useSeasonLeague(supabase, access) {
     // Secure, commissioner-only roster. No account identities enter the public
     // season response; the server verifies current commissioner access.
     const targetSeason = selected || (r.data || [])[0]?.id;
-    if (access.role === "commissioner" && targetSeason) {
+    if (access.signedIn && access.role === "commissioner" && targetSeason) {
       const staged=await supabase.rpc('ssl_preseason_report_action',{
         target_season:targetSeason,target_match:null,operation:'list'});
       setPreseasonPrivateReports(!staged.error&&Array.isArray(staged.data)?staged.data:[]);
@@ -180,7 +188,7 @@ export function useSeasonLeague(supabase, access) {
       setBallotVotersError("");
     }
     if (
-      ["gm", "commissioner"].includes(access.role) &&
+      access.signedIn && ["gm", "commissioner"].includes(access.role) &&
       (selected || (r.data || [])[0]?.id)
     ) {
       const m = await supabase.rpc("ssl_inbox", {
@@ -193,8 +201,8 @@ export function useSeasonLeague(supabase, access) {
   useEffect(() => {
     refresh();
     const t = setInterval(refresh, 8000);
-    return () => clearInterval(t);
-  }, [supabase, access.role, access.slot, selected]);
+    return () => { clearInterval(t); refreshToken.current++; };
+  }, [supabase, publicSupabase, access.signedIn, access.role, access.slot, selected]);
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now() + serverOffsetMs.current), 1000);
     return () => clearInterval(t);
