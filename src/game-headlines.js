@@ -70,7 +70,14 @@ export function matchPerformanceHighlights(game,players=[]){
   if(hrs>=2)add('batting',100+Math.min(hrs,5)*5,name+' blasted '+hrs+' home runs');
   else if(n(s.grandSlams))add('batting',95,name+' hit a grand slam');
   else if(n(s.rbi)>=4)add('batting',80+n(s.rbi),name+' drove in '+n(s.rbi)+' runs');
-  else if(n(s.hits)>=4)add('batting',75+n(s.hits),name+' collected '+n(s.hits)+' hits');
+  else if(n(s.hits)>=4){
+    const hits=n(s.hits),atBats=Number(s.atBats);
+    // Use the actual at-bats denominator, not plate appearances or a guess.
+    const hasValidAtBats=s.atBats!=null&&Number.isInteger(atBats)&&atBats>=hits;
+    add('batting',75+hits,hasValidAtBats
+      ?name+' went '+hits+'-for-'+atBats+' at the plate'
+      :name+' racked up '+hits+' hits');
+  }
   const defense=['putouts','assists','doublePlays','triplePlays','buddyJumpPutouts'].reduce((sum,k)=>sum+n(s[k]),0);
   if(defense>=8)add('fielding',70+Math.min(defense,20),name+' recorded '+defense+' defensive contributions');
   else if(n(s.buddyJumpPutouts)>=2)add('fielding',71,name+' made '+n(s.buddyJumpPutouts)+' Buddy Jump putouts');
@@ -87,6 +94,27 @@ export function matchPerformanceHighlights(game,players=[]){
  // same type of highlight. Presentation groups them by team instead of
  // limiting the entire matchup to one batter/one pitcher/one fielder.
  return candidate;
+}
+// Recap prose groups a player's batting, fielding and pitching highlights
+// into one mention. Preserve the rank of their top achievement and retain
+// every underlying highlight for other site features.
+function playerGroupedHighlights(highlights,players=[]){
+ const names=new Map(players.map(p=>[Number(p.id),p.name]));
+ const grouped=new Map();
+ for(const highlight of highlights){
+   const playerId=Number(highlight.playerId);
+   if(!grouped.has(playerId))grouped.set(playerId,[]);
+   grouped.get(playerId).push(highlight);
+ }
+ return [...grouped].map(([playerId,entries])=>{
+   const name=names.get(playerId)||'A player';
+   const achievements=entries.map(entry=>
+     entry.text.startsWith(name+' ')?entry.text.slice(name.length+1):entry.text);
+   const joined=achievements.length===1?achievements[0]:
+     achievements.length===2?achievements.join(' and '):
+     achievements.slice(0,-1).join(', ')+', and '+achievements.at(-1);
+   return name+' '+joined;
+ });
 }
 export function matchHeadline(season,game,players=[],{includeRecorded=false}={}){
  if(!(game?.stage==='final'||(includeRecorded&&game?.stage==='recorded'))||!game.result?.scores)return null;
@@ -148,7 +176,7 @@ export function matchHeadline(season,game,players=[],{includeRecorded=false}={})
  const winnerHighlights=highlights.filter(e=>e.teamId===winnerId);
  const loserHighlights=highlights.filter(e=>e.teamId===loserId);
  if(winnerHighlights.length){
-   details.push(winner+': '+winnerHighlights.map(e=>e.text).join('; '));
+   details.push(winner+': '+playerGroupedHighlights(winnerHighlights,players).join('; '));
    // Include a walk-off directly in the victory recap instead of adding
    // an awkward "Confirmed walk-off finish" disclaimer at the bottom.
    const context=gameOutcomeContext(season,game,winnerId).replace(/[.]$/,'');
@@ -156,7 +184,7 @@ export function matchHeadline(season,game,players=[],{includeRecorded=false}={})
      (kind==='walkoff'?context.replace(' win against ',' walk-off win against '):context));
  }
  if(loserHighlights.length){
-   details.push(loser+': '+loserHighlights.map(e=>e.text).join('; '));
+   details.push(loser+': '+playerGroupedHighlights(loserHighlights,players).join('; '));
    const week=Number(game.week);
    const weekLabel=Number.isInteger(week)&&week>0?'Week '+week+' ':'';
    details.push('Despite the '+weekLabel+'loss to the '+winner+

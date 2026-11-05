@@ -37,6 +37,42 @@ assert(text.includes('Wario')&&text.includes('Yoshi')&&
  'Keep all qualifying teammates on both sides of the final-score story');
 assert(!text.includes('..'),'No extra punctuation between team sections');
 
+// Batting highlights use verified hits/at-bats, and every achievement
+// belonging to one player stays together before the next player starts.
+const groupedGame={...game,id:'player-contiguous-highlights',
+ result:{...game.result,players:[
+  row(1,'w',{hits:4,atBats:4,buddyJumpPutouts:2}),
+  row(2,'w',{putouts:8}),
+  row(3,'l',{hits:4,atBats:5,assists:8}),
+  row(4,'l',{hits:4}),
+ ]},
+};
+const groupedStory=matchHeadline(season,groupedGame,players);
+const groupedText=groupedStory.summary;
+assert(groupedText.includes('Wario went 4-for-4 at the plate and made 2 Buddy Jump putouts'),
+ 'Pair a perfect four-hit game with the actual four at-bats and fielding recognition');
+assert(groupedText.indexOf('Wario went 4-for-4')<
+ groupedText.indexOf('2 Buddy Jump putouts')&&
+ groupedText.indexOf('2 Buddy Jump putouts')<
+ groupedText.indexOf('Yoshi recorded 8 defensive contributions'),
+ 'Keep the batting and fielding achievements of a player adjacent');
+assert.equal((groupedText.match(/Wario /g)||[]).length,1,
+ 'One grouped recap mention per player, no name repetition');
+assert(groupedText.includes('Bowser went 4-for-5 at the plate and recorded 8 defensive contributions'),
+ 'Never imply 4-for-4 when the official line was 4-for-5');
+assert(groupedText.includes('Luigi racked up 4 hits'),
+ 'Without official at-bats, mention the hits but do not invent a denominator');
+assert(!groupedText.includes('Luigi went 4-for-4'),
+ 'Missing at-bats must not become a perfect batting line');
+assert(groupedText.indexOf('New Donk City Knights:')<
+ groupedText.indexOf("Week 1's win against the Starborn Voidstriders")&&
+ groupedText.indexOf("Week 1's win against the Starborn Voidstriders")<
+ groupedText.indexOf('Starborn Voidstriders:'),
+ 'Group players without disturbing the separate winning and losing sections');
+const privateGrouped=matchHeadline(season,{...groupedGame,stage:'recorded'},players,{includeRecorded:true});
+assert.equal(privateGrouped.summary,groupedText,
+ 'Private previews also keep each player contiguous and use the correct at-bats');
+
 // The walk-off outcome belongs in the winning team's recap, with no
 // standalone "Confirmed walk-off finish" line after game highlights.
 const walkoffGame={...game,id:'walkoff-recap',
