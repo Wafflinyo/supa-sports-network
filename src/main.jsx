@@ -33,13 +33,21 @@ import {PlayerProfileContext} from './PlayerProfileLink.jsx'
 import MyDraftTeam from './MyDraftTeam.jsx'
 import {OfficialTeams,TeamSetup,CommissionerWorkspace,teamLogo} from './TeamIdentity.jsx'
 import connection from './supabase-config.json'
+import {createLeagueAuthStorage} from './league-auth-storage.js'
 import './styles.css'
 import './mobile.css'
 import './site-refresh.css'
 
 const url = import.meta.env.VITE_SUPABASE_URL || connection.url
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || connection.publishableKey
-const supabase = url && key ? createClient(url, key) : null
+const authStorage = url && key ? createLeagueAuthStorage(url) : null
+const supabase = url && key ? createClient(url, key, {
+  auth: {
+    storageKey: authStorage.authKey,
+    storage: authStorage.storage,
+    persistSession: true,
+  },
+}) : null
 // Public league data must load even with no account and during sign-out.
 // Keep guest reads independent of the authenticated client's session state.
 const publicSupabase = url && key ? createClient(url, key, {
@@ -312,7 +320,7 @@ function App() {
     <PwaInstall/>
     <footer><div className="container footer-inner"><span>SLUGGERS <b>SUPA</b> LEAGUE</span><small>LEAGUE DATA AND FANTASY HUB</small></div></footer>
     {selectedPlayer && <PlayerProfile careerSeasons={careerSeasons} fullSeasons={seasonLeague.seasons} includeRecorded={false} player={players.find(p=>p.id===selectedPlayer.id)||selectedPlayer} PlayerAvatar={PlayerAvatar} onClose={() => setSelectedPlayer(null)}/>}
-    {authOpen && <AccountDialog supabase={supabase} session={session} onClose={() => setAuthOpen(false)} onAccess={next=>{setAccess(next);if(next.role==='gm')setTeamWelcomeSeen(false)}}/>}
+    {authOpen && <AccountDialog supabase={supabase} session={session} onClose={() => setAuthOpen(false)} onKeepSignedIn={value=>authStorage?.setKeepSignedIn(value)} onAccess={next=>{setAccess(next);if(next.role==='gm')setTeamWelcomeSeen(false)}}/>}
     {isGM&&Number.isFinite(Number(access.slot))&&
       <GmAchievementNotifications
         key={session.user.id+':'+access.slot}
