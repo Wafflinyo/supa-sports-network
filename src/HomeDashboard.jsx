@@ -189,9 +189,16 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
           <ol className="ssl-home-overall-list">
             {table.map((team,index)=><li key={team.id} className="ssl-home-overall-team">
               <span className="ssl-home-overall-rank">{index+1}.</span>
-              <ConferenceMark id={team.conference} size={26}/>
+              {team.logoPath&&league?.supabase
+                ?<img className="ssl-home-overall-team-logo"
+                  src={teamLogo(league.supabase,team.logoPath)}
+                  alt={team.name+' logo'} width={36} height={36}/>
+                :<span className="ssl-home-overall-team-logo-fallback" aria-hidden="true"/>}
               <span className="ssl-home-overall-info">
-                <strong>{team.name}</strong>
+                <span className="ssl-home-overall-name">
+                  <strong>{team.name}</strong>
+                  <ConferenceMark id={team.conference} size={17}/>
+                </span>
                 <small>GP {team.wins+team.losses} · PCT {team.pct.toFixed(3)} · RF {team.runsFor} · RA {team.runsAgainst} · DIFF {team.runsFor-team.runsAgainst}</small>
               </span>
               <b className="ssl-home-overall-record">{team.wins}–{team.losses}</b>
