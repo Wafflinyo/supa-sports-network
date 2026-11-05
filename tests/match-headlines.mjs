@@ -71,6 +71,30 @@ assert(match.summary.includes('Yoshi')&&match.summary.includes('Luigi'),
  'Hero match summary must mention both qualifying pitchers');
 assert(match.summary.includes('strikeouts'));
 
+// Final score recaps must attribute wins and losses to the right team,
+// including when both clubs have qualifying standout performances.
+const split=result('split-recap',9,4,[
+ row(1,'knights',{hits:4}),
+ row(5,'checkers',{hits:4}),
+]);
+const splitStory=matchHeadline(season,split,players);
+const winningStats=splitStory.summary.indexOf('New Donk City Knights: Wario collected 4 hits');
+const winningRecap=splitStory.summary.indexOf(
+ "These standout performances came in Week 1's win against the Diamond City Checkers");
+const losingStats=splitStory.summary.indexOf('Diamond City Checkers: Diddy Kong collected 4 hits');
+const losingRecap=splitStory.summary.indexOf(
+ 'Despite the Week 1 loss to the New Donk City Knights, these players left it all out on the diamond');
+assert(winningStats>=0&&winningStats<winningRecap&&winningRecap<losingStats&&losingStats<losingRecap,
+ 'Winning stats and victory recap must precede losing stats and loss recap');
+assert(!splitStory.summary.includes('diamond..'),'No double punctuation between team stories');
+const splitPreview=matchHeadline(season,{...split,stage:'recorded'},players,{includeRecorded:true});
+assert.equal(splitPreview.summary,splitStory.summary,'Private previews share the corrected match story');
+assert.equal(splitPreview.private,true);
+const winnerOnly=matchHeadline(season,result('winner-only',9,2,[row(1,'knights',{hits:4})]),players);
+assert(winnerOnly.summary.includes("Week 1's win against the Diamond City Checkers"));
+assert(!winnerOnly.summary.includes('Despite the Week 1 loss'),
+ 'No losing-team commentary without qualifying losing-team stats');
+
 // Very close final scores are known; a walkoff or lead change requires
 // separate verified commissioner scoring-sequence metadata.
 const close=result('close',7,6,[]);

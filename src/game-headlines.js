@@ -141,22 +141,30 @@ export function matchHeadline(season,game,players=[],{includeRecorded=false}={})
   title=player+' '+stat+' as '+winner+' '+(kind==='shutout'?'blank':kind==='close'?'edge':'rout')+' '+loser+', '+score+'!';
  }
  const labels={walkoff:'WALK-OFF THRILLER',comeback:'LATE COMEBACK',shutout:'SHUTOUT VICTORY',blowout:'DOMINANT BLOWOUT',close:margin===1?'ONE-RUN THRILLER':'CLOSE FINISH',result:'FINAL SCORE'};
+ // Keep each team's accomplishments and its outcome commentary together.
+ // In particular, the winning-team conclusion must never follow statistics
+ // from the losing team (including in commissioner-only previews).
  const details=[];
+ const winnerHighlights=highlights.filter(e=>e.teamId===winnerId);
+ const loserHighlights=highlights.filter(e=>e.teamId===loserId);
+ if(winnerHighlights.length){
+   details.push(winner+': '+winnerHighlights.map(e=>e.text).join('; '));
+   details.push('These standout performances came '+
+     gameOutcomeContext(season,game,winnerId).replace(/[.]$/,''));
+ }
+ if(loserHighlights.length){
+   details.push(loser+': '+loserHighlights.map(e=>e.text).join('; '));
+   const week=Number(game.week);
+   const weekLabel=Number.isInteger(week)&&week>0?'Week '+week+' ':'';
+   details.push('Despite the '+weekLabel+'loss to the '+winner+
+     ', these players left it all out on the diamond');
+ }
  if(leadChanges>=2)details.push(leadChanges+' confirmed lead changes');
  if(kind==='walkoff')details.push('Confirmed walk-off finish');
  if(kind==='comeback')details.push('Confirmed late-inning comeback');
- // Mention multiple players together, once per club, not as individual
- // repeated headlines. Their best numbers all remain readable with "more".
- for(const teamId of [winnerId,loserId]){
-   const teamHighlights=highlights.filter(e=>e.teamId===teamId);
-   if(!teamHighlights.length)continue;
-   const club=names.get(teamId)||'This club';
-   details.push(club+': '+teamHighlights.map(e=>e.text).join('; '));
- }
- if(note)details.push(note);
- details.push('The standout performances came '+gameOutcomeContext(season,game,winnerId));
+ if(note)details.push(note.replace(/[.!?]+$/,''));
  return {id:'match:'+game.id,category:'match',tier:kind,label:labels[kind],
-   title,summary:details.join('. ')||winner+' beat '+loser+' '+score+'.',
+   title,summary:details.length?details.join('. ')+'.':winner+' beat '+loser+' '+score+'.',
    season:season.name,seasonId:season.id,gameId:game.id,
    winnerId,loserId,winner,loser,winnerRuns:big,loserRuns:small,
    awayRuns:a,homeRuns:h,awayId:String(game.away),homeId:String(game.home),
