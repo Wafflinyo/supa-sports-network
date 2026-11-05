@@ -40,6 +40,16 @@ import './site-refresh.css'
 const url = import.meta.env.VITE_SUPABASE_URL || connection.url
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || connection.publishableKey
 const supabase = url && key ? createClient(url, key) : null
+// Public league data must load even with no account and during sign-out.
+// Keep guest reads independent of the authenticated client's session state.
+const publicSupabase = url && key ? createClient(url, key, {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false,
+    detectSessionInUrl: false,
+    storageKey: 'ssl-public-read-only',
+  },
+}) : null
 const basePlayers = playerPool.map(player => ({ ...player, gamesPlayed: gamesPlayed[player.id] ?? null }))
 function PlayerAvatar({ player, size = 38 }) {
   return <PlayerPortrait player={player} size={size}/>
@@ -150,12 +160,12 @@ function App() {
   const [teamsMessage,setTeamsMessage]=useState('')
   async function loadOfficialTeams(){
     if(!supabase){setTeamsLoading(false);return}
-    const r=await supabase.from('ssl_teams').select('*,ssl_locations(name)').order('slot')
+    const r=await (publicSupabase||supabase).from('ssl_teams').select('*,ssl_locations(name)').order('slot')
     if(r.error)setTeamsMessage(r.error.message);else{setOfficialTeams(r.data||[]);setTeamsMessage('')}
     setTeamsLoading(false)
   }
   useEffect(()=>{loadOfficialTeams();const timer=setInterval(loadOfficialTeams,15000);return()=>clearInterval(timer)},[])
-  const seasonLeague=useSeasonLeague(supabase,{...access,signedIn:!!session})
+  const seasonLeague=useSeasonLeague(supabase,{...access,signedIn:!!session},publicSupabase)
   const seasonStats=useMemo(()=>aggregate(seasonLeague.season),[seasonLeague.season])
   const seasonHeating=useMemo(()=>heatingUpForSeason(seasonLeague.season),[seasonLeague.season])
   const hotIds=useMemo(()=>new Set(Object.entries(seasonHeating.players).filter(([,r])=>r.currentHotStreak>0).map(([id])=>Number(id))),[seasonHeating])
