@@ -109,7 +109,16 @@ export function useSeasonLeague(supabase, access, publicSupabase = null) {
     [preseasonPrivateReports,setPreseasonPrivateReports] = useState([]),
     [now, setNow] = useState(Date.now());
   const serverOffsetMs = useRef(0);
-  const season = seasons.find((s) => s.id === selected) || seasons[0] || null;
+  // A signed-out viewer must never see private game reports retained in memory
+  // from a previous commissioner session while the anonymous refresh completes.
+  const guestSeasons = useMemo(() => seasons.map(st => ({
+    ...st,
+    games: (st.games || []).map(game => game.stage === 'recorded'
+      ? {...game, result: undefined, story: undefined}
+      : game),
+  })), [seasons]);
+  const visibleSeasons = access.signedIn ? seasons : guestSeasons;
+  const season = visibleSeasons.find(s => s.id === selected) || visibleSeasons[0] || null;
   const refreshToken = useRef(0);
   async function refresh() {
     // Guests must use a session-free client. Signing out must never hide
@@ -133,10 +142,12 @@ export function useSeasonLeague(supabase, access, publicSupabase = null) {
     const rawSeasons = Array.isArray(r.data) ? r.data : [];
     const ids=rawSeasons.map(s=>s.id).filter(Boolean);
     let bySeason=new Map();
+    const publicLoadErrors=[];
     if(ids.length){
       const tournament=await reader.from('ssl_preseason_results')
         .select('season_id,match_key,team_a,team_b,score_a,score_b,recorded_at')
         .in('season_id',ids);
+      if(tournament.error)publicLoadErrors.push('Preseason bracket: '+tournament.error.message);
       if(!tournament.error){
         for(const result of tournament.data||[]){
           const rows=bySeason.get(result.season_id)||[];
@@ -150,6 +161,7 @@ export function useSeasonLeague(supabase, access, publicSupabase = null) {
     let published=[];
     if(ids.length){
       const reports=await reader.rpc('ssl_preseason_published_reports',{target_season:null});
+      if(reports.error)publicLoadErrors.push('Released preseason box scores: '+reports.error.message);
       if(!reports.error&&Array.isArray(reports.data))published=reports.data;
     }
     const releasedBySeason=new Map();
@@ -166,7 +178,7 @@ export function useSeasonLeague(supabase, access, publicSupabase = null) {
       preseasonResults:bySeason.get(s.id)||[],
       preseasonReports:releasedBySeason.get(String(s.id))||[],
     })));
-    setError("");
+    setError(publicLoadErrors.join(' '));
     // Secure, commissioner-only roster. No account identities enter the public
     // season response; the server verifies current commissioner access.
     const targetSeason = selected || (r.data || [])[0]?.id;
@@ -283,11 +295,11 @@ export function useSeasonLeague(supabase, access, publicSupabase = null) {
   }
   const myTeam = season?.teams?.find((t) => t.slot === Number(access.slot));
   return {
-    seasons,
+    seasons: visibleSeasons,
     season,
     selected,
     setSelected,
-    inbox,
+    inbox: access.signedIn ? inbox : [],
     error,
     notice,
     busy,
@@ -298,10 +310,10 @@ export function useSeasonLeague(supabase, access, publicSupabase = null) {
     refresh,
     recordPreseasonResult,
     clearPreseasonResult,
-    preseasonPrivateReports,
+    preseasonPrivateReports: access.signedIn ? preseasonPrivateReports : [],
     savePreseasonReport,
     releasePreseasonReport,
-    access,
+    access: access.signedIn ? access : {role:'viewer',signedIn:false},
     myTeam,
     supabase,
   };
