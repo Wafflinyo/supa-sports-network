@@ -27,9 +27,9 @@ const offense = [
   ...series('season-homer', 'Offense', 'baseball', 'seasonHr', [1,5,10,15,20,25],
     ['First Flight', 'Power Five', 'Double-Digit Dingers', 'Slugger Status', 'Home Run Factory', 'Big Bat Dynasty'],
     'team home runs', {season:true}),
-  ...series('game-homer', 'Offense', 'fireball', 'gameHr', [1,3,5,7,10],
-    ['Going Yard', 'Triple Threat', 'Five-Alarm Fireworks', 'Home Run Frenzy', 'Home Run Apocalypse'],
-    'home runs'),
+  ...series('game-homer', 'Offense', 'fireball', 'gameHr', [1,2,5,7,10,12],
+    ['Going Yard', 'Double Trouble', 'Five-Alarm Fireworks', 'Home Run Frenzy', 'Home Run Apocalypse', 'Dozen Homers'],
+    'home runs').map((badge,index)=>({...badge,tier:['Bronze','Silver','Gold','Platinum','Diamond','Legendary'][index]})),
   ...series('game-runs', 'Offense', 'diamond', 'gameRuns', [1,5,10,15,20,25,30],
     ['On the Board', 'Five Across', 'Run It Up', 'Offensive Onslaught', 'Run Rampage', 'Scoring Spree', 'Scoreboard Breaker'],
     'runs scored'),
@@ -46,7 +46,7 @@ const defense = [
     ['Helping Hand', 'Assist Artist', 'Defensive Connection', 'Precision Plays', 'Assist Machine', 'Field General', 'Defensive Maestro'],
     'defensive assists', {individual:true}),
   ...series('team-double-plays', 'Defense', 'double', 'doublePlays', [1,3,5,7,10],
-    ['Two for One', 'Double Trouble', 'Twin Killing Spree', 'Double Play Dynasty', 'Double Play Masterclass'],
+    ['Two for One', 'Double-Play Trouble', 'Twin Killing Spree', 'Double Play Dynasty', 'Double Play Masterclass'],
     'double plays'),
   ...series('team-triple-plays', 'Defense', 'triple', 'triplePlays', [1,3,5,7],
     ['Triple Threat Defense', 'Three Times the Trouble', 'Triple Play Takeover', 'Triple Play Legend'],
@@ -118,8 +118,8 @@ const preseasonAwards=[{id:'preseason-tournament-champion',group:'preseason',cat
 export const GM_ACHIEVEMENTS = Object.freeze([...wins,...offense,...defense,...pitching,...postseason,...frontOffice,...seasonHonors,...preseasonAwards].map((badge,index) =>
   Object.freeze({...badge,serial:index+1})));
 export const GM_ACHIEVEMENT_CATEGORIES = ['All', 'Wins', 'Offense', 'Defense', 'Pitching', 'Playoffs', 'Front Office', 'Season Honors', 'Preseason'];
-if (GM_ACHIEVEMENTS.length !== 93 || new Set(GM_ACHIEVEMENTS.map(a=>a.id)).size !== 93)
-  throw Error('GM achievements catalog must contain 93 unique badges.');
+if (GM_ACHIEVEMENTS.length !== 94 || new Set(GM_ACHIEVEMENTS.map(a=>a.id)).size !== 94)
+  throw Error('GM achievements catalog must contain 94 unique badges.');
 
 const value = v => Number.isFinite(Number(v)) && Number(v) > 0 ? Number(v) : 0;
 const asId = v => String(v ?? '');
