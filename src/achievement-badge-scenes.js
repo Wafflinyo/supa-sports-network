@@ -1,4 +1,4 @@
-// Badge imagery is curated against the ACTUAL 94-item achievement catalog.
+// Badge imagery is curated against the ACTUAL 93-item achievement catalog.
 // Columns: real achievement ID | illustrated main subject | supporting subject |
 // composition | meaningful engraving. Do not add awards from concept art.
 const DRAWINGS = `
@@ -16,11 +16,10 @@ season-homer-15|bat|star|laurel|15
 season-homer-20|stadium|fire|sunburst|20
 season-homer-25|crown|crossed-bats|royal|25
 game-homer-1|ball|bat|diagonal|1
-game-homer-2|crossed-bats|star|wreath|2
+game-homer-3|crossed-bats|star|wreath|3
 game-homer-5|fire|ball|rays|5
 game-homer-7|ball|bolt|sunburst|7
 game-homer-10|crossed-bats|crown|royal|10
-game-homer-12|stadium|ball|royal|12
 game-runs-1|home-plate|spark|split|1
 game-runs-5|runner|home-plate|diagonal|5
 game-runs-10|scoreboard|ball|rays|10
