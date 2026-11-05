@@ -150,7 +150,7 @@ export function matchHeadline(season,game,players=[],{includeRecorded=false}={})
  if(winnerHighlights.length){
    details.push(winner+': '+winnerHighlights.map(e=>e.text).join('; '));
    details.push('These standout performances came '+
-     gameOutcomeContext(season,game,winnerId).replace(/\\.$/,''));
+     gameOutcomeContext(season,game,winnerId).replace(/[.]$/,''));
  }
  if(loserHighlights.length){
    details.push(loser+': '+loserHighlights.map(e=>e.text).join('; '));
