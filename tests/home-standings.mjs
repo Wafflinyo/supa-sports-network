@@ -17,6 +17,20 @@ assert(rows.every(team=>team.runsFor===0&&team.runsAgainst===0));
 const read=fs.readFileSync('src/HomeDashboard.jsx','utf8');
 assert.match(read,/table\.map\(\(team,index\)=>/,'Home standings must render every Overall row');
 assert.match(read,/<ConferenceMark id=\{team\.conference\}/,'Home standings must carry conference logos');
+assert.match(read,/teamLogo\(league\.supabase,team\.logoPath\)/,'Home standings must show official team crests');
+assert.match(read,/className="ssl-home-overall-name"/,'Home conference badge must be beside team name');
+const full=fs.readFileSync('src/SeasonLeague.jsx','utf8');
+const standingsView=full.slice(full.indexOf('function Standings({ league: l })'),
+  full.indexOf('function TeamStats(',full.indexOf('function Standings({ league: l })')));
+assert.match(standingsView,/teamLogo\(l\.supabase,t\.logoPath\)/,'Full standings must show official team crests');
+assert.match(standingsView,/className="standings-team-conference">\s*<ConferenceMark id=\{t\.conference\} size=\{15\}/,
+  'Full standings put a small conference badge directly before the conference label');
+assert.doesNotMatch(standingsView,/className="standings-team-name"><ConferenceMark/,
+  'Full standings must not substitute the conference logo for the team crest');
+const homeCSS=fs.readFileSync('src/home-dashboard.css','utf8');
+const styleCSS=fs.readFileSync('src/styles.css','utf8');
+assert.match(homeCSS,/\.ssl-home-overall-name \.conference-mark\{width:17px;height:17px/);
+assert.match(styleCSS,/\.standings-team-conference \.conference-mark\{width:15px;height:15px/);
 assert.match(read,/\{team\.wins\}–\{team\.losses\}/,'W-L should be shown before games');
 assert(!read.includes('hasFinal?'),'Standings must not disappear when no game is final');
 
