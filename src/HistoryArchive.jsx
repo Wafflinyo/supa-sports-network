@@ -13,6 +13,7 @@ import {preseasonBoxScore,reportForBracketMatch,bracketScoreOnly,seasonBoxScore}
 import GameBoxScore from './GameBoxScore.jsx';
 import PreseasonStats from './PreseasonStats.jsx';
 import {leagueNews} from './league-news.js';
+import {sortTeamStatRows} from './team-stats-table-sort.js';
 import {historySeasons,historyOverview,historyRegularStandings,historyTeamStats,historyPlayerStats,
   historySchedule,historyTradeGroups} from './history-archive-data.js';
 import './history-archive.css';
@@ -163,8 +164,21 @@ const teamFields=[['hits','H'],['homeRuns','HR'],['rbi','RBI'],['pitchStrikeouts
 function ArchiveTeams({season,supabase}){
   const [phase,setPhase]=useState('regular');
   const [view,setView]=useState('Totals');
+  const [sort,setSort]=useState({key:'record',direction:'desc'});
   const rows=useMemo(()=>historyTeamStats(season,phase),[season,phase]);
-  return <ArchivePanel title="Season team statistics" detail="Regular-season and playoff totals remain separate from preseason statistics.">
+  const sorted=useMemo(()=>sortTeamStatRows(rows,sort,view==='Totals'?'Totals':'Averages per Game'),[rows,sort,view]);
+  const toggleSort=key=>setSort(previous=>previous.key===key
+    ?{key,direction:previous.direction==='desc'?'asc':'desc'}
+    :{key,direction:key==='name'?'asc':'desc'});
+  const heading=(key,label)=><th key={key} scope="col"
+    aria-sort={sort.key===key?(sort.direction==='desc'?'descending':'ascending'):'none'}>
+    <button type="button" className="ssl-history-col-sort" onClick={()=>toggleSort(key)}
+      aria-label={'Sort by '+label}>
+      {label}{sort.key===key?(sort.direction==='desc'?' ▼':' ▲'):' ↕'}
+    </button>
+  </th>;
+  return <ArchivePanel title="Season team statistics"
+    detail="Regular-season and playoff totals remain separate from preseason statistics. Tap a heading to sort; tap again to reverse.">
     <PhaseSwitch value={phase} onChange={setPhase}/>
     <div className="ssl-history-switch" role="group" aria-label="Team stats totals or averages">
       {['Totals','Per Game'].map(option=><button type="button" key={option}
@@ -172,9 +186,10 @@ function ArchiveTeams({season,supabase}){
         onClick={()=>setView(option)}>{option}</button>)}
     </div>
     <div className="ssl-history-table-wrap"><table>
-      <thead><tr><th>Team</th><th>GP</th><th>W–L</th><th>RF</th><th>RA</th>
-        {teamFields.map(([key,label])=><th key={key}>{label}</th>)}<th>AGP</th></tr></thead>
-      <tbody>{rows.map(team=><tr key={team.id}><td><span className="ssl-history-team">
+      <thead><tr>{heading('name','Team')}{heading('gp','GP')}
+        {heading('record','W–L')}{heading('runsFor','RF')}{heading('runsAgainst','RA')}
+        {teamFields.map(([key,label])=>heading(key,label))}{heading('agp','AGP')}</tr></thead>
+      <tbody>{sorted.map(team=><tr key={team.id}><td><span className="ssl-history-team">
         <TeamMark team={team} supabase={supabase} size={28}/><strong>{team.name}</strong></span></td>
         <td>{team.gp}</td><td>{team.wins}–{team.losses}</td>
         <td>{view==='Totals'?team.runsFor:team.gp?fmt(team.runsFor/team.gp,2):'—'}</td>
@@ -185,7 +200,7 @@ function ArchiveTeams({season,supabase}){
         <td><strong>{team.agp===null?'—':fmt(team.agp,2)}</strong></td>
       </tr>)}</tbody>
     </table></div>
-    <p className="ssl-history-note">AGP is team total Game Points divided by completed team games. W–L always displays total wins and losses.</p>
+    <p className="ssl-history-note">Default ordering uses win–loss record. AGP is team total Game Points divided by completed team games. W–L always displays total wins and losses.</p>
   </ArchivePanel>;
 }
 const pointCols=[['gamesPlayed','GP'],['gameScore','Game Score'],['ogp','OGP'],['dgp','DGP'],
