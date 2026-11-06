@@ -54,8 +54,10 @@ begin
   end if;
   if acting_team is null then raise exception 'Choose the franchise managing this block';end if;
   if char_length(clean_note)>240 then raise exception 'Trade Block message must be at most 240 characters';end if;
-  if jsonb_typeof(roster_players) is distinct from 'array'
-   or jsonb_array_length(roster_players)>14 then
+  if jsonb_typeof(roster_players) is distinct from 'array' then
+    raise exception 'Trade Block players must be an array';
+  end if;
+  if jsonb_array_length(roster_players)>14 then
     raise exception 'Choose up to fourteen rostered players';
   end if;
   perform pg_advisory_xact_lock(736114221);
