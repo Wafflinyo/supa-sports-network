@@ -20,6 +20,7 @@ jobs:
       - run: python scripts/check_player_data.py
       - run: npm ci
       - run: npx vite build --base=/supa-sports-network/
+      - run: node tests/trade-block.mjs
       - run: node tests/stadiums.mjs
       - run: node tests/draft-stadium-state.mjs
       - run: node tests/pause-timer-only.mjs
@@ -60,7 +61,6 @@ jobs:
       - run: node tests/stadium-lighting.mjs
       - run: node tests/public-tbd-schedule.mjs
       - run: node tests/trade-negotiation.mjs
-      - run: node tests/trade-block.mjs
       - run: npm run build
         env:
           GITHUB_PAGES_BASE: /supa-sports-network/
