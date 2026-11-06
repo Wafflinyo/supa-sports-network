@@ -110,4 +110,17 @@ assert(css.includes('.draft-my-team-panel[hidden]{display:none!important}'),
  'inactive My Team tab cannot overlap draft player pool');
 assert(draft.includes('if(await l.act(\'pick\',{player:selected.id}))close();'),
  'commissioner can still submit on-clock pick with explicit confirmation');
-console.log('PASS: live draft unchanged; career profiles on player cards; draft round and pick visible only in career profile after draft');
+
+const summary=profile.match(/<dl className="career-summary">(.+?)<\\/dl>/s)?.[1];
+assert(summary,'Career profile displays the summary cards');
+const summaryLabels=[...summary.matchAll(/\\['(YEARS AS A SLUGGER|CAREER [^']+|HOT GAMES|LONGEST HOT STREAK)'/g)].map(m=>m[1]);
+assert.equal(summaryLabels.length,10,'Career profile must have 10 summary cards (five pairs)');
+assert(!summaryLabels.includes('CAREER GAME SCORE'),'Duplicate Game Score card should be removed; Career TGP remains');
+assert(summaryLabels.includes('CAREER TGP'),'Career TGP is retained');
+const styles=readFileSync(new URL('../src/styles.css',import.meta.url),'utf8');
+assert(styles.includes('.career-profile .career-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))'),
+ 'Career summary has two consistent columns');
+assert(!styles.includes('.career-profile .career-summary>div:nth-child('),
+ 'No career card spans both columns or breaks the paired layout');
+
+console.log('PASS: draft profiles retain pedigree; career highlights show 10 balanced cards without duplicate Game Score');
