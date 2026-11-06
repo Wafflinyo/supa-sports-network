@@ -6,9 +6,9 @@ import {
   POWER_WEIGHTS,POWER_PITCHER_COUNT,POWER_SUPPORT_PITCHER_COUNT,
   OFFENSE_SPEED_WEIGHT,DEFENSE_SPEED_WEIGHT,DEFENSE_STAT_WEIGHTS,defenseRating,offenseRating,
   fieldingAbilityBonus,BASERUNNING_ABILITY_BONUS,
-  gamePointPerformanceRating,GAME_POINT_PERFORMANCE_CONFIG,
+  gamePointPerformanceAdjustment,GAME_POINT_RELATIVE_CONFIG,
   GAME_POINT_BLEND_PER_REPORTED_GAME,GAME_POINT_BLEND_MAX,
-  teamRegularGamePointAverages,powerRankings
+  teamRegularGamePointAverages,leagueRegularGamePointAverages,powerRankings
 } from '../src/power-rankings.js';
 
 assert.deepEqual({...PITCHING_STAT_WEIGHTS},{
@@ -82,29 +82,30 @@ assert.equal(offenseRating({
 }),100,'Approved offensive skill weights must total 100%');
 assert.equal(fieldingAbilityBonus(9,'SS'),-12,'Fielding ability rules must be retained');
 
-assert.deepEqual({...GAME_POINT_PERFORMANCE_CONFIG.scales},{
-  ogp:{center:250,spread:100},
-  dgp:{center:208,spread:90},
-  pgp:{center:20,spread:15}
-},'Three independently calibrated performance curves must remain available');
-assert.equal(GAME_POINT_BLEND_PER_REPORTED_GAME,.075);
+assert.deepEqual({...GAME_POINT_RELATIVE_CONFIG.scales},{ogp:100,dgp:90,pgp:15},
+  'League-normalized Game Points retain separate OGP/DGP/PGP sensitivity scales');
+assert.equal(GAME_POINT_RELATIVE_CONFIG.maxAdjustment,20,
+  'An extreme performance cannot change a category by more than 20 times game weight');
+assert.equal(GAME_POINT_BLEND_PER_REPORTED_GAME,.05);
 assert.equal(GAME_POINT_BLEND_MAX,.60);
-assert.equal(gamePointPerformanceRating(null,'ogp'),null,
-  'Unreported production must not invent a performance score');
-assert.equal(gamePointPerformanceRating(1,'unknown'),null);
-for(const stat of ['ogp','dgp','pgp']){
-  const low=gamePointPerformanceRating(-50,stat),
-    mid=gamePointPerformanceRating(GAME_POINT_PERFORMANCE_CONFIG.scales[stat].center,stat),
-    high=gamePointPerformanceRating(999,stat);
-  assert(low>=0&&low<mid&&mid<high&&high<=100,
-    stat+' production converts to a bounded 0–100 score');
-  assert.equal(mid,50,stat+' center must yield a neutral performance rating of 50');
+assert.equal(gamePointPerformanceAdjustment(null,30,'ogp'),0);
+assert.equal(gamePointPerformanceAdjustment(30,null,'ogp'),0);
+assert.equal(gamePointPerformanceAdjustment(30,30,'ogp'),0);
+assert.equal(gamePointPerformanceAdjustment(0,0,'pgp'),0,
+  'A league-average PGP including zero must be perfectly neutral');
+assert.equal(gamePointPerformanceAdjustment(-5,-5,'pgp'),0,
+  'Negative pitching points can still define a neutral league average');
+assert.equal(gamePointPerformanceAdjustment(30,30,'missing'),0);
+for(const key of ['ogp','dgp','pgp']){
+  const spread=GAME_POINT_RELATIVE_CONFIG.scales[key];
+  const positive=gamePointPerformanceAdjustment(100+spread,100,key);
+  const negative=gamePointPerformanceAdjustment(100-spread,100,key);
+  assert(positive>0&&positive<20, key+' above average must improve its category');
+  assert(negative<0&&negative>-20,key+' below average must lower its category');
+  assert(Math.abs(positive+negative)<1e-10,key+' positive and negative adjustments should balance');
+  assert(gamePointPerformanceAdjustment(1e6,-1e6,key)<=20,
+    'Extreme category values must be capped');
 }
-assert(gamePointPerformanceRating(-50,'pgp')<
-  gamePointPerformanceRating(0,'pgp'));
-assert(gamePointPerformanceRating(0,'pgp')<
-  gamePointPerformanceRating(50,'pgp'));
-
 // Published team-box-score game points should affect only the right category,
 // and only for regular-season games, never preseason or postseason.
 const testTeam='test-franchise-a',second='test-franchise-b';
@@ -152,82 +153,121 @@ const synthetic={
   }]))
 };
 const before=powerRankings(synthetic).find(t=>t.id===testTeam);
-const after=powerRankings({...synthetic,games:[regular]}).find(t=>t.id===testTeam);
+const afterSeason={...synthetic,games:[regular]};
+const after=powerRankings(afterSeason).find(t=>t.id===testTeam);
 const round1=n=>Math.round(n*10)/10;
-const calc=(skill,rating,weight)=>
-  round1((1-weight)*skill+weight*rating);
-assert.equal(after.performanceWeight,7.5,
-  'One published regular-season game contributes exactly 7.5%');
+const calc=(skill,adjustment,weight)=>round1(skill+weight*adjustment);
+const league=leagueRegularGamePointAverages(afterSeason);
+assert.equal(league.teamGamesWithReports,2,
+  'Both teams\' reported player Game Points count toward league averages');
+assert.deepEqual({ogp:league.ogp,dgp:league.dgp,pgp:league.pgp},
+  {ogp:9,dgp:7.5,pgp:13.5},
+  'League baseline comes from actual reported team-games, not fixed targets of 250/208/20');
+assert.equal(after.performanceWeight,5,
+  'One published regular-season game contributes exactly 5%');
 assert.equal(after.gamePointAverages.pgp,27);
-assert.equal(after.offense,calc(before.offense,gamePointPerformanceRating(gp.ogp,'ogp'),.075),
-  'Offense blends only roster skills and season-average OGP');
-assert.equal(after.defense,calc(before.defense,gamePointPerformanceRating(gp.dgp,'dgp'),.075),
-  'Defense blends only roster skills and season-average DGP');
-assert.equal(after.pitching,calc(before.pitching,gamePointPerformanceRating(gp.pgp,'pgp'),.075),
-  'Pitching blends only roster skills and season-average PGP');
-const weightedGameValue=
-  .60*gamePointPerformanceRating(gp.ogp,'ogp')+
-  .20*gamePointPerformanceRating(gp.dgp,'dgp')+
-  .20*gamePointPerformanceRating(gp.pgp,'pgp');
-assert.equal(after.score,round1(.925*before.rosterScore+.075*weightedGameValue),
-  'Overall remains 60/20/20 of the blended categories; no second 7.5% form modifier');
+const delta={
+  offense:gamePointPerformanceAdjustment(gp.ogp,league.ogp,'ogp'),
+  defense:gamePointPerformanceAdjustment(gp.dgp,league.dgp,'dgp'),
+  pitching:gamePointPerformanceAdjustment(gp.pgp,league.pgp,'pgp')
+};
+assert.equal(after.offense,calc(before.offense,delta.offense,.05),
+  'Offense adjusts relative to actual league-average OGP only');
+assert.equal(after.defense,calc(before.defense,delta.defense,.05),
+  'Defense adjusts relative to actual league-average DGP only');
+assert.equal(after.pitching,calc(before.pitching,delta.pitching,.05),
+  'Pitching adjusts relative to actual league-average PGP only');
+assert.equal(after.score,round1(before.rosterScore+.05*(
+  .60*delta.offense+.20*delta.defense+.20*delta.pitching)),
+  'Overall stays 60/20/20 with no win/loss or extra fixed-performance baseline');
 assert.equal(after.rosterScore,before.rosterScore,
-  'Lineup talent must stay the unchanged preseason reference');
+  'Lineup talent stays the original preseason score');
 assert(!('gamePointBoosts' in after)&&!('formWeight' in after),
-  'Old independent stat bonuses and record-based form weight are removed');
+  'No old fixed bonuses or record-based performance modifier');
 const adjusted=powerRankings({...synthetic,games:[fakePreseason,fakePlayoffs]})
   .find(t=>t.id===testTeam);
 assert.deepEqual([adjusted.score,adjusted.offense,adjusted.defense,adjusted.pitching],
   [before.score,before.offense,before.defense,before.pitching],
-  'Preseason and postseason results cannot change regular-season ranking categories');
+  'Preseason/postseason cannot alter regular-season rankings');
 const highDefense={...regular,result:{...regular.result,
   players:[{team:testTeam,player:eligible[0],stats:{
     hits:2,runs:1,putouts:20,pitchStrikeouts:2,earnedRuns:1
   }}]}};
 const betterDefense=powerRankings({...synthetic,games:[highDefense]}).find(t=>t.id===testTeam);
-assert(betterDefense.defense>after.defense,
-  'Better DGP must improve only the defensive category');
-assert.equal(betterDefense.offense,after.offense,'DGP must not alter offense');
-assert.equal(betterDefense.pitching,after.pitching,'DGP must not alter pitching');
+assert(betterDefense.defense>after.defense,'Higher DGP increases defensive rating');
+assert.equal(betterDefense.offense,after.offense,'Changing DGP must not change offense');
+assert.equal(betterDefense.pitching,after.pitching,'Changing DGP must not change pitching');
 const lowPitching={...regular,result:{...regular.result,
   players:[{team:testTeam,player:eligible[0],stats:{
     hits:2,runs:1,putouts:3,earnedRuns:7
   }}]}};
 const worsePitching=powerRankings({...synthetic,games:[lowPitching]}).find(t=>t.id===testTeam);
 assert(worsePitching.pitching<after.pitching,
-  'Poor PGP may lower pitching; there is no unconditional positive bonus');
+  'Worse-than-league PGP can lower pitching below the original roster rating');
 assert.equal(worsePitching.offense,after.offense);
 assert.equal(worsePitching.defense,after.defense);
 
-// Win/loss and scoring differential are standings data, NOT extra ranking inputs.
+// A league-average team must stay at its own ORIGINAL baseline: no fixed
+// 50-point performance rating and no assumption that 70 is league average.
+const identicalReports={...regular,result:{...regular.result,
+  players:[{team:testTeam,player:eligible[0],stats:{hits:3,putouts:7,earnedRuns:1}},
+    {team:second,player:eligible[1],stats:{hits:3,putouts:7,earnedRuns:1}}]}};
+const avgTeam=powerRankings({...synthetic,games:[identicalReports]}).find(t=>t.id===testTeam);
+assert.equal(avgTeam.performanceWeight,5);
+assert.equal(avgTeam.score,before.score);
+assert.equal(avgTeam.offense,before.offense);
+assert.equal(avgTeam.defense,before.defense);
+assert.equal(avgTeam.pitching,before.pitching);
+assert.deepEqual(avgTeam.gamePointAdjustments,{offense:0,defense:0,pitching:0});
+assert.equal(avgTeam.leagueGamePointAverages.ogp,12);
+assert.equal(avgTeam.leagueGamePointAverages.dgp,35);
+
+// Win/loss score and run differential must not change the Power Rankings.
 const reversedScore={...regular,result:{...regular.result,
   scores:{[testTeam]:0,[second]:20}}};
 const reversed=powerRankings({...synthetic,games:[reversedScore]}).find(t=>t.id===testTeam);
-assert.equal(reversed.score,after.score,'Win/loss and run differential cannot skew rankings twice');
+assert.equal(reversed.score,after.score);
 assert.equal(reversed.offense,after.offense);
 assert.equal(reversed.defense,after.defense);
 assert.equal(reversed.pitching,after.pitching);
 assert.equal(reversed.losses,1);
 const scoreOnly={...regular,result:{...regular.result,players:[]}};
 const unreported=powerRankings({...synthetic,games:[scoreOnly]}).find(t=>t.id===testTeam);
-assert.equal(unreported.performanceWeight,0,'Score-only game has no production data to blend');
-assert.equal(unreported.score,before.score,'Score-only game does not fabricate OGP/DGP/PGP');
+assert.equal(unreported.performanceWeight,0,'Score-only games have no report-based influence');
+assert.equal(unreported.score,before.score);
 const oneReportedOneUnreported=powerRankings({...synthetic,
   games:[regular,{...scoreOnly,id:'score-only'}]}).find(t=>t.id===testTeam);
-assert.equal(oneReportedOneUnreported.performanceWeight,7.5);
-assert.equal(oneReportedOneUnreported.gamePointAverages.ogp,gp.ogp,
-  'Unreported game cannot dilute the known average as if zero Game Points');
+assert.equal(oneReportedOneUnreported.performanceWeight,5);
+assert.equal(oneReportedOneUnreported.gamePointAverages.ogp,gp.ogp);
 assert.equal(oneReportedOneUnreported.score,after.score);
 const eight=powerRankings({...synthetic,
   games:Array.from({length:8},(_,i)=>({...regular,id:'reg-'+i}))})
   .find(t=>t.id===testTeam);
-assert.equal(eight.performanceWeight,60,'Eight reported games reach the 60% maximum');
-assert.equal(eight.offense,calc(before.offense,gamePointPerformanceRating(gp.ogp,'ogp'),.60));
-assert.equal(eight.defense,calc(before.defense,gamePointPerformanceRating(gp.dgp,'dgp'),.60));
-assert.equal(eight.pitching,calc(before.pitching,gamePointPerformanceRating(gp.pgp,'pgp'),.60));
-const ten=powerRankings({...synthetic,
-  games:Array.from({length:10},(_,i)=>({...regular,id:'reg-'+i}))})
+assert.equal(eight.performanceWeight,40,'Eight reports contribute 40%, not 60%');
+assert.equal(eight.offense,calc(before.offense,delta.offense,.40));
+const twelve=powerRankings({...synthetic,
+  games:Array.from({length:12},(_,i)=>({...regular,id:'reg-'+i}))})
   .find(t=>t.id===testTeam);
-assert.equal(ten.performanceWeight,60,'Blend cap stays at 60% after eight games');
-assert.equal(ten.score,eight.score,'Equal averages and maximum weight are stable');
-console.log('PASS: approved roster weights and 7.5%-per-reported-game OGP/DGP/PGP category blends, 60% cap, no duplicate game form');
+assert.equal(twelve.performanceWeight,60,'Twelve reports reach the 60% cap');
+assert.equal(twelve.offense,calc(before.offense,delta.offense,.60));
+assert.equal(twelve.defense,calc(before.defense,delta.defense,.60));
+assert.equal(twelve.pitching,calc(before.pitching,delta.pitching,.60));
+const thirteen=powerRankings({...synthetic,
+  games:Array.from({length:13},(_,i)=>({...regular,id:'reg-'+i}))})
+  .find(t=>t.id===testTeam);
+assert.equal(thirteen.performanceWeight,60);
+assert.equal(thirteen.score,twelve.score,'A stable season average keeps the cap stable');
+
+// Team-game weighting, rather than equal weighting of per-team averages.
+const unequalGames={...synthetic,games:[
+  regular,
+  {...regular,id:'second',result:{...regular.result,
+    players:[{team:testTeam,player:eligible[0],stats:{hits:5}},
+      {team:second,player:eligible[1],stats:{hits:1}}]}}
+]};
+const unequalBaseline=leagueRegularGamePointAverages(unequalGames);
+assert.equal(unequalBaseline.teamGamesWithReports,4);
+assert.equal(unequalBaseline.ogp,(14+4+20+4)/4);
+assert.equal(unequalBaseline.dgp,(15+0+0+0)/4);
+
+console.log('PASS: league-relative OGP/DGP/PGP adjustments, five percent per reported game, 12-game 60 percent cap, no arbitrary average or duplicate win/loss form');
