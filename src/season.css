@@ -911,3 +911,63 @@ details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
 .ssl-team-stats-table .team-stats-sort-arrow{font:900 14px/1 system-ui,sans-serif;color:#fbd044}
 .ssl-team-stats-table th[aria-sort="none"] .team-stats-sort-arrow{color:#a7b5cd;opacity:.8}
 .ssl-team-stats-table th:first-child .team-stats-sort{justify-content:flex-start;text-align:left}
+
+
+/* Team Stats board — defined column dividers, calm zebra rows and a pinned
+   franchise column for wide totals/averages tables on desktop and mobile. */
+.season-table:has(> .ssl-team-stats-table){
+  border:1px solid #c9d4e4;
+  border-radius:7px;
+  background:#fff;
+  box-shadow:0 2px 8px #122d5010;
+  overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;
+}
+.season-table .ssl-team-stats-table{
+  border-collapse:separate;
+  border-spacing:0;
+  font-variant-numeric:tabular-nums;
+}
+.season-table .ssl-team-stats-table :is(th,td){
+  border-right:1px solid #cbd5e3;
+  border-bottom:1px solid #dce3ec;
+  padding:12px 15px;
+  min-width:92px;
+}
+.season-table .ssl-team-stats-table tr > :last-child{border-right:0}
+.season-table .ssl-team-stats-table thead th{
+  background:#152f56;
+  color:#fff;
+  border-right-color:#536b8a;
+  border-bottom:3px solid #ccac4b;
+  vertical-align:middle;
+  line-height:1.35;
+  min-height:48px;
+}
+.season-table .ssl-team-stats-table thead th[aria-sort]:not([aria-sort="none"]){
+  background:#254d78;
+}
+.season-table .ssl-team-stats-table tbody tr:nth-child(even) td{background:#f2f6fb}
+.season-table .ssl-team-stats-table tbody tr:hover td{background:#e8f2ff}
+.season-table .ssl-team-stats-table tbody tr:last-child td{border-bottom:0}
+.season-table .ssl-team-stats-table th:first-child,
+.season-table .ssl-team-stats-table td:first-child{
+  min-width:235px;
+  max-width:295px;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  font-weight:850;
+  text-align:left;
+  border-right:2px solid #96acc7;
+  box-shadow:3px 0 8px #132e4a0c;
+}
+.season-table .ssl-team-stats-table tbody td:first-child{color:#18365d}
+.season-table .ssl-team-stats-table thead th:first-child{
+  z-index:3;
+  border-right-color:#8ea9c8;
+}
+.season-table .ssl-team-stats-table tbody td:first-child{z-index:2}
+.season-table .ssl-team-stats-table :is(th,td):nth-child(5){
+  border-right:2px solid #9bb0ca;
+}
+.season-table .ssl-team-stats-table td.team-stats-number{text-align:right}
