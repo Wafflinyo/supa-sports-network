@@ -65,9 +65,9 @@ function PlayerAvatar({ player, size = 38 }) {
 }
 // Project Rio's export headings, grouped for browsing. Helper columns are export internals.
 const statGroups = {
-  'Game Score': [
-    ['gamesPlayed','Games Played'],['gameScore','Game Score'],
-    ['ogp','OGP'],['dgp','DGP'],['pgp','PGP'],['tgp','TGP'],['agp','AGP'],['itemScore','Item Score'],
+  'Game Points': [
+    ['gamesPlayed','Games Played'],['tgp','TGP'],['agp','AGP'],
+    ['ogp','OGP'],['dgp','DGP'],['pgp','PGP'],['itemScore','Item Score'],
     ['heatingUpCount','Hot Games'],['longestHotStreak','Longest Hot Streak'],
   ],
   'Offensive Stats': [
@@ -160,7 +160,7 @@ function App() {
   const [leagueSize, setLeagueSize] = useState(8)
   const [joinCode, setJoinCode] = useState('')
   const [query, setQuery] = useState('')
-  const [statTab, setStatTab] = useState('Game Score')
+  const [statTab, setStatTab] = useState('Game Points')
   const [statView, setStatView] = useState('Totals')
   const [sort, setSort] = useState({ key: 'default', direction: 'desc' })
   const [selectedPlayer, setSelectedPlayer] = useState(null)
@@ -248,7 +248,7 @@ function App() {
     setJoinCode(''); setMessage('You joined the league.'); await loadLeagues()
   }
   const hasOfficialStats = players.some(player => (player.gamesPlayed ?? 0) > 0)
-  const categorySort = statTab === 'Pitching Stats' ? {key:'era7',direction:'asc'} : statTab === 'Defensive Stats' ? {key:'putouts',direction:'desc'} : {key:'battingAverage',direction:'desc'}
+  const categorySort = statTab === 'Game Points' ? {key:statView==='Totals'?'tgp':'agp',direction:'desc'} : statTab === 'Pitching Stats' ? {key:'era7',direction:'asc'} : statTab === 'Defensive Stats' ? {key:'putouts',direction:'desc'} : {key:'battingAverage',direction:'desc'}
   const visibleStatColumns=visibleGamePointFields(statGroups[statTab],statView)
   const activeSort = sort.key === 'default' ? (hasOfficialStats ? categorySort : {key:'id',direction:'asc'}) : sort
   const filtered = useMemo(() => players.filter(p => `${p.name} ${p.class} ${p.team}`.toLowerCase().includes(query.toLowerCase())).sort((a,b) => {
