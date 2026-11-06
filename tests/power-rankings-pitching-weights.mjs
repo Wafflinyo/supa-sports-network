@@ -192,7 +192,7 @@ assert.deepEqual([adjusted.score,adjusted.offense,adjusted.defense,adjusted.pitc
 const highDefense={...regular,result:{...regular.result,
   players:[{team:testTeam,player:eligible[0],stats:{
     hits:2,runs:1,putouts:20,pitchStrikeouts:2,earnedRuns:1
-  }}]}};
+  }},...regular.result.players.filter(p=>p.team===second)]}};
 const betterDefense=powerRankings({...synthetic,games:[highDefense]}).find(t=>t.id===testTeam);
 assert(betterDefense.defense>after.defense,'Higher DGP increases defensive rating');
 assert.equal(betterDefense.offense,after.offense,'Changing DGP must not change offense');
@@ -200,7 +200,7 @@ assert.equal(betterDefense.pitching,after.pitching,'Changing DGP must not change
 const lowPitching={...regular,result:{...regular.result,
   players:[{team:testTeam,player:eligible[0],stats:{
     hits:2,runs:1,putouts:3,earnedRuns:7
-  }}]}};
+  }},...regular.result.players.filter(p=>p.team===second)]}};
 const worsePitching=powerRankings({...synthetic,games:[lowPitching]}).find(t=>t.id===testTeam);
 assert(worsePitching.pitching<after.pitching,
   'Worse-than-league PGP can lower pitching below the original roster rating');
