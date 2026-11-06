@@ -7,15 +7,16 @@ permissions:
   contents: read
   pages: write
   id-token: write
+# Keep an in-progress publication alive while future code changes queue.
+# Cancelling an already-started Pages deployment can strand its backend lock.
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   build:
     runs-on: ubuntu-24.04
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      bundle_asset: ${{ steps.bundle.outputs.asset }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -43,11 +44,45 @@ jobs:
           GITHUB_PAGES_BASE: /${{ github.event.repository.name }}/
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      - name: Record built website asset for publishing verification
+        id: bundle
+        run: |
+          ASSET=$(grep -oE 'assets/index-[^"]+[.]js' dist/index.html | head -n 1)
+          test -n "$ASSET"
+          echo "asset=$ASSET" >> "$GITHUB_OUTPUT"
+      - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
+
+  deploy:
+    name: Publish and verify live website
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
+        with:
+          timeout: '900000'
+      - name: Verify the live page references this exact build
+        env:
+          SITE_URL: ${{ steps.deployment.outputs.page_url }}
+          EXPECTED_ASSET: ${{ needs.build.outputs.bundle_asset }}
+        run: |
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent --show-error --location --max-time 15 "$SITE_URL?deployment=$GITHUB_SHA" | grep -Fq "$EXPECTED_ASSET"; then
+              echo "The live SSL site is serving the new asset $EXPECTED_ASSET"
+              exit 0
+            fi
+            echo "The site is still serving older assets (check $attempt of 20)"
+            sleep 6
+          done
+          echo "::error::GitHub Pages reported success, but the live site is not serving this build."
+          exit 1
 
   mobile-qa:
     # Mobile screenshot QA remains automatic, but never blocks the public
