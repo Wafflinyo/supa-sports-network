@@ -69,4 +69,17 @@ assert.match(history,/const sorted=useMemo\(\(\)=>sortTeamStatRows\(rows,sort,/,
 assert.match(history,/\{heading\('record','W–L'\)\}/,
  'Archived team records have a sort button');
 
+const liveCss=readFileSync(new URL('../src/season.css',import.meta.url),'utf8');
+const historyCss=readFileSync(new URL('../src/history-archive.css',import.meta.url),'utf8');
+assert(liveCss.includes('.season-table .ssl-team-stats-table :is(th,td){')&&
+  liveCss.includes('border-right:1px solid #cbd5e3'),
+  'Live Team Stats must have visible vertical dividers across every column');
+assert(liveCss.includes('.season-table .ssl-team-stats-table tbody tr:nth-child(even) td'),
+  'Live Team Stats must use alternating row backgrounds');
+assert(liveCss.includes('.season-table .ssl-team-stats-table th:first-child'),
+  'Live Team Stats must retain a sticky team-name column');
+assert(history.includes('className="ssl-history-team-stats-table"')&&
+  historyCss.includes('.ssl-history-team-stats-table th,'),
+  'Archived Team Stats must have the new bordered table styling');
+
 console.log('PASS: team stat columns, accurate highest/lowest sorting, averages, splits, history and clean source data');
