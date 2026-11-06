@@ -9,9 +9,9 @@ import './preseason-stats.css'
 // Importers should add only participants from uploaded preseason sheets.
 // Each row: {seasonId,playerId,teamId,stats:{...},perGame:{...}}.
 const statGroups = {
-  'Game Score': [
-    ['gamesPlayed','Games Played'],['gameScore','Game Score'],
-    ['ogp','OGP'],['dgp','DGP'],['pgp','PGP'],['tgp','TGP'],['agp','AGP'],['itemScore','Item Score'],
+  'Game Points': [
+    ['gamesPlayed','Games Played'],['tgp','TGP'],['agp','AGP'],
+    ['ogp','OGP'],['dgp','DGP'],['pgp','PGP'],['itemScore','Item Score'],
   ],
   'Offensive Stats': [
     ['ogp','Offensive Game Points (OGP)'],
@@ -67,7 +67,7 @@ function renderValue(row,key,view){
 }
 export default function PreseasonStats({season}){
   const [scope,setScope]=useState('Players')
-  const [category,setCategory]=useState('Game Score')
+  const [category,setCategory]=useState('Game Points')
   const [view,setView]=useState('Totals')
   const [query,setQuery]=useState('')
   const [sort,setSort]=useState(null)
