@@ -11,7 +11,6 @@ export function PlayerCareerSnapshot({player,seasons=[]}){
   const fields=[
     ['Career games',career.games],
     ['Career MVPs',career.mvps],
-    ['Career game score',career.gameScore],
     ['Career OGP',career.ogp?.toFixed(2)],
     ['Career DGP',career.dgp?.toFixed(2)],
     ['Career PGP',career.pgp?.toFixed(2)],
