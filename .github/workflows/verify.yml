@@ -19,6 +19,7 @@ jobs:
       - run: python -m pip install openpyxl==3.1.5
       - run: python scripts/check_player_data.py
       - run: npm ci
+      - run: npx vite build --base=/supa-sports-network/
       - run: node tests/stadiums.mjs
       - run: node tests/draft-stadium-state.mjs
       - run: node tests/pause-timer-only.mjs
