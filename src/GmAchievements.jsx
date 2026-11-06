@@ -36,7 +36,7 @@ export default function GmAchievements({seasons=[],slot,teams=[],commissioner=fa
     <div className="achievement-hero">
       <div><span className="achievement-kicker">SLUGGERS SUPA LEAGUE • TROPHY CASE</span>
         <h2>GM ACHIEVEMENTS</h2>
-        <p>94 collectible badges, including the Preseason Crown. Earn each badge just once across your entire GM career. Unlocked badges stay with your collection.</p>
+        <p>93 collectible badges, including the Preseason Crown. Earn each badge just once across your entire GM career. Unlocked badges stay with your collection.</p>
         {activeTeam&&<div className="achievement-owner">TEAM • <strong>{activeTeam.name}</strong></div>}
       </div>
       <div className="achievement-progress" aria-label={earned+' of '+total+' badges unlocked'}>
