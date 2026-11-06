@@ -1,17 +1,21 @@
 import assert from 'node:assert/strict';
 import {GM_ACHIEVEMENTS,earnedAchievements,achievementProgress} from '../src/gm-achievements.js';
 const badges=GM_ACHIEVEMENTS;
-assert.equal(badges.length,94);
-assert.equal(new Set(badges.map(b=>b.id)).size,94);
+assert.equal(badges.length,93);
+assert.equal(new Set(badges.map(b=>b.id)).size,93);
 assert.equal(badges.find(b=>b.id==='winning-perfect')?.name,'Perfect Season');
 assert.equal(badges.filter(b=>b.category==='Wins').length,7);
-assert.equal(badges.filter(b=>b.category==='Offense').length,26);
+assert.equal(badges.filter(b=>b.category==='Offense').length,25);
 assert.equal(badges.filter(b=>b.category==='Defense').length,34);
 assert.equal(badges.filter(b=>b.category==='Pitching').length,7);
 assert.equal(badges.filter(b=>b.category==='Playoffs').length,6);
 assert.equal(badges.filter(b=>b.category==='Front Office').length,7);
 assert.equal(badges.filter(b=>b.category==='Season Honors').length,6);
 assert.equal(badges.filter(b=>b.category==='Preseason').length,1);
+assert.deepEqual(badges.filter(b=>b.group==='game-runs').map(b=>b.threshold),[1,5,10,15,20,25]);
+assert(!badges.some(b=>b.id==='game-runs-30' || b.name==='Scoreboard Breaker'),
+  '30-run single-game achievement must not exist');
+assert.equal(badges.find(b=>b.id==='game-runs-25')?.name,'Scoring Spree');
 assert.deepEqual(badges.filter(b=>b.group==='game-homer').map(b=>b.threshold),[1,3,5,7,10,12]);
 assert.equal(badges.find(b=>b.id==='game-homer-12')?.name,'Dozen Homers');
 assert.equal(badges.find(b=>b.id==='game-homer-12')?.tier,'Legendary');
@@ -211,4 +215,4 @@ const unfinished=structuredClone(honors);
 unfinished.games[0].stage='recorded';
 assert(!earnedAchievements([unfinished],1).find(b=>b.id==='honors-first-seed').earned,
  'unfinished league cannot award season leadership');
-console.log('PASS: 94 once-only lifetime GM achievements, trades, accepted renewals, full season honors, playoffs and Rio stats');
+console.log('PASS: 93 once-only lifetime GM achievements, trades, accepted renewals, full season honors, playoffs and Rio stats');
