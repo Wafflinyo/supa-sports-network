@@ -2475,26 +2475,25 @@ function TeamStats({ league: l }) {
   const allKeys = [
     "atBats", "hits", "runs", "homeRuns", "rbi",
     "putouts", "assists", "bobbles", "pitchStrikeouts", "shutouts",
-    "gameScore", "ogp", "dgp", "pgp", "tgp", "agp",
+    "tgp", "agp", "ogp", "dgp", "pgp",
   ];
-  // Game Score and Game Score/G already represent total/average Game Points.
-  // TGP and AGP remain internal values but would duplicate the displayed scores.
-  const keys=visibleGamePointFields(allKeys,view).filter(k=>k!=='tgp'&&k!=='agp');
+  // Use one overall Game Points column: TGP in Totals, AGP in Averages.
+  const keys=visibleGamePointFields(allKeys,view);
   const s = l.season;
   const rankedTeams = standings(s);
-  const statLabel = k => ({gameScore:'Game Score',ogp:'OGP',dgp:'DGP',pgp:'PGP',
+  const statLabel = k => ({tgp:'TGP',agp:'AGP',ogp:'OGP',dgp:'DGP',pgp:'PGP',
     shutouts:'Shutouts'})[k] || k.replace(/([A-Z])/g, " $1");
   const columns=[
     ['name','Team'],['gp','GP'],['record','Record (W–L)'],
     ['homeRecord','Home Record (W–L)'],['awayRecord','Away Record (W–L)'],
-    ...keys.map(k=>[k,isAverage&&k==='gameScore'?'Game Score/G':statLabel(k)+(isAverage?' / G':'')]),
+    ...keys.map(k=>[k,statLabel(k)+(isAverage&&k!=='agp'?' / G':'')]),
   ];
   const teamRows=rankedTeams.map(team=>{
     const games=(s?.games||[]).filter(g=>g.stage==='final'&&[g.away,g.home].includes(team.id));
     const players=games.flatMap(g=>(g.result?.players||[]).filter(p=>p.team===team.id));
     const totals=Object.fromEntries(allKeys.filter(k=>k!=='agp'&&k!=='shutouts').map(k=>[
       k,players.reduce((sum,p)=>sum+(Number(['ogp','dgp','pgp','tgp'].includes(k)
-        ?gamePointsForReport(p)[k]:k==='gameScore'?p.gameScore:p.stats?.[k])||0),0),
+        ?gamePointsForReport(p)[k]:p.stats?.[k])||0),0),
     ]));
     // A shutout is counted once per scoreless win, not once per pitcher.
     totals.shutouts=games.filter(g=>Number(g.result?.scores?.[team.id]??-1)>0&&
@@ -2550,8 +2549,8 @@ function TeamStats({ league: l }) {
         Tap any column heading to sort, then tap again to reverse the order. By default,
         teams follow the regular-season win–loss standings. Totals combine player stats from
         released games; averages divide counting stats by completed games. GP and W–L
-        records remain totals. Shutouts count once per scoreless win. Game Score/G is
-        total team Game Score divided by completed team games. Private reports do not change public standings.
+        records remain totals. Shutouts count once per scoreless win. AGP is
+        total team Game Points divided by completed team games. Private reports do not change public standings.
       </p>
     </Box>
   );
