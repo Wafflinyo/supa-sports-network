@@ -147,3 +147,39 @@
   .ssl-history-result-main strong{font-size:16px}
   .ssl-history-result-main b{font-size:18px}
 }
+
+
+/* Historical Team Stats uses the same readable grid as the live table. */
+.ssl-history-team-stats-table th,
+.ssl-history-team-stats-table td{
+  border-right:1px solid #cbd5e3!important;
+  border-bottom:1px solid #dce3ec;
+  padding:12px 15px;
+  min-width:74px;
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+.ssl-history-team-stats-table thead th{
+  border-right-color:#526e90!important;
+  border-bottom:3px solid #ccac4b;
+  background:#152f56;
+}
+.ssl-history-team-stats-table tr > :last-child{border-right:0!important}
+.ssl-history-team-stats-table tbody tr:nth-child(even) td{background:#f2f6fb}
+.ssl-history-team-stats-table tbody tr:hover td{background:#e8f2ff}
+.ssl-history-team-stats-table th:first-child,
+.ssl-history-team-stats-table td:first-child{
+  position:sticky;
+  left:0;
+  z-index:2;
+  min-width:250px;
+  max-width:300px;
+  text-align:left;
+  border-right:2px solid #96acc7!important;
+  box-shadow:3px 0 8px #132e4a0c;
+}
+.ssl-history-team-stats-table thead th:first-child{z-index:3;border-right-color:#8ea9c8!important}
+.ssl-history-team-stats-table tbody td:first-child{background:#fff;color:#18365d}
+.ssl-history-team-stats-table tbody tr:nth-child(even) td:first-child{background:#f2f6fb}
+.ssl-history-team-stats-table tbody tr:hover td:first-child{background:#e8f2ff}
+.ssl-history-team-stats-table :is(th,td):nth-child(5){border-right:2px solid #9bb0ca!important}

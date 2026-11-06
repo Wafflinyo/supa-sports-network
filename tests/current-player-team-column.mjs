@@ -31,8 +31,8 @@ const archive=readFileSync(new URL('../src/HistoryArchive.jsx',import.meta.url),
 const preseason=readFileSync(new URL('../src/PreseasonStats.jsx',import.meta.url),'utf8');
 assert(main.includes('team:playerCurrentTeamName(seasonLeague.season,p.id)'),
   'Regular Player Stats must use the selected season roster');
-assert(main.includes("['name','PLAYER'],['team','CURRENT TEAM'],['class','CLASS']"),
-  'CURRENT TEAM must be beside PLAYER before CLASS in each stat category');
+assert(main.includes("['name','PLAYER'],['team','TEAM'],['class','CLASS']"),
+  'TEAM must be beside PLAYER before CLASS in each stat category');
 assert(main.includes('<td className="player-team-cell">{p.team}</td>'),
   'Regular Player Stats body must display the live current team');
 assert(main.includes('${p.name} ${p.class} ${p.team}'),
@@ -41,7 +41,7 @@ assert(main.includes("!['id','class','team'].includes(key)"),
   'Current Team header must not be formatted as a numeric stat');
 assert(main.includes('<col style={{width:230}}/><col style={{width:270}}/><col style={{width:120}}/>'),
   'Team names must have a readable dedicated table column');
-assert(archive.includes('Season Team')&&archive.includes('playerCurrentTeamName(season,id)'),
+assert(archive.includes("Team{sort==='team'?")&&archive.includes('playerCurrentTeamName(season,id)'),
   'Archived Player Stats must label historical roster teams, not live current teams');
 assert(preseason.includes('row.teamName'),
   'Preseason player statistics must retain their existing game-report team column');
