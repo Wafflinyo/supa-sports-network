@@ -2466,15 +2466,17 @@ function TeamStats({ league: l }) {
     "putouts", "assists", "bobbles", "pitchStrikeouts", "shutouts",
     "gameScore", "ogp", "dgp", "pgp", "tgp", "agp",
   ];
-  const keys=visibleGamePointFields(allKeys,view);
+  // Game Score and Game Score/G already represent total/average Game Points.
+  // TGP and AGP remain internal values but would duplicate the displayed scores.
+  const keys=visibleGamePointFields(allKeys,view).filter(k=>k!=='tgp'&&k!=='agp');
   const s = l.season;
   const rankedTeams = standings(s);
   const statLabel = k => ({gameScore:'Game Score',ogp:'OGP',dgp:'DGP',pgp:'PGP',
-    tgp:'TGP',agp:'AGP',shutouts:'Shutouts'})[k] || k.replace(/([A-Z])/g, " $1");
+    shutouts:'Shutouts'})[k] || k.replace(/([A-Z])/g, " $1");
   const columns=[
     ['name','Team'],['gp','GP'],['record','Record (W–L)'],
     ['homeRecord','Home Record (W–L)'],['awayRecord','Away Record (W–L)'],
-    ...keys.map(k=>[k,statLabel(k)+(isAverage&&k!=='agp'?' / G':'')]),
+    ...keys.map(k=>[k,isAverage&&k==='gameScore'?'Game Score/G':statLabel(k)+(isAverage?' / G':'')]),
   ];
   const teamRows=rankedTeams.map(team=>{
     const games=(s?.games||[]).filter(g=>g.stage==='final'&&[g.away,g.home].includes(team.id));
@@ -2526,7 +2528,7 @@ function TeamStats({ league: l }) {
             <td>{team.homeWins}–{team.homeLosses}</td>
             <td>{team.awayWins}–{team.awayLosses}</td>
             {keys.map(k=><td key={k} className="team-stats-number">
-              {k==='agp'?team.agp?.toFixed(2)??'—':isAverage
+              {isAverage
                 ?team.gp?teamStatColumnValue(team,k,view).toFixed(2):'—'
                 :['ogp','dgp','pgp','tgp'].includes(k)?team.totals[k].toFixed(2):team.totals[k]}
             </td>)}
@@ -2537,8 +2539,8 @@ function TeamStats({ league: l }) {
         Tap any column heading to sort, then tap again to reverse the order. By default,
         teams follow the regular-season win–loss standings. Totals combine player stats from
         released games; averages divide counting stats by completed games. GP and W–L
-        records remain totals. Shutouts count once per scoreless win, and AGP is total
-        Game Points divided by team games. Private reports do not change public standings.
+        records remain totals. Shutouts count once per scoreless win. Game Score/G is
+        total team Game Score divided by completed team games. Private reports do not change public standings.
       </p>
     </Box>
   );
