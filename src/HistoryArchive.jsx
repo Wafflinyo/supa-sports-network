@@ -186,7 +186,7 @@ function ArchiveTeams({season,supabase}){
         className={view===option?'active':''} aria-pressed={view===option}
         onClick={()=>setView(option)}>{option}</button>)}
     </div>
-    <div className="ssl-history-table-wrap"><table>
+    <div className="ssl-history-table-wrap"><table className="ssl-history-team-stats-table">
       <thead><tr>{heading('name','Team')}{heading('gp','GP')}
         {heading('record','W–L')}{heading('runsFor','RF')}{heading('runsAgainst','RA')}
         {teamFields.map(([key,label])=>heading(key,label))}{heading('agp','AGP')}</tr></thead>
