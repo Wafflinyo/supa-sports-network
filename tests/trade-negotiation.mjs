@@ -80,8 +80,8 @@ assert(!overview.includes('TradeConversation')&&!overview.includes('ssl_trade_th
 assert(src.includes('{commissionerTools && admin &&') &&
  src.includes('<CommissionerTradeOverview league={l}'),
  'Commissioner overview must be gated by the commissioner role');
-assert(src.includes('{!commissionerTools && <Box title="YOUR TRADE INBOX">'),
- 'Commissioner Tools should not duplicate the GM inbox');
+assert(src.includes('{!commissionerTools && <Box title="YOUR TRADE PROPOSALS & NEGOTIATIONS">'),
+ 'Commissioner Tools should not duplicate the GM trade proposals and negotiations inbox');
 assert(src.includes('{!admin && <TradeConversation'),
  'GM negotiation controls must not be shown to commissioner accounts');
 assert(previous.includes('ssl_manage_calendar'),
