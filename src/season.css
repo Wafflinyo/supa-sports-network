@@ -1009,3 +1009,37 @@ details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
   .trade-block-roster{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:370px){.trade-block-player-grid,.trade-block-roster{grid-template-columns:1fr}}
+
+
+/* League-wide Trade Block market: one continuously visible roster of available players. */
+.trade-block-market-count{font:900 13px system-ui,sans-serif;color:#52647e;letter-spacing:.08em;margin:4px 0 10px}
+.trade-block-player-grid{grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:12px}
+.trade-block-market-card{display:flex;flex-direction:column;min-width:0;border:1px solid #cbd5e5;background:#fff}
+.trade-block-market-card.selected{border:2px solid #215dab;background:#e8f1fd}
+.trade-block-market-card .trade-block-player{width:100%;height:100%;border:0;display:flex;align-items:flex-start;gap:12px;min-height:124px;padding:14px;text-align:left}
+.trade-block-card-details{display:flex;flex-direction:column;gap:5px;flex:1;min-width:0}
+.trade-block-market-card .trade-block-player-name{display:block;font-size:16px;line-height:1.2;font-weight:900;padding:0;white-space:normal;overflow-wrap:anywhere}
+.trade-block-market-team{display:block;font-size:12px;font-weight:900;color:#244c76;line-height:1.3;white-space:normal;overflow-wrap:anywhere}
+.trade-block-market-note{display:block;font-size:12px;line-height:1.4;font-style:italic;font-weight:500;color:#50627d;white-space:pre-wrap;overflow-wrap:anywhere}
+.trade-block-market-card .trade-block-player-action{position:static;display:block;margin-top:4px;font-size:11px;color:#c8202d;letter-spacing:.04em}
+.trade-block-market-card .trade-block-select-indicator{right:8px;top:3px}
+.trade-block-market-card .trade-block-remove{font-size:11px;font-weight:900;padding:12px 8px;color:#a91d29;background:#fff5f5;border:0;border-top:1px solid #e1ccd0;cursor:pointer}
+.trade-block-market-card .trade-block-remove:hover{background:#fce7e7}
+.trade-block-market-card .trade-block-remove:disabled{opacity:.55;cursor:wait}
+.trade-block-offer-team{border:2px solid #a5c2e6;background:#f1f7ff;padding:16px;margin:16px 0}
+.trade-block-offer-team h3{margin:0 0 6px;font-size:20px;color:#11294c}
+.trade-block-offer-team label,.trade-block-management-selector{display:grid;gap:6px;font-weight:800;max-width:420px;margin:12px 0}
+.trade-block-offer-team select,.trade-block-management-selector select{width:100%;max-width:100%;min-height:42px}
+.trade-block-roster-option.listed{background:#e8f2ff;border-color:#8ab0da}
+.trade-block-roster-option small{display:block;font-size:10px;letter-spacing:.02em;color:#24568c;margin-top:2px}
+.trade-block-unsaved{font-size:12px;font-weight:750;color:#9c5a00}
+#manage-trade-block{scroll-margin-top:110px}
+@media(max-width:600px){
+  .trade-block-player-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .trade-block-market-card .trade-block-player{flex-direction:column;gap:7px;padding:9px;min-height:152px}
+  .trade-block-market-card .trade-block-player-name{font-size:14px}
+  .trade-block-market-team,.trade-block-market-note{font-size:11px}
+  .trade-block-market-card .trade-block-player-action{font-size:10px}
+  .trade-block-market-card .trade-block-remove{font-size:10px}
+}
+@media(max-width:370px){.trade-block-player-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
