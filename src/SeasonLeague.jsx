@@ -1,6 +1,7 @@
 import {DraftPlayers, DraftPickBoard} from './DraftPlayers.jsx';
 import {PowerRankings,PreseasonTournament} from './SeasonPreseason.jsx';
 import {visibleGamePointFields} from './game-point-columns.js';
+import {sortTeamStatRows,teamStatColumnValue} from './team-stats-table-sort.js';
 import {seasonPhaseLabel} from './season-phase.js';
 import {seasonBoxScore,previewPrivateGameBoxScore} from './game-box-score-data.js';
 import GameBoxScore from './GameBoxScore.jsx';
@@ -2457,100 +2458,87 @@ function Standings({ league: l }) {
 }
 function TeamStats({ league: l }) {
   const [view, setView] = useState("Totals");
+  // The default mirrors the standings, and each header toggles its direction.
+  const [sort,setSort] = useState({key:'record',direction:'desc'});
   const isAverage = view === "Averages per Game";
   const allKeys = [
-    "atBats",
-    "hits",
-    "runs",
-    "homeRuns",
-    "rbi",
-    "putouts",
-    "assists",
-    "bobbles",
-    "pitchStrikeouts",
-    "earnedRuns",
-    "shutouts", "combinedShutouts", "shutoutBonus",
-    "gameScore",
-    "ogp", "dgp", "pgp", "tgp", "agp",
+    "atBats", "hits", "runs", "homeRuns", "rbi",
+    "putouts", "assists", "bobbles", "pitchStrikeouts", "shutouts",
+    "gameScore", "ogp", "dgp", "pgp", "tgp", "agp",
   ];
   const keys=visibleGamePointFields(allKeys,view);
   const s = l.season;
   const rankedTeams = standings(s);
-  const records = new Map(rankedTeams.map(t => [t.id, t]));
-  const statLabel = k => ({gameScore:'Game Score',ogp:'OGP',dgp:'DGP',pgp:'PGP',tgp:'TGP',agp:'AGP',shutouts:'Shutouts',combinedShutouts:'Combined Shutouts',shutoutBonus:'Shutout Game Points'})[k] || k.replace(/([A-Z])/g, " $1");
+  const statLabel = k => ({gameScore:'Game Score',ogp:'OGP',dgp:'DGP',pgp:'PGP',
+    tgp:'TGP',agp:'AGP',shutouts:'Shutouts'})[k] || k.replace(/([A-Z])/g, " $1");
+  const columns=[
+    ['name','Team'],['gp','GP'],['record','Record (W–L)'],
+    ['homeRecord','Home Record (W–L)'],['awayRecord','Away Record (W–L)'],
+    ...keys.map(k=>[k,statLabel(k)+(isAverage&&k!=='agp'?' / G':'')]),
+  ];
+  const teamRows=rankedTeams.map(team=>{
+    const games=(s?.games||[]).filter(g=>g.stage==='final'&&[g.away,g.home].includes(team.id));
+    const players=games.flatMap(g=>(g.result?.players||[]).filter(p=>p.team===team.id));
+    const totals=Object.fromEntries(allKeys.filter(k=>k!=='agp'&&k!=='shutouts').map(k=>[
+      k,players.reduce((sum,p)=>sum+(Number(['ogp','dgp','pgp','tgp'].includes(k)
+        ?gamePointsForReport(p)[k]:k==='gameScore'?p.gameScore:p.stats?.[k])||0),0),
+    ]));
+    // A shutout is counted once per scoreless win, not once per pitcher.
+    totals.shutouts=games.filter(g=>Number(g.result?.scores?.[team.id]??-1)>0&&
+      Number(g.result?.scores?.[g.away===team.id?g.home:g.away]??-1)===0).length;
+    const agp=games.length?totals.tgp/games.length:null;
+    return {...team,gp:games.length,totals,agp};
+  });
+  const rows=sortTeamStatRows(teamRows,sort,view);
+  const toggleSort=key=>setSort(previous=>previous.key===key
+    ?{key,direction:previous.direction==='desc'?'asc':'desc'}
+    :{key,direction:key==='name'?'asc':'desc'});
+  const heading=([key,label])=><th key={key} scope="col"
+    aria-sort={sort.key===key?(sort.direction==='desc'?'descending':'ascending'):'none'}>
+    <button type="button" className="team-stats-sort" onClick={()=>toggleSort(key)}
+      aria-label={'Sort by '+label}>
+      {label}<span className="team-stats-sort-arrow" aria-hidden="true">
+        {sort.key===key?(sort.direction==='desc'?'▼':'▲'):'↕'}
+      </span>
+    </button>
+  </th>;
+  const selectedLabel=columns.find(([key])=>key===sort.key)?.[1]||'Record (W–L)';
   return (
     <Box title={isAverage ? "TEAM STAT AVERAGES" : "TEAM STAT TOTALS"}>
       <div className="stat-view-switch" role="group" aria-label="Team stat display">
         {["Totals", "Averages per Game"].map(option => (
-          <button
-            key={option}
-            type="button"
-            className={view === option ? "active" : ""}
-            aria-pressed={view === option}
-            onClick={() => setView(option)}
-          >
-            {option}
-          </button>
+          <button key={option} type="button" className={view === option ? "active" : ""}
+            aria-pressed={view === option} onClick={() => setView(option)}>{option}</button>
         ))}
       </div>
-      <div className="season-table" role="region" aria-label={isAverage ? "Team averages per game" : "Team stat totals"} tabIndex={0}>
+      <div className="season-table" role="region"
+        aria-label={isAverage ? "Team averages per game" : "Team stat totals"} tabIndex={0}>
         <table>
-          <caption className="team-stats-caption">{isAverage ? "Team averages per completed game" : "Team season totals"} · Ordered by win–loss record</caption>
-          <thead>
-            <tr>
-              <th>Team</th>
-              <th>GP</th>
-              <th>Record (W–L)</th><th>Home Record (W–L)</th><th>Away Record (W–L)</th>
-              {keys.map(k => <th key={k}>{statLabel(k)}{isAverage && k!=='agp' ? " / G" : ""}</th>)}
-            </tr>
-          </thead>
-          <tbody>
-            {rankedTeams.map(t => {
-              const games = s.games.filter(g =>
-                g.stage === "final" && [g.away, g.home].includes(t.id)
-              );
-              const all = games.flatMap(g =>
-                (g.result?.players || []).filter(p => p.team === t.id)
-              );
-              const totals = Object.fromEntries(
-                allKeys.filter(k=>k!=='agp').map(k => [k, all.reduce((sum, p) => sum + (Number(['ogp','dgp','pgp','tgp'].includes(k) ? gamePointsForReport(p)[k] : k === 'gameScore' ? p.gameScore : p.stats?.[k]) || 0), 0)])
-              );
-              // One team shutout per scoreless win; player-level combined
-              // appearances must never inflate the team's shutout count.
-              const shutoutGames=games.filter(g=>
-                Number(g.result?.scores?.[t.id]??-1)>0&&
-                Number(g.result?.scores?.[g.away===t.id?g.home:g.away]??-1)===0);
-              totals.shutouts=shutoutGames.length;
-              totals.combinedShutouts=shutoutGames.filter(g=>
-                (g.result?.players||[]).filter(p=>p.team===t.id&&Number(p.shutoutBonus||0)>0).length>1).length;
-              totals.shutoutBonus=all.reduce((sum,p)=>sum+Number(p.shutoutBonus||0),0);
-              totals.agp=games.length?totals.tgp/games.length:null;
-              const record = records.get(t.id);
-              return (
-                <tr key={t.id}>
-                  <td>{t.name}</td>
-                  <td>{games.length}</td>
-                  <td><strong>{record?.wins ?? 0}–{record?.losses ?? 0}</strong></td>
-                  <td>{record?.homeWins ?? 0}–{record?.homeLosses ?? 0}</td>
-                  <td>{record?.awayWins ?? 0}–{record?.awayLosses ?? 0}</td>
-                  {keys.map(k => (
-                    <td key={k} className="team-stats-number">
-                      {k==='agp' ? (totals.agp?.toFixed(2)??'—') : isAverage
-                        ? games.length ? (totals[k] / games.length).toFixed(2) : "—"
-                        : ['ogp','dgp','pgp','tgp','shutoutBonus'].includes(k) ? totals[k].toFixed(2) : totals[k]}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
-          </tbody>
+          <caption className="team-stats-caption">
+            {isAverage ? "Team averages per completed game" : "Team season totals"}
+            {' · Sorted by '+selectedLabel+' ('+(sort.direction==='desc'?'descending':'ascending')+')'}
+          </caption>
+          <thead><tr>{columns.map(heading)}</tr></thead>
+          <tbody>{rows.map(team=><tr key={team.id}>
+            <td>{team.name}</td>
+            <td>{team.gp}</td>
+            <td><strong>{team.wins}–{team.losses}</strong></td>
+            <td>{team.homeWins}–{team.homeLosses}</td>
+            <td>{team.awayWins}–{team.awayLosses}</td>
+            {keys.map(k=><td key={k} className="team-stats-number">
+              {k==='agp'?team.agp?.toFixed(2)??'—':isAverage
+                ?team.gp?teamStatColumnValue(team,k,view).toFixed(2):'—'
+                :['ogp','dgp','pgp','tgp'].includes(k)?team.totals[k].toFixed(2):team.totals[k]}
+            </td>)}
+          </tr>)}</tbody>
         </table>
       </div>
       <p className="team-stats-explainer">
-        {isAverage
-          ? "Team averages are the sum of all players' stats divided by the team's completed games. AGP is the team's total Game Points per completed game. GP and all W–L records remain totals; teams without completed games show a dash."
-          : "Team totals combine every player's stats from completed games. Shutouts count once per team shutout, including combined shutouts; the 30 pitching Game Point shutout bonus is shared by contributing pitchers, and solo shutouts replace the +20 complete-game bonus. OGP, DGP and PGP are weighted components. TGP includes Item Score and MVP points; AGP is always per game."}
-        {" "}Overall, Home and Away Records count released regular-season games only.
+        Tap any column heading to sort, then tap again to reverse the order. By default,
+        teams follow the regular-season win–loss standings. Totals combine player stats from
+        released games; averages divide counting stats by completed games. GP and W–L
+        records remain totals. Shutouts count once per scoreless win, and AGP is total
+        Game Points divided by team games. Private reports do not change public standings.
       </p>
     </Box>
   );
