@@ -25,6 +25,7 @@ assert.deepEqual(groupScheduleWeeks([{id:'x',week:5,phase:'regular',stage:'final
 
 const league=readFileSync(new URL('../src/SeasonLeague.jsx',import.meta.url),'utf8');
 const main=readFileSync(new URL('../src/main.jsx',import.meta.url),'utf8');
+const homeGames=readFileSync(new URL('../src/GmStadiumMatchups.jsx',import.meta.url),'utf8');
 const weekUi=readFileSync(new URL('../src/ScheduleWeekGroups.jsx',import.meta.url),'utf8');
 const style=readFileSync(new URL('../src/season.css',import.meta.url),'utf8');
 
@@ -40,6 +41,10 @@ assert.equal((league.match(/<ScheduleWeekControls containerRef=/g)||[]).length,2
  'Public/commissioner and GM lists both have expand/collapse all controls');
 assert.match(league,/target\?\.closest\('details\.ssl-collapsible-week'\)/,
  'GM reminder expands the hidden week before scrolling to the game');
+assert.match(homeGames,/const weekGroups=groupScheduleWeeks\(games\)/,
+ 'GM Tools Home Games also displays week-by-week collapsible groups');
+assert.match(homeGames,/\{weekGroups\.map\(group=><ScheduleWeekGroup/,
+ 'GM Stadium Day-Night settings remain available inside expanded weeks');
 assert.match(main,/target\?\.closest\('details\.ssl-collapsible-week'\)/,
  'Public Schedule reminder expands the hidden week before scrolling to the game');
 assert.match(weekUi,/<details className="ssl-collapsible-week"/);
