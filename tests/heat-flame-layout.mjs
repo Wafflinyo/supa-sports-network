@@ -22,15 +22,15 @@ const flame=declaration('.heat-mark');
 const top=pixels(flame,'top'),right=pixels(flame,'right');
 const width=pixels(flame,'width'),height=pixels(flame,'height');
 assert(top<0&&top>=-8,'Flame stays above the portrait but within table row padding');
-assert(right>=0,'Flame must be inset from the right edge toward the portrait, not the player name');
+assert.equal(right,-2,'Flame should sit 2px past portrait edge, slightly right of the picture but before the name');
 assert(width<=20&&height<=24,'Flame should be smaller than the former 25 x 28 badge');
 for(const size of [29,31,32,38,68,76]){
  const flameRight=size-right;
  const flameLeft=flameRight-width;
- assert(flameLeft>=0&&flameRight<=size,
-  'Flame stays inside horizontal portrait bounds at '+size+'px');
- assert(flameRight<size+10,
-  'Flame cannot intrude on the text following a portrait');
+ assert(flameLeft>=0&&flameRight<=size+2,
+  'Flame extends at most 2px beyond the portrait at '+size+'px');
+ assert(flameRight<=size+2&&flameRight<size+10,
+  'Flame stays clear of the 10px gap before the player name');
 }
 assert.match(flame,/pointer-events:none/,'Badge must not intercept player card/link taps');
 const inline=declaration('.heat-mark-inline');
@@ -44,4 +44,4 @@ assert.match(data,/<PlayerPortrait player=\{p\}/,
  'Player Data and stat tables use the shared portrait');
 assert.match(season,/<PlayerPortrait player=\{p\}/,
  'Season team and roster views use the same portrait');
-console.log('PASS: smaller, upper-left-shifted Heating Up flames remain clear of player names across standard portrait sizes');
+console.log('PASS: smaller, slightly right-shifted Heating Up flames remain clear of player names across standard portrait sizes');
