@@ -1,4 +1,4 @@
-import {aggregate,standings} from './season-data.js';
+import {aggregate,standings,compareTeamRecords} from './season-data.js';
 import {gamePointsForReport} from './game-points.js';
 import {sslSeasonNumber} from './preseason-season-identity.js';
 
@@ -62,7 +62,7 @@ export function historyTeamStats(season,phase='regular'){
       homeWins:standingsRecord?.homeWins||0,homeLosses:standingsRecord?.homeLosses||0,
       awayWins:standingsRecord?.awayWins||0,awayLosses:standingsRecord?.awayLosses||0,
       totals,agp:played.length?rounded(totals.tgp/played.length):null};
-  });
+  }).sort(compareTeamRecords);
 }
 export function historyOverview(season){
   const finals=historyPublicGames(season);

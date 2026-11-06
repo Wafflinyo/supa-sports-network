@@ -2459,7 +2459,8 @@ function TeamStats({ league: l }) {
   ];
   const keys=visibleGamePointFields(allKeys,view);
   const s = l.season;
-  const records = new Map(standings(s).map(t => [t.id, t]));
+  const rankedTeams = standings(s);
+  const records = new Map(rankedTeams.map(t => [t.id, t]));
   const statLabel = k => ({gameScore:'Game Score',ogp:'OGP',dgp:'DGP',pgp:'PGP',tgp:'TGP',agp:'AGP',shutouts:'Shutouts',combinedShutouts:'Combined Shutouts',shutoutBonus:'Shutout Game Points'})[k] || k.replace(/([A-Z])/g, " $1");
   return (
     <Box title={isAverage ? "TEAM STAT AVERAGES" : "TEAM STAT TOTALS"}>
@@ -2478,7 +2479,7 @@ function TeamStats({ league: l }) {
       </div>
       <div className="season-table" role="region" aria-label={isAverage ? "Team averages per game" : "Team stat totals"} tabIndex={0}>
         <table>
-          <caption className="team-stats-caption">{isAverage ? "Team averages per completed game" : "Team season totals"}</caption>
+          <caption className="team-stats-caption">{isAverage ? "Team averages per completed game" : "Team season totals"} · Ordered by win–loss record</caption>
           <thead>
             <tr>
               <th>Team</th>
@@ -2488,7 +2489,7 @@ function TeamStats({ league: l }) {
             </tr>
           </thead>
           <tbody>
-            {teamsInLotteryOrder(s,s?.serverNow).map(t => {
+            {rankedTeams.map(t => {
               const games = s.games.filter(g =>
                 g.stage === "final" && [g.away, g.home].includes(t.id)
               );

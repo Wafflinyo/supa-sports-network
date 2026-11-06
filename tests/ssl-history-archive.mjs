@@ -36,6 +36,8 @@ assert.equal(historyOverview(other).playoffs,1);
 assert.equal(historyRegularStandings(other).find(t=>t.id==='t1').wins,1);
 const rows=historyTeamStats(other,'regular');
 assert.equal(rows.length,12,'Every team must appear in historical team stats even at 0-0');
+assert.equal(rows[0].id,'t1','Best win-loss record must head archived team stats');
+assert.equal(rows.at(-1).id,'t2','A losing team must follow every unbeaten or unplayed team');
 assert.equal(rows.find(t=>t.id==='t1').totals.hits,2);
 assert.equal(rows.find(t=>t.id==='t1').gp,1,'Never count unreleased or playoff matches in regular stats');
 assert.equal(rows.find(t=>t.id==='t1').runsFor,6);
@@ -75,5 +77,7 @@ assert(!archive.includes('releasePreseasonReport'),'Archive must never release r
 assert(!archive.includes('savePreseasonReport'),'Archive must never modify game reports');
 assert(!archive.includes('league.act('),'Archive cannot mutate league state');
 assert(league.includes('<HistoryArchive seasons={l.seasons} supabase={l.supabase}/>'));
+assert.match(league,/const rankedTeams = standings\(s\);/,'Current Team Stats must follow standings order');
+assert.match(league,/\{rankedTeams\.map\(t => \{/,'Both Team Stats views must render record-ranked teams');
 assert(league.includes('CAREER LEAGUE RECORDS'),'Existing cross-season records tab remains');
 console.log('PASS: season-aware, read-only SSL History covering draft/preseason/standings/teams/players/box scores/playoffs/trades/awards/news with no private reports');
