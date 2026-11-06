@@ -39,6 +39,8 @@ jobs:
       - run: node tests/lottery-timing.mjs
       - run: node tests/matchup-display.mjs
       - run: node tests/trade-negotiation.mjs
+      - run: node tests/trade-block.mjs
+      - run: node tests/game-point-column-visibility.mjs
       - run: npm run build
         env:
           GITHUB_PAGES_BASE: /${{ github.event.repository.name }}/

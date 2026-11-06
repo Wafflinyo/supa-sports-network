@@ -19,5 +19,11 @@ assert.match(preseason,/const columns=visibleGamePointFields\(statGroups\[catego
 assert.match(main,/const visibleStatColumns=visibleGamePointFields\(statGroups\[statTab\],statView\)/);
 assert.match(main,/visibleStatColumns\.map/);
 assert.match(season,/const keys=visibleGamePointFields\(allKeys,view\)/);
-assert.match(season,/visibleGamePointFields\(allKeys,view\)\.filter\(k=>k!=='tgp'&&k!=='agp'\)/);
-console.log('Player Game Points remain view-specific; Team Stats omit duplicate TGP/AGP columns.');
+assert.match(season,/const keys=visibleGamePointFields\(allKeys,view\);/);
+assert(!main.includes("['gameScore','Game Score']")&& !preseason.includes("['gameScore','Game Score']"),
+  'Do not leave Game Score as a separate statistics column');
+assert(main.includes("'Game Points': [")&&preseason.includes("'Game Points': ["),
+  'Game Points replaces the old Game Score category');
+assert(season.includes("tgp:'TGP',agp:'AGP'"),
+  'Team Stats replace Game Score with TGP or AGP in the corresponding view');
+console.log('PASS: Player, preseason and team tables display exclusive TGP/AGP without duplicate Game Score columns.');

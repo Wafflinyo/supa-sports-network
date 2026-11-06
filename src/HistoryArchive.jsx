@@ -14,6 +14,7 @@ import GameBoxScore from './GameBoxScore.jsx';
 import PreseasonStats from './PreseasonStats.jsx';
 import {leagueNews} from './league-news.js';
 import {sortTeamStatRows} from './team-stats-table-sort.js';
+import {visibleGamePointFields} from './game-point-columns.js';
 import {playerCurrentTeamName} from './player-current-team.js';
 import {historySeasons,historyOverview,historyRegularStandings,historyTeamStats,historyPlayerStats,
   historySchedule,historyTradeGroups} from './history-archive-data.js';
@@ -161,7 +162,7 @@ function ArchiveStandings({season,supabase}){
   </ArchivePanel>;
 }
 const teamFields=[['hits','H'],['homeRuns','HR'],['rbi','RBI'],['pitchStrikeouts','K'],
-  ['ogp','OGP'],['dgp','DGP'],['pgp','PGP'],['itemScore','Item'],['tgp','Game Score']];
+  ['ogp','OGP'],['dgp','DGP'],['pgp','PGP'],['itemScore','Item'],['tgp','TGP']];
 function ArchiveTeams({season,supabase}){
   const [phase,setPhase]=useState('regular');
   const [view,setView]=useState('Totals');
@@ -189,7 +190,7 @@ function ArchiveTeams({season,supabase}){
     <div className="ssl-history-table-wrap"><table className="ssl-history-team-stats-table">
       <thead><tr>{heading('name','Team')}{heading('gp','GP')}
         {heading('record','W–L')}{heading('runsFor','RF')}{heading('runsAgainst','RA')}
-        {teamFields.map(([key,label])=>heading(key,key==='tgp'&&view!=='Totals'?'Game Score/G':label))}</tr></thead>
+        {teamFields.map(([key,label])=>heading(key,key==='tgp'&&view!=='Totals'?'AGP':label))}</tr></thead>
       <tbody>{sorted.map(team=><tr key={team.id}><td><span className="ssl-history-team">
         <TeamMark team={team} supabase={supabase} size={28}/><strong>{team.name}</strong></span></td>
         <td>{team.gp}</td><td>{team.wins}–{team.losses}</td>
@@ -201,44 +202,60 @@ function ArchiveTeams({season,supabase}){
 
       </tr>)}</tbody>
     </table></div>
-    <p className="ssl-history-note">Default ordering uses win–loss record. Game Score/G is team Game Score divided by completed team games. W–L always displays total wins and losses.</p>
+    <p className="ssl-history-note">Default ordering uses win–loss record. TGP is the team Game Points total; AGP is that total divided by completed team games. W–L always displays total wins and losses.</p>
   </ArchivePanel>;
 }
-const pointCols=[['gamesPlayed','GP'],['gameScore','Game Score'],['ogp','OGP'],['dgp','DGP'],
-  ['pgp','PGP'],['itemScore','Item'],['tgp','TGP'],['agp','AGP']];
+const pointCols=[['gamesPlayed','GP'],['tgp','TGP'],['agp','AGP'],['ogp','OGP'],['dgp','DGP'],
+  ['pgp','PGP'],['itemScore','Item']];
 const groupCols={'Game Points':pointCols,'Batting':statColumns['Offensive Stats'],
   'Fielding':statColumns['Defensive Stats'],'Pitching':statColumns['Pitching Stats']};
 const rates=new Set(['battingAverage','onBase','slug','onBasePlusSlug','starSlug','era7','era9',
   'whip','baAgainst','obAgainst','slgAgainst','opsAgainst']);
 function ArchivePlayers({season}){
   const [phase,setPhase]=useState('regular'),[group,setGroup]=useState('Game Points'),
+    [view,setView]=useState('Totals'),
     [search,setSearch]=useState(''),[sort,setSort]=useState('tgp'),[reverse,setReverse]=useState(true);
   const raw=useMemo(()=>historyPlayerStats(season,phase),[season,phase]);
   const rows=useMemo(()=>{
     const q=search.trim().toLowerCase();
+    const valueFor=(stats,key)=>{
+      if(view==='Totals'||key==='gamesPlayed'||rates.has(key)||key==='agp')return stats[key]??0;
+      const gp=Number(stats.gamesPlayed)||0;
+      return gp>0?(Number(stats[key]||0)/gp):null;
+    };
     return Object.entries(raw).filter(([id])=>!q||person(id).toLowerCase().includes(q)||
       playerCurrentTeamName(season,id).toLowerCase().includes(q))
       .sort((a,b)=>{
-        const av=sort==='name'?person(a[0]):sort==='team'?playerCurrentTeamName(season,a[0]):a[1][sort]??0;
-        const bv=sort==='name'?person(b[0]):sort==='team'?playerCurrentTeamName(season,b[0]):b[1][sort]??0;
-        const comp=typeof av==='number'&&typeof bv==='number'?av-bv:String(av).localeCompare(String(bv));
+        const av=sort==='name'?person(a[0]):sort==='team'?playerCurrentTeamName(season,a[0]):valueFor(a[1],sort);
+        const bv=sort==='name'?person(b[0]):sort==='team'?playerCurrentTeamName(season,b[0]):valueFor(b[1],sort);
+        if(av==null&&bv!=null)return 1;
+        if(bv==null&&av!=null)return -1;
+        const comp=typeof av==='number'&&typeof bv==='number'?av-bv:String(av??'').localeCompare(String(bv??''));
         return (reverse?-comp:comp)||person(a[0]).localeCompare(person(b[0]));
       });
-  },[raw,search,sort,reverse,season]);
-  const fields=(groupCols[group]||[]).filter(([key])=>key!=='positionsPlayed');
+  },[raw,search,sort,reverse,season,view]);
+  const fields=visibleGamePointFields(
+    (groupCols[group]||[]).filter(([key])=>key!=='positionsPlayed'),
+    view==='Totals'?'Totals':'Averages per Game');
   const show=(stats,key)=>{
-    const value=stats[key];
-    if(value==null)return key==='agp'||rates.has(key)?'—':'0';
+    const gp=Number(stats.gamesPlayed)||0;
+    const average=view==='Per Game'&&key!=='gamesPlayed'&&key!=='agp'&&!rates.has(key);
+    const value=average?(gp>0?Number(stats[key]||0)/gp:null):stats[key];
+    if(value==null)return '—';
     if(key==='gamesPlayed')return value;
-    return fmt(value,rates.has(key)?3:['ogp','dgp','pgp','itemScore','tgp','agp','gameScore'].includes(key)?2:0);
+    return fmt(value,rates.has(key)?3:average||['ogp','dgp','pgp','itemScore','tgp','agp'].includes(key)?2:0);
   };
   return <ArchivePanel title="Season player statistics"
-    detail="Complete season-only game totals. Team reflects the selected season's final roster; preseason player stats are in the Preseason tab.">
+    detail="Season-only totals and per-game statistics. Team reflects the selected season's final roster; preseason stats remain separate.">
     <PhaseSwitch value={phase} onChange={setPhase}/>
+    <div className="ssl-history-switch" role="group" aria-label="Archived player totals or averages">
+      {['Totals','Per Game'].map(option=><button type="button" key={option} className={view===option?'active':''}
+        aria-pressed={view===option} onClick={()=>{setView(option);setSort(option==='Totals'?'tgp':'agp');setReverse(true);}}>{option}</button>)}
+    </div>
     <div className="ssl-history-player-tools">
       <div className="ssl-history-switch" role="group" aria-label="Player statistics category">
         {Object.keys(groupCols).map(name=><button type="button" key={name} className={group===name?'active':''}
-          aria-pressed={group===name} onClick={()=>{setGroup(name);setSort(name==='Game Points'?'tgp':(groupCols[name]?.[1]?.[0]||'gamesPlayed'));setReverse(true)}}>{name}</button>)}
+          aria-pressed={group===name} onClick={()=>{setGroup(name);setSort(name==='Game Points'?(view==='Totals'?'tgp':'agp'):(groupCols[name]?.[1]?.[0]||'gamesPlayed'));setReverse(true)}}>{name}</button>)}
       </div>
       <input aria-label="Search archived players" type="search" value={search} onChange={e=>setSearch(e.target.value)}
         placeholder="Search players"/>
