@@ -268,7 +268,12 @@ function App() {
     if(page==='Voting'&&notificationTarget.focus==='ballot'&&notificationTarget.ballot)id='ssl-voting-'+notificationTarget.ballot;
     if(page==='Messages'&&notificationTarget.focus==='trade'&&notificationTarget.offerId)id='ssl-trade-'+notificationTarget.offerId;
     if(!id)return;
-    const frame=requestAnimationFrame(()=>document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'}));
+    const frame=requestAnimationFrame(()=>{
+      const target=document.getElementById(id);
+      const week=target?.closest('details.ssl-collapsible-week');
+      if(week)week.open=true;
+      target?.scrollIntoView({behavior:'smooth',block:'start'});
+    });
     return ()=>cancelAnimationFrame(frame);
   },[page,notificationTarget]);
   const logo = `${import.meta.env.BASE_URL}sluggers-supa-league-logo.svg`
