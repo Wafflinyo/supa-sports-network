@@ -111,9 +111,9 @@ assert(css.includes('.draft-my-team-panel[hidden]{display:none!important}'),
 assert(draft.includes('if(await l.act(\'pick\',{player:selected.id}))close();'),
  'commissioner can still submit on-clock pick with explicit confirmation');
 
-const summary=profile.match(/<dl className="career-summary">(.+?)<\\/dl>/s)?.[1];
+const summary=profile.split('<dl className="career-summary">')[1]?.split('</dl>')[0];
 assert(summary,'Career profile displays the summary cards');
-const summaryLabels=[...summary.matchAll(/\\['(YEARS AS A SLUGGER|CAREER [^']+|HOT GAMES|LONGEST HOT STREAK)'/g)].map(m=>m[1]);
+const summaryLabels=[...summary.matchAll(/\['(YEARS AS A SLUGGER|CAREER [^']+|HOT GAMES|LONGEST HOT STREAK)'/g)].map(m=>m[1]);
 assert.equal(summaryLabels.length,10,'Career profile must have 10 summary cards (five pairs)');
 assert(!summaryLabels.includes('CAREER GAME SCORE'),'Duplicate Game Score card should be removed; Career TGP remains');
 assert(summaryLabels.includes('CAREER TGP'),'Career TGP is retained');
