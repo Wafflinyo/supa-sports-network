@@ -1,17 +1,20 @@
 import assert from 'node:assert/strict';
 import {GM_ACHIEVEMENTS,earnedAchievements,achievementProgress} from '../src/gm-achievements.js';
 const badges=GM_ACHIEVEMENTS;
-assert.equal(badges.length,93);
-assert.equal(new Set(badges.map(b=>b.id)).size,93);
+assert.equal(badges.length,94);
+assert.equal(new Set(badges.map(b=>b.id)).size,94);
 assert.equal(badges.find(b=>b.id==='winning-perfect')?.name,'Perfect Season');
 assert.equal(badges.filter(b=>b.category==='Wins').length,7);
-assert.equal(badges.filter(b=>b.category==='Offense').length,25);
+assert.equal(badges.filter(b=>b.category==='Offense').length,26);
 assert.equal(badges.filter(b=>b.category==='Defense').length,34);
 assert.equal(badges.filter(b=>b.category==='Pitching').length,7);
 assert.equal(badges.filter(b=>b.category==='Playoffs').length,6);
 assert.equal(badges.filter(b=>b.category==='Front Office').length,7);
 assert.equal(badges.filter(b=>b.category==='Season Honors').length,6);
 assert.equal(badges.filter(b=>b.category==='Preseason').length,1);
+assert.deepEqual(badges.filter(b=>b.group==='game-homer').map(b=>b.threshold),[1,3,5,7,10,12]);
+assert.equal(badges.find(b=>b.id==='game-homer-12')?.name,'Dozen Homers');
+assert.equal(badges.find(b=>b.id==='game-homer-12')?.tier,'Legendary');
 assert.deepEqual(badges.filter(b=>b.group==='player-putouts').map(b=>b.threshold),[5,8,10,12,15,18,20]);
 assert.deepEqual(badges.filter(b=>b.group==='player-assists').map(b=>b.threshold),[5,8,10,12,15,18,20]);
 
@@ -43,6 +46,17 @@ assert(!has('winning-5').earned);
 assert(has('season-homer-1').earned);
 assert(has('game-homer-1').earned);
 assert(!has('game-homer-3').earned,'3HR means a single three-run homer');
+assert(!has('game-homer-12').earned,'one home run cannot earn the 12-HR award');
+const dozen=structuredClone(first);
+dozen.result.players[0].stats.homeRuns=7;
+dozen.result.players[1].stats.homeRuns=5;
+dozen.result.scores.knights=12;
+const eleven=structuredClone(dozen);
+eleven.result.players[1].stats.homeRuns=4;
+assert(earnedAchievements([{...season,games:[dozen]}],1)
+  .find(b=>b.id==='game-homer-12').earned,'12 team home runs in one game earns Dozen Homers');
+assert(!earnedAchievements([{...season,games:[eleven]}],1)
+  .find(b=>b.id==='game-homer-12').earned,'11 team home runs cannot earn Dozen Homers');
 assert(has('player-putouts-12').earned);
 assert(!has('player-putouts-15').earned);
 assert(has('player-assists-12').earned);
@@ -197,4 +211,4 @@ const unfinished=structuredClone(honors);
 unfinished.games[0].stage='recorded';
 assert(!earnedAchievements([unfinished],1).find(b=>b.id==='honors-first-seed').earned,
  'unfinished league cannot award season leadership');
-console.log('PASS: 93 once-only lifetime GM achievements, trades, accepted renewals, full season honors, playoffs and Rio stats');
+console.log('PASS: 94 once-only lifetime GM achievements, trades, accepted renewals, full season honors, playoffs and Rio stats');
