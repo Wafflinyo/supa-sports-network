@@ -10,7 +10,7 @@ import {heatingUpCareer} from './heating-up.js'
 import {HeatMark} from './HeatingUpBadge.jsx'
 
 const groups = [
-  ['Game Points', [['agp','AGP (Average Game Points)',2],['ogp','OGP / Game',2],['dgp','DGP / Game',2],['pgp','PGP / Game',2],['tgp','TGP / Game',2],['gameScore','Game Score / Game',2]]],
+  ['Game Points', [['agp','AGP (Average Game Points)',2],['ogp','OGP / Game',2],['dgp','DGP / Game',2],['pgp','PGP / Game',2]]],
   ['Batting', [['battingAverage','Batting Average',3],['onBase','On-Base %',3],['slug','Slugging %',3],['onBasePlusSlug','OPS',3],['hits','Hits / Game',2],['homeRuns','Home Runs / Game',2],['rbi','RBIs / Game',2],['runs','Runs / Game',2]]],
   ['Fielding', [['putouts','Putouts / Game',2],['assists','Assists / Game',2]]],
   ['Pitching', [['pitchStrikeouts','Strikeouts / Game',2],['era7','ERA (7 Innings)',2]]],
