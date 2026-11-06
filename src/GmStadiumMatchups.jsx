@@ -1,4 +1,5 @@
-import React,{useEffect,useState} from 'react';
+import React,{useEffect,useState,useRef} from 'react';
+import {groupScheduleWeeks,firstExpandedWeek,ScheduleWeekControls,ScheduleWeekGroup} from './ScheduleWeekGroups.jsx';
 import {homeStadium} from './matchup-display.js';
 import {homeGames,homeOpponent,supportsStadiumVariant,canEditStadiumVariant} from './stadium-lighting.js';
 import {Sun,Moon,CheckCircle2,MapPin,LockKeyhole} from 'lucide-react';
@@ -63,8 +64,11 @@ function MatchupSetting({league:l,game,teamId,stadium}){
 }
 export default function GmStadiumMatchups({league:l}){
   const s=l.season,team=l.myTeam;
+  const weekListRef=useRef(null);
   if(!s||!team)return <section className="panel season-box"><h2>HOME MATCHUPS · DAY / NIGHT</h2><p>Your home games will appear after the draft and schedule are generated.</p></section>;
   const games=homeGames(s,team.id);
+  const weekGroups=groupScheduleWeeks(games);
+  const expandedWeek=firstExpandedWeek(weekGroups,game=>game.stage==='scheduled'&&!game.lockedAt);
   const stadium=homeStadium(s,team.id);
   const selectable=supportsStadiumVariant(stadium);
   const upcoming=games.filter(g=>g.stage==='scheduled'&&!g.lockedAt);
@@ -82,7 +86,12 @@ export default function GmStadiumMatchups({league:l}){
       {missing>0&&<b>{missing} NEED{missing===1?'S':''} A SELECTION</b>}
     </div>}
     {games.length===0?<p className="gm-stadium-empty">No home matchups have been generated yet. They'll appear here as soon as the commissioner creates the schedule.</p>:
-      <div className="gm-stadium-games">{games.map(game=><MatchupSetting key={game.id} league={l} game={game} stadium={stadium} teamId={team.id}/>)}</div>}
+      <div className="gm-stadium-games ssl-week-collection" ref={weekListRef}>
+        <ScheduleWeekControls containerRef={weekListRef}/>
+        {weekGroups.map(group=><ScheduleWeekGroup key={group.key} group={group} initiallyOpen={group.key===expandedWeek}>
+          {group.games.map(game=><MatchupSetting key={game.id} league={l} game={game} stadium={stadium} teamId={team.id}/>)}
+        </ScheduleWeekGroup>)}
+      </div>}
     <p className="gm-stadium-help">Only the home-team GM can save these choices. The public Schedule automatically shows the selected version but has no edit controls. Choices lock when the game is officially locked or recorded.</p>
   </section>;
 }
