@@ -47,7 +47,7 @@ jobs:
       - name: Record built website asset for publishing verification
         id: bundle
         run: |
-          ASSET=$(grep -oE 'assets/index-[^"]+\\.js' dist/index.html | head -n 1)
+          ASSET=$(grep -oE 'assets/index-[^"]+[.]js' dist/index.html | head -n 1)
           test -n "$ASSET"
           echo "asset=$ASSET" >> "$GITHUB_OUTPUT"
       - uses: actions/configure-pages@v5
