@@ -161,7 +161,7 @@ function ArchiveStandings({season,supabase}){
   </ArchivePanel>;
 }
 const teamFields=[['hits','H'],['homeRuns','HR'],['rbi','RBI'],['pitchStrikeouts','K'],
-  ['ogp','OGP'],['dgp','DGP'],['pgp','PGP'],['itemScore','Item'],['tgp','TGP']];
+  ['ogp','OGP'],['dgp','DGP'],['pgp','PGP'],['itemScore','Item'],['tgp','Game Score']];
 function ArchiveTeams({season,supabase}){
   const [phase,setPhase]=useState('regular');
   const [view,setView]=useState('Totals');
@@ -189,7 +189,7 @@ function ArchiveTeams({season,supabase}){
     <div className="ssl-history-table-wrap"><table className="ssl-history-team-stats-table">
       <thead><tr>{heading('name','Team')}{heading('gp','GP')}
         {heading('record','W–L')}{heading('runsFor','RF')}{heading('runsAgainst','RA')}
-        {teamFields.map(([key,label])=>heading(key,label))}{heading('agp','AGP')}</tr></thead>
+        {teamFields.map(([key,label])=>heading(key,key==='tgp'&&view!=='Totals'?'Game Score/G':label))}</tr></thead>
       <tbody>{sorted.map(team=><tr key={team.id}><td><span className="ssl-history-team">
         <TeamMark team={team} supabase={supabase} size={28}/><strong>{team.name}</strong></span></td>
         <td>{team.gp}</td><td>{team.wins}–{team.losses}</td>
@@ -198,10 +198,10 @@ function ArchiveTeams({season,supabase}){
         {teamFields.map(([key])=><td key={key}>{view==='Totals'
           ?fmt(team.totals[key],['ogp','dgp','pgp','tgp','itemScore'].includes(key)?2:0)
           :team.gp?fmt(team.totals[key]/team.gp,2):'—'}</td>)}
-        <td><strong>{team.agp===null?'—':fmt(team.agp,2)}</strong></td>
+
       </tr>)}</tbody>
     </table></div>
-    <p className="ssl-history-note">Default ordering uses win–loss record. AGP is team total Game Points divided by completed team games. W–L always displays total wins and losses.</p>
+    <p className="ssl-history-note">Default ordering uses win–loss record. Game Score/G is team Game Score divided by completed team games. W–L always displays total wins and losses.</p>
   </ArchivePanel>;
 }
 const pointCols=[['gamesPlayed','GP'],['gameScore','Game Score'],['ogp','OGP'],['dgp','DGP'],
