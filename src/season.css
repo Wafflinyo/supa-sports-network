@@ -901,3 +901,13 @@ details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
   .ssl-future-picks-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:380px){.ssl-future-picks-grid{grid-template-columns:1fr}}
+
+
+/* Team statistics: every table header acts as an accessible sort control. */
+.ssl-team-stats-table th{white-space:nowrap}
+.ssl-team-stats-table .team-stats-sort{display:inline-flex;align-items:center;justify-content:flex-end;gap:7px;width:100%;border:0;background:transparent;color:inherit;text-transform:inherit;font:inherit;font-weight:900;text-align:right;white-space:nowrap;cursor:pointer;padding:2px 0}
+.ssl-team-stats-table .team-stats-sort:hover{color:#fbd044}
+.ssl-team-stats-table .team-stats-sort:focus-visible{outline:3px solid #fbd044;outline-offset:4px}
+.ssl-team-stats-table .team-stats-sort-arrow{font:900 14px/1 system-ui,sans-serif;color:#fbd044}
+.ssl-team-stats-table th[aria-sort="none"] .team-stats-sort-arrow{color:#a7b5cd;opacity:.8}
+.ssl-team-stats-table th:first-child .team-stats-sort{justify-content:flex-start;text-align:left}
