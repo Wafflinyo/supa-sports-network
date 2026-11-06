@@ -120,6 +120,15 @@ export function matchupType(season,game){
   if(!a?.conference||!b?.conference)return 'Conference Pending';
   return a.conference===b.conference?'In Conference Matchup':'Out of Conference Matchup';
 }
+// Shared record ordering: winning percentage, run differential, then fewer runs allowed.
+// Used for both the standings and the current/historical Team Stats tables.
+export function compareTeamRecords(a,b) {
+  const apct=(a.wins+a.losses)?a.wins/(a.wins+a.losses):0;
+  const bpct=(b.wins+b.losses)?b.wins/(b.wins+b.losses):0;
+  return bpct-apct ||
+    (b.runsFor-b.runsAgainst)-(a.runsFor-a.runsAgainst) ||
+    a.runsAgainst-b.runsAgainst;
+}
 export function standings(season) {
   return (season?.teams || [])
     .map((t) => {
@@ -150,12 +159,7 @@ export function standings(season) {
         pct: wins + losses ? wins / (wins + losses) : 0,
       };
     })
-    .sort(
-      (a, b) =>
-        b.pct - a.pct ||
-        b.runsFor - b.runsAgainst - (a.runsFor - a.runsAgainst) ||
-        a.runsAgainst - b.runsAgainst,
-    );
+    .sort(compareTeamRecords);
 }
 const normalize = (x) =>
   String(x ?? "")
