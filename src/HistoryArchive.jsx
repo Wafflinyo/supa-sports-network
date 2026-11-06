@@ -249,7 +249,7 @@ function ArchivePlayers({season}){
         <button type="button" onClick={()=>{setSort('name');setReverse(v=>sort==='name'?!v:false)}}> SORT</button>
       </th><th><button type="button" className="ssl-history-col-sort"
         onClick={()=>{setReverse(sort==='team'?!reverse:false);setSort('team')}}>
-        Season Team{sort==='team'?(reverse?' ▼':' ▲'):''}</button></th>{fields.map(([key,label])=><th key={key}><button type="button"
+        Team{sort==='team'?(reverse?' ▼':' ▲'):''}</button></th>{fields.map(([key,label])=><th key={key}><button type="button"
         className="ssl-history-col-sort" onClick={()=>{setReverse(sort===key?!reverse:true);setSort(key)}}>{label}{sort===key?(reverse?' ▼':' ▲'):''}</button></th>)}</tr></thead>
       <tbody>{rows.map(([id,stats])=><tr key={id}>
         <td className="ssl-history-sticky"><span className="ssl-history-player-name">
