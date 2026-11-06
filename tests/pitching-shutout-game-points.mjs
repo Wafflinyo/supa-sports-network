@@ -121,11 +121,11 @@ for(const game of preseasonGames){
 for(const path of ['src/PreseasonStats.jsx','src/main.jsx','src/temporary-stat-columns.json']){
   const contents=readFileSync(new URL('../'+path,import.meta.url),'utf8');
   assert.match(contents,/combinedShutouts/,'Pitching stats must show combined shutout appearances: '+path);
-  assert.match(contents,/shutoutBonus/,'Pitching stats must show shutout points: '+path);
+  assert.doesNotMatch(contents,/shutoutBonus/,'Shutout bonus is still scored but its column should be hidden: '+path);
 }
 const viewer=readFileSync(new URL('../src/GameBoxScore.jsx',import.meta.url),'utf8');
 assert.match(viewer,/columns\['Pitching Stats'\]/);
-assert.match(viewer,/shutoutBonus/);
+assert.doesNotMatch(viewer,/shutoutBonus/,'Box score should not expose redundant shutout bonus column');
 const migration=readFileSync(new URL('../supabase/migrations/20261103024000_ssl_pitching_shutout_points.sql',import.meta.url),'utf8');
 assert.match(migration,/shutout_expected/);
 assert.match(migration,/team_runs/);
