@@ -14,6 +14,7 @@ import GameBoxScore from './GameBoxScore.jsx';
 import PreseasonStats from './PreseasonStats.jsx';
 import {leagueNews} from './league-news.js';
 import {sortTeamStatRows} from './team-stats-table-sort.js';
+import {playerCurrentTeamName} from './player-current-team.js';
 import {historySeasons,historyOverview,historyRegularStandings,historyTeamStats,historyPlayerStats,
   historySchedule,historyTradeGroups} from './history-archive-data.js';
 import './history-archive.css';
@@ -215,14 +216,15 @@ function ArchivePlayers({season}){
   const raw=useMemo(()=>historyPlayerStats(season,phase),[season,phase]);
   const rows=useMemo(()=>{
     const q=search.trim().toLowerCase();
-    return Object.entries(raw).filter(([id])=>!q||person(id).toLowerCase().includes(q))
+    return Object.entries(raw).filter(([id])=>!q||person(id).toLowerCase().includes(q)||
+      playerCurrentTeamName(season,id).toLowerCase().includes(q))
       .sort((a,b)=>{
-        const av=sort==='name'?person(a[0]):a[1][sort]??0;
-        const bv=sort==='name'?person(b[0]):b[1][sort]??0;
+        const av=sort==='name'?person(a[0]):sort==='team'?playerCurrentTeamName(season,a[0]):a[1][sort]??0;
+        const bv=sort==='name'?person(b[0]):sort==='team'?playerCurrentTeamName(season,b[0]):b[1][sort]??0;
         const comp=typeof av==='number'&&typeof bv==='number'?av-bv:String(av).localeCompare(String(bv));
         return (reverse?-comp:comp)||person(a[0]).localeCompare(person(b[0]));
       });
-  },[raw,search,sort,reverse]);
+  },[raw,search,sort,reverse,season]);
   const fields=(groupCols[group]||[]).filter(([key])=>key!=='positionsPlayed');
   const show=(stats,key)=>{
     const value=stats[key];
@@ -231,7 +233,7 @@ function ArchivePlayers({season}){
     return fmt(value,rates.has(key)?3:['ogp','dgp','pgp','itemScore','tgp','agp','gameScore'].includes(key)?2:0);
   };
   return <ArchivePanel title="Season player statistics"
-    detail="Complete season-only game totals. Preseason player stats are in the Preseason tab.">
+    detail="Complete season-only game totals. Team reflects the selected season's final roster; preseason player stats are in the Preseason tab.">
     <PhaseSwitch value={phase} onChange={setPhase}/>
     <div className="ssl-history-player-tools">
       <div className="ssl-history-switch" role="group" aria-label="Player statistics category">
@@ -245,12 +247,15 @@ function ArchivePlayers({season}){
     <div className="ssl-history-table-wrap" role="region" aria-label="Historical player statistics" tabIndex={0}>
       <table><thead><tr><th className="ssl-history-sticky">Player
         <button type="button" onClick={()=>{setSort('name');setReverse(v=>sort==='name'?!v:false)}}> SORT</button>
-      </th>{fields.map(([key,label])=><th key={key}><button type="button"
+      </th><th><button type="button" className="ssl-history-col-sort"
+        onClick={()=>{setReverse(sort==='team'?!reverse:false);setSort('team')}}>
+        Season Team{sort==='team'?(reverse?' ▼':' ▲'):''}</button></th>{fields.map(([key,label])=><th key={key}><button type="button"
         className="ssl-history-col-sort" onClick={()=>{setReverse(sort===key?!reverse:true);setSort(key)}}>{label}{sort===key?(reverse?' ▼':' ▲'):''}</button></th>)}</tr></thead>
       <tbody>{rows.map(([id,stats])=><tr key={id}>
         <td className="ssl-history-sticky"><span className="ssl-history-player-name">
           {players.has(String(id))&&<PlayerPortrait player={players.get(String(id))} size={29}/>}
           <strong>{person(id)}</strong></span></td>
+        <td>{playerCurrentTeamName(season,id)}</td>
         {fields.map(([key])=><td key={key}>{show(stats,key)}</td>)}</tr>)}
       </tbody></table>
     </div>
