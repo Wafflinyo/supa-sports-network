@@ -16,6 +16,7 @@ import {orderedDraftPickTeams,lotteryOrderReady,teamsInLotteryOrder} from './dra
 import DraftOrderBoard from './DraftOrderBoard.jsx';
 import {BingoLottery} from './BingoLottery.jsx';
 import {matchupDisplay} from './matchup-display.js';
+import {groupScheduleWeeks,firstExpandedWeek,ScheduleWeekControls,ScheduleWeekGroup} from './ScheduleWeekGroups.jsx';
 import {supportsStadiumVariant,matchupStadiumVariant} from './stadium-lighting.js';
 import DraftChat from './DraftChat.jsx';
 import {heatingUpForSeason,HEATING_UP_THRESHOLD} from './heating-up.js';
@@ -1078,13 +1079,18 @@ export function RosterManager({ league: l, focus=null }) {
   const [team,setTeam]=useActingTeam(l);
   const [editDefault,setEditDefault]=useState(false);
   const [editingGame,setEditingGame]=useState(null);
+  const fixtureWeeksRef=useRef(null);
   useEffect(()=>{setEditDefault(false);setEditingGame(null)},[s?.id,team]);
   useEffect(()=>{
     if(!focus||!team||!s)return;
     if(focus.focus==='game'&&teamGameLineups(s,team).some(g=>String(g.id)===String(focus.gameId))){setEditingGame(focus.gameId);setEditDefault(false)}
     if(focus.focus==='default'){setEditDefault(true);setEditingGame(null)}
     const id=focus.focus==='game'?'ssl-game-lineup-'+focus.gameId:focus.focus==='default'?'ssl-default-lineup':'ssl-roster-players';
-    const frame=requestAnimationFrame(()=>document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'}));
+    const frame=requestAnimationFrame(()=>{
+      const target=document.getElementById(id);
+      target?.closest('details.ssl-collapsible-week')?.setAttribute('open','');
+      target?.scrollIntoView({behavior:'smooth',block:'start'});
+    });
     return ()=>cancelAnimationFrame(frame);
   },[focus?.requestId,team,s?.id]);
   if(!s)return <Box title="ROSTER"><p>No season has been created yet. Team rosters will appear after the draft starts.</p></Box>;
@@ -1094,6 +1100,8 @@ export function RosterManager({ league: l, focus=null }) {
   const canEditDefault=playable && roster.length>=11;
   const hasDefault=team&&validLineup(s,team,s.defaults?.[team]);
   const fixtures=team?teamGameLineups(s,team):[];
+  const fixtureWeeks=groupScheduleWeeks(fixtures.filter(g=>g.stage!=='cancelled'));
+  const firstFixtureWeek=firstExpandedWeek(fixtureWeeks,g=>gameLineupIsEditable(s,team,g));
   const ready=fixtures.filter(g=>gameLineupIsEditable(s,team,g));
   const defaultLineup=s.defaults?.[team];
   return <>
@@ -1127,7 +1135,10 @@ export function RosterManager({ league: l, focus=null }) {
       <Box title="UPCOMING GAME LINEUPS">
         <p>Select a scheduled game, then submit the nine starters, batting order, defensive positions and bench. Your saved lineup appears automatically in Schedule and replaces the default for that matchup only. You may edit it again until the game is locked by its result upload.</p>
         {!s.schedulePublished?<p><strong>The commissioner must publish the schedule before game-specific lineups can be submitted.</strong></p>:!fixtures.length?<p>No scheduled games for this franchise yet.</p>:<>
-          {fixtures.filter(g=>g.stage!=='cancelled').map(g=>{
+          <div className="ssl-week-collection" ref={fixtureWeeksRef}>
+            <ScheduleWeekControls containerRef={fixtureWeeksRef}/>
+            {fixtureWeeks.map(group=><ScheduleWeekGroup key={group.key} group={group} initiallyOpen={group.key===firstFixtureWeek}>
+              {group.games.map(g=>{
             const editable=gameLineupIsEditable(s,team,g);
             const opponent=s.teams.find(t=>t.id===(g.away===team?g.home:g.away));
             const existing=effectiveGameLineup(s,team,g);
@@ -1142,7 +1153,9 @@ export function RosterManager({ league: l, focus=null }) {
               {active&&editable&&<><OpponentScout season={s} team={team} game={g}/><LineupEditor key={s.id+':'+team+':'+g.id} league={l} team={team} game={g} onDone={()=>setEditingGame(null)}/></>}
               {!editable&&<p className="roster-lock-status">{g.stage==='recorded'||g.stage==='final'||g.lockedAt?'Lineup locked after result upload.':'Lineup edits are unavailable for this game.'}</p>}
             </section>;
-          })}
+              })}
+            </ScheduleWeekGroup>)}
+          </div>
         </>}
       </Box>
     </>}
@@ -1250,6 +1263,7 @@ function Schedule({ league: l, commissioner = false }) {
     [reportGame, setReportGame] = useState(null),
     [boxGameId, setBoxGameId] = useState(null),
     [team, setTeam] = useActingTeam(l);
+  const weekListRef=useRef(null);
   const closeBox=useCallback(()=>setBoxGameId(null),[]);
   if (!s)
     return (
@@ -1264,6 +1278,8 @@ function Schedule({ league: l, commissioner = false }) {
       (a.startsAt?new Date(a.startsAt).getTime():0)-(b.startsAt?new Date(b.startsAt).getTime():0)||
       String(a.id).localeCompare(String(b.id))
     );
+  const weekGroups=groupScheduleWeeks(games);
+  const expandedWeek=firstExpandedWeek(weekGroups);
   const selectedBoxGame=boxGameId==null?null:s.games.find(g=>String(g.id)===String(boxGameId));
   const currentBoxScore=selectedBoxGame?seasonBoxScore(s,selectedBoxGame.stage==='recorded'&&admin
     ?{...selectedBoxGame,stage:'final',label:'COMMISSIONER PRIVATE PREVIEW · '+(selectedBoxGame.label||'GAME REPORT')}
@@ -1398,10 +1414,10 @@ function Schedule({ league: l, commissioner = false }) {
           <p>The commissioner is preparing the schedule.</p>
         </Box>
       ) : (
-        games.map((g,i) => (
-          <React.Fragment key={g.id}>
-          {g.week && (i===0 || games[i-1].week!==g.week) && <h2 className="schedule-week-heading">WEEK {g.week} <small>· SIX MATCHUPS</small></h2>}
-          <section className="panel season-game" id={'ssl-schedule-game-'+g.id} style={{scrollMarginTop:125}}>
+        <div className="ssl-week-collection" ref={weekListRef}>
+          <ScheduleWeekControls containerRef={weekListRef}/>
+          {weekGroups.map(group=><ScheduleWeekGroup key={group.key} group={group} initiallyOpen={group.key===expandedWeek}>
+            {group.games.map(g=><section key={g.id} className="panel season-game" id={'ssl-schedule-game-'+g.id} style={{scrollMarginTop:125}}>
             <div>
               <small className="ssl-matchup-week-label">
                 {g.postponed ? "POSTPONED · " : ""}
@@ -1504,9 +1520,9 @@ function Schedule({ league: l, commissioner = false }) {
                 onDone={() => setEditing(null)}
               />
             )}
-          </section>
-          </React.Fragment>
-        ))
+            </section>)}
+          </ScheduleWeekGroup>)}
+        </div>
       )}
       {admin&&selectedReportGame&&<RioReportDialog title="PROJECT RIO · GAME FILE REVIEW"
         subtitle={(s.teams.find(t=>t.id===selectedReportGame.away)?.name||'Away')+' @ '+(s.teams.find(t=>t.id===selectedReportGame.home)?.name||'Home')}
