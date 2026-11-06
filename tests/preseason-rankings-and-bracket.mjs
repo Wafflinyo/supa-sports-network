@@ -478,8 +478,9 @@ const season2={...season,preseasonResults:[],games:[{id:'opener',phase:'regular'
 assert(preseasonHasLeagueOpener(season2),'first published regular game moves rankings to Teams tab');
 assert.equal(powerRankings(season2).length,12,'live regular-season power rankings remain available');
 assert.equal(powerRankings(season2).find(x=>x.id==='t1').games,1);
-assert.equal(powerRankings(season2).find(x=>x.id==='t1').formWeight,7.5);
-assert.equal(powerRankings(season2).find(x=>x.id==='t3').formWeight,0);
+assert.equal(powerRankings(season2).find(x=>x.id==='t1').performanceWeight,0,
+  'A score-only game must not add a game-points category influence');
+assert.equal(powerRankings(season2).find(x=>x.id==='t3').performanceWeight,0);
 const badgesStill=earnedAchievements([season2],1);
 assert(!badgesStill.find(b=>b.id===championBadge).earned,
  'no tournament badge is awarded from a league game instead of preseason bracket');
