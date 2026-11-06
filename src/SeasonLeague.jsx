@@ -10,6 +10,7 @@ import {inningScoringDrama} from './rio-inning-scores.js';
 import RioReportDialog from './RioReportDialog.jsx';
 import PreseasonStats from './PreseasonStats.jsx';
 import NextSeasonDraftPicks from './NextSeasonDraftPicks.jsx';
+import TradeBlockListings from './TradeBlockListings.jsx';
 import HistoryArchive from './HistoryArchive.jsx';
 import {preseasonReady} from './preseason.js';
 import {lotteryProgress,lotteryReplayProgress,lotteryDuration,lotteryCountdownClock} from './lottery-timing.js';
@@ -1911,7 +1912,7 @@ function TradeConversation({league:l,offer,teamName}){
     </>}
   </section>;
 }
-function Trades({ league: l, messages = false, commissionerTools = false }) {
+function Trades({ league: l, messages = false, commissionerTools = false, view = 'all', initialOffer = null }) {
   const s = l.season,
     [team, setTeam] = useActingTeam(l),
     [participants, setParticipants] = useState([]),
@@ -1930,9 +1931,19 @@ function Trades({ league: l, messages = false, commissionerTools = false }) {
     setMoves([]);
     setCounter(null);
   }, [team, s?.id]);
+  useEffect(()=>{
+    if(!initialOffer||!s||team!==initialOffer.team)return;
+    setParticipants(initialOffer.teams);
+    setMoves(initialOffer.moves);
+    setNote('');
+    setCounter(null);
+  },[initialOffer?.version,team,s?.id]);
+  useEffect(()=>{
+    if(initialOffer?.team&&l.access.role==='commissioner'&&initialOffer.team!==team)setTeam(initialOffer.team);
+  },[initialOffer?.version]);
   if (!s)
     return (
-      <Box title="TRANSACTIONS">
+      <Box title="TRADE PROPOSALS">
         <p>No season yet.</p>
       </Box>
     );
@@ -1964,10 +1975,10 @@ function Trades({ league: l, messages = false, commissionerTools = false }) {
     <>
       {commissionerTools && admin &&
         <CommissionerTradeOverview league={l} teamName={teamName} showMoves={showMoves}/>}
-      {can && (
+      {can && view!=='transactions' && (
         <>
           <details className={`trade-composer ${messages ? "inbox-composer" : "new-trade-composer"}`}
-            open={(!messages && !commissionerTools) || !!counter}>
+            open={(!messages && !commissionerTools) || !!counter || !!initialOffer}>
             <summary>{commissionerTools
               ? "COMMISSIONER · CREATE A TRADE FOR A TEAM"
               : counter?"EDIT EXISTING PROPOSAL":"WRITE A NEW TRADE OFFER"}</summary>
@@ -2119,7 +2130,7 @@ function Trades({ league: l, messages = false, commissionerTools = false }) {
                   </div>
                 ))}
                 <label>
-                  Note
+                  Message to all participating teams (optional)
                   <textarea
                     maxLength={1000}
                     aria-label="Trade note"
@@ -2159,7 +2170,7 @@ function Trades({ league: l, messages = false, commissionerTools = false }) {
             )}
           </Box>
           </details>
-          {!commissionerTools && <Box title="YOUR TRADE INBOX">
+          {!commissionerTools && <Box title="YOUR TRADE PROPOSALS & NEGOTIATIONS">
             {!l.inbox.length && <p>No offers yet.</p>}
             {l.inbox.map((o) => (
               <article className="season-offer" id={'ssl-trade-'+o.id} style={{scrollMarginTop:125}} key={o.id}>
@@ -2239,7 +2250,7 @@ function Trades({ league: l, messages = false, commissionerTools = false }) {
           </Box>}
         </>
       )}
-      <Box title="COMPLETED TRANSACTIONS">
+      {(view!=='proposals'||commissionerTools)&&<Box title="COMPLETED TRANSACTIONS">
         {!(s.transactions || []).length && <p>No approved trades yet.</p>}
         {(s.transactions || []).map((o) => (
           <article className="season-offer" key={o.id}>
@@ -2247,7 +2258,7 @@ function Trades({ league: l, messages = false, commissionerTools = false }) {
             {showMoves(o.body)}
           </article>
         ))}
-      </Box>
+      </Box>}
     </>
   );
 }
@@ -2605,6 +2616,35 @@ function History({ league: l }) {
     </>
   );
 }
+
+function TradeBlockHub({league:l}){
+  const [tab,setTab]=useState('Trade Block');
+  const [initialOffer,setInitialOffer]=useState(null);
+  const propose=(rows,actingTeam)=>{
+    if(!rows.length||!actingTeam)return;
+    const otherTeams=[...new Set(rows.map(row=>row.team).filter(id=>id!==actingTeam))];
+    if(!otherTeams.length)return;
+    const moves=rows.map(row=>({kind:'player',id:Number(row.player),from:row.team,to:actingTeam,quantity:1}));
+    setInitialOffer(previous=>({
+      version:(previous?.version||0)+1,
+      team:actingTeam,
+      teams:[actingTeam,...otherTeams],
+      moves
+    }));
+    setTab('Trade Proposal');
+  };
+  return <>
+    <div className="subnav trade-block-tabs" role="tablist" aria-label="Trade Block sections">
+      {['Trade Proposal','Trade Block','Transactions'].map(name=><button type="button"
+        role="tab" aria-selected={tab===name} className={tab===name?'active':''}
+        key={name} onClick={()=>setTab(name)}>{name}</button>)}
+    </div>
+    {tab==='Trade Block'?<TradeBlockListings league={l} onPropose={propose}/>:
+     tab==='Trade Proposal'?<Trades league={l} view="proposals" initialOffer={initialOffer}/>:
+     <Trades league={l} view="transactions"/>}
+  </>;
+}
+
 function PlayoffBracketSections({league:l,initialTab='Pre-season'}){
   const s=l.season;
   const [tab,setTab]=useState(initialTab);
@@ -2636,7 +2676,7 @@ export const seasonPages = [
   "Standings",
   "Teams",
   "Team Stats",
-  "Transactions",
+  "Trade Block",
   "Playoff Bracket",
   "Voting",
   "SSL History",
@@ -2665,6 +2705,8 @@ export function SeasonPage({ page, league: l, section=null }) {
         <PublicBallots league={l} />
       ) : page === "Draft Room" ? (
         <Draft league={l} />
+      ) : page === "Trade Block" ? (
+        <TradeBlockHub league={l} />
       ) : page === "Free Agency" ? (
         <FreeAgency league={l} />
       ) : page === "SSL History" ? (

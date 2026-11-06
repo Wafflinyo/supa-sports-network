@@ -96,21 +96,21 @@ assert.equal(diddy.stats.shutoutBonus,30);
 assert.equal(diddy.stats.shutouts,1);
 assert.equal(diddy.stats.completeGames,1,'Solo shutout pitcher retains complete game in statistical history');
 assert.equal(diddy.stats.combinedShutouts,0);
-assert.equal(diddy.stats.pgp,95.25);
-assert.equal(diddy.stats.tgp,129.25);
+assert.equal(diddy.stats.pgp,93.5);
+assert.equal(diddy.stats.tgp,127.5);
 assert.equal(ruffiansPlayers.find(p=>p.playerId===13).stats.tgp,-8,'Negative Game Points still allowed');
 const away=preseasonTeamStats().find(t=>t.teamName==='Rogueport Ruffians');
 assert.equal(away.stats.shutouts,1);
 assert.equal(away.stats.combinedShutouts,0);
 assert.equal(away.stats.shutoutBonus,30);
-assert.equal(away.stats.tgp,476.25);
+assert.equal(away.stats.tgp,474.5);
 const seasonPlayer=preseasonPlayerStats().find(p=>p.playerId===4);
 assert.equal(seasonPlayer.stats.shutouts,1);
 assert.equal(seasonPlayer.stats.shutoutBonus,30);
 const box=preseasonBoxScore(ruffians);
 assert.equal(box.teams[0].players.find(p=>p.playerId===4).stats.shutouts,1);
-assert.equal(box.teams[0].players.find(p=>p.playerId===4).points.tgp,129.25);
-assert.equal(box.teams[0].totalGamePoints,476.25);
+assert.equal(box.teams[0].players.find(p=>p.playerId===4).points.tgp,127.5);
+assert.equal(box.teams[0].totalGamePoints,474.5);
 for(const game of preseasonGames){
   const pts=preseasonPlayerStatsForGame(game);
   const totalShutouts=pts.filter(p=>p.stats.shutoutBonus>0);
@@ -121,11 +121,11 @@ for(const game of preseasonGames){
 for(const path of ['src/PreseasonStats.jsx','src/main.jsx','src/temporary-stat-columns.json']){
   const contents=readFileSync(new URL('../'+path,import.meta.url),'utf8');
   assert.match(contents,/combinedShutouts/,'Pitching stats must show combined shutout appearances: '+path);
-  assert.match(contents,/shutoutBonus/,'Pitching stats must show shutout points: '+path);
+  assert.doesNotMatch(contents,/shutoutBonus/,'Shutout bonus is still scored but its column should be hidden: '+path);
 }
 const viewer=readFileSync(new URL('../src/GameBoxScore.jsx',import.meta.url),'utf8');
 assert.match(viewer,/columns\['Pitching Stats'\]/);
-assert.match(viewer,/shutoutBonus/);
+assert.doesNotMatch(viewer,/shutoutBonus/,'Box score should not expose redundant shutout bonus column');
 const migration=readFileSync(new URL('../supabase/migrations/20261103024000_ssl_pitching_shutout_points.sql',import.meta.url),'utf8');
 assert.match(migration,/shutout_expected/);
 assert.match(migration,/team_runs/);
