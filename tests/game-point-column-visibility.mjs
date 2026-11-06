@@ -19,5 +19,5 @@ assert.match(preseason,/const columns=visibleGamePointFields\(statGroups\[catego
 assert.match(main,/const visibleStatColumns=visibleGamePointFields\(statGroups\[statTab\],statView\)/);
 assert.match(main,/visibleStatColumns\.map/);
 assert.match(season,/const keys=visibleGamePointFields\(allKeys,view\)/);
-assert.match(season,/allKeys\.filter\(k=>k!=='agp'\)/);
-console.log('TGP and AGP show exclusively in their corresponding views in all SSL stats tables.');
+assert.match(season,/visibleGamePointFields\(allKeys,view\)\.filter\(k=>k!=='tgp'&&k!=='agp'\)/);
+console.log('Player Game Points remain view-specific; Team Stats omit duplicate TGP/AGP columns.');
