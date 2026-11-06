@@ -1,4 +1,4 @@
-// Badge imagery is curated against the ACTUAL 94-item achievement catalog.
+// Badge imagery is curated against the ACTUAL 93-item achievement catalog.
 // Columns: real achievement ID | illustrated main subject | supporting subject |
 // composition | meaningful engraving. Do not add awards from concept art.
 const DRAWINGS = `
@@ -27,7 +27,6 @@ game-runs-10|scoreboard|ball|rays|10
 game-runs-15|runner|fire|sunburst|15
 game-runs-20|scoreboard|bolt|wreath|20
 game-runs-25|stadium|stars|laurel|25
-game-runs-30|crown|scoreboard|royal|30
 game-rbi-1|bat|home-plate|diagonal|1
 game-rbi-5|diamond|ball|split|5
 game-rbi-10|bat|diamond|rays|10
