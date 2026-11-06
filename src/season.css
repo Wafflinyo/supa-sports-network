@@ -497,6 +497,23 @@ details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
 /* Matchup-first, commissioner-scheduled 22 week slate */
 .schedule-week-heading{display:flex;justify-content:space-between;gap:12px;align-items:baseline;background:#182b4c;color:white;margin:24px 0 8px;padding:12px 18px;border-left:5px solid #edbf4b;font:900 25px 'Barlow Condensed',Impact,sans-serif;letter-spacing:.055em}
 .schedule-week-heading small{color:#d2dcf1;font-size:12px;letter-spacing:.08em}
+/* Collapsible week navigation shared by the public Schedule, Commissioner
+   Schedule & Results, and GM/Commissioner Roster game-lineup lists. */
+.ssl-week-collection{min-width:0}
+.ssl-week-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin:12px 0}
+.ssl-week-actions .outline-btn{font-size:15px;padding:9px 13px;min-height:40px}
+.ssl-collapsible-week{min-width:0;margin:14px 0}
+.ssl-collapsible-week>.schedule-week-heading{display:grid;grid-template-columns:minmax(0,1fr) auto 18px;align-items:center;gap:12px;margin:0;cursor:pointer;list-style:none;user-select:none}
+.ssl-collapsible-week>.schedule-week-heading::-webkit-details-marker{display:none}
+.ssl-collapsible-week>.schedule-week-heading::after{content:'▾';display:block;font:900 20px/1 system-ui,sans-serif;color:#fbd044;transition:transform .16s ease}
+.ssl-collapsible-week[open]>.schedule-week-heading::after{transform:rotate(180deg)}
+.ssl-collapsible-week>.schedule-week-heading:focus-visible{outline:3px solid #fbd044;outline-offset:3px}
+.ssl-collapsible-week>.ssl-week-games{margin-top:9px}
+.ssl-collapsible-week .ssl-week-games>.season-game{margin-bottom:12px}
+.ssl-collapsible-week .ssl-week-games>.roster-fixture{padding:15px 12px;border:1px solid #dce1eb;border-bottom:0}
+.ssl-collapsible-week .ssl-week-games>.roster-fixture:last-child{border-bottom:1px solid #dce1eb}
+@media(max-width:620px){.ssl-week-actions{justify-content:stretch}.ssl-week-actions .outline-btn{flex:1 1 130px;font-size:13px}.ssl-collapsible-week>.schedule-week-heading{grid-template-columns:minmax(0,1fr) auto 16px;gap:8px;font-size:22px;padding:12px}.ssl-collapsible-week>.schedule-week-heading small{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.ssl-collapsible-week>.schedule-week-heading::after{transition:none}}
 .game-date-editor{margin:14px 0}
 .game-date-editor>button{max-width:100%}
 .game-date-editor form{margin:12px 0;max-width:500px;padding:15px;background:#f2f5fa;border-radius:6px;border:1px solid #d9dfeb}
