@@ -971,3 +971,41 @@ details.fantasy-schedule-row > p { margin: 10px 0 6px 18px; }
   border-right:2px solid #9bb0ca;
 }
 .season-table .ssl-team-stats-table td.team-stats-number{text-align:right}
+
+
+/* Public Trade Block and multi-franchise offer flow. */
+.trade-block-tabs{display:flex;flex-wrap:wrap;margin-bottom:18px}
+.trade-block-tabs button{flex:1 1 180px;min-width:0}
+.trade-block-page{display:grid;gap:20px}
+.trade-block-page .season-box{min-width:0}
+.trade-block-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin:20px 0}
+.trade-block-actions label{display:grid;gap:6px;min-width:min(100%,250px);font-size:12px;font-weight:800}
+.trade-block-actions select{max-width:100%;min-height:42px}
+.trade-block-team-list{display:grid;gap:18px;margin-top:15px}
+.trade-block-team{border:1px solid #d5deeb;padding:15px;background:#f6f8fc;min-width:0}
+.trade-block-team h3{font:900 22px 'Barlow Condensed',Impact,sans-serif;color:#122950;margin:0 0 10px}
+.trade-block-team h3 small{font:800 12px system-ui,sans-serif;color:#64758b}
+.trade-block-team-note{background:#fff;border-left:4px solid #d9232e;padding:10px 14px;white-space:pre-wrap;overflow-wrap:anywhere;color:#233a59;margin:10px 0}
+.trade-block-player-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:9px}
+.trade-block-player{position:relative;display:flex;align-items:center;gap:8px;text-align:left;min-height:76px;min-width:0;padding:9px;border:1px solid #cbd5e5;background:#fff;color:#122950;cursor:pointer;font:inherit}
+.trade-block-player:hover:not(:disabled),.trade-block-player:focus-visible{border-color:#2764af;outline:2px solid #2764af;outline-offset:1px}
+.trade-block-player.selected{background:#e8f1fd;border:2px solid #215dab}
+.trade-block-player:disabled{cursor:default;opacity:.78}
+.trade-block-player-name{font-weight:900;min-width:0;overflow-wrap:anywhere;line-height:1.2;padding-bottom:18px}
+.trade-block-player-action{position:absolute;right:8px;bottom:6px;font-size:10px;font-weight:900;color:#d9232e;letter-spacing:.03em}
+.trade-block-select-indicator{position:absolute;top:3px;right:6px;color:#215dab;font-size:17px}
+.trade-block-roster{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:7px;margin:15px 0}
+.trade-block-roster-option{display:flex;align-items:center;gap:9px;padding:9px;border:1px solid #d5deeb;background:#f7f9fd;font-weight:750;cursor:pointer;min-width:0}
+.trade-block-roster-option input{width:18px;height:18px;flex:none;accent-color:#d9232e}
+.trade-block-message-label{display:grid;gap:7px;margin:15px 0;font-weight:800}
+.trade-block-message-label textarea{max-width:100%;width:100%;box-sizing:border-box}
+.trade-block-readonly-note{font-size:13px;color:#556b86}
+@media(max-width:600px){
+  .trade-block-player-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .trade-block-player{min-height:76px;padding:8px 6px}
+  .trade-block-player-name{font-size:12px}
+  .trade-block-player-action{font-size:9px}
+  .trade-block-team{padding:10px}
+  .trade-block-roster{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:370px){.trade-block-player-grid,.trade-block-roster{grid-template-columns:1fr}}
