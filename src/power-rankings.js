@@ -24,10 +24,11 @@ import {gamePointsForReport} from './game-points.js';
 // four distinct players contributes equally; never count the starter twice.
 // Publish a franchise ONLY after its GM submits a valid nine-starter
 // default lineup; never rank bench players or invent unsubmitted starters.
-// Each reported regular-season game contributes 7.5% to the blend of
-// roster ratings and season-average Game Points (OGP/DGP/PGP).
-// After eight reported games, the weight caps at 60%. There are no
-// separate, immediate Game Point boosts or win/loss form modifiers.
+// Each reported regular-season game contributes 5% of the actual league-
+// relative OGP/DGP/PGP impact to its respective category, capped at 60%
+// after twelve reported games. A team performing at the league's true
+// reported per-team-game average retains its original roster category score.
+// No arbitrary 50/70 average rating and no extra win/loss modifier.
 // Preseason and postseason games NEVER affect live Power Rankings.
 const clamp=(x,min=0,max=100)=>Math.max(min,Math.min(max,x));
 const average=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:0;
@@ -48,21 +49,22 @@ export const DEFENSE_STAT_WEIGHTS=Object.freeze({
   fielding:.55,throwingSpeed:.30,runningSpeed:.15
 });
 export const DEFENSE_SPEED_WEIGHT=DEFENSE_STAT_WEIGHTS.runningSpeed;
-// Reference averages calibrate season team OGP, DGP and PGP to comparable
-// 0–100 category-performance ratings. These ARE NOT additive bonuses.
-export const GAME_POINT_PERFORMANCE_CONFIG=Object.freeze({
-  scales:Object.freeze({
-    ogp:Object.freeze({center:250,spread:100}),
-    dgp:Object.freeze({center:208,spread:90}),
-    pgp:Object.freeze({center:20,spread:15})
-  })
+// League-average production is the neutral point for every category.
+// The spread controls sensitivity to meaningful over/underperformance,
+// not a target or assumed league average. The tanh cap prevents runaway
+// ratings while allowing negative and positive Pitching Game Points.
+export const GAME_POINT_RELATIVE_CONFIG=Object.freeze({
+  maxAdjustment:20,
+  scales:Object.freeze({ogp:100,dgp:90,pgp:15})
 });
-export const GAME_POINT_BLEND_PER_REPORTED_GAME=.075;
+export const GAME_POINT_BLEND_PER_REPORTED_GAME=.05;
 export const GAME_POINT_BLEND_MAX=.60;
-export function gamePointPerformanceRating(averagePoints,category){
-  const scale=GAME_POINT_PERFORMANCE_CONFIG.scales[category];
-  if(!scale||averagePoints==null||!Number.isFinite(Number(averagePoints)))return null;
-  return clamp(100/(1+Math.exp(-(Number(averagePoints)-scale.center)/scale.spread)));
+export function gamePointPerformanceAdjustment(teamAverage,leagueAverage,category){
+  const spread=GAME_POINT_RELATIVE_CONFIG.scales[category];
+  if(!spread||teamAverage==null||leagueAverage==null||
+    !Number.isFinite(Number(teamAverage))||!Number.isFinite(Number(leagueAverage)))return 0;
+  return GAME_POINT_RELATIVE_CONFIG.maxAdjustment*
+    Math.tanh((Number(teamAverage)-Number(leagueAverage))/spread);
 }
 export function defenseRating(stats){
   return DEFENSE_STAT_WEIGHTS.fielding*numeric(stats,'fielding')+
@@ -297,6 +299,26 @@ export function teamRegularGamePointAverages(season,teamId){
       key,gamesWithReports?totals[key]/gamesWithReports:null
     ]))};
 }
+// Average the reported team-game production of ALL franchises. Weight by
+// report count, so a club with 12 games contributes 12 team-game samples,
+// not one equally weighted sample against a club with a single game.
+// Games without Project Rio player stats are excluded from the denominator.
+export function leagueRegularGamePointAverages(season){
+  const sums={ogp:0,dgp:0,pgp:0};
+  let teamGamesWithReports=0;
+  for(const team of season?.teams||[]){
+    const perTeam=teamRegularGamePointAverages(season,team.id);
+    const count=perTeam.gamesWithReports;
+    if(!count)continue;
+    teamGamesWithReports+=count;
+    for(const category of ['ogp','dgp','pgp'])
+      sums[category]+=perTeam[category]*count;
+  }
+  return {teamGamesWithReports,
+    ...Object.fromEntries(['ogp','dgp','pgp'].map(key=>[
+      key,teamGamesWithReports?sums[key]/teamGamesWithReports:null
+    ]))};
+}
 function playedRecord(season,teamId){
   const played=(season?.games||[]).filter(g=>g.phase==='regular'&&g.stage==='final'&&
     [g.home,g.away].map(String).includes(String(teamId))&&g.result?.scores);
@@ -312,6 +334,7 @@ function playedRecord(season,teamId){
 export function powerRankings(season){
   if(!season || !['preseason','regular','postseason','retention','archived'].includes(season.status) ||
     season.teams?.length!==12)return [];
+  const leagueGamePointAverages=leagueRegularGamePointAverages(season);
   return season.teams.filter(team=>
     rankingParticipants(season,team.id).length===9).map(team=>{
     const participants=rankingParticipants(season,team.id);
@@ -320,33 +343,35 @@ export function powerRankings(season){
     const gamePointAverages=teamRegularGamePointAverages(season,team.id);
     const performanceWeight=Math.min(GAME_POINT_BLEND_MAX,
       gamePointAverages.gamesWithReports*GAME_POINT_BLEND_PER_REPORTED_GAME);
-    const gamePointRatings={
-      offense:gamePointPerformanceRating(gamePointAverages.ogp,'ogp'),
-      defense:gamePointPerformanceRating(gamePointAverages.dgp,'dgp'),
-      pitching:gamePointPerformanceRating(gamePointAverages.pgp,'pgp')
+    const gamePointAdjustments={
+      offense:gamePointPerformanceAdjustment(gamePointAverages.ogp,
+        leagueGamePointAverages.ogp,'ogp'),
+      defense:gamePointPerformanceAdjustment(gamePointAverages.dgp,
+        leagueGamePointAverages.dgp,'dgp'),
+      pitching:gamePointPerformanceAdjustment(gamePointAverages.pgp,
+        leagueGamePointAverages.pgp,'pgp')
     };
-    // The 7.5% per reported game applies INSIDE each category. Recalculate
-    // the overall score using the same 60% offense/20% defense/20% pitching
-    // formula—never add a second team-form component on top.
+    // League-average production means zero adjustment, retaining the
+    // preseason score. Strong/weak OGP changes only offense; likewise
+    // DGP/defense and PGP/pitching. The 5% x game-count weight is applied
+    // only once to those relative changes, not to any win/loss component.
     const blended={
-      offense:clamp((1-performanceWeight)*c.offense+
-        performanceWeight*(gamePointRatings.offense??c.offense)),
-      defense:clamp((1-performanceWeight)*c.defense+
-        performanceWeight*(gamePointRatings.defense??c.defense)),
-      pitching:clamp((1-performanceWeight)*c.pitching+
-        performanceWeight*(gamePointRatings.pitching??c.pitching))
+      offense:clamp(c.offense+performanceWeight*gamePointAdjustments.offense),
+      defense:clamp(c.defense+performanceWeight*gamePointAdjustments.defense),
+      pitching:clamp(c.pitching+performanceWeight*gamePointAdjustments.pitching)
     };
-    const performanceScore=POWER_WEIGHTS.offense*(gamePointRatings.offense??c.offense)+
-      POWER_WEIGHTS.defense*(gamePointRatings.defense??c.defense)+
-      POWER_WEIGHTS.pitching*(gamePointRatings.pitching??c.pitching);
-    // Preserve the unrounded pregame composite; visible category scores
-    // are rounded to one decimal only when returning the ranked teams.
-    const score=(1-performanceWeight)*c.rosterScore+performanceWeight*performanceScore;
+    // Use actual (clamped) category changes when computing the 60/20/20
+    // overall score. Original roster score retains full precision.
+    const score=c.rosterScore+
+      POWER_WEIGHTS.offense*(blended.offense-c.offense)+
+      POWER_WEIGHTS.defense*(blended.defense-c.defense)+
+      POWER_WEIGHTS.pitching*(blended.pitching-c.pitching);
     const record=playedRecord(season,team.id);
     return {...team,...c,
       offense:round(blended.offense),defense:round(blended.defense),
       pitching:round(blended.pitching),
-      gamePointAverages,gamePointRatings,performanceWeight:round(performanceWeight*100),
+      gamePointAverages,leagueGamePointAverages,
+      gamePointAdjustments,performanceWeight:round(performanceWeight*100),
       ...record,score:round(clamp(score))};
   }).sort((a,b)=>b.score-a.score||b.rosterScore-a.rosterScore||
     String(a.name).localeCompare(String(b.name))).map((t,i)=>({...t,rank:i+1}));
