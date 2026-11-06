@@ -34,3 +34,7 @@
 .ssl-matchup-variant{font-size:11px;font-weight:900;color:#194f7c;background:#ebf4ff;border-radius:5px;padding:3px 6px;white-space:nowrap}
 .ssl-matchup-variant.unset{color:#876323;background:#fff2d6}
 @media(max-width:650px){.gm-stadium-game{padding:12px}.gm-stadium-game-top{flex-direction:column}.gm-stadium-current{max-width:100%;text-align:left}.gm-stadium-choices,.gm-stadium-choices button{flex:1;justify-content:center}.gm-stadium-controls>.red-btn{width:100%}}
+
+/* The same collapsible week navigation is used for home Stadium settings. */
+.gm-stadium-games .ssl-collapsible-week{margin:0}
+.gm-stadium-games .ssl-week-games>.gm-stadium-game+.gm-stadium-game{margin-top:12px}
