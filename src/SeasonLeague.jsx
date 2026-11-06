@@ -2513,7 +2513,7 @@ function TeamStats({ league: l }) {
       </div>
       <div className="season-table" role="region"
         aria-label={isAverage ? "Team averages per game" : "Team stat totals"} tabIndex={0}>
-        <table>
+        <table className="ssl-team-stats-table">
           <caption className="team-stats-caption">
             {isAverage ? "Team averages per completed game" : "Team season totals"}
             {' · Sorted by '+selectedLabel+' ('+(sort.direction==='desc'?'descending':'ascending')+')'}
