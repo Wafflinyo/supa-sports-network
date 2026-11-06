@@ -3,12 +3,12 @@
 // Each approved design is staged outside the public website until the
 // commissioner orders the entire collection released. During staging, this
 // module always returns null and the original SVG badge is displayed.
-// At publication: commit all 93 image assets and IDs first, verify the
+// At publication: commit all 94 image assets and IDs first, verify the
 // catalog, then change status to 'released' in the final release commit.
 export const BADGE_ART_ROLLOUT = Object.freeze({
   status: 'legacy',
   collection: 'v1',
-  expectedBadges: 93,
+  expectedBadges: 94,
   publishedIds: Object.freeze([]),
 });
 
