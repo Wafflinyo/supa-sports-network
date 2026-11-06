@@ -48,7 +48,7 @@ export function sortTeamStatRows(rows,sort={key:'record',direction:'desc'},view=
         comparison=0;
       } else {
         const raw=typeof av==='number'&&typeof bv==='number'?av-bv:String(av).localeCompare(String(bv));
-        comparison=key==='name'?raw:-raw;
+        comparison=-raw;
       }
     }
     const primary=ascending?-comparison:comparison;
