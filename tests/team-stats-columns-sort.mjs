@@ -46,26 +46,27 @@ const league=readFileSync(new URL('../src/SeasonLeague.jsx',import.meta.url),'ut
 const history=readFileSync(new URL('../src/HistoryArchive.jsx',import.meta.url),'utf8');
 const teamSource=league.split('function TeamStats({ league: l }) {')[1]?.split('function History({ league: l }) {')[0]||'';
 assert(teamSource,'Current Team Stats view must exist');
-assert(teamSource.includes("visibleGamePointFields(allKeys,view).filter(k=>k!=='tgp'&&k!=='agp')"),
- 'Live Team Stats must NOT display redundant TGP and AGP columns');
-assert(teamSource.includes("'Game Score/G'"),
- 'Team averages must display the pre-existing Game Score/G field');
-assert(teamSource.includes("['gameScore'")===false || teamSource.includes('"gameScore"'),
- 'Game Score remains part of the visible Team Stats fields');
+assert(teamSource.includes("const keys=visibleGamePointFields(allKeys,view);"),
+ 'Live Team Stats shows TGP only in Totals and AGP only in Averages');
+assert(teamSource.includes("tgp:'TGP',agp:'AGP'"),
+ 'TGP and AGP take the former Game Score position with proper labels');
+assert(!teamSource.includes('"gameScore"')&&!teamSource.includes("'Game Score/G'"),
+ 'Remove redundant Game Score and Game Score/G Team Stats columns entirely');
 assert(teamSource.includes("['ogp','dgp','pgp','tgp']"),
- 'Internal TGP scoring stays intact even though the duplicate column is hidden');
-assert(history.includes("['tgp','Game Score']"),
- 'Archived Team Stats must label total points as Game Score, not TGP');
-assert(history.includes("key==='tgp'&&view!=='Totals'?'Game Score/G':label"),
- 'Archived Team Stats must label team per-game points as Game Score/G');
+ 'Game Points continue to derive from the existing scoring system');
+assert(history.includes("['tgp','TGP']"),
+ 'Archived Team Stats must label total points TGP');
+assert(history.includes("key==='tgp'&&view!=='Totals'?'AGP':label"),
+ 'Archived Team Stats must label per-game points AGP');
 const historyTeamSource=history.split('function ArchiveTeams({season,supabase}){')[1]
   ?.split('const pointCols=')[0]||'';
 assert(!historyTeamSource.includes("heading('agp','AGP')"),
  'Archived Team Stats must not show a second AGP/Game Score average column');
-// Don't remove TGP or AGP from player-only statistics and career reporting.
+// Player tables also show TGP/AGP exclusively in their corresponding views.
 const main=readFileSync(new URL('../src/main.jsx',import.meta.url),'utf8');
-assert(main.includes("['tgp','TGP']")&&main.includes("['agp','AGP']"),
- 'TGP and AGP stay in Player Stats; the request only concerns Team Stats');
+assert(main.includes("['tgp','TGP']")&&main.includes("['agp','AGP']")&&
+  main.includes("'Game Points': [")&&!main.includes("['gameScore','Game Score']"),
+ 'Player Stats must show TGP/AGP in place of Game Score, not as duplicates');
 
 for(const removed of ['"earnedRuns"','"combinedShutouts"','"shutoutBonus"']){
  assert(!teamSource.includes(removed),'Do not display '+removed+' in Team Stats');
