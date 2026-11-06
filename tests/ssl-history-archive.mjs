@@ -77,7 +77,8 @@ assert(!archive.includes('releasePreseasonReport'),'Archive must never release r
 assert(!archive.includes('savePreseasonReport'),'Archive must never modify game reports');
 assert(!archive.includes('league.act('),'Archive cannot mutate league state');
 assert(league.includes('<HistoryArchive seasons={l.seasons} supabase={l.supabase}/>'));
-assert.match(league,/const rankedTeams = standings\(s\);/,'Current Team Stats must follow standings order');
-assert.match(league,/\{rankedTeams\.map\(t => \{/,'Both Team Stats views must render record-ranked teams');
+assert.match(league,/const rankedTeams = standings\(s\);/,'Current Team Stats must derive from standings');
+assert.match(league,/const teamRows=rankedTeams\.map\(team=>\{/,'Team Stats must calculate rows using the official standings');
+assert.match(league,/const rows=sortTeamStatRows\(teamRows,sort,view\);/,'Both Team Stats views must apply the requested column sort');
 assert(league.includes('CAREER LEAGUE RECORDS'),'Existing cross-season records tab remains');
 console.log('PASS: season-aware, read-only SSL History covering draft/preseason/standings/teams/players/box scores/playoffs/trades/awards/news with no private reports');
