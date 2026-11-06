@@ -36,7 +36,9 @@ export function ScheduleWeekControls({containerRef}) {
 }
 
 export function ScheduleWeekGroup({group,initiallyOpen=false,children}) {
-  return <details className="ssl-collapsible-week" data-week-key={group.key} defaultOpen={initiallyOpen}>
+  const [open,setOpen]=React.useState(initiallyOpen);
+  return <details className="ssl-collapsible-week" data-week-key={group.key} open={open}
+    onToggle={event=>setOpen(event.currentTarget.open)}>
     <summary className="schedule-week-heading">
       <span>{group.label}</span>
       <small>· {group.games.length} {group.games.length===1?'MATCHUP':'MATCHUPS'}</small>
