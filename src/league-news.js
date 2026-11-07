@@ -1,4 +1,5 @@
 import {HEATING_UP_THRESHOLD} from './heating-up.js';
+import {gamePointsForReport} from './game-points.js';
 import {preseasonChampionshipFeature} from './preseason-champion-feature.js';
 import {matchHeadline,gameOutcomeContext,pitchingNewsPerformance} from './game-headlines.js';
 import {reporterParagraph} from './reporter-copy.js';
@@ -102,7 +103,7 @@ export function consolidateTeammateNews(items,seasons,players=[]){
         const name=names.get(id)||'A player';
         const row=game.result?.players?.find(r=>
           Number(r.player)===id&&String(r.team)===String(first.teamId));
-        const score=Number(row?.gameScore);
+        const score=row?gamePointsForReport(row).tgp:NaN;
         return name+(Number.isFinite(score)?' ('+score+' Game Score)':'');
       });
       combined={
@@ -163,7 +164,7 @@ export function leagueNews(seasons, players, {includeRecorded = false} = {}) {
         const player = pool.get(playerId) || 'A player';
         const stats = row.stats || {};
         const opponent = teamName(row.team === game.away ? game.home : game.away);
-        const score = Number(row.gameScore);
+        const score = gamePointsForReport(row).tgp;
         const key = `game:${game.id}:${playerId}`;
         const headline = (category, tier, alternatives) =>
           wording(game.id, playerId, category, tier, alternatives);
@@ -176,7 +177,7 @@ export function leagueNews(seasons, players, {includeRecorded = false} = {}) {
           private: game.stage === 'recorded',
         });
 
-        if (row.gameScore != null && Number.isFinite(score) && score >= HEATING_UP_THRESHOLD)
+        if (Number.isFinite(score) && score >= HEATING_UP_THRESHOLD)
           add('heating', 'hot', 'HEATING UP', `${player} is heating up!`,
             `A ${score} Game Score against ${opponent} earns ${player} a star for the next team game.`);
 
