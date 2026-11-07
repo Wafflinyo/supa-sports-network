@@ -43,7 +43,8 @@ const bottomFirstScore=extractRioInningScores(bottomFirst,season.teams,game);
 assert.deepEqual(bottomFirstScore,{
   away:[3,2,0,0,1,0,2],
   home:[1,3,0,5,2,2,null],
-},'X in FIRST displayed scorecard row belongs to the home/bottom team');
+  top:'away',
+},'X in FIRST displayed scorecard row belongs to the coin-toss Bottom side');
 assert.deepEqual(validateInningScores(bottomFirstScore,8,13),bottomFirstScore);
 const awayPitcher={player:'Ronald',chosen:45,label:away,inningspitched:6,completegames:0};
 const visitingSixInningPreview={labels:[away,home],pitch:[awayPitcher],inningScores:bottomFirstScore};
@@ -55,17 +56,63 @@ const playedScore=extractRioInningScores(playedZero,season.teams,game);
 assert.equal(playedScore.home[6],0);
 assert.equal(earnedSixInningCompleteGame({...visitingSixInningPreview,inningScores:playedScore},awayPitcher),false,
   'Numerical 0 means scoreless played half, never automatic shortened CG');
-const conflicting=bottomFirst.map(row=>[...row]);
-conflicting[23][9]='Jr. Rookies (Top)';
-conflicting[24][9]='DK Wilds (Bottom)';
-assert.throws(()=>extractRioInningScores(conflicting,season.teams,game),
-  /labels conflict with this scheduled matchup/,
-  'Conflicting Top/Bottom annotations must fail rather than silently swap credited teams');
+// Coin toss can assign TOP to the SSL-scheduled HOME team, even though
+// that team is in the second line of the scorecard.
+const flipped=bottomFirst.map(row=>[...row]);
+flipped[23][9]='Jr. Rookies (Top)';
+flipped[24][9]='DK Wilds (Bottom)';
+flipped[23][16]=0;
+flipped[24][16]='X';
+assert.deepEqual(extractRioInningScores(flipped,season.teams,game),{
+  away:[3,2,0,0,1,0,null],
+  home:[1,3,0,5,2,2,0],
+  top:'home',
+},'Coin toss can make the scheduled HOME team bat TOP and scheduled AWAY team bat BOTTOM');
+const flippedPitcher={...awayPitcher,label:home};
+assert.equal(earnedSixInningCompleteGame({
+  labels:[away,home],pitch:[flippedPitcher],
+  inningScores:extractRioInningScores(flipped,season.teams,game),
+},flippedPitcher),true,
+  'Six-inning CG belongs to top-batting scheduled HOME pitcher when bottom seventh is X');
 const partial=bottomFirst.map(row=>[...row]);
 partial[24][9]='DK Wilds';
 assert.throws(()=>extractRioInningScores(partial,season.teams,game),
-  /labels conflict with this scheduled matchup/,
-  'Both teams need consistent annotations if either is labeled');
+  /needs one \(Top\) and one \(Bottom\)/,
+  'Partial (Top)/(Bottom) tagging is rejected to prevent miscrediting');
+const bothTop=bottomFirst.map(row=>[...row]);
+bothTop[24][9]='DK Wilds (Bottom)';
+bothTop[23][9]='Jr. Rookies (Bottom)';
+assert.throws(()=>extractRioInningScores(bothTop,season.teams,game),
+  /needs one \(Top\) and one \(Bottom\)/,
+  'Both team tags cannot say Bottom');
+// Exact reported scorecard: Jr. Rookies scheduled AWAY but coin-toss BOTTOM,
+// Bowser Monsters scheduled HOME but coin-toss TOP; X is in FIRST row.
+const coinTeams=[{id:'rookies',slot:1,name:'Delfino Dolphins'},
+  {id:'monsters',slot:11,name:'TWILIGHT TOWN TANKS'}];
+const coinGame={away:'rookies',home:'monsters'};
+const userScorecard=[
+  ['Scorecard'],
+  ['', '',1,2,3,4,5,6,7,'Final'],
+  ['Jr. Rookies (Bottom)','',0,0,1,0,2,0,'x',3],
+  ['Bowser Monsters (Top)','',1,0,3,0,0,0,0,4],
+];
+const coinResult=extractRioInningScores(userScorecard,coinTeams,coinGame);
+assert.deepEqual(coinResult,{
+  away:[0,0,1,0,2,0,null],
+  home:[1,0,3,0,0,0,0],
+  top:'home',
+},'Real reversed, coin-toss-labeled 3–4 scorecard must import without an unreadable scorecard error');
+assert.deepEqual(validateInningScores(coinResult,3,4),coinResult);
+const coinPitcher={player:'Ronald',chosen:45,label:'TWILIGHT TOWN TANKS',inningspitched:6,completegames:0};
+assert.equal(earnedSixInningCompleteGame({
+  labels:['Delfino Dolphins','TWILIGHT TOWN TANKS'],
+  pitch:[coinPitcher],inningScores:coinResult,
+},coinPitcher),true,'Ronald completes every defensive inning even when his scheduled HOME team bats TOP');
+assert.equal(earnedSixInningCompleteGame({
+  labels:['Delfino Dolphins','TWILIGHT TOWN TANKS'],
+  pitch:[{...coinPitcher,label:'Delfino Dolphins'}],inningScores:coinResult,
+},{...coinPitcher,label:'Delfino Dolphins'}),false,
+  'Do not credit pitcher from the BOTTOM-batting team');
 // Vertical Rio scorecard layouts also use the team name/half rather than
 // positional order of the team columns.
 const vertical=[['Inning','Jr. Rookies (Bottom)','DK Wilds (Top)']];
