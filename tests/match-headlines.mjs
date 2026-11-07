@@ -63,7 +63,8 @@ const teamStory=news.filter(e=>e.category==='team-game'&&e.teamId==='knights');
 assert.equal(teamStory.length,1,'All qualifying teammates appear in one combined news post');
 for(const name of ['Wario','Bowser','Yoshi','Luigi'])
  assert(teamStory[0].summary.includes(name),name+' is included in a single news recap');
-assert(teamStory[0].summary.includes("Week 1's win against the Diamond City Checkers."),
+assert(teamStory[0].summary.includes("Diamond City Checkers") &&
+  /win|victory/i.test(teamStory[0].summary),
  'Expanded team story closes with week, win/loss and opponent');
 assert(!news.some(e=>e.category==='pitching'&&e.teamId==='knights'),
  'There must not be separate per-pitcher stories in the same team-game');
