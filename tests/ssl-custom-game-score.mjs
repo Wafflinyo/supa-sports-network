@@ -33,14 +33,14 @@ assert.equal(SSL_HEATING_THRESHOLD,120);
 assert.deepEqual(SSL_GAME_SCORE_WEIGHTS,{
   hits:4,runs:6,rbi:8,homeRuns:15,doubles:4,triples:6,
   twoHr:2,threeHr:4,grandSlams:6,totalBases:4,
-  hitlessAtBats:-2,batStrikeouts:-10,
+  hitlessAtBats:-2,batStrikeouts:-10,stolenBases:4,caughtStealing:-4,
   putouts:5,assists:4,buddyJumpPutouts:15,doublePlays:8,triplePlays:18,
   pitchStrikeouts:15,outs:1,strikes:.5,pitches:.25,earnedRuns:-3,
   hitsAllowed:-.25,pitchWalks:-2,beanBalls:-2,
   completeGames:20,hrAllowed:-8,mvps:10,
   bobbles:-6,doublePlaysHitInto:-6,triplePlaysHitInto:-10
 });
-assert.equal(Object.keys(SSL_GAME_SCORE_WEIGHTS).length,31);
+assert.equal(Object.keys(SSL_GAME_SCORE_WEIGHTS).length,33);
 assert.equal(customGameScore({
  pitchStrikeouts:2,outs:18,strikes:24,earnedRuns:2,
  completeGames:1,hrAllowed:1,mvps:1
@@ -205,3 +205,22 @@ assert.equal(customGameScore({atBats:4,hits:1,batStrikeouts:1,doublePlaysHitInto
   4-6-10-6,'hitless at-bats and K/DP stack as specified');
 assert.equal(customGameScore({atBats:1,hits:0,buddyJumpsHitInto:1}).gameScore,-2,
   'Buddy Jump incurs only the missed-hit penalty');
+
+// Stolen bases (+4) and caught stealing (-4) affect OGP and total score equally.
+assert.equal(customGameScore({stolenBases:2,caughtStealing:1}).gameScore,4);
+assert.deepEqual(gamePointComponents({stolenBases:2,caughtStealing:1}),
+  {ogp:4,dgp:0,pgp:0});
+assert.deepEqual(gamePointsForReport({gameScore:99,stats:{stolenBases:1,caughtStealing:2}}),
+  {ogp:-4,dgp:0,pgp:0,tgp:-4},'Recorded counts override stale saved Game Score');
+assert.equal(customGameScore({stolenBases:1}).gameScore,4);
+assert.equal(customGameScore({caughtStealing:1}).gameScore,-4);
+assert.throws(()=>customGameScore({caughtStealing:-1}),/Invalid Game Score count/);
+console.log('PASS: stolen bases and caught stealing contribute +4/-4 OGP and TGP');
+
+const stealMigration=readFileSync(new URL('../supabase/migrations/20261107031500_ssl_stolen_bases_scoring_and_backfill.sql',import.meta.url),'utf8');
+assert.match(stealMigration,/\+ 4\*coalesce\(\(score_row->'stats'->>'stolenBases'\)/,
+  'Protected commissioner verifier must award the stolen base bonus');
+assert.match(stealMigration,/- 4\*coalesce\(\(score_row->'stats'->>'caughtStealing'\)/,
+  'Protected commissioner verifier must deduct for caught stealing');
+assert.match(stealMigration,/ssl_season_states[\s\S]*ssl_preseason_game_reports/,
+  'Historical regular-season and preseason scores are recalculated from original stats');

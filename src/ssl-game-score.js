@@ -5,7 +5,7 @@ export const SSL_GAME_SCORE_WEIGHTS=Object.freeze({
   hits:4,runs:6,rbi:8,homeRuns:15,doubles:4,triples:6,
   twoHr:2,threeHr:4,grandSlams:6,totalBases:4,
   // Hitless at-bat means official AB minus hits; strikeouts incur an additional penalty.
-  hitlessAtBats:-2,batStrikeouts:-10,
+  hitlessAtBats:-2,batStrikeouts:-10,stolenBases:4,caughtStealing:-4,
   putouts:5,assists:4,buddyJumpPutouts:15,doublePlays:8,triplePlays:18,
   // Every three recorded pitching outs equal one inning (+3 total).
   // Score full and partial innings proportionally; don't use rounded Rio IP.
