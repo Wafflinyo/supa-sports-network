@@ -17,7 +17,11 @@ export function gameOutcomeContext(season,game,teamId){
    ?teamRuns>opponentRuns?'win':teamRuns<opponentRuns?'loss':'tie':'game';
  const week=Number(game.week);
  const where=Number.isInteger(week)&&week>0?'Week '+week+"'s":'the';
- return 'in '+where+' '+result+' against the '+opponent+'.';
+ const inningDrama=inningScoringDrama(game.result?.innings);
+ const extra=inningDrama?.extraInnings
+   ?inningDrama.inningCount>7?' after '+inningDrama.inningCount+' innings':' after extra innings'
+   :'';
+ return 'in '+where+' '+result+' against the '+opponent+extra+'.';
 }
 // Report PGP is calculated with the SAME official SSL scoring weights used
 // by the box score. Never confuse an individual pitcher's PGP with TGP.
@@ -129,6 +133,9 @@ export function matchHeadline(season,game,players=[],{includeRecorded=false}={})
  // changes, late comebacks and home walk-offs. Commissioner annotations are
  // only a fallback for older reports that lack an inning breakdown.
  const calculated=inningScoringDrama(game.result?.innings);
+ const extraInnings=!!calculated?.extraInnings;
+ const inningCount=calculated?.inningCount??null;
+ const extraPhrase=inningCount>7?inningCount+'-inning':'extra-inning';
  const leadChanges=calculated?calculated.leadChanges:
    Number.isInteger(story.leadChanges)&&story.leadChanges>=0?Math.min(20,story.leadChanges):0;
  const lateFinish=calculated?calculated.lateFinish:
@@ -163,11 +170,16 @@ export function matchHeadline(season,game,players=[],{includeRecorded=false}={})
   kind==='blowout'?winner+' dominate '+loser+', '+score+'!':
   kind==='close'?winner+' edge '+loser+' in a '+score+' thriller!':
   winner+' defeat '+loser+', '+score+'!';
- if(best&&['blowout','shutout','close'].includes(kind)){
+ if(best&&['blowout','shutout','close'].includes(kind)&&!extraInnings){
   const player=players.find(p=>Number(p.id)===best.playerId)?.name||'A player';
   const stat=best.text.startsWith(player)?best.text.slice(player.length).trim():best.text;
   title=player+' '+stat+' as '+winner+' '+(kind==='shutout'?'blank':kind==='close'?'edge':'rout')+' '+loser+', '+score+'!';
  }
+ // Extra innings are a verified Game Info event, not an inference from a
+ // close final score. Feature the event prominently in headlines and recaps.
+ if(extraInnings)title=kind==='walkoff'
+   ?winner+' walk off '+loser+' in a '+extraPhrase+' thriller, '+score+'!'
+   :winner+' outlast '+loser+' in a '+extraPhrase+' showdown, '+score+'!';
  const labels={walkoff:'WALK-OFF THRILLER',comeback:'LATE COMEBACK',shutout:'SHUTOUT VICTORY',blowout:'DOMINANT BLOWOUT',close:margin===1?'ONE-RUN THRILLER':'CLOSE FINISH',result:'FINAL SCORE'};
  // Keep each team's accomplishments and its outcome commentary together.
  // In particular, the winning-team conclusion must never follow statistics
@@ -190,17 +202,22 @@ export function matchHeadline(season,game,players=[],{includeRecorded=false}={})
    details.push('Despite the '+weekLabel+'loss to the '+winner+
      ', these players left it all out on the diamond');
  }
+ if(extraInnings)details.push(
+   inningCount>7?'The game went '+inningCount+' innings, beyond SSL’s seven-inning regulation':
+     'The Project Rio scorecard marks this as an extra-innings game');
  if(leadChanges>=2)details.push(leadChanges+' confirmed lead changes');
  if(kind==='comeback')details.push('Confirmed late-inning comeback');
  if(note)details.push(note.replace(/[.!?]+$/,''));
- return {id:'match:'+game.id,category:'match',tier:kind,label:labels[kind],
+ return {id:'match:'+game.id,category:'match',tier:kind,
+   label:extraInnings?(kind==='walkoff'?'EXTRA-INNINGS WALK-OFF':'EXTRA-INNINGS THRILLER'):labels[kind],
    title,summary:details.length?details.join('. ')+'.':winner+' beat '+loser+' '+score+'.',
    season:season.name,seasonId:season.id,gameId:game.id,
    winnerId,loserId,winner,loser,winnerRuns:big,loserRuns:small,
    awayRuns:a,homeRuns:h,awayId:String(game.away),homeId:String(game.home),
    week:game.week||null,leadChanges,lateFinish,highlights,topPlayers,teamSpotlight,
+   extraInnings,inningCount,
    importance:kind==='walkoff'?100:kind==='comeback'?96:
-    kind==='shutout'?91:kind==='blowout'?86:kind==='close'?82:58,
+    extraInnings?95:kind==='shutout'?91:kind==='blowout'?86:kind==='close'?82:58,
    at:game.releasedAt||game.result.postedAt||null,private:game.stage==='recorded'};
 }
 // At most five slides. The season's active Upcoming Matches week determines
