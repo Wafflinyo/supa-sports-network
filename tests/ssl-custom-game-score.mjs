@@ -110,7 +110,7 @@ assert.equal(report.players[0].gameScore,109,'saved report score calculated from
 assert.equal(report.players[0].baseGameScore,99);
 assert.equal(report.players[0].itemScore,10);
 assert.deepEqual(gamePointComponents(report.players[0].stats),{ogp:75,dgp:-1,pgp:25});
-assert.deepEqual(gamePointsForReport(report.players[0]),{ogp:75,dgp:-1,pgp:25,tgp:109});
+assert.deepEqual(gamePointsForReport(report.players[0]),{ogp:85,dgp:-1,pgp:25,tgp:109},'Item Score counts as OGP');
 assert.equal(gamePointsForReport({...report.players[0],gameScore:-8}).tgp,109,'official stat formula overrides an outdated saved score');
 assert.equal(report.players[0].stats.totalBases,6,'TB derived from hit types');
 assert.equal(report.players[0].stats.pitchStrikeouts,1,'pitching strikeouts from Pitching sheet');
@@ -138,12 +138,12 @@ season.games=[g];
 assert.equal(aggregate(season)[10].gameScore,109,'store total custom score separately from fantasy score');
 assert.equal(aggregate(season)[10].itemScore,10);
 assert.equal(aggregate(season)[10].gameScoreAvg,109);
-for(const [key,value] of Object.entries({ogp:75,dgp:-1,pgp:25,tgp:109,agp:109}))
+for(const [key,value] of Object.entries({ogp:85,dgp:-1,pgp:25,tgp:109,agp:109}))
  assert.equal(aggregate(season)[10][key],value,'season Game Points '+key);
 const avg=playerCareer(10,[{id:'s1',playerStats:aggregate(season)}]);
 assert.equal(avg.gameScore,109);
 assert.equal(avg.averages.gameScore,109);
-assert.deepEqual([avg.ogp,avg.dgp,avg.pgp,avg.tgp,avg.agp],[75,-1,25,109,109]);
+assert.deepEqual([avg.ogp,avg.dgp,avg.pgp,avg.tgp,avg.agp],[85,-1,25,109,109]);
 assert.equal(avg.averages.agp,109);
 const below={...game,id:'g0',startsAt:'2026-10-31T17:00:00Z',
   result:{players:[{...report.players[0],stats:{hits:29,atBats:29},itemScore:0,gameScore:119}]}};

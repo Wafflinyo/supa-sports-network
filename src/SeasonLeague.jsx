@@ -2551,7 +2551,10 @@ function TeamStats({ league: l }) {
         teams follow the regular-season win–loss standings. Totals combine player stats from
         released games; averages divide counting stats by completed games. GP and W–L
         records remain totals. Shutouts count once per scoreless win. AGP is
-        total team Game Points divided by completed team games. Private reports do not change public standings.
+        total team Game Points divided by completed team games. TGP = OGP + DGP + PGP.
+        Item Score counts inside OGP; the 10-point MVP bonus is distributed among
+        the player's eligible categories in proportion to those category scores.
+        Private reports do not change public standings.
       </p>
     </Box>
   );
