@@ -387,7 +387,9 @@ export function earnedSixInningCompleteGame(preview,pitcher){
      home.slice(0,6).some(n=>!Number.isInteger(n)||n<0))return false;
   // Project Rio can mark an unplayed bottom seventh as X/blank (null),
   // or as a zero. Reconstruct the actual outcome rather than trusting zero.
-  if(home[6]!==null&&home[6]!==0)return false;
+  // A literal 0 records a played, scoreless bottom seventh. Only an
+  // explicit X/blank (parsed as null) proves this half-inning was skipped.
+  if(home[6]!==null)return false;
   const homeAfterSix=home.slice(0,6).reduce((sum,n)=>sum+n,0);
   const awayAfterSeven=away.reduce((sum,n)=>sum+n,0);
   return homeAfterSix>awayAfterSeven;

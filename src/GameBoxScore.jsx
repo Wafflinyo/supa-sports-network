@@ -9,9 +9,16 @@ const categories={
   ],
   'Batting':[
     ...columns['Offensive Stats'].filter(([k])=>!['gamesPlayed','mvps'].includes(k)),
+    ['ogp','OGP'],
   ],
-  'Fielding':columns['Defensive Stats'].filter(([k])=>!['gamesPlayed','mvps'].includes(k)),
-  'Pitching':columns['Pitching Stats'].filter(([k])=>!['gamesPlayed','mvps'].includes(k)),
+  'Fielding':[
+    ...columns['Defensive Stats'].filter(([k])=>!['gamesPlayed','mvps'].includes(k)),
+    ['dgp','DGP'],
+  ],
+  'Pitching':[
+    ...columns['Pitching Stats'].filter(([k])=>!['gamesPlayed','mvps'].includes(k)),
+    ['pgp','PGP'],
+  ],
 };
 const rateKeys=new Set(['battingAverage','onBase','slug','onBasePlusSlug','starSlug','era7','era9','whip','baAgainst','obAgainst','slgAgainst','opsAgainst']);
 const round2=n=>Math.round((Number(n||0)+Number.EPSILON)*100)/100;
@@ -49,7 +56,7 @@ function TeamBoxTable({team,tab}){
               <span className="ssl-box-name">{p.name}{p.mvp&&<span className="ssl-box-mvp">MVP</span>}</span>
               <small>{p.positions}</small>
             </th>
-            {fields.map(([key])=><td key={key} className={key==='tgp'?'ssl-box-highlight':''}>{fmt(valueFor(p,key),key)}</td>)}
+            {fields.map(([key])=><td key={key} className={['tgp','ogp','dgp','pgp'].includes(key)?'ssl-box-highlight':''}>{fmt(valueFor(p,key),key)}</td>)}
           </tr>)}</tbody>
         </table>
       </div>
