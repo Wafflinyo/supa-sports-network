@@ -89,7 +89,9 @@ function InningLineScore({game}){
         </tr></thead>
         <tbody>{game.teams.map((team,index)=>
           <tr key={team.key}>
-            <th scope="row">{team.name}</th>
+            <th scope="row">{team.name}
+              {innings.top&&<small> · {innings.top===(index===0?'away':'home')?'TOP':'BOTTOM'}</small>}
+            </th>
             {innings[index===0?'away':'home'].map((runs,i)=>
               <td key={i}>{runs==null?'X':runs}</td>)}
             <td className="ssl-box-innings-total">{team.score}</td>
