@@ -69,3 +69,12 @@
 .ssl-box-innings-table thead .ssl-box-innings-total{color:#ffd342;background:#18355e}
 .ssl-box-innings>p{margin:8px 0 0;color:#64748b;font-size:11px}
 @media(max-width:600px){.ssl-box-innings{padding:12px 12px}.ssl-box-innings-table th,.ssl-box-innings-table td{padding:9px 10px}}
+
+/* Project Rio red inning cells signal extra innings. Preserve the marker in
+   public and commissioner-only box scores, including horizontally scrolled
+   mobile line scores. */
+.ssl-box-extra-label{display:inline-block;vertical-align:middle;margin-left:8px;padding:3px 8px;
+  border-radius:6px;background:#fff1f2;color:#a81428;border:1px solid #fecdd3;
+  font:900 12px system-ui,sans-serif;letter-spacing:.045em}
+.ssl-box-innings-table thead th.ssl-box-inning-extra{background:#65192e;color:#ffe0e5}
+.ssl-box-innings-table tbody td.ssl-box-inning-extra{background:#fff1f2;color:#a81428;font-weight:900}
