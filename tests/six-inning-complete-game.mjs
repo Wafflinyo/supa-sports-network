@@ -34,9 +34,19 @@ assert.equal(gamePointsForReport(ronald).pgp,
 assert.deepEqual(report.innings,lines);
 
 const zeros={...preview,inningScores:{away:[...lines.away],home:[0,0,2,1,0,0,0]}};
-assert(earnedSixInningCompleteGame(zeros,pitcher),
-  'Rio may display unplayed bottom of seventh as zero, not X/blank');
-assert.equal(buildReport(zeros,'Away',season,game,[],null).players[0].stats.completeGames,1);
+assert.equal(earnedSixInningCompleteGame(zeros,pitcher),false,
+  'A zero in the seventh is a played scoreless half-inning, not evidence that it was skipped');
+assert.equal(completeGameForReportPitcher(zeros,pitcher),0,
+  'Never automatically award a complete game when bottom seventh is recorded as zero');
+const zeroReport=buildReport(zeros,'Away',season,game,[],null);
+assert.equal(zeroReport.players[0].stats.completeGames,0);
+assert.equal(zeroReport.players[0].gameScore,baseline,
+  'No +20 CG award when a zero rather than X/blank appears');
+const manuallyVerified={...pitcher,completegames:1};
+const reviewed={...zeros,pitch:[manuallyVerified]};
+assert.equal(completeGameForReportPitcher(reviewed,manuallyVerified),1,
+  'Commissioner can explicitly verify a skipped inning when Rio recorded an ambiguous zero');
+assert.equal(buildReport(reviewed,'Away',season,game,[],null).players[0].stats.completeGames,1);
 const withReliever={...preview,pitch:[pitcher,{...pitcher,chosen:33,player:'Reliever',inningspitched:0}]};
 assert(!earnedSixInningCompleteGame(withReliever,pitcher),'Any additional team pitcher prevents automatic CG');
 assert(!earnedSixInningCompleteGame({...preview,labels:['Home','Away']},pitcher),
@@ -52,4 +62,4 @@ assert(!earnedSixInningCompleteGame({...preview,pitch:[shortPitcher]},shortPitch
   'Pitcher must actually record eighteen outs');
 assert.equal(completeGameForReportPitcher({...preview,pitch:[{...pitcher,completegames:1}]},
   {...pitcher,completegames:1}),1,'Explicit verified Rio CG remains valid');
-console.log('PASS: six-inning sole visiting pitcher earns +20 CG if bottom seventh is unplayed; no false positives');
+console.log('PASS: six-inning CG needs unplayed X/blank, zero never triggers it automatically, explicit commissioner CG remains available');
