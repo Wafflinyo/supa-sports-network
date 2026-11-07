@@ -56,7 +56,7 @@ function MatchStorySlide({story,seasons,supabase,players,onOpenGame}){
        <strong>TOP {topPlayers.length} GAME POINT {topPlayers.length===1?'LEADER':'LEADERS'}</strong>
        <ol>{topPlayers.map((p,i)=><li key={p.playerId}>
          <span className="ssl-headliner-rank">{i+1}</span>
-         <PlayerPortrait player={playerPool.get(Number(p.playerId))||{id:p.playerId,name:p.name}} size={32}/>
+         <PlayerPortrait player={playerPool.get(Number(p.playerId))||{id:p.playerId,name:p.name}} size={32} showHeat={false}/>
          <span className="ssl-headliner-player-name">{p.name}</span>
          <span className="ssl-headliner-tgp" title="Total Game Points">{pointsLabel(p.gamePoints)} <small>TGP</small></span>
          {p.heatingUp&&<span className="ssl-headliner-hot" aria-label="Heating Up threshold reached" title="Heating Up"><HeatFlame/></span>}

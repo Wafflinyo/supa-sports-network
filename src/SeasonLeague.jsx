@@ -78,9 +78,10 @@ const iso = (v) => new Date(v).toISOString();
 const name = (id) => byPlayer.has(Number(id)) ? taggedName(byPlayer.get(Number(id))) : "Unknown player";
 function Player({ id, seasons=[] }) {
   const p = byPlayer.get(Number(id));
-  return <PlayerProfileLink player={p} className="portrait-label">
+  return <PlayerProfileLink player={p} className="portrait-label" showHeatMark={false}>
     <PlayerPortrait player={p} />
     {p?.name || 'Unknown player'}
+    {p&&<HeatMark playerId={p.id} inline/>}
     {p&&<PitcherPriorityBadge player={p} record={playerData.players[p.id]}/>}
   </PlayerProfileLink>;
 }
