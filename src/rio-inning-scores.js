@@ -169,7 +169,10 @@ export function inningScoringDrama(lines){
     finalLeader!==penultimateLead;
   const lateTieBreaking=!walkoff&&finalLeader!==0&&penultimateLead===0&&
     valid.away.length>=2;
+  const inningCount=valid.away.length;
   return {leadChanges,lateFinish:walkoff?'walkoff':lateComeback?'late-comeback':'none',
-    lateTieBreaking,inningCount:valid.away.length,
+    lateTieBreaking,inningCount,
+    extraInnings:inningCount>7,
+    extraInningCount:Math.max(0,inningCount-7),
     evidence:'scored innings (top then bottom)',walkoff};
 }
