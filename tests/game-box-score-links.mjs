@@ -70,10 +70,13 @@ assert.deepEqual(regular.teams.map(t=>t.score),[3,5]);
 assert.equal(regular.hasPlayerStats,true);
 assert.equal(regular.teams[1].players[0].name,'Daisy');
 assert.equal(regular.teams[1].players[0].mvp,true);
-assert.equal(regular.teams[1].players[0].points.ogp,22);
+assert.equal(regular.teams[1].players[0].points.ogp,30.56,'OGP includes Item Score and its proportional MVP portion');
 assert.equal(regular.teams[1].players[0].itemScore,4);
 assert.equal(regular.teams[1].players[0].points.tgp,67);
-assert.equal(regular.teams[1].players[0].points.pgp,26,'PGP counts +3 for 12 pitches as well as +5 for strikes');
+assert.equal(regular.teams[1].players[0].points.pgp,30.56,'PGP includes the proportional MVP portion for players who pitched');
+assert.equal(regular.teams[1].players[0].points.dgp,5.88);
+assert.equal(Math.round(['ogp','dgp','pgp'].reduce((s,k)=>s+regular.teams[1].players[0].points[k],0)*100)/100,67,
+  'Box score categories fully explain the TGP without separate MVP/Item Score additions');
 assert.equal(seasonBoxScore(season,{...game,stage:'recorded'}),null,'Do not leak unreleased report statistics');
 const finalWithoutReport=seasonBoxScore(season,{...game,result:{scores:{away:3,home:5}}});
 assert.equal(finalWithoutReport.hasPlayerStats,false,'Final scores without player reports must be represented honestly');
