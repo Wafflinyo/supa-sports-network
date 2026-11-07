@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {extractRioInningScores,validateInningScores} from '../src/rio-inning-scores.js';
+import {earnedSixInningCompleteGame} from '../src/season-data.js';
+import {validateRioMatchup} from '../src/rio-team-mapping.js';
 import {seasonBoxScore,preseasonBoxScore,previewPrivateGameBoxScore} from '../src/game-box-score-data.js';
 
 const away='New Donk City Fuggetaboudits',home='Delfino Dolphins';
@@ -27,6 +29,50 @@ const skipped=extractRioInningScores(skippedRows,season.teams,game);
 assert.equal(skipped.home[6],null,'X/blank bottom seventh stays an unplayed inning');
 assert.equal(extractRioInningScores(rows,season.teams,game).home[6],0,
   'A recorded scoreless bottom seventh must remain a played zero');
+// The first physical scorecard row may be the team that bats BOTTOM.
+// Both explicit labels and team aliases are supported in either row order.
+const bottomFirst=rows.map(row=>[...row]);
+bottomFirst[23]=[...rows[24]];
+bottomFirst[24]=[...rows[23]];
+bottomFirst[23][9]='Jr. Rookies (Bottom)';
+bottomFirst[24][9]='DK Wilds (Top)';
+bottomFirst[23][16]='X';
+assert.equal(validateRioMatchup(bottomFirst,season.teams,game).length,2,
+  'Game Info matchup recognition ignores the optional batting-half tag');
+const bottomFirstScore=extractRioInningScores(bottomFirst,season.teams,game);
+assert.deepEqual(bottomFirstScore,{
+  away:[3,2,0,0,1,0,2],
+  home:[1,3,0,5,2,2,null],
+},'X in FIRST displayed scorecard row belongs to the home/bottom team');
+assert.deepEqual(validateInningScores(bottomFirstScore,8,13),bottomFirstScore);
+const awayPitcher={player:'Ronald',chosen:45,label:away,inningspitched:6,completegames:0};
+const visitingSixInningPreview={labels:[away,home],pitch:[awayPitcher],inningScores:bottomFirstScore};
+assert.equal(earnedSixInningCompleteGame(visitingSixInningPreview,awayPitcher),true,
+  'CG goes to the visiting pitcher despite X being in the top spreadsheet row');
+const playedZero=bottomFirst.map(row=>[...row]);
+playedZero[23][16]=0;
+const playedScore=extractRioInningScores(playedZero,season.teams,game);
+assert.equal(playedScore.home[6],0);
+assert.equal(earnedSixInningCompleteGame({...visitingSixInningPreview,inningScores:playedScore},awayPitcher),false,
+  'Numerical 0 means scoreless played half, never automatic shortened CG');
+const conflicting=bottomFirst.map(row=>[...row]);
+conflicting[23][9]='Jr. Rookies (Top)';
+conflicting[24][9]='DK Wilds (Bottom)';
+assert.throws(()=>extractRioInningScores(conflicting,season.teams,game),
+  /labels conflict with this scheduled matchup/,
+  'Conflicting Top/Bottom annotations must fail rather than silently swap credited teams');
+const partial=bottomFirst.map(row=>[...row]);
+partial[24][9]='DK Wilds';
+assert.throws(()=>extractRioInningScores(partial,season.teams,game),
+  /labels conflict with this scheduled matchup/,
+  'Both teams need consistent annotations if either is labeled');
+// Vertical Rio scorecard layouts also use the team name/half rather than
+// positional order of the team columns.
+const vertical=[['Inning','Jr. Rookies (Bottom)','DK Wilds (Top)']];
+for(let i=0;i<7;i++)vertical.push([i+1,[1,3,0,5,2,2,'X'][i],expected.away[i]]);
+assert.deepEqual(extractRioInningScores(vertical,season.teams,game),bottomFirstScore,
+  'Vertical scorecard can put Bottom team in first team column too');
+
 assert.throws(()=>validateInningScores(expected,8,12),/do not match/);
 const released=seasonBoxScore(season,{...game,result:{scores:{away:8,home:13},players:[],innings:expected}});
 assert.deepEqual(released.innings,expected,'Official released box score carries inning lines');
