@@ -202,7 +202,7 @@ function ArchiveTeams({season,supabase}){
 
       </tr>)}</tbody>
     </table></div>
-    <p className="ssl-history-note">Default ordering uses win–loss record. TGP is the team Game Points total; AGP is that total divided by completed team games. W–L always displays total wins and losses.</p>
+    <p className="ssl-history-note">Default ordering uses win–loss record. TGP = OGP + DGP + PGP; AGP is TGP divided by completed team games. Item is already part of OGP (not additional points), and each +10 MVP bonus is split proportionally among the player's eligible categories. W–L always displays total wins and losses.</p>
   </ArchivePanel>;
 }
 const pointCols=[['gamesPlayed','GP'],['tgp','TGP'],['agp','AGP'],['ogp','OGP'],['dgp','DGP'],
