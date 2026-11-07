@@ -200,7 +200,7 @@ const counts = new Set(
 // Derived percentages, ERA, WHIP and innings pitched (decimal) must never be
 // included in a saved report. Keep outs and complete-game counts explicitly;
 // they are not regular spreadsheet counting-column keys.
-const savedCountingFields=new Set([...counts,'outs','completeGames','starBases','mvps']);
+const savedCountingFields=new Set([...counts,'outs','completeGames','starBases','mvps','zeroOutRemoval']);
 export function savedReportCountingStats(stats){
   return Object.fromEntries(Object.entries(stats||{}).filter(([key])=>
     savedCountingFields.has(key)));
