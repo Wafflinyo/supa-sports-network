@@ -146,8 +146,8 @@ assert.equal(avg.averages.gameScore,109);
 assert.deepEqual([avg.ogp,avg.dgp,avg.pgp,avg.tgp,avg.agp],[75,-1,25,109,109]);
 assert.equal(avg.averages.agp,109);
 const below={...game,id:'g0',startsAt:'2026-10-31T17:00:00Z',
-  result:{players:[{...report.players[0],stats:{hits:29,atBats:29},gameScore:119}]}};
-const above={...g,result:{players:[{...report.players[0],stats:{hits:30,atBats:30},gameScore:120}]}};
+  result:{players:[{...report.players[0],stats:{hits:29,atBats:29},itemScore:0,gameScore:119}]}};
+const above={...g,result:{players:[{...report.players[0],stats:{hits:30,atBats:30},itemScore:0,gameScore:120}]}};
 const hotSeason={...season,games:[below,above,{...game,id:'g2',stage:'scheduled',
  startsAt:'2026-11-02T17:00:00Z'}]};
 const heat=heatingUpForSeason(hotSeason);
