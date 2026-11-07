@@ -84,8 +84,9 @@ assert.equal(recordedHeat.length,1,'Commissioner private Heating Up previews are
 assert.equal(recordedStats.length,2,'Both teams get grouped private achievements');
 assert(commissioner.every(x=>x.private===true),
   'Grouping must NEVER strip private marker from staged Project Rio stories');
-assert(commissioner.every(x=>x.category!=='match'),
-  'Unreleased result must not generate a public game headline');
+assert(commissioner.some(x=>x.category==='match'&&x.private) &&
+  commissioner.filter(x=>x.category==='match').every(x=>x.private),
+  'Commissioner-only match previews remain private until public release');
 const publicBeforeRelease=leagueNews([privateSeason],people,{includeRecorded:false});
 assert.deepEqual(publicBeforeRelease,[],
   'GM and public news must not see private reports or their grouped achievements');
