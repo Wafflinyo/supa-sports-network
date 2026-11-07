@@ -8,10 +8,10 @@ const makeSeason=(stage='recorded',awayScore=6,homeScore=5)=>({
  games:[{
   id:'game1',phase:'regular',week:1,stage,away:'away',home:'home',
   result:{scores:{away:awayScore,home:homeScore},players:[
-   {player:1,team:'away',gameScore:HEATING_UP_THRESHOLD,stats:{runs:2,rbi:3,homeRuns:1,twoHr:1,putouts:3,assists:3,doublePlays:2}},
+   {player:1,team:'away',gameScore:HEATING_UP_THRESHOLD,stats:{runs:2,rbi:3,homeRuns:1,twoHr:1,hits:1,atBats:1,totalBases:4,putouts:3,assists:4,doublePlays:2}},
    {player:2,team:'away',gameScore:97,stats:{putouts:7,assists:5,doublePlays:5}},
    {player:3,team:'away',gameScore:88,stats:{putouts:6,doublePlays:5}},
-   {player:4,team:'home',gameScore:114,stats:{homeRuns:1,oneHr:1}},
+   {player:4,team:'home',gameScore:114,stats:{homeRuns:1,oneHr:1,hits:1,atBats:1,totalBases:4,runs:1,rbi:1,pitchStrikeouts:4,putouts:1}},
   ]}
  }],
  transactions:[],
