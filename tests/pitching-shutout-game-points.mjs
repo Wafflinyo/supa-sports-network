@@ -96,7 +96,9 @@ assert.equal(diddy.stats.shutoutBonus,30);
 assert.equal(diddy.stats.shutouts,1);
 assert.equal(diddy.stats.completeGames,1,'Solo shutout pitcher retains complete game in statistical history');
 assert.equal(diddy.stats.combinedShutouts,0);
-assert.equal(diddy.stats.pgp,93.5);
+assert(diddy.stats.pgp>93.5,'MVP pitcher receives the pitching portion of the bonus');
+assert.equal(Math.round((diddy.stats.ogp+diddy.stats.dgp+diddy.stats.pgp)*100)/100,diddy.stats.tgp,
+  'Preseason pitcher MVP share is fully accounted for across OGP/DGP/PGP');
 assert.equal(diddy.stats.tgp,123.5,'Diddy earns -2 per hitless at-bat under the new scoring formula');
 assert(ruffiansPlayers.find(p=>p.playerId===13).stats.tgp<0,'Negative Game Points still allowed');
 const away=preseasonTeamStats().find(t=>t.teamName==='Rogueport Ruffians');
