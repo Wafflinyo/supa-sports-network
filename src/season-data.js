@@ -368,11 +368,41 @@ export function previewShutoutBonuses(preview){
     away:labels[0],home:labels[1],awayScore:runs[0],homeScore:runs[1],pitchers,
   });
 }
+// In seven-inning baseball the visiting team never pitches the bottom of the
+// seventh if the home team already leads after the top half. A sole visiting
+// pitcher with 18 outs has therefore completed ALL of his team's defensive
+// innings, even when Project Rio's Complete Games cell is zero.
+export function earnedSixInningCompleteGame(preview,pitcher){
+  if(!pitcher||!Array.isArray(preview?.pitch)||!Array.isArray(preview?.labels)||
+     preview.labels.length!==2||pitcher.label!==preview.labels[0])return false;
+  const sameTeam=preview.pitch.filter(p=>p.label===pitcher.label);
+  if(sameTeam.length!==1||sameTeam[0]!==pitcher||!Number(pitcher.chosen))return false;
+  // The report's IP decimal is innings, not baseball's 6.1/6.2 notation:
+  // require exactly eighteen retired batters, not rounded 5.99/6.01 IP.
+  if(Number(pitcher.inningspitched)!==6)return false;
+  const {away,home}=preview.inningScores||{};
+  if(!Array.isArray(away)||!Array.isArray(home)||
+     away.length!==7||home.length!==7)return false;
+  if(away.some(n=>!Number.isInteger(n)||n<0)||
+     home.slice(0,6).some(n=>!Number.isInteger(n)||n<0))return false;
+  // Project Rio can mark an unplayed bottom seventh as X/blank (null),
+  // or as a zero. Reconstruct the actual outcome rather than trusting zero.
+  if(home[6]!==null&&home[6]!==0)return false;
+  const homeAfterSix=home.slice(0,6).reduce((sum,n)=>sum+n,0);
+  const awayAfterSeven=away.reduce((sum,n)=>sum+n,0);
+  return homeAfterSix>awayAfterSeven;
+}
+export function completeGameForReportPitcher(preview,pitcher){
+  if(!pitcher)return 0;
+  const rioFlag=/^(1|yes|true)$/i.test(String(pitcher.completegames??'').trim());
+  return Number(rioFlag||earnedSixInningCompleteGame(preview,pitcher));
+}
 export function previewCustomGameScore(preview,row,mvp=null){
   const pitching=preview.pitch.filter(p=>Number(p.chosen)&&Number(p.chosen)===Number(row.chosen)
     || (normalize(p.player)===normalize(row.player)&&(!p.team||String(p.team)===row.label)));
   if(pitching.length>1)throw Error(`Ambiguous pitching row for ${row.player}.`);
   const stats=reportRowStats(row,pitching[0]);
+  stats.completeGames=completeGameForReportPitcher(preview,pitching[0]);
   stats.mvps=mvp!=null&&Number(row.chosen)===Number(mvp)?1:0;
   const bonus=previewShutoutBonuses(preview).get(String(row.chosen))||0;
   return customGameScore(stats,row.itemscore===''?0:row.itemscore,bonus);
@@ -405,6 +435,7 @@ export function buildReport(preview, awayLabel, season, game, players, mvp) {
     if (pitching.length > 1)
       throw Error(`Ambiguous pitching row for ${r.player}.`);
     const stats=reportRowStats(r,pitching[0]);
+    stats.completeGames=completeGameForReportPitcher(preview,pitching[0]);
     stats.mvps=player===Number(mvp)?1:0;
     stats.starBases=Number(r.starbaseshelper||0);
     const shutoutBonus=shutoutBonuses.get(String(player))||0;
@@ -426,7 +457,7 @@ export function buildReport(preview, awayLabel, season, game, players, mvp) {
   if (new Set(result.map((x) => x.player)).size !== result.length)
     throw Error("A player was mapped more than once.");
   for (const pitcher of preview.pitch) {
-    if (Number(pitcher.completegames)===1 &&
+    if (completeGameForReportPitcher(preview,pitcher)===1 &&
        (preview.pitch.filter(p=>p.label===pitcher.label).length!==1 ||
         Number(pitcher.inningspitched)<=0))
       throw Error(`${pitcher.player}: a complete game requires that pitcher to throw the entire game, with no relief pitchers for the same team.`);
