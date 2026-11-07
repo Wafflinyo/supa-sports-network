@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {leagueNews} from '../src/league-news.js';
+import {gamePointsForReport} from '../src/game-points.js';
 
 const people=[
   {id:1,name:'Wario'},{id:2,name:'Wendy'},
@@ -12,13 +13,14 @@ const teams=[
 ];
 const row=(player,team,gameScore,stats)=>({player,team,gameScore,stats});
 const wario=row(1,'knights',180.5,{
-  homeRuns:2,twoHr:2,runs:2,rbi:5,atBats:4,plateAppearances:4,hits:2,
+  homeRuns:2,twoHr:2,runs:2,rbi:5,atBats:4,plateAppearances:4,hits:2,totalBases:8,
 });
 const wendy=row(2,'knights',123,{
-  putouts:8,assists:1,hits:3,atBats:3,plateAppearances:3,
+  putouts:8,assists:1,buddyJumpPutouts:5,hits:3,atBats:3,plateAppearances:3,
 });
 const diddy=row(3,'knights',141.36,{
   outs:16,pitchStrikeouts:3,earnedRuns:0,runsAllowed:0,strikes:13,
+  pitches:100,hits:2,atBats:2,totalBases:2,
 });
 const bowser=row(4,'checkers',53,{
   homeRuns:1,oneHr:1,runs:2,rbi:4,atBats:4,plateAppearances:4,hits:2,
@@ -39,8 +41,8 @@ assert.equal(teamStats.filter(item=>item.teamId==='checkers').length,1,
 assert.equal(teamHeat.length,1,'All three teammates Heating Up appear in ONE fire post');
 assert.equal(teamHeat[0].teamId,'knights');
 assert(teamHeat[0].id.startsWith('team-heating:'));
-assert(teamHeat[0].summary.includes('180.5')&&teamHeat[0].summary.includes('123')&&
-  teamHeat[0].summary.includes('141.36'));
+assert([wario,wendy,diddy].every(row=>teamHeat[0].summary.includes(String(gamePointsForReport(row).tgp))),
+  'Heating Up news displays dynamically recomputed scores, never old imported totals');
 assert(teamHeat[0].summary.includes('Wendy')&&teamHeat[0].summary.includes('Diddy Kong'));
 assert(!teamHeat[0].summary.includes('Home runs:')&&!teamHeat[0].summary.includes('Fielding:'),
   'Heating Up news must not be merged with unrelated stat achievements');
