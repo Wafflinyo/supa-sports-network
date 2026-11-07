@@ -8,13 +8,13 @@ export const PlayerProfileContext=createContext(null);
 export function usePlayerProfile(){
   return useContext(PlayerProfileContext);
 }
-export function PlayerProfileLink({player,children,className='',title}){
+export function PlayerProfileLink({player,children,className='',title,showHeatMark=true}){
   const open=usePlayerProfile();
   if(!player)return <span>{children}</span>;
   return <button type="button" className={'ssl-player-profile-link '+className}
     aria-label={title||'View '+player.name+' career statistics'}
     onClick={()=>open?.(player)}>
     <PortraitFlameContext.Provider value={false}>{children}</PortraitFlameContext.Provider>
-    <HeatMark playerId={player.id} inline/>
+    {showHeatMark&&<HeatMark playerId={player.id} inline/>}
   </button>;
 }
