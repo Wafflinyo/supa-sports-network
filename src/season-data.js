@@ -319,6 +319,11 @@ export function reportRowStats(row,pitchRow=null){
   for(const [key] of [...columns['Offensive Stats'],...columns['Defensive Stats']])
     if(counts.has(key)&&key!=='mvps')stats[key]=reportStatCount(row,key);
   stats.totalBases=stats.singles+2*stats.doubles+3*stats.triples+4*stats.homeRuns;
+  // Official SSL credit: each Project Rio sacrifice fly adds one RBI,
+  // even if the Rio RBI column already records other runs batted in.
+  // Normalize ONCE while importing source rows, so the saved RBI, OGP,
+  // TGP, leaderboards and box scores all use the same authoritative count.
+  stats.rbi+=stats.sacFlys;
   stats.plateAppearances=stats.plateAppearances||
     stats.atBats+stats.batWalks+stats.hitByPitch+stats.sacFlys;
   if(pitchRow){
