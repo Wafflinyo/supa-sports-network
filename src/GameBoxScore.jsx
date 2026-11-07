@@ -56,7 +56,7 @@ function TeamBoxTable({team,tab}){
               <span className="ssl-box-name">{p.name}{p.mvp&&<span className="ssl-box-mvp">MVP</span>}</span>
               <small>{p.positions}</small>
             </th>
-            {fields.map(([key])=><td key={key} className={key==='tgp'?'ssl-box-highlight':''}>{fmt(valueFor(p,key),key)}</td>)}
+            {fields.map(([key])=><td key={key} className={['tgp','ogp','dgp','pgp'].includes(key)?'ssl-box-highlight':''}>{fmt(valueFor(p,key),key)}</td>)}
           </tr>)}</tbody>
         </table>
       </div>
