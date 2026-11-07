@@ -77,13 +77,17 @@ function InningLineScore({game}){
       </p>
     </section>;
   const columns=Array.from({length:innings.away.length},(_,i)=>i+1);
+  const red=new Set(innings.redInnings||[]);
+  const isExtra=!!innings.extraInnings||columns.length>7||red.size>0;
+  const isExtraInning=n=>n>7||red.has(n);
   return <section className="ssl-box-innings" aria-label="Runs scored by inning">
-    <h3>SCORING BY INNING</h3>
+    <h3>SCORING BY INNING {isExtra&&<span className="ssl-box-extra-label">EXTRA INNINGS</span>}</h3>
     <div className="ssl-box-innings-scroll" role="region" tabIndex={0}
       aria-label="Inning-by-inning game line score">
       <table className="ssl-box-innings-table">
         <thead><tr><th scope="col">TEAM</th>
-          {columns.map(n=><th key={n} scope="col">{n}</th>)}
+          {columns.map(n=><th key={n} scope="col"
+            className={isExtraInning(n)?'ssl-box-inning-extra':''}>{n}</th>)}
           <th scope="col" className="ssl-box-innings-total">R</th>
           <th scope="col">H</th>
         </tr></thead>
@@ -93,14 +97,15 @@ function InningLineScore({game}){
               {innings.top&&<small> · {innings.top===(index===0?'away':'home')?'TOP':'BOTTOM'}</small>}
             </th>
             {innings[index===0?'away':'home'].map((runs,i)=>
-              <td key={i}>{runs==null?'X':runs}</td>)}
+              <td key={i} className={isExtraInning(i+1)?'ssl-box-inning-extra':''}>{runs==null?'X':runs}</td>)}
             <td className="ssl-box-innings-total">{team.score}</td>
             <td>{team.hits}</td>
           </tr>)}
         </tbody>
       </table>
     </div>
-    <p>Runs in each inning, directly from the Project Rio Game Info worksheet.</p>
+    <p>Runs in each inning, directly from the Project Rio Game Info worksheet.
+      {isExtra&&' Extra innings are marked in red.'}</p>
   </section>;
 }
 export default function GameBoxScore({game,onClose,inline=false}){
