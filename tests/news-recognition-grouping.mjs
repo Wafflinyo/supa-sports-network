@@ -100,7 +100,7 @@ assert.match(home,/item.category==='heating'&&item.gameId&&item.playerId==null/,
 assert.match(home,/<HeadlineReadMore id=\{item.id\} text=\{item.summary\} limit=\{195\}/,
   'Long team news stories continue to expand with …more');
 const main=readFileSync(new URL('../src/main.jsx',import.meta.url),'utf8');
-assert.match(main,/includeRecorded:access.role==='commissioner'/,
+assert.match(main,/includeRecorded:!!session&&access.role==='commissioner'/,
   'Only commissioner account enables private preview mode');
 const server=readFileSync(new URL('../supabase/migrations/20261104072400_ssl_match_story_editor_and_private_headlines.sql',import.meta.url),'utf8');
 assert.match(server,/g:=g-''result''-''story''/,
