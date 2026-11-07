@@ -50,7 +50,7 @@ const validateHalfLabels=(found,game)=>{
 };
 // Store innings by the scheduled Away/Home teams; store who actually bats TOP
 // separately, based only on explicit coin-toss labels on Game Info.
-const scoreLines=(game,away,home,top=null)=>{
+const scoreLines=(game,away,home,top=null,source={})=>{
   if(!Array.isArray(away)||!Array.isArray(home)||
      !away.length||away.length!==home.length||away.length>20||
      (top!=null&&top!=='away'&&top!=='home'))return null;
@@ -59,8 +59,19 @@ const scoreLines=(game,away,home,top=null)=>{
   if(topRuns.some(x=>!Number.isInteger(x)||x<0||x>99)||
      bottomRuns.some((x,i)=>(x!==null&&(!Number.isInteger(x)||x<0||x>99))||
        (x===null&&i!==bottomRuns.length-1)))return null;
-  return {away,home,...(top!=null?{top}:{})};
+  const redInnings=[...new Set(
+    (Array.isArray(source.redInnings)?source.redInnings:[])
+      .filter(n=>Number.isInteger(n)&&n>=1&&n<=away.length)
+  )].sort((a,b)=>a-b);
+  // SSL normally plays seven innings; an eighth is extra even if a user's
+  // spreadsheet loses its red font when exported. Red inning cells are also
+  // an explicit Project Rio signal that must survive the upload.
+  const extraInnings=away.length>7||redInnings.length>0||source.extraInnings===true;
+  return {away,home,...(top!=null?{top}:{}),
+    ...(extraInnings?{extraInnings:true}:{}),
+    ...(redInnings.length?{redInnings}:{})};
 };
+const redAt=(row,col)=>Array.isArray(row?._rioRedCols)&&row._rioRedCols.includes(col);
 function horizontalScore(rows,teams,game){
   for(let h=0;h<rows.length;h++){
     const header=rows[h]||[];
@@ -79,7 +90,7 @@ function horizontalScore(rows,teams,game){
         if(!team||found.has(team.id))continue;
         const values=cols.map(c=>asRuns(row[c]));
         if(values.some(v=>v===undefined))continue;
-        found.set(team.id,{values,half:team.half});
+        found.set(team.id,{values,half:team.half,redCols:row._rioRedCols||[]});
       }
       if(found.size!==2)continue;
       const awayTeam=found.get(String(game.away));
@@ -92,7 +103,11 @@ function horizontalScore(rows,teams,game){
       let end=cols.length;
       while(end>0&&rawAway[end-1]===null&&rawHome[end-1]===null)end--;
       const away=rawAway.slice(0,end),home=rawHome.slice(0,end);
-      const parsed=scoreLines(game,away,home,top);
+      const redInnings=cols.slice(0,end).flatMap((col,index)=>
+        (redAt(header,col)||
+          awayTeam.redCols.includes(col)||
+          homeTeam.redCols.includes(col))?[index+1]:[]);
+      const parsed=scoreLines(game,away,home,top,{redInnings});
       if(parsed)return parsed;
     }
   }
@@ -115,7 +130,7 @@ function verticalScore(rows,teams,game){
     }
     if(awayCol<0||homeCol<0)continue;
     const top=validateHalfLabels(found,game);
-    const away=[],home=[];
+    const away=[],home=[],redInnings=[];
     for(let r=h+1;r<Math.min(rows.length,h+21);r++){
       const row=rows[r]||[];
       const inning=asInning(row[inningCol]);
@@ -123,8 +138,10 @@ function verticalScore(rows,teams,game){
       const a=asRuns(row[awayCol]),b=asRuns(row[homeCol]);
       if(a===undefined||b===undefined||(a===null&&b===null))break;
       away.push(a);home.push(b);
+      if([inningCol,awayCol,homeCol].some(col=>redAt(row,col)))
+        redInnings.push(inning);
     }
-    if(away.length>=3)return scoreLines(game,away,home,top);
+    if(away.length>=3)return scoreLines(game,away,home,top,{redInnings});
   }
   return null;
 }
@@ -135,7 +152,7 @@ export function extractRioInningScores(gameInfo,seasonTeams,game){
 }
 export function validateInningScores(lines,awayTotal,homeTotal){
   if(!lines)return null;
-  const parsed=scoreLines(null,lines.away,lines.home,lines.top??null);
+  const parsed=scoreLines(null,lines.away,lines.home,lines.top??null,lines);
   if(!parsed)throw Error('Game Info inning scores must be nonnegative whole runs in each inning.');
   const sum=x=>x.reduce((n,v)=>n+(v??0),0);
   if(sum(parsed.away)!==Number(awayTotal)||sum(parsed.home)!==Number(homeTotal))
@@ -145,7 +162,7 @@ export function validateInningScores(lines,awayTotal,homeTotal){
 // The coin toss decides which team bats TOP, not the SSL schedule.
 export function inningScoringDrama(lines){
   if(!lines)return null;
-  const valid=scoreLines(null,lines.away,lines.home,lines.top??null);
+  const valid=scoreLines(null,lines.away,lines.home,lines.top??null,lines);
   if(!valid)return null;
   const top=valid.top==='home'?'home':'away',bottom=top==='away'?'home':'away';
   let away=0,home=0,lastLeader=0,leadChanges=0;
@@ -171,5 +188,8 @@ export function inningScoringDrama(lines){
     valid.away.length>=2;
   return {leadChanges,lateFinish:walkoff?'walkoff':lateComeback?'late-comeback':'none',
     lateTieBreaking,inningCount:valid.away.length,
+    extraInnings:!!valid.extraInnings,
+    extraInningCount:Math.max(0,valid.away.length-7),
+    redInnings:valid.redInnings||[],
     evidence:'scored innings (top then bottom)',walkoff};
 }
