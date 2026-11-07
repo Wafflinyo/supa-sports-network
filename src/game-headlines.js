@@ -17,7 +17,9 @@ export function gameOutcomeContext(season,game,teamId){
    ?teamRuns>opponentRuns?'win':teamRuns<opponentRuns?'loss':'tie':'game';
  const week=Number(game.week);
  const where=Number.isInteger(week)&&week>0?'Week '+week+"'s":'the';
- return 'in '+where+' '+result+' against the '+opponent+'.';
+ const extra=inningScoringDrama(game.result?.innings);
+ const finish=extra?.extraInnings?' after '+extra.inningCount+' innings':'';
+ return 'in '+where+' '+result+' against the '+opponent+finish+'.';
 }
 // Report PGP is calculated with the SAME official SSL scoring weights used
 // by the box score. Never confuse an individual pitcher's PGP with TGP.
@@ -129,6 +131,8 @@ export function matchHeadline(season,game,players=[],{includeRecorded=false}={})
  // changes, late comebacks and home walk-offs. Commissioner annotations are
  // only a fallback for older reports that lack an inning breakdown.
  const calculated=inningScoringDrama(game.result?.innings);
+ const extraInnings=!!calculated?.extraInnings;
+ const inningCount=calculated?.inningCount??null;
  const leadChanges=calculated?calculated.leadChanges:
    Number.isInteger(story.leadChanges)&&story.leadChanges>=0?Math.min(20,story.leadChanges):0;
  const lateFinish=calculated?calculated.lateFinish:
@@ -163,11 +167,15 @@ export function matchHeadline(season,game,players=[],{includeRecorded=false}={})
   kind==='blowout'?winner+' dominate '+loser+', '+score+'!':
   kind==='close'?winner+' edge '+loser+' in a '+score+' thriller!':
   winner+' defeat '+loser+', '+score+'!';
- if(best&&['blowout','shutout','close'].includes(kind)){
+ if(best&&['blowout','shutout','close'].includes(kind)&&!extraInnings){
   const player=players.find(p=>Number(p.id)===best.playerId)?.name||'A player';
   const stat=best.text.startsWith(player)?best.text.slice(player.length).trim():best.text;
   title=player+' '+stat+' as '+winner+' '+(kind==='shutout'?'blank':kind==='close'?'edge':'rout')+' '+loser+', '+score+'!';
  }
+ // Verified 8+ innings, independent of spreadsheet cell colors.
+ if(extraInnings)title=kind==='walkoff'
+   ?winner+' win an '+inningCount+'-inning walk-off thriller against '+loser+', '+score+'!'
+   :winner+' outlast '+loser+' in '+inningCount+' innings, '+score+'!';
  const labels={walkoff:'WALK-OFF THRILLER',comeback:'LATE COMEBACK',shutout:'SHUTOUT VICTORY',blowout:'DOMINANT BLOWOUT',close:margin===1?'ONE-RUN THRILLER':'CLOSE FINISH',result:'FINAL SCORE'};
  // Keep each team's accomplishments and its outcome commentary together.
  // In particular, the winning-team conclusion must never follow statistics
@@ -190,16 +198,20 @@ export function matchHeadline(season,game,players=[],{includeRecorded=false}={})
    details.push('Despite the '+weekLabel+'loss to the '+winner+
      ', these players left it all out on the diamond');
  }
+ if(extraInnings)details.push(
+   'The contest went '+inningCount+' innings, beyond SSL’s seven-inning regulation');
  if(leadChanges>=2)details.push(leadChanges+' confirmed lead changes');
  if(kind==='comeback')details.push('Confirmed late-inning comeback');
  if(note)details.push(note.replace(/[.!?]+$/,''));
- return {id:'match:'+game.id,category:'match',tier:kind,label:labels[kind],
+ return {id:'match:'+game.id,category:'match',tier:kind,
+   label:extraInnings?'EXTRA-INNINGS '+(kind==='walkoff'?'WALK-OFF':'THRILLER'):labels[kind],
    title,summary:details.length?details.join('. ')+'.':winner+' beat '+loser+' '+score+'.',
    season:season.name,seasonId:season.id,gameId:game.id,
    winnerId,loserId,winner,loser,winnerRuns:big,loserRuns:small,
    awayRuns:a,homeRuns:h,awayId:String(game.away),homeId:String(game.home),
    week:game.week||null,leadChanges,lateFinish,highlights,topPlayers,teamSpotlight,
-   importance:kind==='walkoff'?100:kind==='comeback'?96:
+   extraInnings,inningCount,
+   importance:kind==='walkoff'?100:kind==='comeback'?96:extraInnings?95:
     kind==='shutout'?91:kind==='blowout'?86:kind==='close'?82:58,
    at:game.releasedAt||game.result.postedAt||null,private:game.stage==='recorded'};
 }
