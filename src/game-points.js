@@ -4,7 +4,7 @@ import {SSL_GAME_SCORE_WEIGHTS,customGameScore,gameScoreStatCount,pitchingOuting
 export const GAME_POINT_KEYS=Object.freeze({
   ogp:['hits','runs','rbi','homeRuns','doubles','triples','twoHr','threeHr','grandSlams','totalBases','hitlessAtBats','batStrikeouts','stolenBases','caughtStealing','doublePlaysHitInto','triplePlaysHitInto'],
   dgp:['putouts','assists','buddyJumpPutouts','doublePlays','triplePlays','bobbles'],
-  pgp:['pitchStrikeouts','outs','strikes','pitches','earnedRuns','hitsAllowed','pitchWalks','beanBalls','completeGames','hrAllowed'],
+  pgp:['pitchStrikeouts','outs','strikes','pitches','earnedRuns','hitsAllowed','pitchWalks','beanBalls','zeroOutRemoval','completeGames','hrAllowed'],
 });
 const round2=n=>Math.round((n+Number.EPSILON)*100)/100;
 
