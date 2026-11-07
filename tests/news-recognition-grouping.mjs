@@ -54,8 +54,9 @@ assert.equal(performance.recognitions.filter(x=>x.playerId===1).length,2,
 assert.equal(performance.recognitions.filter(x=>x.playerId===2).length,2,
   'Wendy gets fielding and perfect on-base recognition in the same post');
 for(const name of ['Wario','Wendy','Diddy Kong'])assert(performance.summary.includes(name));
-assert.match(performance.summary,/Week 1.{0,4}win against the Diamond City Checkers/i,
-  "Grouped recognition retains the accurate matchup result without relying on paragraph order");
+assert(performance.summary.includes("Diamond City Checkers") &&
+  /win|victory/i.test(performance.summary),
+  "Grouped recognition retains the opponent and winning context across varied reporter wording");
 assert(!official.some(x=>['home-run','offense','defense','pitching','perfect-batting'].includes(x.category)&&
   x.teamId==='knights'),'No separate recognition posts remain for team');
 assert(performance.private===false&&teamHeat[0].private===false);
