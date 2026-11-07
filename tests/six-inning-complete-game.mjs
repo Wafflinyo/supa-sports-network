@@ -47,8 +47,9 @@ assert(!earnedSixInningCompleteGame({...preview,inningScores:{away:[...lines.awa
   'No CG if home team actually bats in the seventh');
 assert(!earnedSixInningCompleteGame({...preview,inningScores:{away:[0,0,0,0,0,1],home:[0,0,2,1,0,0]}},pitcher),
   'Game Info must prove the top of seventh was played');
-assert(!earnedSixInningCompleteGame({...preview,pitch:[{...pitcher,inningspitched:5.99}]},
-  {...pitcher,inningspitched:5.99}),'Pitcher must actually record eighteen outs');
+const shortPitcher={...pitcher,inningspitched:5.99};
+assert(!earnedSixInningCompleteGame({...preview,pitch:[shortPitcher]},shortPitcher),
+  'Pitcher must actually record eighteen outs');
 assert.equal(completeGameForReportPitcher({...preview,pitch:[{...pitcher,completegames:1}]},
   {...pitcher,completegames:1}),1,'Explicit verified Rio CG remains valid');
 console.log('PASS: six-inning sole visiting pitcher earns +20 CG if bottom seventh is unplayed; no false positives');
