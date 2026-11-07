@@ -57,8 +57,9 @@ export function aggregate(season) {
       const st = stats[p.player] || { gamesPlayed: 0, positionsPlayed: [] };
       st.gamesPlayed++;
       for (const [k, v] of Object.entries(p.stats)) st[k] = (st[k] || 0) + v;
-      if(typeof p.gameScore==='number'&&Number.isFinite(p.gameScore))
-        st.gameScore=(st.gameScore||0)+p.gameScore;
+      // Recomputed Game Score must match the TGP shown in box scores and history.
+      const gp=gamePointsForReport(p);
+      st.gameScore=Math.round(((st.gameScore||0)+gp.tgp+Number.EPSILON)*100)/100;
       if(typeof p.itemScore==='number'&&Number.isFinite(p.itemScore))
         st.itemScore=(st.itemScore||0)+p.itemScore;
       if(typeof p.shutoutBonus==='number'&&Number.isFinite(p.shutoutBonus))
@@ -69,7 +70,6 @@ export function aggregate(season) {
         st.shutouts=(st.shutouts||0)+counts.shutouts;
         st.combinedShutouts=(st.combinedShutouts||0)+counts.combinedShutouts;
       }
-      const gp=gamePointsForReport(p);
       for(const key of ['ogp','dgp','pgp','tgp'])st[key]=Math.round(((st[key]||0)+gp[key]+Number.EPSILON)*100)/100;
       st.positionsPlayed = [
         ...new Set([...st.positionsPlayed, ...(p.positions || [])]),
