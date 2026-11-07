@@ -50,9 +50,9 @@ assert.equal(buildReport(reviewed,'Away',season,game,[],null).players[0].stats.c
 const withReliever={...preview,pitch:[pitcher,{...pitcher,chosen:33,player:'Reliever',inningspitched:0}]};
 assert(!earnedSixInningCompleteGame(withReliever,pitcher),'Any additional team pitcher prevents automatic CG');
 assert(!earnedSixInningCompleteGame({...preview,labels:['Home','Away']},pitcher),
-  'Six innings for the home-side pitcher are not enough in a seven-inning game');
-assert(!earnedSixInningCompleteGame({...preview,inningScores:{away:[0,0,0,0,0,0,4],home:[0,0,2,1,0,0,null]}},pitcher),
-  'No CG if home team did not lead after visiting seventh');
+  'Six innings for the BOTTOM-batting pitcher are not enough when that team had seven defensive turns');
+assert(earnedSixInningCompleteGame({...preview,inningScores:{away:[0,0,0,0,0,0,4],home:[0,0,2,1,0,0,null]}},pitcher),
+  'Top and Bottom labels determine the needed defensive innings; the scheduled winner does not change complete-game credit');
 assert(!earnedSixInningCompleteGame({...preview,inningScores:{away:[...lines.away],home:[0,0,2,1,0,0,1]}},pitcher),
   'No CG if home team actually bats in the seventh');
 assert(!earnedSixInningCompleteGame({...preview,inningScores:{away:[0,0,0,0,0,1],home:[0,0,2,1,0,0]}},pitcher),

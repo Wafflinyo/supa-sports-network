@@ -368,31 +368,27 @@ export function previewShutoutBonuses(preview){
     away:labels[0],home:labels[1],awayScore:runs[0],homeScore:runs[1],pitchers,
   });
 }
-// In seven-inning baseball the visiting team never pitches the bottom of the
-// seventh if the home team already leads after the top half. A sole visiting
-// pitcher with 18 outs has therefore completed ALL of his team's defensive
-// innings, even when Project Rio's Complete Games cell is zero.
+// A seven-inning game may finish after the TOP of the seventh; whichever
+// SSL franchise won the in-game coin toss and bats TOP only has six defensive
+// innings to pitch. This is independent of the league's scheduled Home/Away.
+// Trust only an explicit X/blank for the unplayed BOTTOM seventh, never a 0.
 export function earnedSixInningCompleteGame(preview,pitcher){
+  const {away,home,top}=preview?.inningScores||{};
   if(!pitcher||!Array.isArray(preview?.pitch)||!Array.isArray(preview?.labels)||
-     preview.labels.length!==2||pitcher.label!==preview.labels[0])return false;
-  const sameTeam=preview.pitch.filter(p=>p.label===pitcher.label);
-  if(sameTeam.length!==1||sameTeam[0]!==pitcher||!Number(pitcher.chosen))return false;
-  // The report's IP decimal is innings, not baseball's 6.1/6.2 notation:
-  // require exactly eighteen retired batters, not rounded 5.99/6.01 IP.
-  if(Number(pitcher.inningspitched)!==6)return false;
-  const {away,home}=preview.inningScores||{};
-  if(!Array.isArray(away)||!Array.isArray(home)||
+     preview.labels.length!==2||!Array.isArray(away)||!Array.isArray(home)||
      away.length!==7||home.length!==7)return false;
-  if(away.some(n=>!Number.isInteger(n)||n<0)||
-     home.slice(0,6).some(n=>!Number.isInteger(n)||n<0))return false;
-  // Project Rio can mark an unplayed bottom seventh as X/blank (null),
-  // or as a zero. Reconstruct the actual outcome rather than trusting zero.
-  // A literal 0 records a played, scoreless bottom seventh. Only an
-  // explicit X/blank (parsed as null) proves this half-inning was skipped.
-  if(home[6]!==null)return false;
-  const homeAfterSix=home.slice(0,6).reduce((sum,n)=>sum+n,0);
-  const awayAfterSeven=away.reduce((sum,n)=>sum+n,0);
-  return homeAfterSix>awayAfterSeven;
+  const topSide=top==='home'?'home':'away';
+  const topTeam=preview.labels[topSide==='home'?1:0];
+  if(pitcher.label!==topTeam)return false;
+  const sameTeam=preview.pitch.filter(p=>p.label===pitcher.label);
+  if(sameTeam.length!==1||sameTeam[0]!==pitcher||!Number(pitcher.chosen)||
+     Number(pitcher.inningspitched)!==6)return false;
+  const topInnings=topSide==='home'?home:away;
+  const bottomInnings=topSide==='home'?away:home;
+  if(topInnings.some(n=>!Number.isInteger(n)||n<0)||
+     bottomInnings.slice(0,6).some(n=>!Number.isInteger(n)||n<0))
+    return false;
+  return bottomInnings[6]===null;
 }
 export function completeGameForReportPitcher(preview,pitcher){
   if(!pitcher)return 0;
