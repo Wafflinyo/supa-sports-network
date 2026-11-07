@@ -7,7 +7,6 @@ import {playerCareer} from './player-career.js'
 import {sslCareerTenure} from './draft-pedigree.js'
 import {DraftPickBadge} from './DraftPickBadge.jsx'
 import {heatingUpCareer} from './heating-up.js'
-import {HeatMark} from './HeatingUpBadge.jsx'
 
 const groups = [
   ['Game Points', [['agp','AGP (Average Game Points)',2],['ogp','OGP / Game',2],['dgp','DGP / Game',2],['pgp','PGP / Game',2]]],
@@ -30,7 +29,7 @@ export default function PlayerProfile({player, PlayerAvatar, onClose,careerSeaso
   return <dialog ref={dialog} className="modal player-modal career-profile" aria-labelledby="career-player-name" onCancel={e=>{e.preventDefault();onClose()}} onClick={e=>{if(e.target===e.currentTarget){const r=e.currentTarget.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)onClose()}}}>
     <div className="career-profile-toolbar"><button className="close" onClick={onClose} aria-label="Close player profile" autoFocus><X size={20}/> CLOSE</button></div>
     <div className="career-profile-content">
-    <div className="player-modal-heading"><PlayerAvatar player={player} size={76}/><div><span className="eyebrow dark">SSL PLAYER PROFILE · #{player.rosterOrder || player.id}</span><div className="profile-name-row"><h2 id="career-player-name">{player.name}</h2><HeatMark playerId={player.id} inline/><PitcherPriorityBadge player={player} record={gameData.players[player.id]}/></div></div></div>
+    <div className="player-modal-heading"><PlayerAvatar player={player} size={76}/><div><span className="eyebrow dark">SSL PLAYER PROFILE · #{player.rosterOrder || player.id}</span><div className="profile-name-row"><h2 id="career-player-name">{player.name}</h2><PitcherPriorityBadge player={player} record={gameData.players[player.id]}/></div></div></div>
     <div className="career-bio"><span>{player.class}</span><span>{player.team || 'Free agent'}</span><DraftPickBadge playerId={player.id} seasons={fullSeasons}/></div>
     <dl className="career-summary">{[['YEARS AS A SLUGGER',sslCareerTenure(player.id,fullSeasons)],['CAREER GAMES PLAYED',career.games],['CAREER MVPs',career.mvps],['CAREER OGP',career.ogp?.toFixed(2)],['CAREER DGP',career.dgp?.toFixed(2)],['CAREER PGP',career.pgp?.toFixed(2)],['CAREER TGP',career.tgp?.toFixed(2)],['CAREER AGP',career.agp?.toFixed(2)],['HOT GAMES',heat.heatingUpCount],['LONGEST HOT STREAK',heat.longestHotStreak]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value ?? '—'}</dd></div>)}</dl>
     <details className="profile-game-data"><summary>GAME STATS & CHEMISTRY</summary><PlayerDataDetails player={player} seasons={fullSeasons}/></details>
