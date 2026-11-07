@@ -12,6 +12,8 @@ export const SSL_GAME_SCORE_WEIGHTS=Object.freeze({
   pitchStrikeouts:15,outs:1,strikes:.5,pitches:.25,earnedRuns:-3,
   // Pitching discipline penalties (PGP only, and consequently TGP).
   hitsAllowed:-.25,pitchWalks:-2,beanBalls:-2,
+  // Pitcher used and replaced before recording a single defensive out.
+  zeroOutRemoval:-10,
   completeGames:20,hrAllowed:-8,mvps:10,
   bobbles:-6,doublePlaysHitInto:-6,triplePlaysHitInto:-10
 });
