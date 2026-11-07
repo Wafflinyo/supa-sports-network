@@ -60,6 +60,8 @@ const corrected = structuredClone(season);
 corrected.games[0].result.players[0].stats.homeRuns = 1;
 corrected.games[0].result.players[0].stats.oneHr = 1;
 corrected.games[0].result.players[0].stats.threeHr = 0;
+// Removing the three-run home run also removes the two RBIs it provided.
+corrected.games[0].result.players[0].stats.rbi = 1;
 corrected.games[0].result.players[0].gameScore = 89;
 const edited = leagueNews([corrected], names);
 assert.equal(edited.filter(e => e.category === 'heating').length, 0);

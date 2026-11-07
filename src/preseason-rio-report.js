@@ -1,5 +1,5 @@
 import {buildReport,automaticReportMvp,readRio} from './season-data.js';
-import {gamePointComponents} from './game-points.js';
+import {gamePointsForReport} from './game-points.js';
 import roster from './players.json' with {type:'json'};
 const playerNames=new Map(roster.map(p=>[Number(p.id),p.name]));
 
@@ -66,11 +66,11 @@ export function preseasonPreviewBox(season,match,report){
   if(!report)return null;
   const players=report.players.map(p=>{
     const stats={...p.stats,shutoutBonus:Number(p.shutoutBonus||0)};
-    const parts=gamePointComponents(stats,p.shutoutBonus);
+    const points=gamePointsForReport({...p,stats});
     return {
       playerId:Number(p.player),name:playerNames.get(Number(p.player))||String(p.player),
       teamKey:String(p.team),positions:(p.positions||[]).join(', '),
-      stats,points:{...parts,tgp:round2(p.gameScore)},
+      stats,points,
       itemScore:Number(p.itemScore||0),mvp:Number(stats.mvps||0)>0,
     };
   });

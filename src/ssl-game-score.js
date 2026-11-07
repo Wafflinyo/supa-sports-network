@@ -3,7 +3,9 @@
 import {SSL_PITCHING_SHUTOUT_BONUS} from './pitching-shutout.js';
 export const SSL_GAME_SCORE_WEIGHTS=Object.freeze({
   hits:4,runs:6,rbi:8,homeRuns:15,doubles:4,triples:6,
-  twoHr:8,threeHr:12,grandSlams:15,totalBases:4,
+  twoHr:2,threeHr:4,grandSlams:6,totalBases:4,
+  // Hitless at-bat means official AB minus hits; strikeouts incur an additional penalty.
+  hitlessAtBats:-2,batStrikeouts:-10,
   putouts:5,assists:4,buddyJumpPutouts:15,doublePlays:8,triplePlays:18,
   // Every three recorded pitching outs equal one inning (+3 total).
   // Score full and partial innings proportionally; don't use rounded Rio IP.
@@ -11,7 +13,7 @@ export const SSL_GAME_SCORE_WEIGHTS=Object.freeze({
   // Pitching discipline penalties (PGP only, and consequently TGP).
   hitsAllowed:-.25,pitchWalks:-2,beanBalls:-2,
   completeGames:20,hrAllowed:-8,mvps:10,
-  bobbles:-6,doublePlaysHitInto:-8,triplePlaysHitInto:-12
+  bobbles:-6,doublePlaysHitInto:-6,triplePlaysHitInto:-10
 });
 // One earned-run performance tier per pitcher who records at least 9 outs
 // (three full innings), independent of complete-game and shutout awards.
@@ -28,6 +30,15 @@ export function soloShutoutReplacesCompleteGame(stats={},shutoutBonus=0){
   return Number(shutoutBonus)===SSL_PITCHING_SHUTOUT_BONUS&&Number(stats?.completeGames??0)>0;
 }
 export const SSL_HEATING_THRESHOLD=120;
+// Derived solely from the Rio AB/H counts; not a separate field in saved reports.
+// Guard older imperfect stat lines with H > AB instead of inventing negative outs.
+export function gameScoreStatCount(stats={},key){
+  const n=key==='hitlessAtBats'
+    ?Math.max(0,Number(stats?.atBats??0)-Number(stats?.hits??0))
+    :Number(stats?.[key]??0);
+  if(!Number.isInteger(n)||n<0)throw Error('Invalid Game Score count: '+key);
+  return n;
+}
 const round2=n=>Math.round((n+Number.EPSILON)*100)/100;
 export function customGameScore(stats,itemScore=0,shutoutBonus=0){
   const bonus=Number(shutoutBonus);
@@ -40,8 +51,7 @@ export function customGameScore(stats,itemScore=0,shutoutBonus=0){
   let raw=0;
   const detail={};
   for(const [key,weight] of Object.entries(SSL_GAME_SCORE_WEIGHTS)){
-    const n=Number(stats?.[key]??0);
-    if(!Number.isInteger(n)||n<0)throw Error('Invalid Game Score count: '+key);
+    const n=gameScoreStatCount(stats,key);
     detail[key]=n*weight;
     raw+=detail[key];
   }

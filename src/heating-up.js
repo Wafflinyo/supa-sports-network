@@ -1,6 +1,7 @@
 // Official custom SSL Game Score calculated at Project Rio import time.
 // Corrections automatically update the score, heat history and streaks.
 import {SSL_HEATING_THRESHOLD} from './ssl-game-score.js';
+import {gamePointsForReport} from './game-points.js';
 export const HEATING_UP_THRESHOLD = SSL_HEATING_THRESHOLD;
 export function heatingUpForSeason(season,{includeRecorded=false}={}) {
   const players={},byGame={},ready={},lastEarned={};
@@ -31,7 +32,8 @@ export function heatingUpForSeason(season,{includeRecorded=false}={}) {
       for(const id of active)if(lastEarned[id]&&!lastEarned[id].starredGame)lastEarned[id].starredGame=g.id;
       const next=new Set();
       if(finalized)for(const id of roster){
-        const score=appearances.get(id)?.gameScore;
+        const report=appearances.get(id);
+        const score=report?gamePointsForReport(report).tgp:null;
         const good=typeof score==='number'&&Number.isFinite(score)&&score>=HEATING_UP_THRESHOLD;
         const record=players[id]||={heatingUpCount:0,hotStreaks:0,currentHotStreak:0,longestHotStreak:0,events:[]};
         if(good){

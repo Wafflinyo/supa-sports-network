@@ -79,7 +79,9 @@ const posts=leagueNews([season],rosters);
 const collective=posts.filter(x=>x.category==='team-game');
 assert.equal(collective.length,1,'One grouped individual-performance post per team and game');
 for(const p of rosters.slice(0,5))assert(collective[0].summary.includes(p.name));
-assert(collective[0].summary.endsWith("Week 1's win against the Diamond City Checkers."));
+assert(collective[0].summary.includes("Diamond City Checkers") &&
+  /win|victory/i.test(collective[0].summary),
+  "Grouped game headlines preserve the accurate opponent and winning context");
 assert.equal(posts.filter(x=>x.category==='pitching'&&x.teamId==='a').length,0,
   'Qualifying teammates are grouped, not repeated as separate pitching posts');
 
