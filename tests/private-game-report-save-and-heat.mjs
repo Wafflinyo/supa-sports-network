@@ -93,7 +93,10 @@ assert.match(box,/inline\?'Batting':'Game Points'/,
   'Private preview opens on Batting rather than Game Points');
 assert.match(cards,/<HeatMark playerId=\{player.id\} inline\/>/,
   'Player profile links and cards include official Heating Up symbol');
-assert.match(playerData,/<HeatMark playerId=\{player.id\} inline\/>/);
+assert.match(playerData,/<PlayerPortrait player=\{player\} size=\{68\}\/>/,
+  'Player Data details retain one portrait-mounted Heating Up badge');
+assert.doesNotMatch(playerData,/<h3>\{player.name\} <HeatMark/,
+  'Player Data details must not show a second flame beside the name');
 assert.match(main,/heatingUpForSeason\(seasonLeague.season\)/,
   'Global player cards cannot derive active Heating Up from private uploads');
 assert(!main.includes('heatingUpForSeason(seasonLeague.season,{includeRecorded'),
