@@ -200,7 +200,7 @@ const counts = new Set(
 // Derived percentages, ERA, WHIP and innings pitched (decimal) must never be
 // included in a saved report. Keep outs and complete-game counts explicitly;
 // they are not regular spreadsheet counting-column keys.
-const savedCountingFields=new Set([...counts,'outs','completeGames','starBases','mvps']);
+const savedCountingFields=new Set([...counts,'outs','completeGames','starBases','mvps','zeroOutRemoval']);
 export function savedReportCountingStats(stats){
   return Object.fromEntries(Object.entries(stats||{}).filter(([key])=>
     savedCountingFields.has(key)));
@@ -395,12 +395,32 @@ export function completeGameForReportPitcher(preview,pitcher){
   const rioFlag=/^(1|yes|true)$/i.test(String(pitcher.completegames??'').trim());
   return Number(rioFlag||earnedSixInningCompleteGame(preview,pitcher));
 }
+// Project Rio's Pitching sheet lists appearances in order. A pitcher who
+// really took the mound, recorded no outs (0.00 IP), and was replaced by a
+// later pitcher for the SAME team gets -10 PGP. It is not a runs-allowed tier.
+// A zero-filled placeholder or the last pitcher in a game is NOT sufficient.
+export function zeroOutRemovalForReportPitcher(preview,pitcher){
+  if(!pitcher||!Array.isArray(preview?.pitch))return 0;
+  const index=preview.pitch.indexOf(pitcher);
+  if(index<0||!pitcher.label||!Number(pitcher.chosen)||
+     Number(pitcher.inningspitched)!==0)return 0;
+  const facedOrPitched=Number(pitcher.battersfaced||0)>0||
+    Number(pitcher.pitches||0)>0;
+  if(!facedOrPitched)return 0;
+  const subsequentPitcher=preview.pitch.slice(index+1).some(next=>
+    next.label===pitcher.label&&Number(next.chosen)>0&&(
+      Number(next.battersfaced||0)>0||
+      Number(next.pitches||0)>0||
+      Number(next.inningspitched||0)>0));
+  return subsequentPitcher?1:0;
+}
 export function previewCustomGameScore(preview,row,mvp=null){
   const pitching=preview.pitch.filter(p=>Number(p.chosen)&&Number(p.chosen)===Number(row.chosen)
     || (normalize(p.player)===normalize(row.player)&&(!p.team||String(p.team)===row.label)));
   if(pitching.length>1)throw Error(`Ambiguous pitching row for ${row.player}.`);
   const stats=reportRowStats(row,pitching[0]);
   stats.completeGames=completeGameForReportPitcher(preview,pitching[0]);
+  stats.zeroOutRemoval=zeroOutRemovalForReportPitcher(preview,pitching[0]);
   stats.mvps=mvp!=null&&Number(row.chosen)===Number(mvp)?1:0;
   const bonus=previewShutoutBonuses(preview).get(String(row.chosen))||0;
   return customGameScore(stats,row.itemscore===''?0:row.itemscore,bonus);
@@ -434,6 +454,7 @@ export function buildReport(preview, awayLabel, season, game, players, mvp) {
       throw Error(`Ambiguous pitching row for ${r.player}.`);
     const stats=reportRowStats(r,pitching[0]);
     stats.completeGames=completeGameForReportPitcher(preview,pitching[0]);
+    stats.zeroOutRemoval=zeroOutRemovalForReportPitcher(preview,pitching[0]);
     stats.mvps=player===Number(mvp)?1:0;
     stats.starBases=Number(r.starbaseshelper||0);
     const shutoutBonus=shutoutBonuses.get(String(player))||0;
