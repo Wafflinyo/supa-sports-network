@@ -222,5 +222,5 @@ assert.match(stealMigration,/\+ 4\*coalesce\(\(score_row->'stats'->>'stolenBases
   'Protected commissioner verifier must award the stolen base bonus');
 assert.match(stealMigration,/- 4\*coalesce\(\(score_row->'stats'->>'caughtStealing'\)/,
   'Protected commissioner verifier must deduct for caught stealing');
-assert.match(stealMigration,/ssl_season_states[\\s\\S]*ssl_preseason_game_reports/,
+assert.match(stealMigration,/ssl_season_states[\s\S]*ssl_preseason_game_reports/,
   'Historical regular-season and preseason scores are recalculated from original stats');
