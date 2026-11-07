@@ -1,7 +1,7 @@
 // Project Rio "Game Info" inning-by-inning score extraction.
 // Prefer explicit in-game team labels; never infer scores from unrelated
 // numeric metadata or guess a scoring sequence if the worksheet is ambiguous.
-import {resolveRioTeam} from './rio-team-mapping.js';
+import {resolveRioTeam,rioBattingHalf} from './rio-team-mapping.js';
 
 const label=v=>String(v??'').trim().toLowerCase().replace(/[^a-z0-9]/g,'');
 const asRuns=v=>{
@@ -15,18 +15,37 @@ const asInning=v=>{
   return m?Number(m[1]):null;
 };
 const rowTeam=(row,teams,game,exclude=new Set())=>{
+  // Identify team by its name, not by physical row order. The first
+  // spreadsheet row can represent the BOTTOM half of each inning.
   for(let i=0;i<row.length;i++){
     if(exclude.has(i))continue;
     const value=String(row[i]??'').trim();
     let team=resolveRioTeam(value,teams);
-    if(!team&&/^(?:team\s*[:=-]\s*|(?:away|home|visitor)\s*[:=-]\s*)/i.test(value))
-      team=resolveRioTeam(value.replace(/^(?:team\s*[:=-]\s*|(?:away|home|visitor)\s*[:=-]\s*)/i,''),teams);
-    if(team&&[String(game.away),String(game.home)].includes(String(team.id)))return String(team.id);
-    const t=label(value);
-    if(['away','visitor','visitors','top'].includes(t))return String(game.away);
-    if(['home','bottom'].includes(t))return String(game.home);
+    let annotation=rioBattingHalf(value);
+    if(!team&&/^(?:team\s*[:=-]\s*|(?:away|home|visitor)\s*[:=-]\s*)/i.test(value)){
+      const cleaned=value.replace(/^(?:team\s*[:=-]\s*|(?:away|home|visitor)\s*[:=-]\s*)/i,'');
+      team=resolveRioTeam(cleaned,teams);
+      annotation=rioBattingHalf(cleaned);
+    }
+    if(team&&[String(game.away),String(game.home)].includes(String(team.id)))
+      return {id:String(team.id),half:annotation};
+  }
+  // Also accept older Rio exports with generic Away/Home row identifiers.
+  for(let i=0;i<row.length;i++){
+    if(exclude.has(i))continue;
+    const t=label(row[i]);
+    if(['away','visitor','visitors','top'].includes(t))return {id:String(game.away),half:null};
+    if(['home','bottom'].includes(t))return {id:String(game.home),half:null};
   }
   return null;
+};
+// Explicit (Top)/(Bottom) tags are batting order, not worksheet row order.
+// A conflict must be corrected instead of assigning a CG to the wrong pitcher.
+const validateHalfLabels=(found,game)=>{
+  const away=found.get(String(game.away)),home=found.get(String(game.home));
+  if(!away?.half&&!home?.half)return;
+  if(away?.half!=='top'||home?.half!=='bottom')
+    throw Error('Game Info (Top)/(Bottom) labels conflict with this scheduled matchup. Mark the away team (Top) and home team (Bottom), regardless of which worksheet row is first.');
 };
 const scoreLines=(game,away,home)=>{
   if(!away.length||away.length!==home.length||away.length>20)return null;
@@ -49,16 +68,19 @@ function horizontalScore(rows,teams,game){
       const found=new Map();
       for(let r=h+1;r<Math.min(rows.length,h+8);r++){
         const row=rows[r]||[];
-        const id=rowTeam(row,teams,game,new Set(cols));
-        if(!id||found.has(id))continue;
+        const team=rowTeam(row,teams,game,new Set(cols));
+        if(!team||found.has(team.id))continue;
         const values=cols.map(c=>asRuns(row[c]));
         if(values.some(v=>v===undefined))continue;
-        found.set(id,values);
+        found.set(team.id,{values,half:team.half});
       }
       if(found.size!==2)continue;
-      const rawAway=found.get(String(game.away));
-      const rawHome=found.get(String(game.home));
-      if(!rawAway||!rawHome)continue;
+      const awayTeam=found.get(String(game.away));
+      const homeTeam=found.get(String(game.home));
+      if(!awayTeam||!homeTeam)continue;
+      validateHalfLabels(found,game);
+      const rawAway=awayTeam.values;
+      const rawHome=homeTeam.values;
       // The home team may not bat in the final inning, shown as X/blank.
       let end=cols.length;
       while(end>0&&rawAway[end-1]===null&&rawHome[end-1]===null)end--;
@@ -76,13 +98,17 @@ function verticalScore(rows,teams,game){
     const inningCol=header.findIndex(v=>/^(inning|innings|inn)$/i.test(String(v??'').trim()));
     if(inningCol<0)continue;
     let awayCol=-1,homeCol=-1;
+    const found=new Map();
     for(let c=0;c<header.length;c++){
       if(c===inningCol)continue;
       const team=rowTeam([header[c]],teams,game);
-      if(team===String(game.away))awayCol=c;
-      if(team===String(game.home))homeCol=c;
+      if(!team)continue;
+      if(team.id===String(game.away))awayCol=c;
+      if(team.id===String(game.home))homeCol=c;
+      found.set(team.id,team);
     }
     if(awayCol<0||homeCol<0)continue;
+    validateHalfLabels(found,game);
     const away=[],home=[];
     for(let r=h+1;r<Math.min(rows.length,h+21);r++){
       const row=rows[r]||[];

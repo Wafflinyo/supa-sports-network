@@ -16,7 +16,14 @@ export const RIO_TEAM_MAPPINGS = Object.freeze([
   {rio:"Bowser Jr. Rookies",slot:1,ssl:"Delfino Dolphins",aliases:["Jr. Rookies","Rookies"]},
   {rio:"Birdo Bows",slot:12,ssl:"Decalburg Dedennes",aliases:["Bows"]},
 ]);
-export const normalizeRioTeam = value => String(value??"").trim().toLowerCase().replace(/[^a-z0-9]/g,"");
+// Optional batting-half annotations on Game Info scoreboard labels do not
+// change the in-game team identity or SSL franchise mapping.
+// e.g. "Jr. Rookies (Bottom)" and "DK Wilds (Top)".
+export const rioBattingHalf = value =>
+  String(value??'').match(/\(\s*(top|bottom)\s*\)\s*$/i)?.[1]?.toLowerCase()||null;
+export const stripRioBattingHalf = value =>
+  String(value??'').trim().replace(/\s*\(\s*(?:top|bottom)\s*\)\s*$/i,'').trim();
+export const normalizeRioTeam = value => stripRioBattingHalf(value).toLowerCase().replace(/[^a-z0-9]/g,"");
 const byAlias = new Map();
 for(const mapping of RIO_TEAM_MAPPINGS){
   for(const label of [mapping.rio,...mapping.aliases]){
