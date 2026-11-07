@@ -216,3 +216,11 @@ assert.equal(customGameScore({stolenBases:1}).gameScore,4);
 assert.equal(customGameScore({caughtStealing:1}).gameScore,-4);
 assert.throws(()=>customGameScore({caughtStealing:-1}),/Invalid Game Score count/);
 console.log('PASS: stolen bases and caught stealing contribute +4/-4 OGP and TGP');
+
+const stealMigration=readFileSync(new URL('../supabase/migrations/20261107031500_ssl_stolen_bases_scoring_and_backfill.sql',import.meta.url),'utf8');
+assert.match(stealMigration,/\+ 4\*coalesce\(\(score_row->'stats'->>'stolenBases'\)/,
+  'Protected commissioner verifier must award the stolen base bonus');
+assert.match(stealMigration,/- 4\*coalesce\(\(score_row->'stats'->>'caughtStealing'\)/,
+  'Protected commissioner verifier must deduct for caught stealing');
+assert.match(stealMigration,/ssl_season_states[\\s\\S]*ssl_preseason_game_reports/,
+  'Historical regular-season and preseason scores are recalculated from original stats');
