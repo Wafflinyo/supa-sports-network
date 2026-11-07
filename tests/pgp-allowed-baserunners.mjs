@@ -20,7 +20,7 @@ const stats={hitsAllowed:4,pitchWalks:3,beanBalls:1};
 assert.deepEqual(gamePointComponents(stats),{ogp:0,dgp:0,pgp:-9});
 assert.equal(customGameScore(stats,5).gameScore,-4);
 assert.equal(customGameScore(stats,5).baseGameScore,-9);
-assert.deepEqual(gamePointsForReport({stats,itemScore:5}),{ogp:0,dgp:0,pgp:-9,tgp:-4});
+assert.deepEqual(gamePointsForReport({stats,itemScore:5}),{ogp:5,dgp:0,pgp:-9,tgp:-4},'Item Score belongs to OGP and is not counted twice');
 assert.equal(gamePointComponents({hitsAllowed:1}).pgp,-0.25);
 assert.equal(gamePointComponents({pitchWalks:1}).pgp,-2);
 assert.equal(gamePointComponents({beanBalls:1}).pgp,-2);
