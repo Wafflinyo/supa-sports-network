@@ -1,4 +1,5 @@
 import React from 'react';
+import {conferencePotwStory} from './conference-potw-story.js';
 import {ConferenceMark} from './ConferenceMark.jsx';
 import {PlayerPortrait} from './PlayerPortrait.jsx';
 import {potwDate,potwPlayer,potwTrophyUrl,potwWeekLabel,potwConferenceName} from './player-of-the-week.js';
@@ -6,7 +7,7 @@ import './conference-potw.css';
 
 const score=n=>(Number(n)||0).toFixed(2);
 
-export default function ConferencePotwHeadliner({awards=[],onPlayerSelect}){
+export default function ConferencePotwHeadliner({awards=[],season,onPlayerSelect}){
  const supa=awards.find(a=>a.conference==='supa');
  const galaxy=awards.find(a=>a.conference==='galaxy');
  if(!supa||!galaxy)return null;
@@ -22,6 +23,7 @@ export default function ConferencePotwHeadliner({awards=[],onPlayerSelect}){
    <div className="ssl-conference-awards-sides">
      {sides.map(([conference,a])=>{
        const player=potwPlayer(a.player);
+       const story=conferencePotwStory(season,a);
        return <div key={conference} className={'ssl-conf-potw-side ssl-conf-potw-'+conference}>
          <div className="ssl-conf-potw-bg-mark" aria-hidden="true"><ConferenceMark id={conference} size={185}/></div>
          <div className="ssl-conf-potw-side-head">
@@ -50,6 +52,13 @@ export default function ConferencePotwHeadliner({awards=[],onPlayerSelect}){
            ].map(([label,key])=><div className="ssl-conf-potw-stat" key={key}>
              <span>{label} / G</span><strong>{score(a.metrics?.[key])}</strong>
            </div>)}
+         </div>
+         <div className="ssl-conf-potw-editorial">
+           <h3>{story.title}</h3>
+           <p>{story.summary}</p>
+           <details><summary>READ FULL PLAYER &amp; TEAM SPOTLIGHT</summary>
+             <p>{story.detail}</p>
+           </details>
          </div>
        </div>;
      })}
