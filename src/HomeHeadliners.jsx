@@ -1,4 +1,4 @@
-import React,{useEffect,useState} from 'react';
+import React,{useEffect,useRef,useState} from 'react';
 import {ChevronLeft,ChevronRight,Newspaper,Trophy} from 'lucide-react';
 import {teamLogo} from './TeamIdentity.jsx';
 import {PlayerPortrait} from './PlayerPortrait.jsx';
@@ -78,7 +78,23 @@ export default function HomeHeadliners({slides,championContent,seasons,supabase,
  const index=Math.min(active,count-1),slide=slides[index];
  const next=()=>setActive(i=>(i+1)%count);
  const prev=()=>setActive(i=>(i-1+count)%count);
+ const touchStart=useRef(null);
+ const onSwipeStart=event=>{
+   const point=event.changedTouches?.[0];
+   touchStart.current=point?{x:point.clientX,y:point.clientY}:null;
+ };
+ const onSwipeEnd=event=>{
+   const origin=touchStart.current;touchStart.current=null;
+   const point=event.changedTouches?.[0];
+   if(!origin||!point||count<2)return;
+   const dx=point.clientX-origin.x,dy=point.clientY-origin.y;
+   if(Math.abs(dx)<45||Math.abs(dx)<Math.abs(dy)*1.25)return;
+   if(dx<0)next();else prev();
+ };
  return <section className="ssl-headliners" aria-label="SSL top headlines" aria-roledescription="carousel"
+    onTouchStart={onSwipeStart}
+    onTouchEnd={onSwipeEnd}
+    onTouchCancel={()=>{touchStart.current=null;}}
     onKeyDown={event=>{
       if(event.target instanceof HTMLButtonElement)return;
       if(event.key==='ArrowRight'){event.preventDefault();next();}
