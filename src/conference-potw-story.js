@@ -166,7 +166,9 @@ export function conferencePotwStory(season,award){
   summary:'The commissioner selected '+(potwPlayer(award.player)?.name||'this player')+
     ' of '+award.teamName+' for '+potwWeekLabel(award.roundNo)+'.',
   detail:'This award recognizes the player’s two-game performance in '+potwWeekLabel(award.roundNo)+'.',
-  standouts:[],qualifyingCategories:[]
+  standouts:[],qualifyingCategories:[],
+  teaser:'A standout two-game performance earned this conference award.',
+  articleSections:['This award recognizes the player’s two-game performance in '+potwWeekLabel(award.roundNo)+'.']
  };
  const players=twoGameAwardRows(season,award.roundNo).allPlayers;
  const played=potwTeamGames(season,award.roundNo,award.team);
@@ -234,7 +236,32 @@ export function conferencePotwStory(season,award){
    if(category.standouts[i])standouts.push(category.standouts[i]);
   }
  }
- return {title,summary,detail:details.join(' '),
+ const quickFacts=[];
+ if(qualifying.has('offense')){
+  if(hr>=2)quickFacts.push(hr+' home runs');
+  else if(rbi>=4)quickFacts.push(rbi+' RBI');
+  else if(num(s.hits)>=4)quickFacts.push(num(s.hits)+' hits');
+ }
+ if(qualifying.has('defense')){
+  if(num(s.buddyJumpPutouts)>=2)
+   quickFacts.push(num(s.buddyJumpPutouts)+' Buddy Jump putouts');
+  else if(num(s.doublePlays)>=2)
+   quickFacts.push(num(s.doublePlays)+' double plays');
+  else if(num(s.putouts)>=8)
+   quickFacts.push(num(s.putouts)+' putouts');
+  else if(num(s.assists)>=4)
+   quickFacts.push(num(s.assists)+' assists');
+ }
+ if(qualifying.has('pitching')){
+  if(num(s.pitchStrikeouts)>=4)
+   quickFacts.push(num(s.pitchStrikeouts)+' pitching strikeouts');
+  else if(num(s.outs)>=9)
+   quickFacts.push(ipString(num(s.outs))+' innings pitched');
+ }
+ const teaser=quickFacts.length?
+  row.name+' earned the spotlight for '+wordJoin(quickFacts)+' across the two-game award window.':
+  row.name+' earned conference honors for an exceptional two-game performance.';
+ return {title,summary,detail:details.join(' '),teaser,articleSections:details,
   standouts,qualifyingCategories:categories.map(category=>category.key),
   featuredCategory:categories[0]?.key||'all-around',
   stats:{gamesPlayed:row.gamesPlayed,teamWins:team.wins,teamLosses:team.losses,
