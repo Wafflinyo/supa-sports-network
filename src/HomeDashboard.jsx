@@ -98,7 +98,24 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
   const ranks=useMemo(()=>powerRankings(season),[season]);
   const table=useMemo(()=>standings(season),[season]);
   const championship=useMemo(()=>latestPreseasonChampionship(league?.seasons||[],players),[league?.seasons,players]);
-  const headlines=useMemo(()=>homepageHeadlineSlides(championship,newsItems,season?.id,5,season,canPreviewHeadlines),[championship,newsItems,season,canPreviewHeadlines]);
+  // Two commissioner-issued conference awards share one full-width headliner.
+  // No unreleased nominee/poll data is ever promoted as a headline.
+  const officialAwardSlides=useMemo(()=>{
+    const groups=new Map();
+    for(const award of league?.potw?.conferenceAwards||[]){
+      const key=Number(award.roundNo);
+      if(!groups.has(key))groups.set(key,[]);
+      groups.get(key).push(award);
+    }
+    return [...groups.entries()]
+      .filter(([,awards])=>awards.some(a=>a.conference==='supa')&&awards.some(a=>a.conference==='galaxy'))
+      .sort((a,b)=>b[0]-a[0])
+      .map(([roundNo,awards])=>({id:'conference-potw-'+season?.id+'-'+roundNo,kind:'potw',roundNo,awards}));
+  },[league?.potw?.conferenceAwards,season?.id]);
+  const headlines=useMemo(()=>{
+    const regular=homepageHeadlineSlides(championship,newsItems,season?.id,5,season,canPreviewHeadlines);
+    return [...officialAwardSlides,...regular].slice(0,5);
+  },[championship,newsItems,season,canPreviewHeadlines,officialAwardSlides]);
   const openGame=game=>go('Schedule',null,{focus:'game',gameId:game.id});
   const openStory=story=>{
     if(story.seasonId!=null&&String(story.seasonId)!==String(league?.season?.id))
@@ -122,7 +139,7 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
           </button>}
         </div>}
       {headlines.length?<HomeHeadliners slides={headlines} seasons={league?.seasons||[]}
-        supabase={league?.supabase} players={players} onOpenGame={openStory}
+        supabase={league?.supabase} players={players} onOpenGame={openStory} onPlayerSelect={onPlayerSelect}
         championContent={championship?<ChampionshipHero feature={championship} supabase={league?.supabase}
           players={players} onResults={()=>openPreseason(championship.seasonId)}/>:null}/>:
       <section className="hero ssl-home-hero" aria-label="Sluggers Supa League">
