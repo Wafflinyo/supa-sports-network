@@ -142,7 +142,7 @@ export function conferencePotwStory(season,award){
  parts.push('Congratulations to '+row.name+' and the GM of '+teamName+'!');
  return {
    title:getHeadline(row,players),
-   summary:[...parts.slice(0,2),...(hrLead&&hr>=2?[parts.find(part=>part.includes('led the entire SSL')||part.includes('tied for the SSL lead'))].filter(Boolean):[]),parts.at(-1)].join(' '),
+   summary:[...parts.slice(0,2),...(hrLead&&hr>=2?[parts.find(part=>part.includes('led the entire SSL')||part.includes('tied for the SSL lead'))].filter(Boolean):[]),...parts.filter(part=>part.includes('combined RBI-plus-runs contributions')),parts.at(-1)].join(' '),
    detail:parts.join(' '),
    stats:{gamesPlayed:row.gamesPlayed,teamWins:team.wins,teamLosses:team.losses,
      teamRuns:team.scored,playerRuns:runs,rbi,homeRuns:hr,hits,atBats,outs,
