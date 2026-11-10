@@ -166,7 +166,7 @@ export function conferencePotwStory(season,award){
   summary:'The commissioner selected '+(potwPlayer(award.player)?.name||'this player')+
     ' of '+award.teamName+' for '+potwWeekLabel(award.roundNo)+'.',
   detail:'This award recognizes the player’s two-game performance in '+potwWeekLabel(award.roundNo)+'.',
-  standouts:[],qualifyingCategories:[],
+  standouts:[],qualifyingCategories:[],stats:{totalGamePoints:null},
   teaser:'A standout two-game performance earned this conference award.',
   articleSections:['This award recognizes the player’s two-game performance in '+potwWeekLabel(award.roundNo)+'.']
  };
@@ -264,7 +264,8 @@ export function conferencePotwStory(season,award){
  return {title,summary,detail:details.join(' '),teaser,articleSections:details,
   standouts,qualifyingCategories:categories.map(category=>category.key),
   featuredCategory:categories[0]?.key||'all-around',
-  stats:{gamesPlayed:row.gamesPlayed,teamWins:team.wins,teamLosses:team.losses,
+  stats:{gamesPlayed:row.gamesPlayed,totalGamePoints:Number(row.stats.tgp||0),
+   teamWins:team.wins,teamLosses:team.losses,
    teamRuns:team.scored,playerRuns:runs,rbi,homeRuns:hr,
    hits:num(s.hits),atBats:num(s.atBats),outs:num(s.outs),
    pitchingStrikeouts:num(s.pitchStrikeouts),earnedRuns:num(s.earnedRuns),
