@@ -3,7 +3,9 @@ import pool from './players.json';
 
 const namedPlayers = new Map(pool.map(player => [Number(player.id),player]));
 
-export const potwTrophyUrl = () => import.meta.env.BASE_URL+'ssl-potw-trophy.svg';
+export const potwTrophyUrl = (conference='supa') => import.meta.env.BASE_URL+(conference==='galaxy'?'potw-mario-galaxy.svg':'potw-supa-mario.svg');
+export const potwConferenceName = conference => conference==='galaxy' ? 'Mario Galaxy Player of the Week' : 'Supa Mario Player of the Week';
+export const potwConferenceLabel = conference => conference==='galaxy' ? 'Mario Galaxy Conference' : 'Supa Mario Conference';
 export const potwPlayer = id => namedPlayers.get(Number(id));
 export const potwWeekLabel = round => 'Weeks '+(2*round-1)+'/'+(2*round);
 export const potwDate = value => value ? new Intl.DateTimeFormat('en-US',{
@@ -56,9 +58,14 @@ export function potwLeaderboard(season,roundNo){
     .filter(p=>Number(p.player)===Number(id))
     .map(p=>({team:p.team,week:Number(g.week),game:g.id})));
   played.sort((a,b)=>b.week-a.week);
-  const team=played[0]?.team || null;
+  // A trophy belongs to the team that currently rosters the player, not to
+  // a prior franchise appearing in the two-week game logs.
+  const rosterTeam=(season.teams||[]).find(t=>(season.rosters?.[t.id]||[]).some(p=>Number(p)===Number(id)));
+  if(!rosterTeam)return null;
+  const team=rosterTeam.id;
   return {id:Number(id),name:player?.name||'Player '+id,
-   team,teamName:teamMap.get(String(team))||'SSL Team',stats:st,gamesPlayed:st.gamesPlayed||0};
+   team,conference:rosterTeam.conference,
+   teamName:teamMap.get(String(team))||'SSL Team',stats:st,gamesPlayed:st.gamesPlayed||0};
  });
 }
 export function potwStatValue(row,key,view){
