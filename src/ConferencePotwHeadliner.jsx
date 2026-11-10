@@ -24,6 +24,9 @@ export default function ConferencePotwHeadliner({awards=[],season,onPlayerSelect
      {sides.map(([conference,a])=>{
        const player=potwPlayer(a.player);
        const story=conferencePotwStory(season,a);
+       const featuredPoints=[
+         ['OGP','ogp','offense'],['DGP','dgp','defense'],['PGP','pgp','pitching']
+       ].filter(([,key,category])=>story.qualifyingCategories?.includes(category));
        return <div key={conference} className={'ssl-conf-potw-side ssl-conf-potw-'+conference}>
          <div className="ssl-conf-potw-bg-mark" aria-hidden="true"><ConferenceMark id={conference} size={185}/></div>
          <div className="ssl-conf-potw-side-head">
@@ -47,9 +50,7 @@ export default function ConferencePotwHeadliner({awards=[],season,onPlayerSelect
          </div>
          <div className="ssl-conf-potw-averages">
            <div className="ssl-conf-potw-major-stat"><span>AGP</span><strong>{score(a.metrics?.agp)}</strong></div>
-           {[
-             ['OGP','ogp'],['DGP','dgp'],['PGP','pgp']
-           ].map(([label,key])=><div className="ssl-conf-potw-stat" key={key}>
+           {featuredPoints.map(([label,key])=><div className="ssl-conf-potw-stat" key={key}>
              <span>{label} / G</span><strong>{score(a.metrics?.[key])}</strong>
            </div>)}
          </div>
