@@ -4,6 +4,7 @@ import {teamLogo} from './TeamIdentity.jsx';
 import {PlayerPortrait} from './PlayerPortrait.jsx';
 import {HeatFlame} from './HeatingUpBadge.jsx';
 import HeadlineReadMore from './HeadlineReadMore.jsx';
+import ConferencePotwHeadliner from './ConferencePotwHeadliner.jsx';
 import './home-headliners.css';
 
 function Crest({team,supabase,large=false}){
@@ -70,7 +71,7 @@ function MatchStorySlide({story,seasons,supabase,players,onOpenGame}){
    </div>
  </section>;
 }
-export default function HomeHeadliners({slides,championContent,seasons,supabase,players,onOpenGame}){
+export default function HomeHeadliners({slides,championContent,seasons,supabase,players,onOpenGame,onPlayerSelect}){
  const [active,setActive]=useState(0);
  const count=Math.min(5,slides?.length||0);
  useEffect(()=>setActive(index=>Math.min(index,Math.max(0,count-1))),[count]);
@@ -102,7 +103,8 @@ export default function HomeHeadliners({slides,championContent,seasons,supabase,
     }}>
    <div className="ssl-headliners-stage" role="group" aria-roledescription="slide"
      aria-label={'Show headline '+(index+1)+' of '+count} key={slide.id}>
-     {slide.kind==='champion'?championContent:
+     {slide.kind==='potw'?<ConferencePotwHeadliner awards={slide.awards} season={(seasons||[]).find(season=>String(season.id)===String(slide.awards?.[0]?.seasonId))} onPlayerSelect={onPlayerSelect}/>:
+       slide.kind==='champion'?championContent:
        <MatchStorySlide story={slide.story} seasons={seasons} supabase={supabase}
          players={players} onOpenGame={onOpenGame}/>}
    </div>
