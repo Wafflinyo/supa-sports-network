@@ -103,7 +103,7 @@ export default function HomeHeadliners({slides,championContent,seasons,supabase,
     }}>
    <div className="ssl-headliners-stage" role="group" aria-roledescription="slide"
      aria-label={'Show headline '+(index+1)+' of '+count} key={slide.id}>
-     {slide.kind==='potw'?<ConferencePotwHeadliner awards={slide.awards} onPlayerSelect={onPlayerSelect}/>:
+     {slide.kind==='potw'?<ConferencePotwHeadliner awards={slide.awards} season={(seasons||[]).find(season=>String(season.id)===String(slide.awards?.[0]?.seasonId))} onPlayerSelect={onPlayerSelect}/>:
        slide.kind==='champion'?championContent:
        <MatchStorySlide story={slide.story} seasons={seasons} supabase={supabase}
          players={players} onOpenGame={onOpenGame}/>}
