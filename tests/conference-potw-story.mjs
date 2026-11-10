@@ -103,7 +103,7 @@ const pitcherSeason={
 };
 const ace=conferencePotwStory(pitcherSeason,galaxyAward);
 assert.equal(ace.featuredCategory,'pitching');
-assert.match(ace.title,/7 strikeouts/);
+assert.match(ace.title,/bat and arm/,'Both good hitting and pitching deserve the award title');
 assert.match(ace.summary,/On the mound/);
 assert.match(ace.summary,/6.0 innings/);
 assert.match(ace.summary,/7 batters/);
@@ -128,7 +128,7 @@ const fieldSeason={
 const fielder=conferencePotwStory(fieldSeason,{roundNo:2,player:10,team:'opposition',
  teamName:'Peach Gardens',awardTitle:'Supa Mario Player of the Week'});
 assert.equal(fielder.featuredCategory,'defense');
-assert.match(fielder.title,/Buddy Jump/);
+assert.match(fielder.title,/bat and glove/,'Both good batting and defense deserve the award title');
 assert.match(fielder.summary,/In the field/);
 assert.match(fielder.summary,/8 putouts/);
 assert.match(fielder.summary,/6 assists/);
@@ -138,3 +138,42 @@ assert.equal(fielder.standouts[0].label,'PO');
 assert(fielder.standouts.some(s=>s.label==='Buddy Jump'&&s.value==='2'));
 assert(!fielder.summary.startsWith('At the plate'));
 console.log('PASS: offense, pitching and defense compete on merit; standout metrics and category-first copy are grounded in exactly two games.');
+
+// Fire Bro example: strong BOTH at bat and in the field, but a very poor
+// pitching outing. The headline must highlight offense and defense together,
+// with absolutely no pitching facts, PGP stat chips or pitching averages.
+const fireBroSeason={
+ id:'fire-bro-combined',name:'Fire Bro Both',teams,
+ rosters:{haliban:[53]},games:[
+  makeGame('fire3',3,'haliban','opposition',5,2,[['haliban',53,{
+   homeRuns:1,rbi:3,runs:1,hits:3,atBats:4,
+   putouts:5,assists:2,buddyJumpPutouts:1,
+   outs:3,pitchStrikeouts:0,earnedRuns:6,hitsAllowed:8,hrAllowed:2
+  }]]),
+  makeGame('fire4',4,'haliban','opposition',7,4,[['haliban',53,{
+   homeRuns:1,rbi:2,runs:2,hits:3,atBats:4,
+   putouts:6,assists:3,buddyJumpPutouts:1,
+   outs:3,pitchStrikeouts:0,earnedRuns:5,hitsAllowed:7,hrAllowed:3
+  }]])
+ ]
+};
+const fire=conferencePotwStory(fireBroSeason,{
+ roundNo:2,player:53,team:'haliban',teamName:'Moleville Haliban',
+ awardTitle:'Supa Mario Player of the Week'
+});
+assert.match(fire.title,/Fire Bro.*bat and glove/);
+assert(fire.qualifyingCategories.includes('offense'));
+assert(fire.qualifyingCategories.includes('defense'));
+assert(!fire.qualifyingCategories.includes('pitching'));
+assert.match(fire.summary,/At the plate, Fire Bro/);
+assert.match(fire.summary,/In the field, Fire Bro/);
+assert.match(fire.summary,/2 home runs/);
+assert.match(fire.summary,/11 putouts/);
+assert.match(fire.summary,/5 assists/);
+assert(!fire.summary.includes('On the mound'));
+assert(!fire.detail.includes('On the mound'));
+assert(!fire.standouts.some(item=>['PGP','Pitch K','IP','ER','SHO'].includes(item.label)));
+assert(fire.standouts.some(item=>item.label==='HR'&&item.value==='2'));
+assert(fire.standouts.some(item=>item.label==='PO'&&item.value==='11'));
+assert(fire.standouts.some(item=>item.label==='Buddy Jump'&&item.value==='2'));
+console.log('PASS: Fire Bro highlights both outstanding offense and defense while poor pitching is omitted entirely.');
