@@ -71,7 +71,10 @@ export function potwLeaderboard(season,roundNo){
  return (season.teams||[]).flatMap(team=>{
    const games=potwTeamGames(season,roundNo,team.id);
    if(!games.length)return [];
-   const stats=aggregate({...season,games});
+   const teamGames=games.map(game=>({...game,result:{...game.result,
+     players:(game.result?.players||[]).filter(p=>String(p.team)===String(team.id))
+   }}));
+   const stats=aggregate({...season,games:teamGames});
    return (season.rosters?.[team.id]||[]).map(id=>{
      const st=stats[id];
      if(!st?.gamesPlayed)return null;
