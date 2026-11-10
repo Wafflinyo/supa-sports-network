@@ -1,0 +1,88 @@
+/* Two-conference SSL awards: official red Supa / deep-blue Galaxy trophy treatment. */
+.potw-dual-trophies{display:flex;align-items:center;gap:2px;flex:none}
+.potw-feature-heading .potw-dual-trophies .potw-trophy{width:81px;height:124px;object-fit:contain}
+.potw-award-selection{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:20px}
+.potw-choice-card{display:flex;flex-direction:column;align-items:center;gap:10px;justify-content:center;
+ padding:15px;min-width:0;background:linear-gradient(165deg,#fff,#f7f9ff);
+ border:2px solid #d8dfeb;border-radius:12px;color:#12264a;text-align:center;
+ font:800 14px system-ui,sans-serif;cursor:pointer}
+.potw-choice-card:focus-visible,.potw-choice-card.is-active{outline:3px solid #ffd15d;outline-offset:2px}
+.potw-choice-card.potw-choice-supa.is-active{background:#fff6f5;border-color:#c32135}
+.potw-choice-card.potw-choice-galaxy.is-active{background:#f2f5ff;border-color:#374da7}
+.potw-choice-card .potw-trophy{width:120px;height:150px;object-fit:contain}
+.potw-choice-card>strong{font:900 20px/1.15 'Barlow Condensed',Impact,sans-serif;color:#10254d}
+.potw-choice-card>span:not(.potw-person){color:#a33a40;font-weight:900}
+.potw-choice-card>small{color:#546986;line-height:1.4}
+.potw-cabinet-empty .potw-dual-trophies{justify-content:center}
+.potw-cabinet-empty .potw-dual-trophies .potw-trophy{height:125px;width:90px}
+.potw-award-dialog .potw-trophy{width:200px;max-width:100%;height:235px;object-fit:contain}
+.ssl-home-layout .ssl-home-hero.ssl-conference-awards-hero{position:relative;display:block;isolation:isolate;
+ background:#102249;min-height:390px;padding:0;overflow:hidden;color:#fff;border:2px solid #e4b84b}
+.ssl-conference-awards-title{position:relative;z-index:2;text-align:center;padding:12px 14px 11px;
+ background:linear-gradient(90deg,#541225 0%,#112e60 100%);
+ border-bottom:2px solid #f5c542}
+.ssl-conference-awards-title .eyebrow{color:#f6d875;font:900 11px system-ui,sans-serif;letter-spacing:.13em}
+.ssl-home-layout .ssl-conference-awards-title h1{font:900 clamp(26px,3.2vw,46px)/1 'Barlow Condensed',Impact,sans-serif;
+ margin:7px 0 4px;letter-spacing:.01em;color:#fff;text-wrap:balance}
+.ssl-conference-awards-title h1 em{color:#ffd866;font-style:normal}
+.ssl-conference-awards-title small{color:#e9e2d2;font-weight:700;font-size:11px}
+.ssl-conference-awards-sides{position:relative;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ isolation:isolate;min-height:310px}
+.ssl-conference-awards-sides::before,.ssl-conference-awards-sides::after{
+ content:'';position:absolute;inset:0;z-index:-1;pointer-events:none}
+.ssl-conference-awards-sides::before{background:radial-gradient(circle at 25% 40%,#a83a44,#650d23 63%,#4f1125);
+ clip-path:polygon(0 0,56% 0,45% 100%,0 100%)}
+.ssl-conference-awards-sides::after{background:radial-gradient(circle at 79% 43%,#324eb6,#0b2a67 61%,#081a49);
+ clip-path:polygon(56% 0,100% 0,100% 100%,45% 100%)}
+.ssl-conf-potw-side{min-width:0;position:relative;padding:10px 17px 15px;display:grid;align-content:start;gap:9px}
+.ssl-conf-potw-bg-mark{position:absolute;z-index:0;opacity:.11;top:48px;left:4%;
+ transform:rotate(-13deg);pointer-events:none;filter:grayscale(.2) contrast(1.2)}
+.ssl-conf-potw-galaxy .ssl-conf-potw-bg-mark{left:auto;right:4%;transform:rotate(12deg)}
+.ssl-conf-potw-side>*:not(.ssl-conf-potw-bg-mark){position:relative;z-index:1}
+.ssl-conf-potw-side-head{display:flex;gap:10px;align-items:center;min-width:0}
+.ssl-conf-potw-side-head img{filter:drop-shadow(0 2px 6px #0009);width:49px;height:49px}
+.ssl-conf-potw-side-head>div{display:grid;gap:3px;text-shadow:0 2px 4px #0018;min-width:0}
+.ssl-conf-potw-side-head small{font:900 14px 'Barlow Condensed',Impact,sans-serif;letter-spacing:.08em;color:#f8cd56}
+.ssl-conf-potw-side-head strong{font:900 16px 'Barlow Condensed',Impact,sans-serif;color:#fff}
+.ssl-conf-potw-player-block{display:grid;grid-template-columns:76px minmax(0,1fr) 90px;align-items:center;gap:8px}
+.ssl-conf-potw-portrait{display:grid;place-items:center;border:2px solid #f2c760;background:#111d3a99;
+ border-radius:50%;width:76px;height:76px;cursor:pointer}
+.ssl-conf-potw-portrait:hover,.ssl-conf-potw-portrait:focus-visible{outline:2px solid #ffde7a}
+.ssl-conf-potw-player-info{min-width:0}
+.ssl-conf-potw-player-info h2{color:#fff;font:900 clamp(18px,2.35vw,33px)/1.05 'Barlow Condensed',Impact,sans-serif;
+ text-transform:uppercase;margin:0 0 5px;overflow-wrap:anywhere;text-shadow:0 2px 3px #000a}
+.ssl-conf-potw-player-info p{color:#edebf0;font:700 12px/1.3 system-ui,sans-serif;margin:0}
+.ssl-conf-potw-trophy{width:89px;height:129px;object-fit:contain;
+ filter:drop-shadow(0 5px 7px #0008) drop-shadow(0 0 7px #ffdb4a77)}
+.ssl-conf-potw-averages{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-top:0;
+ padding:8px 7px;border:1px solid #e7b95677;background:#06132888;border-radius:8px}
+.ssl-conf-potw-averages>div{display:grid;text-align:center;align-content:center;gap:5px;min-width:0}
+.ssl-conf-potw-averages span{font:800 10px system-ui,sans-serif;color:#e5edfa;white-space:nowrap}
+.ssl-conf-potw-averages strong{font:900 clamp(13px,1.8vw,21px) 'Barlow Condensed',Impact,sans-serif;
+ letter-spacing:.015em;color:#fff;font-variant-numeric:tabular-nums}
+.ssl-conf-potw-major-stat strong{color:#ffde72}
+@media(max-width:750px){
+ .ssl-conf-potw-side{padding:12px 8px 15px;gap:9px}
+ .ssl-conf-potw-side-head{gap:6px}
+ .ssl-conf-potw-side-head img{width:34px;height:34px}
+ .ssl-conf-potw-side-head small{font-size:12px}
+ .ssl-conf-potw-side-head strong{font-size:13px}
+ .ssl-conf-potw-player-block{grid-template-columns:51px minmax(0,1fr);gap:6px}
+ .ssl-conf-potw-portrait{width:50px;height:50px;overflow:hidden}
+ .ssl-conf-potw-trophy{grid-column:2;justify-self:end;width:60px;height:75px;margin-top:-6px}
+ .ssl-conf-potw-player-info h2{font-size:18px}
+ .ssl-conf-potw-averages{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .ssl-conf-potw-averages strong{font-size:18px}
+ .potw-award-selection{gap:9px}
+ .potw-choice-card{padding:12px 6px}
+ .potw-choice-card .potw-trophy{width:90px;height:115px}
+ .potw-choice-card>strong{font-size:16px}
+}
+@media(max-width:420px){
+ .ssl-conference-awards-title h1{font-size:29px}
+ .ssl-conf-potw-side-head>div{line-height:1}
+ .ssl-conf-potw-side-head small{font-size:11px}
+ .ssl-conf-potw-side-head strong{font-size:12px}
+ .ssl-conf-potw-portrait{width:48px;height:48px}
+ .ssl-conf-potw-player-info p{font-size:10px}
+}
