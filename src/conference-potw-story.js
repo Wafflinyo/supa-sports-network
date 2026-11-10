@@ -93,11 +93,11 @@ export function conferencePotwStory(season,award){
  const recordText=team.total>0?team.wins+'–'+team.losses:'unrecorded';
  let opener;
  if(team.total===2 && team.wins===0)
-   opener="Despite "+teamName+"'s 0–2 stretch, "+row.name+
-     " delivered an exceptional performance across its two most recent games.";
+   opener="Despite "+teamName+"'s 0–2 "+(Number(award.roundNo)===1?'start':'stretch')+
+     ", "+row.name+" delivered an exceptional performance across its last two games.";
  else if(team.total===2 && team.wins===2)
-   opener="As "+teamName+" went 2–0 over its last two games, "+row.name+
-     " played a leading role in the unbeaten run.";
+   opener="As "+teamName+" "+(Number(award.roundNo)===1?'opened 2–0':'went 2–0')+
+     " over its last two games, "+row.name+" played a leading role in the unbeaten run.";
  else if(team.total>0)
    opener="With "+teamName+" finishing "+recordText+" over "+relevant+
      ", "+row.name+" stood out for the club.";
@@ -142,7 +142,7 @@ export function conferencePotwStory(season,award){
  parts.push('Congratulations to '+row.name+' and the GM of '+teamName+'!');
  return {
    title:getHeadline(row,players),
-   summary:parts.slice(0,2).join(' '),
+   summary:[...parts.slice(0,2),...(hrLead&&hr>=2?[parts.find(part=>part.includes('led the entire SSL')||part.includes('tied for the SSL lead'))].filter(Boolean):[]),parts.at(-1)].join(' '),
    detail:parts.join(' '),
    stats:{gamesPlayed:row.gamesPlayed,teamWins:team.wins,teamLosses:team.losses,
      teamRuns:team.scored,playerRuns:runs,rbi,homeRuns:hr,hits,atBats,outs,
