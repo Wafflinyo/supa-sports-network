@@ -46,28 +46,43 @@ export function potwRounds(season){
   return {roundNo,start,end,total:matches.length,finished,complete:matches.length>0&&finished===matches.length};
  });
 }
+
+// The award is for the two games within this two-week award period.
+// If a reschedule puts more games into the period, use only a team's two
+// most recent played games, never earlier season/career numbers.
+const gameOrder=(a,b)=>
+ Number(a.week||0)-Number(b.week||0) ||
+ (Date.parse(a.releasedAt||a.startsAt||a.result?.postedAt||'')||0)-
+ (Date.parse(b.releasedAt||b.startsAt||b.result?.postedAt||'')||0) ||
+ String(a.id||'').localeCompare(String(b.id||''));
+export function potwWindowGames(season,roundNo){
+ const start=2*Number(roundNo)-1,end=start+1;
+ return (season?.games||[]).filter(g=>g.phase==='regular'&&g.stage==='final'&&
+   Number(g.week)>=start&&Number(g.week)<=end).sort(gameOrder);
+}
+export function potwTeamGames(season,roundNo,teamId){
+ return potwWindowGames(season,roundNo).filter(g=>
+  String(g.home)===String(teamId)||String(g.away)===String(teamId)).slice(-2);
+}
 export function potwLeaderboard(season,roundNo){
- if(!season || !roundNo)return [];
- const games=(season.games||[]).filter(g=>g.phase==='regular'&&g.stage==='final'
-  &&Number(g.week)>=roundNo*2-1 &&Number(g.week)<=roundNo*2);
- const stats=aggregate({...season,games});
- const teamMap=new Map((season.teams||[]).map(t=>[String(t.id),t.name]));
- return Object.entries(stats).map(([id,st])=>{
-  const player=potwPlayer(id);
-  const played=games.flatMap(g=>(g.result?.players||[])
-    .filter(p=>Number(p.player)===Number(id))
-    .map(p=>({team:p.team,week:Number(g.week),game:g.id})));
-  played.sort((a,b)=>b.week-a.week);
-  // A trophy belongs to the team that currently rosters the player, not to
-  // a prior franchise appearing in the two-week game logs.
-  const rosterTeam=(season.teams||[]).find(t=>(season.rosters?.[t.id]||[]).some(p=>Number(p)===Number(id)));
-  if(!rosterTeam)return null;
-  const team=rosterTeam.id;
-  return {id:Number(id),name:player?.name||'Player '+id,
-   team,conference:rosterTeam.conference,
-   teamName:teamMap.get(String(team))||'SSL Team',stats:st,gamesPlayed:st.gamesPlayed||0};
+ if(!season||!roundNo)return [];
+ // Snapshot the team a player represents NOW; an old team does not receive
+ // award credit for a player it traded before the commissioner submits.
+ return (season.teams||[]).flatMap(team=>{
+   const games=potwTeamGames(season,roundNo,team.id);
+   if(!games.length)return [];
+   const stats=aggregate({...season,games});
+   return (season.rosters?.[team.id]||[]).map(id=>{
+     const st=stats[id];
+     if(!st?.gamesPlayed)return null;
+     const player=potwPlayer(id);
+     return {id:Number(id),name:player?.name||'Player '+id,
+       team:team.id,conference:team.conference,teamName:team.name,
+       stats:st,gamesPlayed:st.gamesPlayed,gameIds:games.map(g=>g.id)};
+   }).filter(Boolean);
  });
 }
+
 export function potwStatValue(row,key,view){
  if(key==='gamesPlayed')return row.gamesPlayed;
  const number=Number(row.stats?.[key]||0);
