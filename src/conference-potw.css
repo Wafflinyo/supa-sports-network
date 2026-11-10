@@ -121,3 +121,170 @@
  .ssl-conf-potw-standout strong{font-size:13px}
  .ssl-conf-potw-standout span{font-size:9px}
 }
+
+
+/* Compact award hero: enforce two independent conference panels instead of
+   diagonal red/blue backgrounds that visually crossed the center line. */
+.ssl-home-layout .ssl-home-hero.ssl-conference-awards-hero{
+  height:auto;max-height:none;overflow:hidden;
+}
+.ssl-conference-awards-sides{
+  isolation:isolate;align-items:stretch;overflow:hidden;min-height:0;
+}
+.ssl-conference-awards-sides::before,
+.ssl-conference-awards-sides::after{display:none!important}
+.ssl-conf-potw-side{
+  overflow:hidden;isolation:isolate;min-width:0;
+  gap:9px;padding:14px 18px 17px;
+}
+.ssl-conf-potw-supa{
+  background:radial-gradient(ellipse at 30% 20%,#a8364c 0%,#69182e 60%,#420f23 100%);
+}
+.ssl-conf-potw-galaxy{
+  background:radial-gradient(ellipse at 70% 20%,#3553a6 0%,#112e70 58%,#081d47 100%);
+}
+.ssl-conf-potw-bg-mark{
+  max-width:90%;overflow:hidden;top:65px;
+  left:4%;opacity:.11;pointer-events:none;
+}
+.ssl-conf-potw-galaxy .ssl-conf-potw-bg-mark{right:4%;left:auto}
+.ssl-conf-potw-spine{
+  position:absolute;z-index:5;pointer-events:none;
+  left:50%;top:0;bottom:0;width:20px;transform:translateX(-50%);
+  display:flex;flex-direction:column;justify-content:space-evenly;
+  align-items:center;color:#ffe58a;font-size:14px;
+  text-shadow:0 1px 3px #4e2813,0 0 6px #eebd60;
+}
+.ssl-conf-potw-spine::before{
+  content:'';position:absolute;z-index:-1;top:0;bottom:0;width:4px;
+  background:linear-gradient(90deg,#a86a12,#fff4bb 47%,#c17f1a);
+  box-shadow:0 0 0 1px #59350f,0 0 7px #ffe28f99;
+}
+.ssl-conf-potw-spine span{display:grid;place-items:center;width:18px;height:18px;
+  background:#8a5017;border:1px solid #ffe48b;border-radius:50%}
+.ssl-conf-potw-player-block{
+  display:grid;grid-template-columns:100px minmax(0,1fr) 132px;
+  gap:9px;align-items:center;min-width:0;
+}
+.ssl-conf-potw-portrait{
+  width:98px;height:98px;max-width:100%;overflow:hidden;
+  display:grid;place-items:center;border-width:3px;
+}
+.ssl-conf-potw-portrait>.tier-portrait-wrap{transform:scale(.91);transform-origin:center}
+.ssl-conf-potw-trophy{
+  width:128px;height:165px;max-width:100%;min-width:0;justify-self:center;
+  filter:drop-shadow(0 4px 4px #000a) drop-shadow(0 0 6px #ffdf7b55);
+}
+.ssl-conf-potw-averages{grid-template-columns:repeat(auto-fit,minmax(70px,1fr))}
+.ssl-conf-potw-editorial{
+  display:flex;flex-direction:column;align-self:start;
+  padding:12px 13px;gap:8px;min-width:0;
+}
+.ssl-conf-potw-editorial .ssl-conf-potw-teaser{
+  font:600 12px/1.45 system-ui,sans-serif;
+  margin:0;display:-webkit-box;-webkit-box-orient:vertical;
+  -webkit-line-clamp:3;line-clamp:3;overflow:hidden;
+}
+.ssl-conf-potw-view-article{
+  margin-top:auto;width:100%;background:#efc965;color:#152340;
+  border:1px solid #fff0b0;border-radius:6px;
+  padding:9px 7px;font:900 12px system-ui,sans-serif;
+  letter-spacing:.025em;cursor:pointer;
+}
+.ssl-conf-potw-view-article:hover,
+.ssl-conf-potw-view-article:focus-visible{background:#fff0ac;outline:2px solid #fff0ac;outline-offset:2px}
+@media(max-width:750px){
+ .ssl-conf-potw-side{padding:12px 10px 15px;gap:8px}
+ .ssl-conf-potw-player-block{
+   grid-template-columns:74px minmax(0,1fr);
+   grid-template-areas:"portrait info" "trophy trophy";
+   align-items:center;row-gap:3px;
+ }
+ .ssl-conf-potw-portrait{grid-area:portrait;width:72px;height:72px;border-width:2px}
+ .ssl-conf-potw-portrait>.tier-portrait-wrap{transform:scale(.72);transform-origin:center}
+ .ssl-conf-potw-player-info{grid-area:info}
+ .ssl-conf-potw-player-info h2{font-size:clamp(16px,4.1vw,22px)}
+ .ssl-conf-potw-player-info p{font-size:11px;line-height:1.2}
+ .ssl-conf-potw-trophy{
+   grid-area:trophy;justify-self:center;
+   width:116px;height:148px;margin:0;
+ }
+ .ssl-conf-potw-averages{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+ .ssl-conf-potw-averages span{font-size:9px}
+ .ssl-conf-potw-averages strong{font-size:19px}
+ .ssl-conf-potw-standouts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .ssl-conf-potw-standout{min-width:0}
+ .ssl-conf-potw-editorial{padding:9px;gap:8px;min-height:154px}
+ .ssl-conf-potw-editorial h3{font-size:17px;line-height:1.1}
+ .ssl-conf-potw-editorial .ssl-conf-potw-teaser{font-size:11px;-webkit-line-clamp:3;line-clamp:3}
+ .ssl-conf-potw-view-article{font-size:11px;padding:8px 3px}
+ .ssl-conf-potw-spine{width:14px;font-size:11px}
+ .ssl-conf-potw-spine span{width:14px;height:14px}
+}
+@media(max-width:420px){
+ .ssl-conf-potw-side{padding:10px 8px 14px;gap:8px}
+ .ssl-conf-potw-player-block{grid-template-columns:66px minmax(0,1fr)}
+ .ssl-conf-potw-portrait{width:64px;height:64px}
+ .ssl-conf-potw-portrait>.tier-portrait-wrap{transform:scale(.64)}
+ .ssl-conf-potw-trophy{width:112px;height:140px}
+ .ssl-conf-potw-player-info h2{font-size:18px}
+ .ssl-conf-potw-player-info p{font-size:10px}
+ .ssl-conf-potw-editorial h3{font-size:16px}
+}
+
+/* Accessible article modal is portaled into <body> so the homepage carousel's
+   clipping, swipe handlers, and fixed navigation cannot overlap its contents. */
+.ssl-conf-potw-overlay{
+ position:fixed;inset:0;z-index:200000;
+ display:flex;align-items:center;justify-content:center;padding:20px;
+ background:#030b1edb;backdrop-filter:blur(6px);
+}
+.ssl-conf-potw-article{
+ display:flex;flex-direction:column;width:min(660px,100%);
+ max-height:min(85dvh,790px);min-height:0;overflow:hidden;
+ color:#f8f9fc;background:#111d3a;
+ border:2px solid #e3b95a;border-radius:15px;
+ box-shadow:0 18px 65px #000c;
+}
+.ssl-conf-potw-article-supa{border-color:#f6d174}
+.ssl-conf-potw-article-galaxy{border-color:#c8dbff}
+.ssl-conf-potw-article-heading{
+ display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+ padding:21px 22px;background:linear-gradient(110deg,#64182e,#18325f);
+ border-bottom:1px solid #ffe9a45c;
+}
+.ssl-conf-potw-article-galaxy .ssl-conf-potw-article-heading{
+ background:linear-gradient(110deg,#203a82,#0a1e47);
+}
+.ssl-conf-potw-article-heading>div{min-width:0}
+.ssl-conf-potw-article-heading span{
+ font:900 11px system-ui,sans-serif;color:#ffe597;letter-spacing:.08em;
+}
+.ssl-conf-potw-article-heading h2{
+ font:900 clamp(23px,4vw,34px)/1.08 'Barlow Condensed',Impact,sans-serif;
+ margin:9px 0;color:#fff;overflow-wrap:anywhere;
+}
+.ssl-conf-potw-article-heading small{font:700 13px system-ui,sans-serif;color:#ecf0f9}
+.ssl-conf-potw-article-close{
+ flex:none;display:grid;place-items:center;color:#fff;
+ border:1px solid #ffffff80;border-radius:50%;background:#09152f99;
+ width:39px;height:39px;cursor:pointer;
+}
+.ssl-conf-potw-article-content{
+ flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+ padding:22px 25px;font:500 16px/1.65 system-ui,sans-serif;
+}
+.ssl-conf-potw-article-content p{margin:0 0 16px}
+.ssl-conf-potw-article-done{
+ flex:none;margin:0 22px 20px;padding:12px 15px;border-radius:7px;
+ border:1px solid #f5dda5;background:#f0c866;color:#111b30;
+ font:900 13px system-ui,sans-serif;cursor:pointer;
+}
+@media(max-width:600px){
+ .ssl-conf-potw-overlay{padding:12px}
+ .ssl-conf-potw-article{max-height:calc(100dvh - 24px)}
+ .ssl-conf-potw-article-heading{padding:16px;gap:10px}
+ .ssl-conf-potw-article-heading h2{font-size:24px}
+ .ssl-conf-potw-article-content{padding:16px;font-size:14px;line-height:1.65}
+ .ssl-conf-potw-article-done{margin:0 16px 16px}
+}
