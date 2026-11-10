@@ -53,6 +53,11 @@ export default function ConferencePotwHeadliner({awards=[],season,onPlayerSelect
              <span>{label} / G</span><strong>{score(a.metrics?.[key])}</strong>
            </div>)}
          </div>
+         {!!story.standouts?.length&&<div className="ssl-conf-potw-standouts" aria-label="Outstanding statistics from the two-game award period">
+           {story.standouts.map(item=><div className="ssl-conf-potw-standout" key={item.label}>
+             <strong>{item.value}</strong><span>{item.label}</span>
+           </div>)}
+         </div>}
          <div className="ssl-conf-potw-editorial">
            <h3>{story.title}</h3>
            <p>{story.summary}</p>
