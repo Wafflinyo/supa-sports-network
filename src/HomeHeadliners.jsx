@@ -101,7 +101,7 @@ export default function HomeHeadliners({slides,championContent,seasons,supabase,
       if(event.key==='ArrowLeft'){event.preventDefault();prev();}
     }}>
    <div className="ssl-headliners-stage" role="group" aria-roledescription="slide"
-     aria-label={'Headline '+(index+1)+' of '+count} key={slide.id}>
+     aria-label={'Show headline '+(index+1)+' of '+count} key={slide.id}>
      {slide.kind==='champion'?championContent:
        <MatchStorySlide story={slide.story} seasons={seasons} supabase={supabase}
          players={players} onOpenGame={onOpenGame}/>}
