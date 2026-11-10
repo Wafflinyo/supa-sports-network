@@ -1,5 +1,5 @@
 import {aggregate} from './season-data.js';
-import pool from './players.json';
+import pool from './players.json' with {type:'json'};
 
 const namedPlayers = new Map(pool.map(player => [Number(player.id),player]));
 
