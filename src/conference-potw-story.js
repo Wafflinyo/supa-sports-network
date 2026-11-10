@@ -210,7 +210,9 @@ export function conferencePotwStory(season,award){
  // Lead with the category that actually made the player exceptional. An elite
  // pitcher or defender never has to wait behind routine batting numbers.
  const title=categories[0]?.title||row.name+' earns conference honors for a standout two-game stretch';
- const summary=[opener,...categoryText.slice(0,2),...leagueClaims.slice(0,1),
+ const summaryCategories=categories.filter((category,index)=>index===0||category.strength>=85);
+ const summary=[opener,...summaryCategories.slice(0,2).map(category=>category.sentence),
+  ...leagueClaims.slice(0,1),
   ...(contribution?[contribution]:[]),congratulation].join(' ');
  return {title,summary,detail:details.join(' '),
   standouts:categories.flatMap(c=>c.standouts.slice(0,3)).slice(0,5),
