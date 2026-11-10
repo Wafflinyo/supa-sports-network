@@ -72,15 +72,17 @@ assert.match(story.detail,/7-for-8/);
 assert.match(story.detail,/16 total runs/);
 
 // The other conference must receive its own story, not Wario's copy.
-for(const g of otherGames.filter(g=>g.stage==='final')){
- g.result.players.push({team:'galaxy',player:2,stats:{outs:9,pitchStrikeouts:5,earnedRuns:1,
-   putouts:0,assists:2},itemScore:0,shutoutBonus:0});
-}
+season.games.push(
+ makeGame('galaxy3',3,'galaxy','opposition',4,2,[['galaxy',2,
+   {outs:9,pitchStrikeouts:5,earnedRuns:1,assists:2}]]),
+ makeGame('galaxy4',4,'galaxy','opposition',3,1,[['galaxy',2,
+   {outs:9,pitchStrikeouts:4,earnedRuns:1,assists:2}]])
+);
 const galaxyAward={roundNo:2,player:2,team:'galaxy',teamName:'Galaxy Knights',
  awardTitle:'Mario Galaxy Player of the Week'};
 const galaxyStory=conferencePotwStory(season,galaxyAward);
 assert.match(galaxyStory.title,/strikeouts|pitching/i);
-assert.match(galaxyStory.detail,/5 batters/);
+assert.match(galaxyStory.detail,/9 batters/);
 assert.match(galaxyStory.detail,/Galaxy Knights/);
 assert(!galaxyStory.detail.includes('Moleville Haliban'));
 assert(!galaxyStory.detail.includes('7-for-8'));
