@@ -76,10 +76,8 @@ export function conferencePotwStory(season,award){
  else opener=row.name+" put together a standout performance for "+teamName+".";
  const highlights=[];
  const hrLead=strongerLead(row,players,'homeRuns');
- if(hr>0)highlights.push(hrLead?
-    'With '+hr+' '+plural(hr,'home run')+', '+row.name+' is '+hrLead+' in that two-game award window':
-    row.name+' launched '+hr+' '+plural(hr,'home run'));
- if(rbi>0)highlights.push('drove in '+rbi+' '+plural(rbi,'run')+' (RBI)');
+ if(hr>0)highlights.push('crushed '+hr+' '+plural(hr,'home run'));
+ if(rbi>0)highlights.push('drove in '+rbi+' '+plural(rbi,'run'));
  if(runs>0)highlights.push('scored '+runs+' '+plural(runs,'run'));
  if(hits>0&&atBats>0)highlights.push('went '+batLine(hits,atBats)+' at the plate');
  if(doubles>0)highlights.push('hit '+doubles+' '+plural(doubles,'double'));
@@ -97,13 +95,11 @@ export function conferencePotwStory(season,award){
  if(assists>0)defense.push(assists+' '+plural(assists,'assist'));
  if(buddy>0)defense.push(buddy+' buddy-jump '+plural(buddy,'putout'));
  const parts=[opener];
- if(highlights.length){
-   const preferred=highlights.slice(0,4);
-   const sentence=preferred.map((fragment,index)=>{
-     if(index===0)return fragment[0].toUpperCase()+fragment.slice(1);
-     return fragment;
-   });
-   parts.push(wordJoin(sentence)+'.');
+ if(highlights.length)parts.push(row.name+' '+wordJoin(highlights.slice(0,4))+'.');
+ if(hrLead && hr>=2){
+   parts.push(hrLead==='tied for the SSL lead'
+     ?'Those '+hr+' home runs tied for the SSL lead over this same two-game award window.'
+     :'Those '+hr+' home runs led the entire SSL over the same two-game award window.');
  }
  if(pitching.length && (outs>=6||strikeouts>=2||!highlights.length))
    parts.push('On the mound, '+row.name+' '+wordJoin(pitching)+'.');
