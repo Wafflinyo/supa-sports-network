@@ -30,7 +30,6 @@ function awardedTeamRow(season,award){
 }
 
 const num=(value)=>Number(value)||0;
-const safe=(number)=>Number.isFinite(number)?number:0;
 const plural=(n,word)=>n===1?word:word+'s';
 const wordJoin=values=>values.length<2?values[0]||'':
  values.length===2?values.join(' and '):
@@ -58,18 +57,107 @@ function strongerLead(row,others,key){
  if(above.length)return null;
  return tied.length?'tied for the SSL lead':'leading the SSL outright';
 }
-function getHeadline(row,leaders){
- const s=row.stats,hr=num(s.homeRuns),rbi=num(s.rbi),h=num(s.hits),k=num(s.pitchStrikeouts),
-       outs=num(s.outs),po=num(s.putouts),dgp=num(s.dgp);
- const leagueLead=strongerLead(row,leaders,'homeRuns');
- if(hr>=2)return row.name+"'s "+hr+'-homer explosion earns conference honors';
- if(hr===1&&leagueLead)return row.name+' hits into conference spotlight';
- if(rbi>=5)return row.name+"'s "+rbi+'-RBI surge claims conference honors';
- if(k>=4&&outs>=6)return row.name+"'s "+k+' strikeouts power conference award';
- if(outs>=9&&num(s.earnedRuns)<=2)return row.name+"'s dominant pitching wins conference honor";
- if(h>=5)return row.name+"'s "+h+' hits earn conference honors';
- if(po>=8||dgp>=20)return row.name+"'s fielding brilliance earns weekly award";
- return row.name+' earns conference honors for a standout two-game stretch';
+
+const ipString=outs=>Math.floor(outs/3)+'.'+(outs%3);
+const pointsString=n=>Number.isInteger(n)?String(n):n.toFixed(2).replace(/0+$/,'').replace(/[.]$/,'');
+const highlight=(label,value)=>({label,value:String(value)});
+function performanceCategories(row){
+ const s=row.stats, name=row.name;
+ const hr=num(s.homeRuns),rbi=num(s.rbi),runs=num(s.runs),hits=num(s.hits),ab=num(s.atBats),
+  doubles=num(s.doubles),triples=num(s.triples),steals=num(s.stolenBases),
+  outs=num(s.outs),ks=num(s.pitchStrikeouts),er=num(s.earnedRuns),
+  shutouts=num(s.shutouts),combined=num(s.combinedShutouts),complete=num(s.completeGames),
+  putouts=num(s.putouts),assists=num(s.assists),buddy=num(s.buddyJumpPutouts),
+  doublePlays=num(s.doublePlays),triplePlays=num(s.triplePlays),
+  ogp=num(s.ogp),dgp=num(s.dgp),pgp=num(s.pgp);
+ const avg=ab>0?hits/ab:0;
+ const offensiveStrength=Math.max(
+  hr>=2?100+hr*9:hr?65:0,
+  hr>=1&&rbi>=3&&hits>=3?95+hr*5+rbi*2:0,
+  rbi>=4?85+rbi*4:0,
+  hits>=5?85+hits*4:0,
+  ab>=4&&avg>=.7?90+hits*3:0,
+  runs>=4?75+runs*4:0,
+  steals>=2?80+steals*6:0,
+  doubles>=3||triples>=2?75+2*(doubles+triples):0,
+  ogp>=65&&hits+rbi+hr+runs>0?70+ogp/5:0
+ );
+ const defensiveTotal=putouts+assists+buddy+doublePlays+triplePlays;
+ const defensiveStrength=defensiveTotal===0?0:Math.max(
+  buddy>=2?100+buddy*9:0,
+  triplePlays>=1?120+triplePlays*10:0,
+  doublePlays>=2?95+doublePlays*8:0,
+  defensiveTotal>=8?70+defensiveTotal*4:0,
+  dgp>=20?70+dgp*1.6:0
+ );
+ // Even a few recorded outs are not worth praising when the player
+ // had a poor pitching outing or a nonpositive pitching Game Point total.
+ const pitchingStrength=outs<3||pgp<=0?0:Math.max(
+  shutouts>=1?125+shutouts*15:0,
+  combined>=1?115+combined*12:0,
+  complete>=1?105+complete*12:0,
+  ks>=4?90+ks*7:0,
+  outs>=9&&er<=2?85+outs*2:0,
+  pgp>=30?75+pgp*.65:0
+ );
+ const offenseFacts=[];
+ if(hr)offenseFacts.push('hit '+hr+' '+plural(hr,'home run'));
+ if(rbi)offenseFacts.push('drove in '+rbi+' '+plural(rbi,'run'));
+ if(runs)offenseFacts.push('scored '+runs+' '+plural(runs,'run'));
+ if(hits&&ab)offenseFacts.push('went '+batLine(hits,ab)+' at the plate');
+ if(doubles>=2)offenseFacts.push('collected '+doubles+' doubles');
+ if(triples)offenseFacts.push('recorded '+triples+' '+plural(triples,'triple'));
+ if(steals)offenseFacts.push('stole '+steals+' '+plural(steals,'base'));
+ const pitchingFacts=[];
+ if(outs) pitchingFacts.push('worked '+ipString(outs)+' innings');
+ if(ks) pitchingFacts.push('struck out '+ks+' '+plural(ks,'batter'));
+ if(outs) pitchingFacts.push('allowed '+er+' earned '+plural(er,'run'));
+ if(shutouts) pitchingFacts.push('earned '+shutouts+' solo '+plural(shutouts,'shutout'));
+ if(combined) pitchingFacts.push('contributed to '+combined+' combined '+plural(combined,'shutout'));
+ if(complete) pitchingFacts.push('finished '+complete+' complete '+plural(complete,'game'));
+ if(pgp>=20) pitchingFacts.push('earned '+pointsString(pgp)+' PGP');
+ const defenseFacts=[];
+ if(putouts)defenseFacts.push(putouts+' '+plural(putouts,'putout'));
+ if(assists)defenseFacts.push(assists+' '+plural(assists,'assist'));
+ if(buddy)defenseFacts.push(buddy+' Buddy Jump '+plural(buddy,'putout'));
+ if(doublePlays)defenseFacts.push(doublePlays+' '+plural(doublePlays,'double play'));
+ if(triplePlays)defenseFacts.push(triplePlays+' '+plural(triplePlays,'triple play'));
+ if(dgp>=20)defenseFacts.push(pointsString(dgp)+' DGP');
+ const categories=[
+  {key:'offense',strength:offensiveStrength,
+   title:hr>=2?name+"'s "+hr+'-homer burst earns conference honors':
+     rbi>=5?name+"'s "+rbi+'-RBI surge claims conference honors':
+     hits>=5?name+"'s "+hits+' hits power conference award':
+     name+"'s standout hitting earns conference honors",
+   sentence:offenseFacts.length?'At the plate, '+name+' '+wordJoin(offenseFacts.slice(0,4))+'.':'',
+   standouts:[hr&&highlight('HR',hr),rbi>=3&&highlight('RBI',rbi),
+     hits&&ab&&highlight('H / AB',hits+' / '+ab),steals>=2&&highlight('SB',steals)].filter(Boolean)},
+  {key:'pitching',strength:pitchingStrength,
+   title:shutouts?name+"'s shutout pitching earns conference honor":
+     combined?name+' shines in a combined shutout to claim conference honors':
+     ks>=4?name+"'s "+ks+' strikeouts power conference award':
+     complete?name+"'s complete-game effort wins conference honor":
+     name+"'s dominant pitching earns conference recognition",
+   sentence:pitchingFacts.length?'On the mound, '+name+' '+wordJoin(pitchingFacts)+'.':'',
+   standouts:[outs&&highlight('IP',ipString(outs)),ks&&highlight('Pitch K',ks),
+     outs&&highlight('ER',er),shutouts&&highlight('SHO',shutouts),
+     pgp>=20&&highlight('PGP',pointsString(pgp))].filter(Boolean)},
+  {key:'defense',strength:defensiveStrength,
+   title:buddy>=2?name+"'s "+buddy+' Buddy Jump putouts headline defensive award':
+     triplePlays?name+"'s triple-play heroics earn conference honors":
+     doublePlays>=2?name+"'s "+doublePlays+' double plays earn conference honors':
+     name+"'s spectacular glove work earns conference honors",
+   sentence:defenseFacts.length?'In the field, '+name+' contributed '+wordJoin(defenseFacts)+'.':'',
+   standouts:[putouts&&highlight('PO',putouts),assists&&highlight('AST',assists),
+     buddy&&highlight('Buddy Jump',buddy),doublePlays&&highlight('DP',doublePlays),
+     triplePlays&&highlight('TP',triplePlays),dgp>=20&&highlight('DGP',pointsString(dgp))].filter(Boolean)}
+ ];
+ // One or two home runs alone must not beat a genuinely exceptional pitcher or
+ // fielder. Prefer the most notable supported two-game performance, not batting.
+ // The same independent quality threshold applies to every category.
+ return categories.filter(c=>c.strength>=85&&c.sentence)
+   .sort((a,b)=>b.strength-a.strength||
+     ['pitching','defense','offense'].indexOf(a.key)-['pitching','defense','offense'].indexOf(b.key));
 }
 export function conferencePotwStory(season,award){
  const row=awardedTeamRow(season,award);
@@ -77,17 +165,13 @@ export function conferencePotwStory(season,award){
   title:(potwPlayer(award.player)?.name||'SSL player')+' receives '+(award.awardTitle||'conference Player of the Week'),
   summary:'The commissioner selected '+(potwPlayer(award.player)?.name||'this player')+
     ' of '+award.teamName+' for '+potwWeekLabel(award.roundNo)+'.',
-  detail:'This award recognizes the player’s two-game performance in '+potwWeekLabel(award.roundNo)+'.'
+  detail:'This award recognizes the player’s two-game performance in '+potwWeekLabel(award.roundNo)+'.',
+  standouts:[],qualifyingCategories:[]
  };
  const players=twoGameAwardRows(season,award.roundNo).allPlayers;
  const played=potwTeamGames(season,award.roundNo,award.team);
  const team=record(season,played,String(award.team));
- const s=row.stats,hr=num(s.homeRuns),rbi=num(s.rbi),runs=num(s.runs),
-       hits=num(s.hits),atBats=num(s.atBats),outs=num(s.outs),
-       strikeouts=num(s.pitchStrikeouts),earnedRuns=num(s.earnedRuns),
-       putouts=num(s.putouts),assists=num(s.assists),
-       steals=num(s.stolenBases), doubles=num(s.doubles), triples=num(s.triples),
-       buddy=num(s.buddyJumpPutouts);
+ const s=row.stats,hr=num(s.homeRuns),rbi=num(s.rbi),runs=num(s.runs);
  const teamName=award.teamName||row.teamName;
  const relevant=team.total===2?'the two-game stretch':'the award period';
  const recordText=team.total>0?team.wins+'–'+team.losses:'unrecorded';
@@ -102,50 +186,61 @@ export function conferencePotwStory(season,award){
    opener="With "+teamName+" finishing "+recordText+" over "+relevant+
      ", "+row.name+" stood out for the club.";
  else opener=row.name+" put together a standout performance for "+teamName+".";
- const highlights=[];
- const hrLead=strongerLead(row,players,'homeRuns');
- if(hr>0)highlights.push('crushed '+hr+' '+plural(hr,'home run'));
- if(rbi>0)highlights.push('drove in '+rbi+' '+plural(rbi,'run'));
- if(runs>0)highlights.push('scored '+runs+' '+plural(runs,'run'));
- if(hits>0&&atBats>0)highlights.push('went '+batLine(hits,atBats)+' at the plate');
- if(doubles>0)highlights.push('hit '+doubles+' '+plural(doubles,'double'));
- if(triples>0)highlights.push('added '+triples+' '+plural(triples,'triple'));
- if(steals>0)highlights.push('stole '+steals+' '+plural(steals,'base'));
- const pitching=[];
- if(outs>0){
-   const innings=Math.floor(outs/3),part=outs%3;
-   pitching.push('recorded '+innings+'.'+part+' innings pitched');
+ const categories=performanceCategories(row);
+ const categoryText=categories.map(category=>category.sentence);
+ const qualifying=new Set(categories.map(category=>category.key));
+ const leagueClaims=[];
+ // A "league lead" can only use the same two-week award data for all players.
+ for(const [key,label,category] of [
+  ['homeRuns','home runs','offense'],['pitchStrikeouts','pitching strikeouts','pitching'],
+  ['putouts','putouts','defense'],['buddyJumpPutouts','Buddy Jump putouts','defense']
+ ]){
+  if(!qualifying.has(category))continue;
+  const n=num(s[key]);
+  const threshold=key==='homeRuns'?2:key==='pitchStrikeouts'?4:key==='putouts'?8:2;
+  if(n<threshold)continue;
+  const lead=strongerLead(row,players,key);
+  if(!lead)continue;
+  leagueClaims.push(lead==='tied for the SSL lead'
+   ?'With '+n+' '+label+', '+row.name+' tied for the SSL lead over this two-game award window.'
+   :'With '+n+' '+label+', '+row.name+' led the entire SSL over this same two-game award window.');
  }
- if(strikeouts>0)pitching.push('struck out '+strikeouts+' '+plural(strikeouts,'batter'));
- if(outs>0)pitching.push('allowed '+earnedRuns+' earned '+plural(earnedRuns,'run'));
- const defense=[];
- if(putouts>0)defense.push(putouts+' '+plural(putouts,'putout'));
- if(assists>0)defense.push(assists+' '+plural(assists,'assist'));
- if(buddy>0)defense.push(buddy+' buddy-jump '+plural(buddy,'putout'));
- const parts=[opener];
- if(highlights.length)parts.push(row.name+' '+wordJoin(highlights.slice(0,4))+'.');
- if(hrLead && hr>=2){
-   parts.push(hrLead==='tied for the SSL lead'
-     ?'Those '+hr+' home runs tied for the SSL lead over this same two-game award window.'
-     :'Those '+hr+' home runs led the entire SSL over the same two-game award window.');
+ const contribution=qualifying.has('offense')&&rbi>=2&&runs>=1&&team.scored>0?
+   'Those '+rbi+' RBI and '+runs+' runs scored add up to '+
+   (rbi+runs)+' combined RBI-plus-runs contributions; '+teamName+
+   ' scored '+team.scored+' total '+plural(team.scored,'run')+' over its last two games.':null;
+ const congratulation='Congratulations to '+row.name+' and the GM of '+teamName+'!';
+ const details=[opener,...categoryText,...leagueClaims,
+  ...(contribution?[contribution]:[]),congratulation];
+ // Lead with the category that actually made the player exceptional. An elite
+ // pitcher or defender never has to wait behind routine batting numbers.
+ // Headline and summary represent every strong category, not just the best.
+ let title=categories[0]?.title||row.name+' earns conference honors for a standout two-game stretch';
+ if(categories.length>=3)title=row.name+"'s all-around brilliance earns conference honors";
+ else if(qualifying.has('offense')&&qualifying.has('defense'))
+   title=row.name+"'s bat and glove power conference honors";
+ else if(qualifying.has('pitching')&&qualifying.has('defense'))
+   title=row.name+"'s pitching and glove work earn conference honors";
+ else if(qualifying.has('offense')&&qualifying.has('pitching'))
+   title=row.name+"'s bat and arm power conference honors";
+ const summary=[opener,...categoryText,...leagueClaims.slice(0,2),
+   ...(contribution?[contribution]:[]),congratulation].join(' ');
+ // Alternate stat chips across all qualifying categories so a great batter
+ // AND fielder is visually credited for both, rather than just the bat.
+ const standouts=[];
+ for(let i=0;i<3&&standouts.length<6;i++){
+  for(const category of categories){
+   if(standouts.length>=6)break;
+   if(category.standouts[i])standouts.push(category.standouts[i]);
+  }
  }
- if(pitching.length && (outs>=6||strikeouts>=2||!highlights.length))
-   parts.push('On the mound, '+row.name+' '+wordJoin(pitching)+'.');
- if(defense.length && (!highlights.length||num(s.dgp)>num(s.ogp)))
-   parts.push('In the field, '+row.name+' contributed '+wordJoin(defense)+'.');
- // Runs plus RBI may count the same run twice, so never describe this
- // number as distinct runs directly "responsible for".
- if(rbi>=2&&runs>=1&&team.scored>0)
-   parts.push('Those '+rbi+' RBI and '+runs+' runs scored add up to '+
-     (rbi+runs)+' combined RBI-plus-runs contributions; '+teamName+
-     ' scored '+team.scored+' total '+plural(team.scored,'run')+' over its last two games.');
- parts.push('Congratulations to '+row.name+' and the GM of '+teamName+'!');
- return {
-   title:getHeadline(row,players),
-   summary:[...parts.slice(0,2),...(hrLead&&hr>=2?[parts.find(part=>part.includes('led the entire SSL')||part.includes('tied for the SSL lead'))].filter(Boolean):[]),...parts.filter(part=>part.includes('combined RBI-plus-runs contributions')),parts.at(-1)].join(' '),
-   detail:parts.join(' '),
-   stats:{gamesPlayed:row.gamesPlayed,teamWins:team.wins,teamLosses:team.losses,
-     teamRuns:team.scored,playerRuns:runs,rbi,homeRuns:hr,hits,atBats,outs,
-     pitchingStrikeouts:strikeouts,earnedRuns,putouts,assists},
+ return {title,summary,detail:details.join(' '),
+  standouts,qualifyingCategories:categories.map(category=>category.key),
+  featuredCategory:categories[0]?.key||'all-around',
+  stats:{gamesPlayed:row.gamesPlayed,teamWins:team.wins,teamLosses:team.losses,
+   teamRuns:team.scored,playerRuns:runs,rbi,homeRuns:hr,
+   hits:num(s.hits),atBats:num(s.atBats),outs:num(s.outs),
+   pitchingStrikeouts:num(s.pitchStrikeouts),earnedRuns:num(s.earnedRuns),
+   putouts:num(s.putouts),assists:num(s.assists)}
  };
 }
