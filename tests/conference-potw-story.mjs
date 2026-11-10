@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {gamePointsForReport} from '../src/game-points.js';
 import {potwLeaderboard,potwTeamGames} from '../src/player-of-the-week.js';
 import {conferencePotwStory} from '../src/conference-potw-story.js';
 const teams=[
@@ -39,6 +41,11 @@ assert.equal(potwTeamGames(season,2,'haliban').length,2);
 const award={roundNo:2,player:11,team:'haliban',teamName:'Moleville Haliban',
  awardTitle:'Supa Mario Player of the Week'};
 let story=conferencePotwStory(season,award);
+assert.equal(story.stats.totalGamePoints,row.stats.tgp,
+ 'TPG must be the actual exact two-game Game Points sum, not a rounded average');
+assert.equal(story.stats.totalGamePoints,Math.round(potwTeamGames(season,2,'haliban')
+ .map(game=>game.result.players.find(p=>p.team==='haliban'&&p.player===11))
+ .reduce((total,p)=>total+gamePointsForReport(p).tgp,0)*100)/100);
 assert.match(story.detail,/Moleville Haliban/);
 assert.match(story.detail,/0–2/);
 assert.match(story.detail,/4 home runs/);
@@ -191,3 +198,24 @@ assert(!fire.teaser.includes('pitching'),'Weak pitching cannot be praised in tea
 assert(fire.teaser.includes('home runs'),'Offense is represented in teaser');
 assert(fire.teaser.includes('Buddy Jump'),'Fielding is represented in teaser');
 console.log('PASS: compact two-game news teasers remain distinct from full modal articles.');
+
+
+// Confirm the production headliner uses the genuinely sharper originals and
+// puts the two-game TPG cell immediately below OGP/G on mobile.
+const ui=readFileSync(new URL('../src/ConferencePotwHeadliner.jsx',import.meta.url),'utf8');
+const css=readFileSync(new URL('../src/conference-potw.css',import.meta.url),'utf8');
+const trophyUrls=readFileSync(new URL('../src/player-of-the-week.js',import.meta.url),'utf8');
+assert.match(ui,/ssl-conf-potw-face/,'Dedicated face frame avoids the old portrait scaling');
+assert.match(ui,/size=\{70\}/,'Portrait sprite must match the face frame size');
+assert.match(ui,/ssl-conf-potw-total-stat/);
+assert.match(ui,/<span>TPG<\/span>/);
+assert.match(ui,/story\.stats\?\.totalGamePoints/);
+assert.match(css,/\.ssl-conf-potw-total-stat\{grid-column:2;grid-row:2\}/);
+assert.match(trophyUrls,/hires-330-20261110/,'Mobile must request fresh trophy assets');
+for(const name of ['supa-mario','mario-galaxy']){
+ const svg=readFileSync(new URL('../public/potw-'+name+'.svg',import.meta.url),'utf8');
+ assert.match(svg,/viewBox="0 0 330 408"/);
+ assert(svg.length>40000,'Original 330px trophy replaces 81px embedded thumbnail');
+ assert.match(svg,/data:image\/webp;base64,/);
+}
+console.log('PASS: exact two-game TPG, centered face framing, cache-busted high-resolution trophies, and TPG location.');
