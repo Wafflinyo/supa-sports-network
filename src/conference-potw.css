@@ -104,3 +104,20 @@
  .ssl-conf-potw-editorial h3{font-size:17px}
  .ssl-conf-potw-editorial>p,.ssl-conf-potw-editorial details p{font-size:11px}
 }
+
+/* Show the actual category-leading batting, pitching, or defensive box-score
+   numbers alongside AGP / OGP / DGP / PGP, never a fixed offense-only row. */
+.ssl-conf-potw-standouts{display:flex;flex-wrap:wrap;gap:6px;align-items:stretch}
+.ssl-conf-potw-standout{flex:1 1 auto;min-width:56px;display:flex;gap:5px;
+ justify-content:center;align-items:center;padding:6px 7px;
+ border:1px solid #ffdb7977;background:#07183099;border-radius:6px}
+.ssl-conf-potw-standout strong{color:#ffdf81;font:900 15px 'Barlow Condensed',Impact,sans-serif;
+ font-variant-numeric:tabular-nums;white-space:nowrap}
+.ssl-conf-potw-standout span{color:#e8ecf7;font:800 10px system-ui,sans-serif;
+ letter-spacing:.02em;white-space:nowrap}
+@media(max-width:750px){
+ .ssl-conf-potw-standouts{gap:4px}
+ .ssl-conf-potw-standout{min-width:42px;padding:5px 4px;gap:4px}
+ .ssl-conf-potw-standout strong{font-size:13px}
+ .ssl-conf-potw-standout span{font-size:9px}
+}
