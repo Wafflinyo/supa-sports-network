@@ -110,6 +110,9 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
     return [...groups.entries()]
       .filter(([,awards])=>awards.some(a=>a.conference==='supa')&&awards.some(a=>a.conference==='galaxy'))
       .sort((a,b)=>b[0]-a[0])
+      // Feature only the newest issued pair; older awards remain in the
+      // trophy cabinet instead of filling all five live news headline slides.
+      .slice(0,1)
       .map(([roundNo,awards])=>({id:'conference-potw-'+season?.id+'-'+roundNo,kind:'potw',roundNo,awards}));
   },[league?.potw?.conferenceAwards,season?.id]);
   const headlines=useMemo(()=>{
