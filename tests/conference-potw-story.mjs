@@ -59,3 +59,30 @@ story=conferencePotwStory(season,award);
 assert(!story.detail.includes('led the entire SSL'),'Only proven league leads should be claimed');
 assert(!story.detail.includes('tied for the SSL lead'),'Wario should not be called a league leader when another has 8');
 console.log('PASS: only two eligible games per player and team, correct Wario line and team record, truthful league-lead copy, no earlier/future games.');
+
+// A trophy and its editorial story stay with the award-winning team even
+// if the winner moves to another roster later in the season.
+season.rosters.haliban=[];
+season.rosters.galaxy.push(11);
+story=conferencePotwStory(season,award);
+assert.match(story.detail,/Moleville Haliban/);
+assert.match(story.detail,/4 home runs/);
+assert.match(story.detail,/9 runs/);
+assert.match(story.detail,/7-for-8/);
+assert.match(story.detail,/16 total runs/);
+
+// The other conference must receive its own story, not Wario's copy.
+for(const g of otherGames.filter(g=>g.stage==='final')){
+ g.result.players.push({team:'galaxy',player:2,stats:{outs:9,pitchStrikeouts:5,earnedRuns:1,
+   putouts:0,assists:2},itemScore:0,shutoutBonus:0});
+}
+const galaxyAward={roundNo:2,player:2,team:'galaxy',teamName:'Galaxy Knights',
+ awardTitle:'Mario Galaxy Player of the Week'};
+const galaxyStory=conferencePotwStory(season,galaxyAward);
+assert.match(galaxyStory.title,/strikeouts|pitching/i);
+assert.match(galaxyStory.detail,/5 batters/);
+assert.match(galaxyStory.detail,/Galaxy Knights/);
+assert(!galaxyStory.detail.includes('Moleville Haliban'));
+assert(!galaxyStory.detail.includes('7-for-8'));
+console.log('PASS: archived stories survive trades and the second conference gets a distinct, stat-led story.');
+
