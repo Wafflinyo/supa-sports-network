@@ -30,7 +30,6 @@ function awardedTeamRow(season,award){
 }
 
 const num=(value)=>Number(value)||0;
-const safe=(number)=>Number.isFinite(number)?number:0;
 const plural=(n,word)=>n===1?word:word+'s';
 const wordJoin=values=>values.length<2?values[0]||'':
  values.length===2?values.join(' and '):
@@ -74,7 +73,8 @@ function performanceCategories(row){
  const avg=ab>0?hits/ab:0;
  const offensiveStrength=Math.max(
   hr>=2?100+hr*9:hr?65:0,
-  rbi>=5?90+rbi*4:0,
+  hr>=1&&rbi>=3&&hits>=3?95+hr*5+rbi*2:0,
+  rbi>=4?85+rbi*4:0,
   hits>=5?85+hits*4:0,
   ab>=4&&avg>=.7?90+hits*3:0,
   runs>=4?75+runs*4:0,
@@ -90,7 +90,9 @@ function performanceCategories(row){
   defensiveTotal>=8?70+defensiveTotal*4:0,
   dgp>=20?70+dgp*1.6:0
  );
- const pitchingStrength=outs===0?0:Math.max(
+ // Even a few recorded outs are not worth praising when the player
+ // had a poor pitching outing or a nonpositive pitching Game Point total.
+ const pitchingStrength=outs<3||pgp<=0?0:Math.max(
   shutouts>=1?125+shutouts*15:0,
   combined>=1?115+combined*12:0,
   complete>=1?105+complete*12:0,
@@ -143,7 +145,7 @@ function performanceCategories(row){
   {key:'defense',strength:defensiveStrength,
    title:buddy>=2?name+"'s "+buddy+' Buddy Jump putouts headline defensive award':
      triplePlays?name+"'s triple-play heroics earn conference honors":
-     doublePlays>=2?name+"'s "+doublePlays+' double plays earn conference honors":
+     doublePlays>=2?name+"'s "+doublePlays+' double plays earn conference honors':
      name+"'s spectacular glove work earns conference honors",
    sentence:defenseFacts.length?'In the field, '+name+' contributed '+wordJoin(defenseFacts)+'.':'',
    standouts:[putouts&&highlight('PO',putouts),assists&&highlight('AST',assists),
@@ -152,7 +154,8 @@ function performanceCategories(row){
  ];
  // One or two home runs alone must not beat a genuinely exceptional pitcher or
  // fielder. Prefer the most notable supported two-game performance, not batting.
- return categories.filter(c=>c.strength>0&&c.sentence)
+ // The same independent quality threshold applies to every category.
+ return categories.filter(c=>c.strength>=85&&c.sentence)
    .sort((a,b)=>b.strength-a.strength||
      ['pitching','defense','offense'].indexOf(a.key)-['pitching','defense','offense'].indexOf(b.key));
 }
@@ -163,7 +166,7 @@ export function conferencePotwStory(season,award){
   summary:'The commissioner selected '+(potwPlayer(award.player)?.name||'this player')+
     ' of '+award.teamName+' for '+potwWeekLabel(award.roundNo)+'.',
   detail:'This award recognizes the player’s two-game performance in '+potwWeekLabel(award.roundNo)+'.',
-  standouts:[]
+  standouts:[],qualifyingCategories:[]
  };
  const players=twoGameAwardRows(season,award.roundNo).allPlayers;
  const played=potwTeamGames(season,award.roundNo,award.team);
@@ -185,12 +188,14 @@ export function conferencePotwStory(season,award){
  else opener=row.name+" put together a standout performance for "+teamName+".";
  const categories=performanceCategories(row);
  const categoryText=categories.map(category=>category.sentence);
+ const qualifying=new Set(categories.map(category=>category.key));
  const leagueClaims=[];
  // A "league lead" can only use the same two-week award data for all players.
- for(const [key,label] of [
-  ['homeRuns','home runs'],['pitchStrikeouts','pitching strikeouts'],
-  ['putouts','putouts'],['buddyJumpPutouts','Buddy Jump putouts']
+ for(const [key,label,category] of [
+  ['homeRuns','home runs','offense'],['pitchStrikeouts','pitching strikeouts','pitching'],
+  ['putouts','putouts','defense'],['buddyJumpPutouts','Buddy Jump putouts','defense']
  ]){
+  if(!qualifying.has(category))continue;
   const n=num(s[key]);
   const threshold=key==='homeRuns'?2:key==='pitchStrikeouts'?4:key==='putouts'?8:2;
   if(n<threshold)continue;
@@ -200,7 +205,7 @@ export function conferencePotwStory(season,award){
    ?'With '+n+' '+label+', '+row.name+' tied for the SSL lead over this two-game award window.'
    :'With '+n+' '+label+', '+row.name+' led the entire SSL over this same two-game award window.');
  }
- const contribution=rbi>=2&&runs>=1&&team.scored>0?
+ const contribution=qualifying.has('offense')&&rbi>=2&&runs>=1&&team.scored>0?
    'Those '+rbi+' RBI and '+runs+' runs scored add up to '+
    (rbi+runs)+' combined RBI-plus-runs contributions; '+teamName+
    ' scored '+team.scored+' total '+plural(team.scored,'run')+' over its last two games.':null;
@@ -209,13 +214,28 @@ export function conferencePotwStory(season,award){
   ...(contribution?[contribution]:[]),congratulation];
  // Lead with the category that actually made the player exceptional. An elite
  // pitcher or defender never has to wait behind routine batting numbers.
- const title=categories[0]?.title||row.name+' earns conference honors for a standout two-game stretch';
- const summaryCategories=categories.filter((category,index)=>index===0||category.strength>=85);
- const summary=[opener,...summaryCategories.slice(0,2).map(category=>category.sentence),
-  ...leagueClaims.slice(0,1),
-  ...(contribution?[contribution]:[]),congratulation].join(' ');
+ // Headline and summary represent every strong category, not just the best.
+ let title=categories[0]?.title||row.name+' earns conference honors for a standout two-game stretch';
+ if(categories.length>=3)title=row.name+"'s all-around brilliance earns conference honors";
+ else if(qualifying.has('offense')&&qualifying.has('defense'))
+   title=row.name+"'s bat and glove power conference honors";
+ else if(qualifying.has('pitching')&&qualifying.has('defense'))
+   title=row.name+"'s pitching and glove work earn conference honors";
+ else if(qualifying.has('offense')&&qualifying.has('pitching'))
+   title=row.name+"'s bat and arm power conference honors";
+ const summary=[opener,...categoryText,...leagueClaims.slice(0,2),
+   ...(contribution?[contribution]:[]),congratulation].join(' ');
+ // Alternate stat chips across all qualifying categories so a great batter
+ // AND fielder is visually credited for both, rather than just the bat.
+ const standouts=[];
+ for(let i=0;i<3&&standouts.length<6;i++){
+  for(const category of categories){
+   if(standouts.length>=6)break;
+   if(category.standouts[i])standouts.push(category.standouts[i]);
+  }
+ }
  return {title,summary,detail:details.join(' '),
-  standouts:categories.flatMap(c=>c.standouts.slice(0,3)).slice(0,5),
+  standouts,qualifyingCategories:categories.map(category=>category.key),
   featuredCategory:categories[0]?.key||'all-around',
   stats:{gamesPlayed:row.gamesPlayed,teamWins:team.wins,teamLosses:team.losses,
    teamRuns:team.scored,playerRuns:runs,rbi,homeRuns:hr,
