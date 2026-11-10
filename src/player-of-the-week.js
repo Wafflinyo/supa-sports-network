@@ -3,7 +3,7 @@ import pool from './players.json' with {type:'json'};
 
 const namedPlayers = new Map(pool.map(player => [Number(player.id),player]));
 
-export const potwTrophyUrl = (conference='supa') => import.meta.env.BASE_URL+(conference==='galaxy'?'potw-mario-galaxy.svg':'potw-supa-mario.svg');
+export const potwTrophyUrl = (conference='supa') => import.meta.env.BASE_URL+(conference==='galaxy'?'potw-mario-galaxy.svg':'potw-supa-mario.svg')+'?v=hires-330-20261110';
 export const potwConferenceName = conference => conference==='galaxy' ? 'Mario Galaxy Player of the Week' : 'Supa Mario Player of the Week';
 export const potwConferenceLabel = conference => conference==='galaxy' ? 'Mario Galaxy Conference' : 'Supa Mario Conference';
 export const potwPlayer = id => namedPlayers.get(Number(id));
