@@ -1,6 +1,7 @@
 import React,{useEffect,useMemo,useRef,useState} from 'react';
 import {Award,CheckCircle2,LockKeyhole,Search,Trophy,X} from 'lucide-react';
 import {PlayerPortrait} from './PlayerPortrait.jsx';
+import {trophiesForTeam,trophyCabinetTeams} from './trophy-cabinets.js';
 import {ConferenceMark} from './ConferenceMark.jsx';
 import {
   potwTrophyUrl,potwPlayer,potwWeekLabel,potwDate,potwRounds,potwLeaderboard,
@@ -184,10 +185,23 @@ export function PotwCommissioner({league:l}){
  </section>;
 }
 export function PotwTrophyCabinet({league:l}){
- const team=l.myTeam;
+ const commissioner=l.access?.role==='commissioner';
+ const mine=l.myTeam;
+ const [selectedTeam,setSelectedTeam]=useState('all');
  const [opened,setOpened]=useState(null);
  const triggerRef=useRef(null);
- const awards=(l.potw?.cabinet||[]).filter(a=>team&&String(a.team)===String(team.id));
+ const cabinet=l.potw?.cabinet||[];
+ const allTeams=useMemo(()=>trophyCabinetTeams(l.season?.teams||[],cabinet),
+   [l.season?.teams,l.potw?.cabinet]);
+ const chosenTeam=commissioner
+   ?allTeams.find(team=>String(team.id)===String(selectedTeam))
+   :mine;
+ const awards=trophiesForTeam(cabinet,chosenTeam?.id);
+ const totalAwards=allTeams.reduce((sum,team)=>sum+team.awards,0);
+ useEffect(()=>{
+   setSelectedTeam('all');
+   setOpened(null);
+ },[l.season?.id,commissioner]);
  useEffect(()=>{
   if(!opened)return;
   const onKey=e=>{if(e.key==='Escape')setOpened(null);};
@@ -197,25 +211,64 @@ export function PotwTrophyCabinet({league:l}){
  useEffect(()=>{
   if(!opened&&triggerRef.current){triggerRef.current.focus();triggerRef.current=null;}
  },[opened]);
+ const viewTeam=id=>{
+   triggerRef.current=null;
+   setOpened(null);
+   setSelectedTeam(String(id));
+ };
  return <section className="potw-cabinet panel">
    <div className="potw-cabinet-heading"><Trophy size={30}/><div>
      <span className="eyebrow dark">OFFICIAL SSL FRANCHISE HONORS</span>
-     <h2>TROPHY CABINET</h2>
-     <p>{team?.name||'Your franchise'} · {awards.length} conference award{awards.length===1?'':'s'}</p>
+     <h2>{commissioner?'ALL TEAM TROPHY CABINETS':'TROPHY CABINET'}</h2>
+     <p>{commissioner&&selectedTeam==='all'
+        ?allTeams.length+' franchises · '+totalAwards+' official conference awards across seasons'
+        :(chosenTeam?.name||'Your franchise')+' · '+awards.length+
+          ' conference award'+(awards.length===1?'':'s')}</p>
    </div></div>
-   {awards.length?<div className="potw-cabinet-grid">
-     {awards.map(a=><button type="button" key={a.id} className="potw-trophy-button"
-       aria-label={'View '+(a.awardTitle||potwConferenceName(a.conference))+' for '+potwPlayer(a.player)?.name}
-       onClick={e=>{triggerRef.current=e.currentTarget;setOpened(a);}}>
-       <ConferenceTrophy conference={a.conference}/>
-       <strong>{a.awardTitle||potwConferenceName(a.conference)}</strong>
-       <span>{potwWeekLabel(a.roundNo)} · {a.seasonName}</span>
-     </button>)}
-   </div>:<div className="potw-cabinet-empty">
-     <div className="potw-dual-trophies"><ConferenceTrophy conference="supa"/><ConferenceTrophy conference="galaxy"/></div>
-     <h3>YOUR CABINET IS READY</h3>
-     <p>Conference Players of the Week will appear after the commissioner issues both awards. Each trophy stays with the franchise that owned its player on the award date.</p>
+   {commissioner&&<div className="potw-cabinet-commissioner-nav">
+     <label htmlFor="commissioner-trophy-team">VIEW FRANCHISE CABINET
+       <select id="commissioner-trophy-team" value={selectedTeam}
+         onChange={e=>viewTeam(e.target.value)}>
+         <option value="all">All teams ({allTeams.length})</option>
+         {allTeams.map(team=><option key={team.id} value={String(team.id)}>
+           {team.name} ({team.awards})
+         </option>)}
+       </select>
+     </label>
+     {selectedTeam!=='all'&&<button type="button" className="outline-btn"
+       onClick={()=>viewTeam('all')}>BACK TO ALL TEAMS</button>}
    </div>}
+   {commissioner&&selectedTeam==='all'&&(
+     allTeams.length?<div className="potw-cabinet-team-overview" aria-label="All team trophy cabinets">
+       {allTeams.map(team=><button type="button" key={team.id}
+         className="potw-cabinet-team-button" onClick={()=>viewTeam(team.id)}
+         aria-label={'View '+team.name+' trophy cabinet, '+team.awards+' awards'}>
+         <span className="potw-cabinet-team-name">{team.name}</span>
+         <span className="potw-cabinet-team-awards">
+           <Trophy size={19} aria-hidden="true"/>
+           <strong>{team.awards}</strong>
+           <small>{team.awards===1?'TROPHY':'TROPHIES'}</small>
+         </span>
+         {!team.current&&<small className="potw-cabinet-archived">ARCHIVED FRANCHISE</small>}
+         <span className="potw-cabinet-team-open">VIEW CABINET ›</span>
+       </button>)}
+     </div>:<p className="potw-cabinet-empty">No league franchises are available yet.</p>
+   )}
+   {(!commissioner||selectedTeam!=='all')&&<>
+     {awards.length?<div className="potw-cabinet-grid">
+       {awards.map(a=><button type="button" key={a.id} className="potw-trophy-button"
+         aria-label={'View '+(a.awardTitle||potwConferenceName(a.conference))+' for '+potwPlayer(a.player)?.name}
+         onClick={e=>{triggerRef.current=e.currentTarget;setOpened(a);}}>
+         <ConferenceTrophy conference={a.conference}/>
+         <strong>{a.awardTitle||potwConferenceName(a.conference)}</strong>
+         <span>{potwWeekLabel(a.roundNo)} · {a.seasonName}</span>
+       </button>)}
+     </div>:<div className="potw-cabinet-empty">
+       <div className="potw-dual-trophies"><ConferenceTrophy conference="supa"/><ConferenceTrophy conference="galaxy"/></div>
+       <h3>{commissioner?'NO TROPHIES YET':'YOUR CABINET IS READY'}</h3>
+       <p>Conference Players of the Week will appear after the commissioner issues both awards. Each trophy stays with the franchise that owned its player on the award date.</p>
+     </div>}
+   </>}
    {opened&&<div className="potw-dialog-scrim" onMouseDown={e=>{if(e.target===e.currentTarget)setOpened(null);}}>
       <section className="potw-award-dialog" role="dialog" aria-modal="true" aria-labelledby="potw-award-detail-title">
         <button className="potw-dialog-close" type="button" aria-label="Close award details" onClick={()=>setOpened(null)}><X size={21}/></button>
