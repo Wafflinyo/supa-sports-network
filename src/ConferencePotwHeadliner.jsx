@@ -89,7 +89,7 @@ export default function ConferencePotwHeadliner({awards=[],season,onPlayerSelect
              <button type="button" className="ssl-conf-potw-portrait"
                aria-label={'View '+(player?.name||'player')+' profile'}
                onClick={()=>player&&onPlayerSelect?.(player)}>
-               <PlayerPortrait player={player} size={94} showHeat={false}/>
+               <span className="ssl-conf-potw-face"><PlayerPortrait player={player} size={70} showHeat={false}/></span>
              </button>
              <div className="ssl-conf-potw-player-info">
                <h2>{player?.name||'SSL Player'}</h2>
@@ -102,10 +102,13 @@ export default function ConferencePotwHeadliner({awards=[],season,onPlayerSelect
              <div className="ssl-conf-potw-major-stat">
                <span>AGP</span><strong>{score(a.metrics?.agp)}</strong>
              </div>
-             {featuredPoints.map(([label,key])=>
-               <div className="ssl-conf-potw-stat" key={key}>
+             {featuredPoints.map(([label,key],index)=>
+               <div className={'ssl-conf-potw-stat ssl-conf-potw-feature-'+index} key={key}>
                  <span>{label} / G</span><strong>{score(a.metrics?.[key])}</strong>
                </div>)}
+             <div className="ssl-conf-potw-total-stat" title="Total Game Points earned across these two award games">
+               <span>TPG</span><strong>{score(story.stats?.totalGamePoints)}</strong>
+             </div>
            </div>
            {!!story.standouts?.length&&<div className="ssl-conf-potw-standouts"
              aria-label="Outstanding stats from the two-game award period">
