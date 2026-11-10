@@ -3,7 +3,7 @@ import pool from './players.json';
 
 const namedPlayers = new Map(pool.map(player => [Number(player.id),player]));
 
-export const potwTrophyUrl = () => import.meta.env.BASE_URL+'ssl-potw-trophy.webp';
+export const potwTrophyUrl = () => import.meta.env.BASE_URL+'ssl-potw-trophy.svg';
 export const potwPlayer = id => namedPlayers.get(Number(id));
 export const potwWeekLabel = round => 'Weeks '+(2*round-1)+'/'+(2*round);
 export const potwDate = value => value ? new Intl.DateTimeFormat('en-US',{
