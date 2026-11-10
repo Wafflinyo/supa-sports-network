@@ -10,6 +10,7 @@ import {teamLogo} from './TeamIdentity.jsx';
 import {PlayerPortrait} from './PlayerPortrait.jsx';
 import {latestPreseasonChampionship} from './preseason-champion-feature.js';
 import {homepageHeadlineSlides} from './game-headlines.js';
+import {rollingHomepageHeadlines} from './home-headline-timeline.js';
 import HomeHeadliners from './HomeHeadliners.jsx';
 import HeadlineReadMore from './HeadlineReadMore.jsx';
 import './home-dashboard.css';
@@ -98,27 +99,12 @@ export default function HomeDashboard({league,go,newsItems=[],players=[],onPlaye
   const ranks=useMemo(()=>powerRankings(season),[season]);
   const table=useMemo(()=>standings(season),[season]);
   const championship=useMemo(()=>latestPreseasonChampionship(league?.seasons||[],players),[league?.seasons,players]);
-  // Two commissioner-issued conference awards share one full-width headliner.
-  // No unreleased nominee/poll data is ever promoted as a headline.
-  const officialAwardSlides=useMemo(()=>{
-    const groups=new Map();
-    for(const award of league?.potw?.conferenceAwards||[]){
-      const key=Number(award.roundNo);
-      if(!groups.has(key))groups.set(key,[]);
-      groups.get(key).push(award);
-    }
-    return [...groups.entries()]
-      .filter(([,awards])=>awards.some(a=>a.conference==='supa')&&awards.some(a=>a.conference==='galaxy'))
-      .sort((a,b)=>b[0]-a[0])
-      // Feature only the newest issued pair; older awards remain in the
-      // trophy cabinet instead of filling all five live news headline slides.
-      .slice(0,1)
-      .map(([roundNo,awards])=>({id:'conference-potw-'+season?.id+'-'+roundNo,kind:'potw',roundNo,awards}));
-  },[league?.potw?.conferenceAwards,season?.id]);
+  // Treat issued conference awards like other news: when newer game stories
+  // arrive, they move backwards through the five featured headline slots.
   const headlines=useMemo(()=>{
     const regular=homepageHeadlineSlides(championship,newsItems,season?.id,5,season,canPreviewHeadlines);
-    return [...officialAwardSlides,...regular].slice(0,5);
-  },[championship,newsItems,season,canPreviewHeadlines,officialAwardSlides]);
+    return rollingHomepageHeadlines(regular,league?.potw?.conferenceAwards||[],season?.id,5);
+  },[championship,newsItems,season,canPreviewHeadlines,league?.potw?.conferenceAwards]);
   const openGame=game=>go('Schedule',null,{focus:'game',gameId:game.id});
   const openStory=story=>{
     if(story.seasonId!=null&&String(story.seasonId)!==String(league?.season?.id))
