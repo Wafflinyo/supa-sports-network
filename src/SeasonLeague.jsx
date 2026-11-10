@@ -23,7 +23,7 @@ import {supportsStadiumVariant,matchupStadiumVariant} from './stadium-lighting.j
 import DraftChat from './DraftChat.jsx';
 import {heatingUpForSeason,HEATING_UP_THRESHOLD} from './heating-up.js';
 import {gamePointsForReport} from './game-points.js';
-import {PotwPublicBallots} from './PlayerOfTheWeek.jsx';
+
 import {effectiveGameLineup,gameLineupIsEditable,teamGameLineups,savedLineupLabel,gameLineupSubmissionStatus} from './roster-lineups.js';
 import {
   SeasonRuleControls,
@@ -2713,7 +2713,7 @@ export function SeasonPage({ page, league: l, section=null }) {
       ) : page === "Team Stats" ? (
         <TeamStats league={l} />
       ) : page === "Voting" ? (
-        <><PotwPublicBallots league={l}/><PublicBallots league={l} /></>
+        <PublicBallots league={l} />
       ) : page === "Draft Room" ? (
         <Draft league={l} />
       ) : page === "Trade Block" ? (
