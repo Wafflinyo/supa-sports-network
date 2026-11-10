@@ -1,4 +1,33 @@
-import {potwPlayer,potwTeamGames,potwLeaderboard,potwWeekLabel} from './player-of-the-week.js';
+import {potwPlayer,potwTeamGames,potwWindowGames,potwWeekLabel} from './player-of-the-week.js';
+import {aggregate} from './season-data.js';
+
+// Read historical Project Rio rows directly. Current rosters can change after
+// an award is issued; neither the recipient nor the original headline should
+// disappear because of a later trade.
+function twoGameAwardRows(season,roundNo){
+ const selected=new Set((season?.teams||[]).flatMap(team=>
+   potwTeamGames(season,roundNo,team.id).map(game=>String(game.id))));
+ const allGames=potwWindowGames(season,roundNo)
+   .filter(game=>selected.has(String(game.id)));
+ const allStats=aggregate({...season,games:allGames});
+ const allPlayers=Object.entries(allStats).map(([id,stats])=>({
+   id:Number(id),stats,name:potwPlayer(id)?.name||'Player '+id,
+   gamesPlayed:stats.gamesPlayed
+ }));
+ return {allPlayers,allGames};
+}
+function awardedTeamRow(season,award){
+ const games=potwTeamGames(season,award.roundNo,award.team).map(game=>({
+   ...game,result:{...game.result,players:(game.result?.players||[]).filter(p=>
+     String(p.team)===String(award.team)&&Number(p.player)===Number(award.player))}
+ }));
+ const stats=aggregate({...season,games})[award.player];
+ return stats?.gamesPlayed?{
+   id:Number(award.player),name:potwPlayer(award.player)?.name||'Player '+award.player,
+   stats,gamesPlayed:stats.gamesPlayed,team:award.team,
+   teamName:award.teamName
+ }:null;
+}
 
 const num=(value)=>Number(value)||0;
 const safe=(number)=>Number.isFinite(number)?number:0;
@@ -43,15 +72,14 @@ function getHeadline(row,leaders){
  return row.name+' earns conference honors for a standout two-game stretch';
 }
 export function conferencePotwStory(season,award){
- const row=potwLeaderboard(season,award.roundNo).find(r=>
-    Number(r.id)===Number(award.player)&&String(r.team)===String(award.team));
+ const row=awardedTeamRow(season,award);
  if(!row)return {
   title:(potwPlayer(award.player)?.name||'SSL player')+' receives '+(award.awardTitle||'conference Player of the Week'),
   summary:'The commissioner selected '+(potwPlayer(award.player)?.name||'this player')+
     ' of '+award.teamName+' for '+potwWeekLabel(award.roundNo)+'.',
   detail:'This award recognizes the player’s two-game performance in '+potwWeekLabel(award.roundNo)+'.'
  };
- const players=potwLeaderboard(season,award.roundNo);
+ const players=twoGameAwardRows(season,award.roundNo).allPlayers;
  const played=potwTeamGames(season,award.roundNo,award.team);
  const team=record(season,played,String(award.team));
  const s=row.stats,hr=num(s.homeRuns),rbi=num(s.rbi),runs=num(s.runs),
