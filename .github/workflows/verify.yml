@@ -23,6 +23,7 @@ jobs:
       - run: npm run build
         env:
           GITHUB_PAGES_BASE: /supa-sports-network/
+      - run: node tests/conference-potw-story.mjs
       - run: node tests/trade-block.mjs
       - run: node tests/stadiums.mjs
       - run: node tests/draft-stadium-state.mjs
