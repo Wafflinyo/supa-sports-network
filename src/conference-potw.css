@@ -86,3 +86,21 @@
  .ssl-conf-potw-portrait{width:48px;height:48px}
  .ssl-conf-potw-player-info p{font-size:10px}
 }
+
+/* Each conference winner gets an independent, data-grounded editorial recap. */
+.ssl-conf-potw-editorial{display:grid;gap:7px;align-self:start;padding:11px 12px;
+  border-radius:9px;border:1px solid #ffe49466;background:#081732b8}
+.ssl-conf-potw-editorial h3{font:900 clamp(17px,2.1vw,25px)/1.06 'Barlow Condensed',Impact,sans-serif;
+  margin:0;color:#ffe08c;text-wrap:balance}
+.ssl-conf-potw-editorial>p,.ssl-conf-potw-editorial details p{font:600 12px/1.55 system-ui,sans-serif;
+  margin:0;color:#f4f5fa}
+.ssl-conf-potw-editorial details{min-width:0}
+.ssl-conf-potw-editorial summary{color:#ffe08c;font:900 10px system-ui,sans-serif;
+  letter-spacing:.06em;cursor:pointer;padding:6px 0;text-decoration:underline;text-underline-offset:3px}
+.ssl-conf-potw-editorial details p{padding:8px 0 3px;border-top:1px solid #ffffff33}
+.ssl-conf-potw-editorial details[open] summary{margin-bottom:6px}
+@media(max-width:750px){
+ .ssl-conf-potw-editorial{padding:9px;gap:6px}
+ .ssl-conf-potw-editorial h3{font-size:17px}
+ .ssl-conf-potw-editorial>p,.ssl-conf-potw-editorial details p{font-size:11px}
+}
