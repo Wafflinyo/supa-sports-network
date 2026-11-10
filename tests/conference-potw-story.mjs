@@ -177,3 +177,17 @@ assert(fire.standouts.some(item=>item.label==='HR'&&item.value==='2'));
 assert(fire.standouts.some(item=>item.label==='PO'&&item.value==='11'));
 assert(fire.standouts.some(item=>item.label==='Buddy Jump'&&item.value==='2'));
 console.log('PASS: Fire Bro highlights both outstanding offense and defense while poor pitching is omitted entirely.');
+
+// The homepage teaser must be short, independently written, and different
+// from the full article. Opening the modal exposes all detail paragraphs.
+const compactWario=conferencePotwStory(season,award);
+assert(compactWario.teaser.length<170,'Short home teaser should fit both conference cards');
+assert.notEqual(compactWario.teaser,compactWario.summary);
+assert.notEqual(compactWario.teaser,compactWario.detail);
+assert(Array.isArray(compactWario.articleSections));
+assert(compactWario.articleSections.length>2);
+assert.equal(compactWario.articleSections.join(' '),compactWario.detail);
+assert(!fire.teaser.includes('pitching'),'Weak pitching cannot be praised in teaser');
+assert(fire.teaser.includes('home runs'),'Offense is represented in teaser');
+assert(fire.teaser.includes('Buddy Jump'),'Fielding is represented in teaser');
+console.log('PASS: compact two-game news teasers remain distinct from full modal articles.');
