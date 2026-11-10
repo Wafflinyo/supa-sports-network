@@ -23,6 +23,7 @@ import {supportsStadiumVariant,matchupStadiumVariant} from './stadium-lighting.j
 import DraftChat from './DraftChat.jsx';
 import {heatingUpForSeason,HEATING_UP_THRESHOLD} from './heating-up.js';
 import {gamePointsForReport} from './game-points.js';
+import {PotwPublicBallots} from './PlayerOfTheWeek.jsx';
 import {effectiveGameLineup,gameLineupIsEditable,teamGameLineups,savedLineupLabel,gameLineupSubmissionStatus} from './roster-lineups.js';
 import {
   SeasonRuleControls,
@@ -112,6 +113,7 @@ export function useSeasonLeague(supabase, access, publicSupabase = null) {
     [ballotVoters, setBallotVoters] = useState(null),
     [ballotVotersError, setBallotVotersError] = useState(""),
     [preseasonPrivateReports,setPreseasonPrivateReports] = useState([]),
+    [potw,setPotw] = useState({rounds:[],cabinet:[]}),
     [now, setNow] = useState(Date.now());
   const serverOffsetMs = useRef(0);
   // A signed-out viewer must never see private game reports retained in memory
@@ -182,6 +184,11 @@ export function useSeasonLeague(supabase, access, publicSupabase = null) {
     // Secure, commissioner-only roster. No account identities enter the public
     // season response; the server verifies current commissioner access.
     const targetSeason = selected || (r.data || [])[0]?.id;
+    if(targetSeason){
+      const awardResponse=await reader.rpc('ssl_potw_read',{target_season:targetSeason});
+      if(token!==refreshToken.current)return;
+      setPotw(!awardResponse.error&&awardResponse.data?awardResponse.data:{rounds:[],cabinet:[]});
+    }else setPotw({rounds:[],cabinet:[]});
     if (access.signedIn && access.role === "commissioner" && targetSeason) {
       const staged=await supabase.rpc('ssl_preseason_report_action',{
         target_season:targetSeason,target_match:null,operation:'list'});
@@ -305,6 +312,7 @@ export function useSeasonLeague(supabase, access, publicSupabase = null) {
     busy,
     ballotVoters,
     ballotVotersError,
+    potw,
     now,
     act,
     refresh,
@@ -2705,7 +2713,7 @@ export function SeasonPage({ page, league: l, section=null }) {
       ) : page === "Team Stats" ? (
         <TeamStats league={l} />
       ) : page === "Voting" ? (
-        <PublicBallots league={l} />
+        <><PotwPublicBallots league={l}/><PublicBallots league={l} /></>
       ) : page === "Draft Room" ? (
         <Draft league={l} />
       ) : page === "Trade Block" ? (

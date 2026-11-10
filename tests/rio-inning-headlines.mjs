@@ -97,7 +97,7 @@ for(const path of ['../src/season-data.js','../src/GameBoxScore.jsx','../src/gam
  if(path.endsWith('GameBoxScore.jsx'))assert.match(source,/SCORING BY INNING/);
  if(path.endsWith('game-box-score-data.js'))assert.match(source,/innings:game.result.innings/);
  if(path.endsWith('GameStoryEditor.jsx'))assert.match(source,/const calculated=inningScoringDrama/);
- if(path.endsWith('HomeDashboard.jsx'))assert.match(source,/5,season\)/);
+ if(path.endsWith('HomeDashboard.jsx'))assert.match(source,/5,season,canPreviewHeadlines\)/);
 }
 const migration=readFileSync(new URL('../supabase/migrations/20261104105000_ssl_rio_game_info_innings.sql',import.meta.url),'utf8');
 assert.match(migration,/ssl_validate_game_innings/);
