@@ -60,7 +60,7 @@ function strongerLead(row,others,key){
 }
 
 const ipString=outs=>Math.floor(outs/3)+'.'+(outs%3);
-const pointsString=n=>Number.isInteger(n)?String(n):n.toFixed(2).replace(/0+$/,'').replace(/\\.$/,'');
+const pointsString=n=>Number.isInteger(n)?String(n):n.toFixed(2).replace(/0+$/,'').replace(/[.]$/,'');
 const highlight=(label,value)=>({label,value:String(value)});
 function performanceCategories(row){
  const s=row.stats, name=row.name;
