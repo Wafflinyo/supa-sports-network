@@ -37,7 +37,7 @@ const main=readFileSync(new URL('../src/main.jsx',import.meta.url),'utf8');
 assert.match(main,/'Trophy Cabinets'/);
 assert.match(main,/commissionerTab==='Trophy Cabinets'\?<PotwTrophyCabinet/);
 assert.match(main,/gmToolsTab==='Trophy Cabinet'\?<PotwTrophyCabinet/,
- 'The GM's existing franchise-specific trophy cabinet remains available');
+ "The GM's existing franchise-specific trophy cabinet remains available");
 assert.match(source,/l\.access\?\.role==='commissioner'/);
 assert.match(source,/const chosenTeam=commissioner[\s\S]+?:mine;/,
  'Only commissioner may select a franchise; GM is restricted to l.myTeam');
