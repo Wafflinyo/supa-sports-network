@@ -95,3 +95,66 @@
  .potw-trophy-button .potw-trophy{height:145px}
 }
 @media(prefers-reduced-motion:reduce){.potw-trophy-button,.potw-trophy-button .potw-trophy{transition:none}}
+
+
+/* Commissioner-only overview: inspect each franchise's permanent award cabinet.
+   GM cabinets remain scoped to the GM's own team. */
+.potw-cabinet-commissioner-nav{
+ display:flex;justify-content:space-between;align-items:end;gap:12px;
+ margin:18px 0 12px;flex-wrap:wrap;
+}
+.potw-cabinet-commissioner-nav label{
+ display:grid;gap:7px;color:#173157;font:900 12px system-ui,sans-serif;
+ letter-spacing:.045em;min-width:min(100%,280px);
+}
+.potw-cabinet-commissioner-nav select{
+ width:100%;min-width:0;min-height:44px;border:1px solid #cad5e5;
+ border-radius:7px;padding:9px 12px;background:#fff;color:#152b4c;
+ font:700 14px system-ui,sans-serif;letter-spacing:0;
+}
+.potw-cabinet-team-overview{
+ display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));
+ gap:12px;margin-top:18px;
+}
+.potw-cabinet-team-button{
+ text-align:left;display:flex;flex-direction:column;gap:12px;
+ padding:17px 16px;min-height:151px;
+ background:linear-gradient(155deg,#fff,#f1f5fc);
+ border:1px solid #d8e2f0;border-radius:11px;color:#162e51;cursor:pointer;
+ transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;
+}
+.potw-cabinet-team-button:hover{
+ border-color:#c79c39;transform:translateY(-2px);
+ box-shadow:0 7px 18px #18365b19;
+}
+.potw-cabinet-team-button:focus-visible{
+ outline:3px solid #e0ad3e;outline-offset:2px;
+}
+.potw-cabinet-team-name{
+ font:900 19px/1.06 'Barlow Condensed',Impact,sans-serif;
+ overflow-wrap:anywhere;min-height:40px;
+}
+.potw-cabinet-team-awards{display:flex;align-items:center;gap:7px;color:#ad7924}
+.potw-cabinet-team-awards strong{
+ color:#162e51;font:900 24px/1 'Barlow Condensed',Impact,sans-serif;
+}
+.potw-cabinet-team-awards small{
+ color:#687890;font:800 10px system-ui,sans-serif;letter-spacing:.05em;
+}
+.potw-cabinet-team-open{
+ margin-top:auto;color:#213e75;font:900 11px system-ui,sans-serif;
+ letter-spacing:.05em;
+}
+.potw-cabinet-archived{color:#937021;font:800 10px system-ui,sans-serif}
+@media(max-width:600px){
+ .potw-cabinet-team-overview{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .potw-cabinet-team-button{padding:12px 10px;min-height:135px;gap:10px}
+ .potw-cabinet-team-name{font-size:18px;min-height:38px}
+ .potw-cabinet-commissioner-nav label{min-width:0;width:100%}
+}
+@media(max-width:355px){
+ .potw-cabinet-team-overview{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+ .potw-cabinet-team-button{transition:none}
+}
