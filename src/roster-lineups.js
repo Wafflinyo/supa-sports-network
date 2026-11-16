@@ -1,9 +1,36 @@
-import {validLineup} from './season-data.js';
+import {validLineup,positions,rosterOf} from './season-data.js';
 import {homeWeekBoard} from './home-dashboard-data.js';
+// Render a default lineup against current roster ownership. Trades preserve the
+// batting-order and defensive slots but leave departed players' positions OPEN.
+// Acquisitions are unassigned until the GM resubmits a complete default.
+export function defaultLineupRosterView(season,team){
+  const roster=rosterOf(season,team).map(Number);
+  const saved=season?.defaults?.[team];
+  const starters=positions.map((position,index)=>{
+    const entry=saved?.starters?.[index];
+    const player=entry?.player==null?null:Number(entry.player);
+    return {
+      player: player!=null&&roster.includes(player)?player:null,
+      position: entry?.position||position,
+    };
+  });
+  const assigned=new Set(starters.filter(p=>p.player!=null).map(p=>p.player));
+  const bench=[...new Set((saved?.bench||[]).map(Number))]
+    .filter(player=>roster.includes(player)&&!assigned.has(player));
+  const benchSet=new Set(bench);
+  const unassigned=roster.filter(player=>!assigned.has(player)&&!benchSet.has(player));
+  return {starters,bench,unassigned,valid:validLineup(season,team,saved)};
+}
 // All lineup editors use the SAME official defaults and scheduled-game storage.
 // No separate GM roster cache: changes saved here appear on the Schedule page.
 export function effectiveGameLineup(season,team,game){
-  return game?.lineups?.[team] || season?.defaults?.[team] || null;
+  const submitted=game?.lineups?.[team];
+  // Preserve the actual lineups played in historical completed games.
+  if(submitted&&(['final','recorded'].includes(game?.stage)||
+    validLineup(season,team,submitted)))return submitted;
+  const fallback=season?.defaults?.[team];
+  // Never show a stale post-trade default as an upcoming game's usable lineup.
+  return validLineup(season,team,fallback)?fallback:null;
 }
 export function gameLineupIsEditable(season,team,game){
   return Boolean(season?.schedulePublished &&
