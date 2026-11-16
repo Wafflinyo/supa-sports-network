@@ -24,7 +24,7 @@ import DraftChat from './DraftChat.jsx';
 import {heatingUpForSeason,HEATING_UP_THRESHOLD} from './heating-up.js';
 import {gamePointsForReport} from './game-points.js';
 
-import {effectiveGameLineup,gameLineupIsEditable,teamGameLineups,savedLineupLabel,gameLineupSubmissionStatus} from './roster-lineups.js';
+import {effectiveGameLineup,gameLineupIsEditable,teamGameLineups,savedLineupLabel,gameLineupSubmissionStatus,defaultLineupRosterView} from './roster-lineups.js';
 import {
   SeasonRuleControls,
   PublicBallots,
@@ -951,19 +951,18 @@ function LineupEditor({ league: l, team, game, onDone }) {
   const s = l.season,
     initial = game?.lineups?.[team] || s.defaults?.[team],
     roster = rosterOf(s, team),
-    [slots, setSlots] = useState(
-      positions.map(
-        (pos, i) => initial?.starters?.[i] || { player: "", position: pos },
-      ),
-    );
+    normalizedSlots = () => positions.map((pos,i)=>{
+      const saved=initial?.starters?.[i];
+      const player=saved?.player==null?null:Number(saved.player);
+      return {
+        player:player!=null&&roster.includes(player)?player:"",
+        position:saved?.position||pos,
+      };
+    }),
+    [slots, setSlots] = useState(normalizedSlots);
   useEffect(
-    () =>
-      setSlots(
-        positions.map(
-          (pos, i) => initial?.starters?.[i] || { player: "", position: pos },
-        ),
-      ),
-    [team, game?.id, JSON.stringify(initial)],
+    () => setSlots(normalizedSlots()),
+    [team, game?.id, JSON.stringify(initial), JSON.stringify(roster)],
   );
   const lineup = {
       starters: slots.map((x) => ({ ...x, player: Number(x.player) })),
@@ -994,7 +993,7 @@ function LineupEditor({ league: l, team, game, onDone }) {
           <select
             aria-label={`Batter ${i + 1}`}
             required
-            value={x.player}
+            value={x.player ?? ""}
             onChange={(e) =>
               setSlots((a) =>
                 a.map((v, j) =>
@@ -1010,7 +1009,7 @@ function LineupEditor({ league: l, team, game, onDone }) {
               </option>
             ))}
           </select>
-          <HeatMark playerId={x.player} inline/>
+          {x.player!==""&&x.player!=null&&<HeatMark playerId={x.player} inline/>}
           <select
             aria-label={`Position ${i + 1}`}
             value={x.position}
