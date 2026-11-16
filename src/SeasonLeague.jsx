@@ -1194,50 +1194,47 @@ function Teams({ league: l, initialTab='Franchises' }) {
       {[0, 1].map((col) => (
         <div key={col}>
           {teamsInLotteryOrder(s,s?.serverNow)
-            .filter((_, i) => i % 2 === col)
-            .map((t) => (
-              <details className="panel season-team" key={t.id}>
-                <summary>
-                  <span className="season-team-head">
-                    <span className="season-team-identity">
-                      {t.logoPath && (
-                        <img
-                          alt=""
-                          width="35"
-                          height="35"
-                          style={{ objectFit: "contain" }}
-                          src={teamLogo(l.supabase, t.logoPath)}
-                        />
-                      )}
-                      <span className="season-team-name">{t.name}</span>
+            .filter((_,i)=>i%2===col)
+            .map((t)=>{
+              const view=defaultLineupRosterView(s,t.id);
+              return (
+                <details className="panel season-team" key={t.id}>
+                  <summary>
+                    <span className="season-team-head">
+                      <span className="season-team-identity">
+                        {t.logoPath&&<img alt="" width="35" height="35"
+                          style={{objectFit:"contain"}} src={teamLogo(l.supabase,t.logoPath)}/>}
+                        <span className="season-team-name">{t.name}</span>
+                      </span>
+                      <span className="season-team-record" title="Overall regular-season wins and losses">
+                        RECORD · {records.get(t.id)?.wins??0}–{records.get(t.id)?.losses??0}
+                      </span>
                     </span>
-                    <span className="season-team-record" title="Overall regular-season wins and losses">RECORD · {records.get(t.id)?.wins ?? 0}–{records.get(t.id)?.losses ?? 0}</span>
-                  </span>
-                  <small>
-                    <ConferenceMark id={t.conference} size={29}/>{conferences[t.conference] || "Conference pending"} ·{" "}
-                    {rosterOf(s, t.id).length} players
-                  </small>
-                </summary>
-                {s.defaults[t.id]?.starters.map((p, i) => (
-                  <div className="roster-line" key={p.player}>
-                    <b>{i + 1}</b>
-                    <Player id={p.player} seasons={l.seasons}/>
-                    <span>{p.position}</span>
-                  </div>
-                ))}
-                <h4>BENCH / ROSTER</h4>
-                {rosterOf(s, t.id)
-                  .filter(
-                    (p) =>
-                      !s.defaults[t.id]?.starters.some((x) => x.player === p),
-                  )
-                  .map((p) => (
-                    <div key={p}>
-                      <Player id={p} seasons={l.seasons}/>
+                    <small><ConferenceMark id={t.conference} size={29}/>
+                      {conferences[t.conference]||"Conference pending"} · {rosterOf(s,t.id).length} players
+                      {" · "}{view.valid?"DEFAULT READY":"DEFAULT REQUIRED"}
+                    </small>
+                  </summary>
+                  {(s.defaults?.[t.id]?.starters?.length>0||rosterOf(s,t.id).length>=11)&&
+                    view.starters.map((entry,index)=>(
+                    <div className="roster-line" key={index}>
+                      <b>{index+1}</b>
+                      {entry.player==null?<strong>OPEN — SELECT PLAYER</strong>:
+                        <Player id={entry.player} seasons={l.seasons}/>}
+                      <span>{entry.position}</span>
                     </div>
                   ))}
-              </details>
-            ))}
+                  <h4>BENCH</h4>
+                  {view.bench.map(id=><div key={id}><Player id={id} seasons={l.seasons}/></div>)}
+                  {!!view.unassigned.length&&<>
+                    <h4>UNASSIGNED PLAYERS</h4>
+                    {view.unassigned.map(id=><div key={id}><Player id={id} seasons={l.seasons}/></div>)}
+                  </>}
+                  {!view.valid&&rosterOf(s,t.id).length>=11&&
+                    <p className="season-lineup-warning">Default lineup incomplete — the GM must save a new one.</p>}
+                </details>
+              );
+            })}
         </div>
       ))}
     </div>}
