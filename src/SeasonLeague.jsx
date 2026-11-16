@@ -1114,6 +1114,7 @@ export function RosterManager({ league: l, focus=null }) {
   const firstFixtureWeek=firstExpandedWeek(fixtureWeeks,g=>gameLineupIsEditable(s,team,g));
   const ready=fixtures.filter(g=>gameLineupIsEditable(s,team,g));
   const defaultLineup=s.defaults?.[team];
+  const defaultView=team?defaultLineupRosterView(s,team):null;
   return <>
     {l.access.role==='commissioner'&&<Box title="COMMISSIONER · ALL TEAM LINEUPS">
       <p>Select any franchise to edit its default lineup or one of its upcoming game lineups. Your changes use the same Schedule records as GM submissions.</p>
@@ -1130,10 +1131,12 @@ export function RosterManager({ league: l, focus=null }) {
       <div id="ssl-default-lineup" className="ssl-roster-notification-focus"><Box title="DEFAULT LINEUP">
         <p>This lineup is the fallback for every game until you submit a specific game lineup. Changes here do not overwrite a game lineup already submitted.</p>
         {roster.length<11?<p><strong>Draft or acquire at least 11 players before saving a default lineup.</strong></p>:<>
-          {hasDefault&&!editDefault&&<div className="roster-lineup-summary">
-            <h3>CURRENT DEFAULT BATTING ORDER</h3>
-            {defaultLineup.starters.map((p,i)=><p key={p.player}><strong>{i+1}.</strong> <Player id={p.player} seasons={l.seasons}/> · {p.position}</p>)}
-            <p><strong>Bench:</strong> {defaultLineup.bench.map(name).join(' · ')||'None'}</p>
+          {defaultLineup&&!editDefault&&<div className="roster-lineup-summary">
+            <h3>{hasDefault?"CURRENT DEFAULT BATTING ORDER":"DEFAULT LINEUP INCOMPLETE — UPDATE REQUIRED"}</h3>
+            {defaultView.starters.map((p,i)=><p key={i}><strong>{i+1}.</strong> {p.player==null?<strong>OPEN — SELECT PLAYER</strong>:<Player id={p.player} seasons={l.seasons}/>} · {p.position}</p>)}
+            <p><strong>Bench:</strong> {defaultView.bench.map(name).join(" · ")||"None"}</p>
+            {!!defaultView.unassigned.length&&<p><strong>Unassigned players:</strong> {defaultView.unassigned.map(name).join(" · ")}</p>}
+            {!hasDefault&&<p>Roster changes have left positions open. A new complete default lineup must be saved before it can be used.</p>}
           </div>}
           {!canEditDefault?<p>Default-lineup editing opens after the draft and closes during the offseason.</p>:<>
             <button type="button" className="outline-btn" onClick={()=>setEditDefault(v=>!v)} aria-expanded={editDefault}>{editDefault?'CANCEL DEFAULT LINEUP EDIT':l.access.role==='commissioner'?'EDIT TEAM DEFAULT LINEUP':'EDIT MY DEFAULT LINEUP'}</button>
