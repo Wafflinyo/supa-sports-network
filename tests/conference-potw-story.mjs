@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {gamePointsForReport} from '../src/game-points.js';
-import {potwLeaderboard,potwTeamGames} from '../src/player-of-the-week.js';
+import {potwLeaderboard,potwTeamGames,potwHeadlinerPointFields} from '../src/player-of-the-week.js';
 import {conferencePotwStory} from '../src/conference-potw-story.js';
 const teams=[
  {id:'haliban',name:'Moleville Haliban',conference:'supa'},
@@ -110,6 +110,11 @@ const pitcherSeason={
 };
 const ace=conferencePotwStory(pitcherSeason,galaxyAward);
 assert.equal(ace.featuredCategory,'pitching');
+assert.equal(ace.stats.hasPitched,true,'Actual pitching activity is recorded for the award period');
+assert(potwHeadlinerPointFields(ace,{pgp:14.51}).some(([,key])=>key==='pgp'),
+ 'Luigi-style two-way winners must display positive PGP/G even when pitching is not emphasized');
+assert(potwHeadlinerPointFields(ace,{pgp:0}).some(([,key])=>key==='pgp'),
+ 'A pitcher with exactly 0.00 PGP/G should still display the stat');
 assert.match(ace.title,/bat and arm/,'Both good hitting and pitching deserve the award title');
 assert.match(ace.summary,/On the mound/);
 assert.match(ace.summary,/6.0 innings/);
@@ -135,6 +140,12 @@ const fieldSeason={
 const fielder=conferencePotwStory(fieldSeason,{roundNo:2,player:10,team:'opposition',
  teamName:'Peach Gardens',awardTitle:'Supa Mario Player of the Week'});
 assert.equal(fielder.featuredCategory,'defense');
+assert.equal(fielder.stats.hasPitched,false,'A non-pitcher must not be mistaken for a pitcher');
+assert(!potwHeadlinerPointFields(fielder,{pgp:0}).some(([,key])=>key==='pgp'),
+ 'Boomerang Bro-style non-pitchers must not show 0.00 PGP/G');
+assert(potwHeadlinerPointFields({...fielder,stats:{...fielder.stats,hasPitched:true}},{pgp:14.51})
+ .some(([,key])=>key==='pgp'),
+ 'Pitching must show for a positive average even without a qualifying pitching headline');
 assert.match(fielder.title,/bat and glove/,'Both good batting and defense deserve the award title');
 assert.match(fielder.summary,/In the field/);
 assert.match(fielder.summary,/8 putouts/);
@@ -172,6 +183,9 @@ assert.match(fire.title,/Fire Bro.*bat and glove/);
 assert(fire.qualifyingCategories.includes('offense'));
 assert(fire.qualifyingCategories.includes('defense'));
 assert(!fire.qualifyingCategories.includes('pitching'));
+assert.equal(fire.stats.hasPitched,true,'A poor pitching appearance still counts as having pitched');
+assert(!potwHeadlinerPointFields(fire,{pgp:-3.87}).some(([,key])=>key==='pgp'),
+ 'Negative PGP/G must remain hidden even for a player who pitched');
 assert.match(fire.summary,/At the plate, Fire Bro/);
 assert.match(fire.summary,/In the field, Fire Bro/);
 assert.match(fire.summary,/2 home runs/);
@@ -209,8 +223,12 @@ assert.match(ui,/ssl-conf-potw-face/,'Dedicated face frame avoids the old portra
 assert.match(ui,/size=\{70\}/,'Portrait sprite must match the face frame size');
 assert.match(ui,/ssl-conf-potw-total-stat/);
 assert.match(ui,/<span>TPG<\/span>/);
+assert.match(ui,/potwHeadlinerPointFields\(story,a\.metrics\)/,
+ 'Headliner must use appearance-aware PGP/G visibility');
 assert.match(ui,/story\.stats\?\.totalGamePoints/);
 assert.match(css,/\.ssl-conf-potw-total-stat\{grid-column:2;grid-row:2\}/);
+assert.match(css,/\.ssl-conf-potw-feature-2\{grid-column:1 \/ -1;grid-row:3\}/,
+ 'Optional PGP/G cell must use its own mobile row');
 assert.match(trophyUrls,/hires-330-20261110/,'Mobile must request fresh trophy assets');
 for(const name of ['supa-mario','mario-galaxy']){
  const svg=readFileSync(new URL('../public/potw-'+name+'.svg',import.meta.url),'utf8');
