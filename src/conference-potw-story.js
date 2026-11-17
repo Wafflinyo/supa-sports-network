@@ -9,10 +9,8 @@ function twoGameAwardRows(season,roundNo){
  const ids=new Set(allGames.flatMap(game=>(game.result?.players||[])
    .map(p=>Number(p.player)).filter(Number.isInteger)));
  const allPlayers=[...ids].map(id=>{
-   const games=potwPlayerGames(season,roundNo,id).map(game=>({
-     ...game,result:{...game.result,players:(game.result?.players||[])
-       .filter(p=>Number(p.player)===id)}
-   }));
+   // Keep teammate pitching rows so shared shutouts remain correctly classified.
+   const games=potwPlayerGames(season,roundNo,id);
    const stats=aggregate({...season,games})[id];
    return stats?.gamesPlayed?{
      id,stats,name:potwPlayer(id)?.name||'Player '+id,
@@ -25,11 +23,8 @@ function awardedTeamRow(season,award){
  const games=potwPlayerGames(season,award.roundNo,award.player);
  const playerRows=games.flatMap(game=>(game.result?.players||[])
    .filter(p=>Number(p.player)===Number(award.player)));
- const filteredGames=games.map(game=>({
-   ...game,result:{...game.result,players:(game.result?.players||[])
-     .filter(p=>Number(p.player)===Number(award.player))}
- }));
- const stats=aggregate({...season,games:filteredGames})[award.player];
+ // Aggregate complete historical reports while selecting only this player's totals.
+ const stats=aggregate({...season,games})[award.player];
  return stats?.gamesPlayed?{
    id:Number(award.player),name:potwPlayer(award.player)?.name||'Player '+award.player,
    stats,gamesPlayed:stats.gamesPlayed,team:award.team,
