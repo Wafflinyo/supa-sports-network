@@ -1958,6 +1958,8 @@ function Trades({ league: l, messages = false, commissionerTools = false, view =
         <p>No season yet.</p>
       </Box>
     );
+  const tradePickAssets = (s.offseasonTrading || Number(s.tradePickSeason)===Number(s.number)) &&
+    Array.isArray(s.currentPickAssets) ? s.currentPickAssets : (s.pickAssets||[]);
   const tradeLimits = validateTradeLimits(s, participants, moves, team);
   const admin = l.access.role === "commissioner",
     can = admin || l.access.role === "gm",
@@ -1968,7 +1970,7 @@ function Trades({ league: l, messages = false, commissionerTools = false, view =
         : m.kind === "coin"
           ? 'Legacy coin transfer (retired)'
           : (() => {
-              const a = s.pickAssets.find((p) => p.id === m.id);
+              const a = tradePickAssets.find((p) => p.id === m.id);
               return `S${s.tradePickSeason || s.number + 1} · Round ${a?.round || "?"} · ${teamName(a?.originalTeam)}`;
             })(),
     showMoves = (body) => (
@@ -2094,7 +2096,7 @@ function Trades({ league: l, messages = false, commissionerTools = false, view =
                                 {name(id)}
                               </option>
                             ))
-                          : s.pickAssets
+                          : tradePickAssets
                               .filter((p) => p.owner === move.from)
                               .map((p) => (
                                 <option key={p.id} value={p.id}>
