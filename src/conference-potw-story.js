@@ -1,31 +1,40 @@
-import {potwPlayer,potwTeamGames,potwWindowGames,potwWeekLabel} from './player-of-the-week.js';
+import {potwPlayer,potwPlayerGames,potwTeamGames,potwWindowGames,potwWeekLabel} from './player-of-the-week.js';
 import {aggregate} from './season-data.js';
 
 // Read historical Project Rio rows directly. Current rosters can change after
 // an award is issued; neither the recipient nor the original headline should
 // disappear because of a later trade.
 function twoGameAwardRows(season,roundNo){
- const selected=new Set((season?.teams||[]).flatMap(team=>
-   potwTeamGames(season,roundNo,team.id).map(game=>String(game.id))));
- const allGames=potwWindowGames(season,roundNo)
-   .filter(game=>selected.has(String(game.id)));
- const allStats=aggregate({...season,games:allGames});
- const allPlayers=Object.entries(allStats).map(([id,stats])=>({
-   id:Number(id),stats,name:potwPlayer(id)?.name||'Player '+id,
-   gamesPlayed:stats.gamesPlayed
- }));
+ const allGames=potwWindowGames(season,roundNo);
+ const ids=new Set(allGames.flatMap(game=>(game.result?.players||[])
+   .map(p=>Number(p.player)).filter(Number.isInteger)));
+ const allPlayers=[...ids].map(id=>{
+   const games=potwPlayerGames(season,roundNo,id).map(game=>({
+     ...game,result:{...game.result,players:(game.result?.players||[])
+       .filter(p=>Number(p.player)===id)}
+   }));
+   const stats=aggregate({...season,games})[id];
+   return stats?.gamesPlayed?{
+     id,stats,name:potwPlayer(id)?.name||'Player '+id,
+     gamesPlayed:stats.gamesPlayed
+   }:null;
+ }).filter(Boolean);
  return {allPlayers,allGames};
 }
 function awardedTeamRow(season,award){
- const games=potwTeamGames(season,award.roundNo,award.team).map(game=>({
-   ...game,result:{...game.result,players:(game.result?.players||[]).filter(p=>
-     String(p.team)===String(award.team)&&Number(p.player)===Number(award.player))}
+ const games=potwPlayerGames(season,award.roundNo,award.player);
+ const playerRows=games.flatMap(game=>(game.result?.players||[])
+   .filter(p=>Number(p.player)===Number(award.player)));
+ const filteredGames=games.map(game=>({
+   ...game,result:{...game.result,players:(game.result?.players||[])
+     .filter(p=>Number(p.player)===Number(award.player))}
  }));
- const stats=aggregate({...season,games})[award.player];
+ const stats=aggregate({...season,games:filteredGames})[award.player];
  return stats?.gamesPlayed?{
    id:Number(award.player),name:potwPlayer(award.player)?.name||'Player '+award.player,
    stats,gamesPlayed:stats.gamesPlayed,team:award.team,
-   teamName:award.teamName
+   teamName:award.teamName,
+   teamsPlayed:[...new Set(playerRows.map(p=>p.team).filter(x=>x!=null).map(String))]
  }:null;
 }
 
@@ -177,8 +186,15 @@ export function conferencePotwStory(season,award){
  const teamName=award.teamName||row.teamName;
  const relevant=team.total===2?'the two-game stretch':'the award period';
  const recordText=team.total>0?team.wins+'–'+team.losses:'unrecorded';
+ const playedForOtherTeam=row.teamsPlayed.some(id=>id!==String(award.team));
+ const clubs=row.teamsPlayed.map(id=>
+   season?.teams?.find(t=>String(t.id)===id)?.name||'another SSL team');
  let opener;
- if(team.total===2 && team.wins===0)
+ if(playedForOtherTeam)
+   opener=row.name+' delivered a standout performance across '+
+     (row.gamesPlayed===2?'both games':'the award period')+' in '+
+     potwWeekLabel(award.roundNo)+', representing '+wordJoin(clubs)+'.';
+ else if(team.total===2 && team.wins===0)
    opener="Despite "+teamName+"'s 0–2 "+(Number(award.roundNo)===1?'start':'stretch')+
      ", "+row.name+" delivered an exceptional performance across its last two games.";
  else if(team.total===2 && team.wins===2)
@@ -207,7 +223,7 @@ export function conferencePotwStory(season,award){
    ?'With '+n+' '+label+', '+row.name+' tied for the SSL lead over this two-game award window.'
    :'With '+n+' '+label+', '+row.name+' led the entire SSL over this same two-game award window.');
  }
- const contribution=qualifying.has('offense')&&rbi>=2&&runs>=1&&team.scored>0?
+ const contribution=!playedForOtherTeam&&qualifying.has('offense')&&rbi>=2&&runs>=1&&team.scored>0?
    'Those '+rbi+' RBI and '+runs+' runs scored add up to '+
    (rbi+runs)+' combined RBI-plus-runs contributions; '+teamName+
    ' scored '+team.scored+' total '+plural(team.scored,'run')+' over its last two games.':null;
