@@ -64,26 +64,30 @@ export function potwTeamGames(season,roundNo,teamId){
  return potwWindowGames(season,roundNo).filter(g=>
   String(g.home)===String(teamId)||String(g.away)===String(teamId)).slice(-2);
 }
+// A player's two award games follow the player ID across franchise trades.
+// Current roster ownership decides the conference/team receiving the honor,
+// not which historical Project Rio performances count.
+export function potwPlayerGames(season,roundNo,playerId){
+ const id=Number(playerId);
+ return potwWindowGames(season,roundNo).filter(game=>
+   (game.result?.players||[]).some(p=>Number(p.player)===id)).slice(-2);
+}
 export function potwLeaderboard(season,roundNo){
  if(!season||!roundNo)return [];
- // Snapshot the team a player represents NOW; an old team does not receive
- // award credit for a player it traded before the commissioner submits.
- return (season.teams||[]).flatMap(team=>{
-   const games=potwTeamGames(season,roundNo,team.id);
-   if(!games.length)return [];
-   const teamGames=games.map(game=>({...game,result:{...game.result,
-     players:(game.result?.players||[]).filter(p=>String(p.team)===String(team.id))
-   }}));
-   const stats=aggregate({...season,games:teamGames});
-   return (season.rosters?.[team.id]||[]).map(id=>{
-     const st=stats[id];
-     if(!st?.gamesPlayed)return null;
+ return (season.teams||[]).flatMap(team=>
+   (season.rosters?.[team.id]||[]).map(id=>{
+     const games=potwPlayerGames(season,roundNo,id);
+     if(!games.length)return null;
+     const playerGames=games.map(game=>({...game,result:{...game.result,
+       players:(game.result?.players||[]).filter(p=>Number(p.player)===Number(id))
+     }}));
+     const stats=aggregate({...season,games:playerGames})[id];
+     if(!stats?.gamesPlayed)return null;
      const player=potwPlayer(id);
      return {id:Number(id),name:player?.name||'Player '+id,
        team:team.id,conference:team.conference,teamName:team.name,
-       stats:st,gamesPlayed:st.gamesPlayed,gameIds:games.map(g=>g.id)};
-   }).filter(Boolean);
- });
+       stats,gamesPlayed:stats.gamesPlayed,gameIds:games.map(game=>game.id)};
+   }).filter(Boolean));
 }
 
 export function potwStatValue(row,key,view){
