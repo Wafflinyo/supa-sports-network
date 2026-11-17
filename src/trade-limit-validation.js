@@ -4,7 +4,7 @@ export function validateTradeLimits(season, participants = [], moves = [], actin
   const issues = [];
   const projections = [];
   if (!season || participants.length < 2 || moves.length < 1) return {issues, projections};
-  const activeAssets = season.tradePickSeason === season.number && Array.isArray(season.currentPickAssets)
+  const activeAssets = (season.offseasonTrading || Number(season.tradePickSeason) === Number(season.number)) && Array.isArray(season.currentPickAssets)
     ? season.currentPickAssets
     : season.pickAssets || [];
   const teamNames = new Map((season.teams || []).map(t => [String(t.id), t.name]));
