@@ -11,6 +11,7 @@ import RioReportDialog from './RioReportDialog.jsx';
 import PreseasonStats from './PreseasonStats.jsx';
 import NextSeasonDraftPicks from './NextSeasonDraftPicks.jsx';
 import TradeBlockListings from './TradeBlockListings.jsx';
+import {validateTradeLimits} from './trade-limit-validation.js';
 import HistoryArchive from './HistoryArchive.jsx';
 import {preseasonReady} from './preseason.js';
 import {lotteryProgress,lotteryReplayProgress,lotteryDuration,lotteryCountdownClock} from './lottery-timing.js';
@@ -1933,11 +1934,13 @@ function Trades({ league: l, messages = false, commissionerTools = false, view =
       quantity: 1,
     }),
     [note, setNote] = useState(""),
-    [counter, setCounter] = useState(null);
+    [counter, setCounter] = useState(null),
+    [tradeError, setTradeError] = useState("");
   useEffect(() => {
     setParticipants(team ? [team] : []);
     setMoves([]);
     setCounter(null);
+    setTradeError("");
   }, [team, s?.id]);
   useEffect(()=>{
     if(!initialOffer||!s||team!==initialOffer.team)return;
@@ -1955,6 +1958,7 @@ function Trades({ league: l, messages = false, commissionerTools = false, view =
         <p>No season yet.</p>
       </Box>
     );
+  const tradeLimits = validateTradeLimits(s, participants, moves, team);
   const admin = l.access.role === "commissioner",
     can = admin || l.access.role === "gm",
     teamName = (id) => s.teams.find((t) => t.id === id)?.name || "Team",
@@ -2003,7 +2007,7 @@ function Trades({ league: l, messages = false, commissionerTools = false, view =
               <>
                 <p>
                   GMs can discuss and revise a proposal privately. All teams must accept the final terms before commissioner approval. Keep at least nine tradable next-season player picks. Without a retained Stadium, the team also receives a nontradable Stadium Pick (ten turns minimum); teams retaining a Stadium get no new Stadium Pick. Stadium Picks can never be traded.
-                  Rosters below 11 must be filled immediately after the trade.
+                  Every participating team must finish the trade with 11–14 characters and at least nine tradable next-season player picks.
                 </p>
                 <details className="trade-participants"><summary>PARTICIPATING TEAMS ({participants.length})</summary><div className="season-team-checks">
                   {teamsInLotteryOrder(s,s?.serverNow).map((t) => (
@@ -2146,19 +2150,36 @@ function Trades({ league: l, messages = false, commissionerTools = false, view =
                     onChange={(e) => setNote(e.target.value)}
                   />
                 </label>
+                {moves.length>0 && participants.length>=2 && <>
+                  <div className="trade-limit-preview" aria-label="Projected team totals after this trade">
+                    <strong>TEAM TOTALS AFTER THIS TRADE</strong>
+                    {tradeLimits.projections.map(p=>
+                      <p key={p.id}>{p.name}: {p.characters} characters · {p.picks} tradable next-season picks</p>)}
+                  </div>
+                  {tradeLimits.issues.length>0 && <div className="season-error trade-limit-errors" role="alert">
+                    <strong>THIS TRADE CANNOT BE SUBMITTED</strong>
+                    <ul>{tradeLimits.issues.map(error=><li key={error}>{error}</li>)}</ul>
+                  </div>}
+                </>}
+                {tradeError && <p className="season-error" role="alert">{tradeError}</p>}
                 {counter && (
                   <p>
-                    Editing proposal {counter.id.slice(0, 8)}. Saving new terms preserves the conversation and resets prior acceptances. Every team must review the revision.
+                    Editing proposal {counter.id.slice(0, 8)}. Saving new terms preserves the conversation and automatically accepts for the revising team. Every other team must accept the revision again.
                   </p>
                 )}
                 <button
                   className="red-btn"
-                  disabled={l.busy || participants.length < 2 || !moves.length}
+                  disabled={l.busy || participants.length < 2 || !moves.length || tradeLimits.issues.length>0}
                   onClick={async () => {
+                    if (tradeLimits.issues.length) {
+                      setTradeError('Correct the listed team limits before submitting this proposal.');
+                      return;
+                    }
+                    setTradeError('');
                     if (
                       await l.act(counter ? "edit_trade" : "submit_trade", counter
                         ? {offer:counter.id,expectedRevision:counter.revision,moves,note}
-                        : {team,teams:participants,moves,note})
+                        : {team,teams:participants,moves,note}, {onError:setTradeError})
                     ) {
                       setMoves([]);
                       setNote("");
