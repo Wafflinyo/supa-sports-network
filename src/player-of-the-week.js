@@ -78,10 +78,8 @@ export function potwLeaderboard(season,roundNo){
    (season.rosters?.[team.id]||[]).map(id=>{
      const games=potwPlayerGames(season,roundNo,id);
      if(!games.length)return null;
-     const playerGames=games.map(game=>({...game,result:{...game.result,
-       players:(game.result?.players||[]).filter(p=>Number(p.player)===Number(id))
-     }}));
-     const stats=aggregate({...season,games:playerGames})[id];
+     // Keep complete game reports: pitching shutout splits depend on teammates.
+     const stats=aggregate({...season,games})[id];
      if(!stats?.gamesPlayed)return null;
      const player=potwPlayer(id);
      return {id:Number(id),name:player?.name||'Player '+id,
