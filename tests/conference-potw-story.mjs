@@ -226,9 +226,12 @@ assert.match(ui,/<span>TPG<\/span>/);
 assert.match(ui,/potwHeadlinerPointFields\(story,a\.metrics\)/,
  'Headliner must use appearance-aware PGP/G visibility');
 assert.match(ui,/story\.stats\?\.totalGamePoints/);
-assert.match(css,/\.ssl-conf-potw-total-stat\{grid-column:2;grid-row:2\}/);
-assert.match(css,/\.ssl-conf-potw-feature-2\{grid-column:1 \/ -1;grid-row:3\}/,
- 'Optional PGP/G cell must use its own mobile row');
+assert.match(css,/\.ssl-conf-potw-total-stat\{grid-column:2;grid-row:2\}/,
+ 'Without pitching, TPG remains the last cell in the standard four-stat layout');
+assert.match(css,/\.ssl-conf-potw-feature-2\{grid-column:2;grid-row:2\}/,
+ 'PGP/G must sit beside DGP/G when it is displayed');
+assert.match(css,/\.ssl-conf-potw-averages:has\(\.ssl-conf-potw-feature-2\) \.ssl-conf-potw-total-stat\{\s*grid-column:1 \/ -1;grid-row:3;/,
+ 'When PGP/G is displayed, TPG must occupy the final full-width bottom row');
 assert.match(trophyUrls,/hires-330-20261110/,'Mobile must request fresh trophy assets');
 for(const name of ['supa-mario','mario-galaxy']){
  const svg=readFileSync(new URL('../public/potw-'+name+'.svg',import.meta.url),'utf8');
