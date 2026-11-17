@@ -4,12 +4,10 @@ import {X} from 'lucide-react';
 import {conferencePotwStory} from './conference-potw-story.js';
 import {ConferenceMark} from './ConferenceMark.jsx';
 import {PlayerPortrait} from './PlayerPortrait.jsx';
-import {potwDate,potwPlayer,potwTrophyUrl,potwWeekLabel,potwConferenceName} from './player-of-the-week.js';
+import {potwDate,potwPlayer,potwTrophyUrl,potwWeekLabel,potwConferenceName,potwHeadlinerPointFields} from './player-of-the-week.js';
 import './conference-potw.css';
 
 const score=n=>(Number(n)||0).toFixed(2);
-const pointCategories=[['OGP','ogp','offense'],['DGP','dgp','defense'],['PGP','pgp','pitching']];
-
 function AwardArticle({award,story,conference,onClose}){
  const closeButton=useRef(null);
  useEffect(()=>{
@@ -72,8 +70,7 @@ export default function ConferencePotwHeadliner({awards=[],season,onPlayerSelect
        {sides.map(([conference,a])=>{
          const player=potwPlayer(a.player);
          const story=conferencePotwStory(season,a);
-         const featuredPoints=pointCategories.filter(([,key,category])=>
-           story.qualifyingCategories?.includes(category));
+         const featuredPoints=potwHeadlinerPointFields(story,a.metrics);
          return <div key={conference}
            className={'ssl-conf-potw-side ssl-conf-potw-'+conference}>
            <div className="ssl-conf-potw-bg-mark" aria-hidden="true">
