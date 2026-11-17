@@ -29,6 +29,11 @@ function awardedTeamRow(season,award){
    id:Number(award.player),name:potwPlayer(award.player)?.name||'Player '+award.player,
    stats,gamesPlayed:stats.gamesPlayed,team:award.team,
    teamName:award.teamName,
+   // A player may pitch only one of the two games, or leave before recording an out.
+   // Position plus pitching activity distinguish a real 0.00 PGP/G from never pitching.
+   hasPitched:playerRows.some(p=>
+     (p.positions||[]).includes('P') ||
+     ['outs','pitches','battersFaced','zeroOutRemoval'].some(key=>Number(p.stats?.[key]||0)>0)),
    teamsPlayed:[...new Set(playerRows.map(p=>p.team).filter(x=>x!=null).map(String))]
  }:null;
 }
@@ -275,7 +280,8 @@ export function conferencePotwStory(season,award){
  return {title,summary,detail:details.join(' '),teaser,articleSections:details,
   standouts,qualifyingCategories:categories.map(category=>category.key),
   featuredCategory:categories[0]?.key||'all-around',
-  stats:{gamesPlayed:row.gamesPlayed,totalGamePoints:Number(row.stats.tgp||0),
+  stats:{gamesPlayed:row.gamesPlayed,hasPitched:row.hasPitched,
+   totalGamePoints:Number(row.stats.tgp||0),
    teamWins:team.wins,teamLosses:team.losses,
    teamRuns:team.scored,playerRuns:runs,rbi,homeRuns:hr,
    hits:num(s.hits),atBats:num(s.atBats),outs:num(s.outs),
