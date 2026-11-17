@@ -88,6 +88,16 @@ export function potwLeaderboard(season,roundNo){
    }).filter(Boolean));
 }
 
+// Award headliners should credit any nonnegative pitching contribution from
+// an actual pitching appearance, even when pitching isn't an editorial highlight.
+export function potwHeadlinerPointFields(story,metrics){
+ return [['OGP','ogp','offense'],['DGP','dgp','defense'],['PGP','pgp','pitching']]
+   .filter(([,key,category])=>category==='pitching'
+     ? Boolean(story?.stats?.hasPitched) && metrics?.pgp!=null &&
+       Number.isFinite(Number(metrics.pgp)) && Number(metrics.pgp)>=0
+     : Boolean(story?.qualifyingCategories?.includes(category)));
+}
+
 export function potwStatValue(row,key,view){
  if(key==='gamesPlayed')return row.gamesPlayed;
  const number=Number(row.stats?.[key]||0);
