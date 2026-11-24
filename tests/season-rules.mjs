@@ -7,6 +7,11 @@ export async function testSeasonRules(db) {
   // Earlier migration fixtures intentionally hold five contracts; the production database has no franchises yet.
   await db.query("update league_private.ssl_franchises set tokens=least(tokens,3)");
   await db.exec(fs.readFileSync("supabase/migrations/" + migration, "utf8"));
+  // This fixture predates the rename of the report wrapper to ssl_manage_before_stars.
+  await db.exec(
+    fs.readFileSync("supabase/migrations/20261124190000_ssl_lock_game_on_report_upload.sql", "utf8")
+      .replace("league_private.ssl_manage_before_stars(text,uuid,jsonb)", "league_private.ssl_manage(text,uuid,jsonb)"),
+  );
   await db.query(
     `select set_config('test.uid','11111111-1111-4111-8111-111111111111',false),set_config('test.access','{"role":"commissioner","slot":0}',false)`,
   );
@@ -214,8 +219,8 @@ export async function testSeasonRules(db) {
         lineups: {},
       },
     ],
-    defaults: { [a]: lineup(a), [b]: lineup(b) },
-    needsDefault: [],
+    defaults: { [a]: lineup(a) },
+    needsDefault: [a],
     schedulePublished: true,
   };
   await set(st);
@@ -231,6 +236,12 @@ export async function testSeasonRules(db) {
       })),
     ),
   };
+  await assert.rejects(
+    () => call("result", { game: gid, report: { ...report, fingerprint: "invalid" } }),
+    /Invalid report or player list/,
+  );
+  assert.equal((await get()).games[0].stage, "scheduled");
+  assert(!(await get()).games[0].lockedAt);
   await call("result", { game: gid, report });
   st = await get();
   assert.equal(st.games[0].stage, "recorded");
